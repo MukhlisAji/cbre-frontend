@@ -9,9 +9,10 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@mapbox/mapbox-gl-geocoder": "^5.0.2",
+    "mapbox-gl": "^2.9.2",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "mapbox-gl": "^2.9.2"
+    "react-dom": "^18.2.0"
   },
   "devDependencies": {
     "@types/react": "^18.0.27",
