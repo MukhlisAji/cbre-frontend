@@ -174,6 +174,16 @@ function App() {
     });
   });
 
+  const fetchApi = async() => {
+    const res = await fetch(`http://103.127.134.145:3000/map?lat=${lat}&lon=${lng}&zoom=${zoom}`)
+    const data = await res.json()
+    console.log(data)
+  }
+
+  useEffect(() => {
+fetchApi()
+  },[lng, lat, zoom])
+
   return (
     <div className="App">
       <div className="sidebar">
