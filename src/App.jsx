@@ -166,6 +166,31 @@ function App() {
           "line-width": 2
         }
       });
+
+      fetch('http://103.127.134.145:3000/map-mrt')
+      .then(response => response.json())
+      .then(data => {
+          const geojsonData = data.geojson;
+          console.log(geojsonData)
+          map.current.addSource('line', {
+            'type': 'geojson',
+            'data': geojsonData
+        });
+        map.current.addLayer({
+          id: 'line',
+          type: 'line',
+          source: 'line',
+          layout: {
+              'line-join': 'round',
+              'line-cap': 'round'
+          },
+          paint: {
+              'line-color': ['get', 'color'],
+              'line-width': 4
+          }
+      });
+      });
+
     });
   }, []);
 
