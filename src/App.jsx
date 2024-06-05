@@ -16,6 +16,9 @@ function App() {
   const [lng, setLng] = useState(data.geometry.coordinates[0][0]);
   const [lat, setLat] = useState(data.geometry.coordinates[0][1]);
   const [zoom, setZoom] = useState(9);
+  const [showMRT, setShowMRT] = useState(false)
+
+
 
 
   const fetchApi = async () => {
@@ -24,16 +27,42 @@ function App() {
     console.log(responseData)
     responseData.geojson.features.forEach((location) => {
       const marker = new mapboxgl.Marker()
-        .setLngLat([location.geometry.coordinates[0], location.geometry.coordinates[1]])
+        .setLngLat(location.geometry.coordinates)
         .addTo(map.current);
-      const popup = new mapboxgl.Popup()
-      marker.getElement().addEventListener('click', () => {
-        popup
-          .setHTML(`
-              <h3>${location.properties.BUILDINGNAME}</h3>
-            `)
-          .addTo(map.current);
-      });
+      const popup = new mapboxgl.Popup({ offset: 25 })
+        .setHTML(`
+        <div>
+        <h3>${location.properties.BUILDINGNAME}</h3>
+        <h4>${location.properties.BUILDINGADDRESS_POSTCODE}</h4>
+        <h5>${location.properties.BUILDINGSTREETNAME}</h5>
+        </div>`
+      );
+
+      marker.setPopup(popup);
+    });
+  }
+
+  const MRTLineData = async () => {
+    const res = await fetch('http://103.127.134.145:3000/map-transportation/line')
+    const responseData = await res.json()
+    const geoJson = responseData.geojson;
+    map.current.addSource('line', {
+      'type': 'geojson',
+      'data': geoJson
+    });
+    map.current.addLayer({
+      id: 'line',
+      type: 'line',
+      source: 'line',
+      layout: {
+        'line-join': 'round',
+        'line-cap': 'round'
+      },
+      paint: {
+        'line-color': ['get', 'color'],
+        'line-width': 4
+      }
+
     });
   }
 
@@ -56,6 +85,16 @@ function App() {
       })
     );
     fetchApi()
+
+    map.current.on('click', 'polygon-fill', (e) => {
+      const coordinates = e.lngLat;
+      const { title, description } = e.features[0].properties;
+
+      new mapboxgl.Popup()
+        .setLngLat(coordinates)
+        .setHTML(<p>${description}</p>)
+        .addTo(map.current);
+    });
 
     const geocoder = new MapboxGeocoder({
       accessToken: mapboxgl.accessToken,
@@ -142,16 +181,16 @@ function App() {
         },
       });
 
-      map.current.addLayer({
-        id: "polygon-fill",
-        type: "fill",
-        source: "polygon",
-        layout: {},
-        paint: {
-          "fill-color": "rgba(237, 64, 104, 1)",
-          "fill-opacity": 0.4,
-        },
-      });
+      // map.current.addLayer({
+      //   id: "polygon-fill",
+      //   type: "fill",
+      //   source: "polygon",
+      //   layout: {},
+      //   paint: {
+      //     "fill-color": "rgba(237, 64, 104, 1)",
+      //     "fill-opacity": 0.4,
+      //   },
+      // });
 
       map.current.addLayer({
         id: "line-layer",
@@ -166,8 +205,35 @@ function App() {
           "line-width": 2
         }
       });
+
+
+      // MRTLineData()
+      // fetch('http://103.127.134.145:3000/map-transportation/line')
+      // .then(response => response.json())
+      // .then(data => {
+      //     const geojsonData = data.geojson;
+      //     console.log(geojsonData)
+      //     map.current.addSource('line', {
+      //       'type': 'geojson',
+      //       'data': geojsonData
+      //   });
+      //   map.current.addLayer({
+      //     id: 'line',
+      //     type: 'line',
+      //     source: 'line',
+      //     layout: {
+      //         'line-join': 'round',
+      //         'line-cap': 'round'
+      //     },
+      //     paint: {
+      //         'line-color': ['get', 'color'],
+      //         'line-width': 4
+      //     }
+      // });
+      // });
     });
   }, []);
+
 
   useEffect(() => {
     if (!map.current) return; // wait for map to initialize
@@ -188,11 +254,32 @@ function App() {
   // fetchApi()
   //   },[lng, lat, zoom])
 
+  useEffect(() => {
+    if (showMRT) {
+      MRTLineData()
+    } else {
+      if (map.current.getLayer('line')) {
+        map.current.removeLayer('line');
+      }
+      if (map.current.getSource('line')) {
+        map.current.removeSource('line');
+      }
+    }
+
+  }, [showMRT])
   return (
 
     <div className="App">
       <div className="sidebar">
         Longitude: {lng} | Latitude: {lat} | Zoom: {zoom}
+      </div>
+
+      {/* Todo: Fix Style so it looks better */}
+      <div style={{ position: "absolute", bottom: "10px", right: "10px", backgroundColor: "gray", padding: "10px", color: "white", width: "200px", height: "200px", zIndex: 99999, cursor: "pointer" }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%', gap: '10px' }}>
+          <button onClick={() => setShowMRT(prev => !prev)}>{showMRT ? "Hide" : "Show"} Line</button>
+
+        </div>
       </div>
       <div ref={mapContainer} className="map-container" />
     </div>
