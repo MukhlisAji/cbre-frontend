@@ -194,7 +194,7 @@ function App() {
 
       
 
-      fetch('http://103.127.134.145:3000/map-mrt')
+      fetch('http://103.127.134.145:3000/map-transportation/line')
       .then(response => response.json())
       .then(data => {
           const geojsonData = data.geojson;
