@@ -16,7 +16,8 @@ function App() {
   const [lng, setLng] = useState(data.geometry.coordinates[0][0]);
   const [lat, setLat] = useState(data.geometry.coordinates[0][1]);
   const [zoom, setZoom] = useState(9);
-  const [showMRT, setShowMRT] = useState(false)
+  const [showMRT, setShowMRT] = useState(false);
+  const [dataJson, setDataJson] = useState([]);
 
 
 
@@ -24,7 +25,7 @@ function App() {
   const fetchApi = async () => {
     const res = await fetch(`http://103.127.134.145:3000/map`)
     const responseData = await res.json()
-    console.log(responseData)
+    setDataJson(responseData.geojson.features)
     responseData.geojson.features.forEach((location) => {
       const marker = new mapboxgl.Marker()
         .setLngLat(location.geometry.coordinates)
@@ -104,7 +105,10 @@ function App() {
     map.current.addControl(geocoder, 'top-left');
 
     geocoder.on('result', (e) => {
-      console.log('Input changed: result', e);
+      console.log('Input changed: result haha', e);
+      const marker = new mapboxgl.Marker()
+      marker.remove()
+      marker.off()
     });
 
     geocoder.on('results', async (e) => {
@@ -112,7 +116,11 @@ function App() {
       console.log('Input changed: results', e.query[0]);
       const res = await fetch(`http://103.127.134.145:3000/map?q=${e.query[0]}`)
       const responseData = await res.json()
-      map.current.setCenter([responseData.data?.[0].LONGITUDE, responseData.data?.[0].LATITUDE])
+      if(responseData.data.length === 0 && e.query[0].length > 0) {
+        alert('Not Found!')
+        return
+      }
+      map.current.setCenter([responseData.data?.[0]?.LONGITUDE, responseData.data?.[0]?.LATITUDE])
       map.current.setZoom(13)
 
 
@@ -267,6 +275,7 @@ function App() {
     }
 
   }, [showMRT])
+  
   return (
 
     <div className="App">
