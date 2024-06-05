@@ -8,47 +8,34 @@ import data from './utils/data.json'
 
 mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_KEY;
 
+
+
 function App() {
   const mapContainer = useRef(null);
   const map = useRef(null);
-  // const [lng, setLng] = useState(106.65555980845397);
   const [lng, setLng] = useState(data.geometry.coordinates[0][0]);
   const [lat, setLat] = useState(data.geometry.coordinates[0][1]);
-  // const [lat, setLat] = useState(-6.128988772162629);
   const [zoom, setZoom] = useState(9);
 
 
-  // const locations = [
-  //   { lng: 103.80824563734359, lat: 1.3537707416903118 },
-  //   { lng: 103.81933304621771, lat: 1.319257524554672 },
-  //   { lng: 103.77880321089287, lat: 1.308529466979948 },
-  //   { lng: 106.79788435814964, lat: -6.247180552811656 },
-  //   { lng: 98.67985320237807, lat: 3.5909641368311895 }
-  // ];
-
-  // const LineValue = {
-  //   type: "Feature",
-  //   geometry: {
-  //     coordinates: [
-  //       [
-  //         103.80824563734359, 1.3537707416903118
-  //       ],
-  //       [
-  //         103.81933304621771, 1.319257524554672
-  //       ],
-  //       [
-  //         103.77880321089287, 1.308529466979948
-  //       ],
-  //       [
-  //         106.79788435814964, -6.247180552811656
-  //       ],
-  //       [
-  //         98.67985320237807, 3.5909641368311895
-  //       ]
-  //     ],
-  //     type: "LineString"
-  //   }
-  // }
+  const fetchApi = async () => {
+    const res = await fetch(`http://103.127.134.145:3000/map`)
+    const responseData = await res.json()
+    console.log(responseData)
+    responseData.geojson.features.forEach((location) => {
+      const marker = new mapboxgl.Marker()
+        .setLngLat([location.geometry.coordinates[0], location.geometry.coordinates[1]])
+        .addTo(map.current);
+      const popup = new mapboxgl.Popup()
+      marker.getElement().addEventListener('click', () => {
+        popup
+          .setHTML(`
+              <h3>${location.properties.BUILDINGNAME}</h3>
+            `)
+          .addTo(map.current);
+      });
+    });
+  }
 
   useEffect(() => {
     if (map.current) return; // initialize map only once
@@ -68,6 +55,7 @@ function App() {
         trackUserLocation: true,
       })
     );
+    fetchApi()
 
     const geocoder = new MapboxGeocoder({
       accessToken: mapboxgl.accessToken,
@@ -75,6 +63,22 @@ function App() {
     });
 
     map.current.addControl(geocoder, 'top-left');
+
+    geocoder.on('result', (e) => {
+      console.log('Input changed: result', e);
+    });
+
+    geocoder.on('results', async (e) => {
+
+      console.log('Input changed: results', e.query[0]);
+      const res = await fetch(`http://103.127.134.145:3000/map?q=${e.query[0]}`)
+      const responseData = await res.json()
+      map.current.setCenter([responseData.data?.[0].LONGITUDE, responseData.data?.[0].LATITUDE])
+      map.current.setZoom(13)
+
+
+    });
+
 
     // Noted: Enable if want to use navigate
     // map.current.addControl(
@@ -84,15 +88,15 @@ function App() {
     //   "top-left"
     // );
 
-    data.geometry.coordinates.forEach((location) => {
-      new mapboxgl.Marker()
-        .setLngLat([location[0], location[1]])
-        .addTo(map.current);
-    });
-    
-      new mapboxgl.Marker()
-        .setLngLat([lng, lat])
-        .addTo(map.current);
+    // data.geometry.coordinates.forEach((location) => {
+    //   new mapboxgl.Marker()
+    //     .setLngLat([location[0], location[1]])
+    //     .addTo(map.current);
+    // });
+
+    // new mapboxgl.Marker()
+    //   .setLngLat([lng, lat])
+    //   .addTo(map.current);
     // // Add line layer
     // map.current.on("load", () => {
     //   map.current.addSource("line", {
@@ -174,17 +178,18 @@ function App() {
     });
   });
 
-  const fetchApi = async() => {
-    const res = await fetch(`http://103.127.134.145:3000/map?lat=${lat}&lon=${lng}&zoom=${zoom}`)
-    const data = await res.json()
-    console.log(data)
-  }
+  //   const fetchApi = async() => {
+  //     const res = await fetch(`http://103.127.134.145:3000/map?lat=${lat}&lon=${lng}&zoom=${zoom}`)
+  //     const data = await res.json()
+  //     console.log(data)
+  //   }
 
-  useEffect(() => {
-fetchApi()
-  },[lng, lat, zoom])
+  //   useEffect(() => {
+  // fetchApi()
+  //   },[lng, lat, zoom])
 
   return (
+
     <div className="App">
       <div className="sidebar">
         Longitude: {lng} | Latitude: {lat} | Zoom: {zoom}
