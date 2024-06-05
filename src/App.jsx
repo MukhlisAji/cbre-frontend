@@ -18,22 +18,37 @@ function App() {
   const [zoom, setZoom] = useState(9);
 
 
+  // const fetchApi = async () => {
+  //   const res = await fetch(`http://103.127.134.145:3000/map`)
+  //   const responseData = await res.json()
+  //   console.log(responseData)
+  //   responseData.geojson.features.forEach((location) => {
+  //     const marker = new mapboxgl.Marker()
+  //       .setLngLat([location.geometry.coordinates[0], location.geometry.coordinates[1]])
+  //       .addTo(map.current);
+  //     const popup = new mapboxgl.Popup()
+  //     marker.getElement().addEventListener('click', () => {
+  //       popup
+  //         .setHTML(`
+  //             <h3>${location.properties.BUILDINGNAME}</h3>
+  //           `)
+  //         .addTo(map.current);
+  //     });
+  //   });
+  // }
+
   const fetchApi = async () => {
     const res = await fetch(`http://103.127.134.145:3000/map`)
     const responseData = await res.json()
     console.log(responseData)
     responseData.geojson.features.forEach((location) => {
       const marker = new mapboxgl.Marker()
-        .setLngLat([location.geometry.coordinates[0], location.geometry.coordinates[1]])
-        .addTo(map.current);
-      const popup = new mapboxgl.Popup()
-      marker.getElement().addEventListener('click', () => {
-        popup
-          .setHTML(`
-              <h3>${location.properties.BUILDINGNAME}</h3>
-            `)
-          .addTo(map.current);
-      });
+      .setLngLat(location.geometry.coordinates)
+      .addTo(map.current);
+      const popup = new mapboxgl.Popup({ offset: 25 })
+          .setHTML(`<h3>` + location.properties.BUILDINGNAME + `</h3><br /><a href="#">Click here</a>`);
+
+      marker.setPopup(popup);
     });
   }
 
@@ -56,6 +71,16 @@ function App() {
       })
     );
     fetchApi()
+    
+    map.current.on('click', 'polygon-fill', (e) => {
+      const coordinates = e.lngLat;
+      const { title, description } = e.features[0].properties;
+  
+      new mapboxgl.Popup()
+          .setLngLat(coordinates)
+          .setHTML(<p>${description}</p>)
+          .addTo(map.current);
+  });
 
     const geocoder = new MapboxGeocoder({
       accessToken: mapboxgl.accessToken,
@@ -142,16 +167,16 @@ function App() {
         },
       });
 
-      map.current.addLayer({
-        id: "polygon-fill",
-        type: "fill",
-        source: "polygon",
-        layout: {},
-        paint: {
-          "fill-color": "rgba(237, 64, 104, 1)",
-          "fill-opacity": 0.4,
-        },
-      });
+      // map.current.addLayer({
+      //   id: "polygon-fill",
+      //   type: "fill",
+      //   source: "polygon",
+      //   layout: {},
+      //   paint: {
+      //     "fill-color": "rgba(237, 64, 104, 1)",
+      //     "fill-opacity": 0.4,
+      //   },
+      // });
 
       map.current.addLayer({
         id: "line-layer",
@@ -166,6 +191,8 @@ function App() {
           "line-width": 2
         }
       });
+
+      
 
       fetch('http://103.127.134.145:3000/map-mrt')
       .then(response => response.json())
@@ -193,6 +220,7 @@ function App() {
 
     });
   }, []);
+  
 
   useEffect(() => {
     if (!map.current) return; // wait for map to initialize
