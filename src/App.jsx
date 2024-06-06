@@ -4,6 +4,11 @@ import "mapbox-gl/dist/mapbox-gl.css";
 import { useEffect, useRef, useState } from "react";
 import "./App.css";
 import data from './utils/data.json';
+import IconLine from './assets/jalur.png'
+import NotFound from "./components/NotFound";
+import FilterLine from "./components/FilterLine";
+import SearchLocation from "./components/SearchLocation";
+import SearchList from "./components/SearchList";
 
 mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_KEY;
 
@@ -305,36 +310,18 @@ function App() {
   return (
 
     <div className="App">
+
+
+      <SearchLocation onSearchChange={handleSearch} />
+      {filteringData.length > 0 && <SearchList onClickAction={handleClick} filteringData={filteringData} />}
+      {!filteringData.length && search.length > 0 && <NotFound />}
+
+      {/* Todo: Fix Style so it looks better */}
+      <FilterLine onClickAction={() => setShowMRT(!showMRT)} />
       <div className="sidebar">
         Longitude: {lng} | Latitude: {lat} | Zoom: {zoom}
       </div>
 
-      <div style={{ position: "absolute", top: "10px", left: "10px", backgroundColor: "white", padding: "2px", color: "white", zIndex: 999, width: '300px', borderRadius: '5px' }}>
-        <input onChange={handleSearch} placeholder="Search Location" type="text" style={{ padding: '10px', outline: 'none', border: '1px solid rgba(0,0,0,.8)', width: '100%', borderRadius: '5px' }} />
-      </div>
-      {filteringData.length > 0 && <div style={{ position: 'absolute', top: "55px", left: "10px", backgroundColor: "white", padding: "2px", color: "white", zIndex: 999, width: '300px', height: 'max-content', maxHeight: '100px', overflow: 'auto', borderRadius: '5px', paddingInline: '5px' }}>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-
-          {filteringData.map((item, index) => (
-            <p onClick={() => handleClick(item.geometry.coordinates)} key={index} style={{ color: 'black', cursor: 'pointer' }}>
-              {item.properties.BUILDINGNAME}
-            </p>
-          ))}
-
-        </div>
-
-      </div>}
-      {!filteringData.length && search.length > 0 && <div style={{ position: 'absolute', top: "55px", left: "10px", backgroundColor: "white", padding: "2px", color: "white", zIndex: 999, width: '300px', height: '200px' , overflow: 'auto', borderRadius: '5px', paddingInline: '5px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <p style={{color: 'black'}}>Not Found</p>
-        </div>}
-
-      {/* Todo: Fix Style so it looks better */}
-      <div style={{ position: "absolute", bottom: "10px", right: "10px", backgroundColor: "gray", padding: "10px", color: "white", width: "200px", height: "200px", zIndex: 99999, cursor: "pointer" }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%', gap: '10px' }}>
-          <button onClick={() => setShowMRT(prev => !prev)}>{showMRT ? "Hide" : "Show"} Line</button>
-
-        </div>
-      </div>
       <div ref={mapContainer} className="map-container" />
     </div>
   );
