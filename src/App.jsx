@@ -43,6 +43,7 @@ function App() {
   const handleClick = (coordinate) => {
     map.current.setCenter(coordinate)
     map.current.setZoom(15)
+    console.log('ha')
   }
 
   const fetchApi = async () => {
