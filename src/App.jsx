@@ -1,10 +1,9 @@
-import mapboxgl from "mapbox-gl";
-import MapboxGeocoder from "@mapbox/mapbox-gl-geocoder";
-import { useEffect, useRef, useState } from "react";
-import "mapbox-gl/dist/mapbox-gl.css";
 import "@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css";
+import mapboxgl from "mapbox-gl";
+import "mapbox-gl/dist/mapbox-gl.css";
+import { useEffect, useRef, useState } from "react";
 import "./App.css";
-import data from './utils/data.json'
+import data from './utils/data.json';
 
 mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_KEY;
 
@@ -18,9 +17,28 @@ function App() {
   const [zoom, setZoom] = useState(9);
   const [showMRT, setShowMRT] = useState(false);
   const [dataJson, setDataJson] = useState([]);
+  const [filteringData, setFilteringData] = useState([])
+  const [search, setSearch] = useState('')
 
+  const handleSearch = (e) => {
+    setSearch(e?.target?.value)
+    const lowerSearch = e?.target?.value?.toLowerCase();
+    const filtering = dataJson?.filter((item) => {
+      const lowerTitle = item?.properties?.BUILDINGNAME?.toLowerCase();
 
+      return lowerTitle?.includes(lowerSearch)
+    })
+    setFilteringData(filtering)
+    if (e?.target?.value.length === 0) {
 
+      setFilteringData([])
+    }
+  }
+
+  const handleClick = (coordinate) => {
+    map.current.setCenter(coordinate)
+    map.current.setZoom(15)
+  }
 
   const fetchApi = async () => {
     const res = await fetch(`http://103.127.134.145:3000/map`)
@@ -37,7 +55,7 @@ function App() {
         <h4>${location.properties.BUILDINGADDRESS_POSTCODE}</h4>
         <h5>${location.properties.BUILDINGSTREETNAME}</h5>
         </div>`
-      );
+        );
 
       marker.setPopup(popup);
     });
@@ -97,34 +115,43 @@ function App() {
         .addTo(map.current);
     });
 
-    const geocoder = new MapboxGeocoder({
-      accessToken: mapboxgl.accessToken,
-      mapboxgl: mapboxgl,
-    });
+    //     const geocoder = new MapboxGeocoder({
+    //       accessToken: mapboxgl.accessToken,
+    //       mapboxgl: mapboxgl,
+    //     });
 
-    map.current.addControl(geocoder, 'top-left');
+    //     map.current.addControl(geocoder, 'top-left');
+    // console.log(dataJson)
+    //     geocoder.on('result', (e) => {
+    //       console.log('Input changed: result haha', e);
+    //      const findItem = dataJson.find((item) => item.geometry.coordinates == e.geometry.coordinates)
+    //      e?.geometry?.marker?.coordinates?.remove()
+    //      if(!findItem) {
+    //       alert("Not Found!")
+    //       return
+    //      }
 
-    geocoder.on('result', (e) => {
-      console.log('Input changed: result haha', e);
-      const marker = new mapboxgl.Marker()
-      marker.remove()
-      marker.off()
-    });
+    //       // const markerToRemove = prevMarkers.find(({ coordinates: coords }) => 
+    //       //   coords[0] === coordinates[0] && coords[1] === coordinates[1]);
+    //       // if (markerToRemove) {
+    //       //   markerToRemove.marker.remove();
+    //       // }
+    //     });
 
-    geocoder.on('results', async (e) => {
+    //     geocoder.on('results', async (e) => {
 
-      console.log('Input changed: results', e.query[0]);
-      const res = await fetch(`http://103.127.134.145:3000/map?q=${e.query[0]}`)
-      const responseData = await res.json()
-      if(responseData.data.length === 0 && e.query[0].length > 0) {
-        alert('Not Found!')
-        return
-      }
-      map.current.setCenter([responseData.data?.[0]?.LONGITUDE, responseData.data?.[0]?.LATITUDE])
-      map.current.setZoom(13)
+    //       console.log('Input changed: results', e.query[0]);
+    //       const res = await fetch(`http://103.127.134.145:3000/map?q=${e.query[0]}`)
+    //       const responseData = await res.json()
+    //       if(responseData.data.length === 0 && e.query[0].length > 0) {
+    //         alert('Not Found!')
+    //         return
+    //       }
+    //       map.current.setCenter([responseData.data?.[0]?.LONGITUDE, responseData.data?.[0]?.LATITUDE])
+    //       map.current.setZoom(13)
 
 
-    });
+    //     });
 
 
     // Noted: Enable if want to use navigate
@@ -275,13 +302,31 @@ function App() {
     }
 
   }, [showMRT])
-  
   return (
 
     <div className="App">
       <div className="sidebar">
         Longitude: {lng} | Latitude: {lat} | Zoom: {zoom}
       </div>
+
+      <div style={{ position: "absolute", top: "10px", left: "10px", backgroundColor: "white", padding: "2px", color: "white", zIndex: 999, width: '300px', borderRadius: '5px' }}>
+        <input onChange={handleSearch} placeholder="Search Location" type="text" style={{ padding: '10px', outline: 'none', border: '1px solid rgba(0,0,0,.8)', width: '100%', borderRadius: '5px' }} />
+      </div>
+      {filteringData.length > 0 && <div style={{ position: 'absolute', top: "55px", left: "10px", backgroundColor: "white", padding: "2px", color: "white", zIndex: 999, width: '300px', height: 'max-content', maxHeight: '100px', overflow: 'auto', borderRadius: '5px', paddingInline: '5px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+
+          {filteringData.map((item, index) => (
+            <p onClick={() => handleClick(item.geometry.coordinates)} key={index} style={{ color: 'black', cursor: 'pointer' }}>
+              {item.properties.BUILDINGNAME}
+            </p>
+          ))}
+
+        </div>
+
+      </div>}
+      {!filteringData.length && search.length > 0 && <div style={{ position: 'absolute', top: "55px", left: "10px", backgroundColor: "white", padding: "2px", color: "white", zIndex: 999, width: '300px', height: '200px' , overflow: 'auto', borderRadius: '5px', paddingInline: '5px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <p style={{color: 'black'}}>Not Found</p>
+        </div>}
 
       {/* Todo: Fix Style so it looks better */}
       <div style={{ position: "absolute", bottom: "10px", right: "10px", backgroundColor: "gray", padding: "10px", color: "white", width: "200px", height: "200px", zIndex: 99999, cursor: "pointer" }}>
