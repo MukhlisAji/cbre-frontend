@@ -3,12 +3,11 @@ import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { useEffect, useRef, useState } from "react";
 import "./App.css";
-import data from './utils/data.json';
-import IconLine from './assets/jalur.png'
-import NotFound from "./components/NotFound";
 import FilterLine from "./components/FilterLine";
-import SearchLocation from "./components/SearchLocation";
+import NotFound from "./components/NotFound";
 import SearchList from "./components/SearchList";
+import SearchLocation from "./components/SearchLocation";
+import data from './utils/data.json';
 
 mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_KEY;
 
@@ -33,6 +32,10 @@ function App() {
 
       return lowerTitle?.includes(lowerSearch)
     })
+    if (filteringData.length > 0) {
+      map.current.setCenter(filtering?.[0]?.geometry?.coordinates)
+      map.current.setZoom(15)
+    }
     setFilteringData(filtering)
     if (e?.target?.value.length === 0) {
 
@@ -91,6 +94,27 @@ function App() {
     });
   }
 
+  const MRTStationData = async () => {
+    const res = await fetch('http://103.127.134.145:3000/map-transportation/label')
+    const responseData = await res.json()
+    responseData?.geojson?.features?.forEach(station => {
+      // Buat elemen HTML untuk custom marker menggunakan SVG
+      const svg = `
+          <svg height="10" width="10" viewBox="0 0 24 24" fill="#030bfc">
+            <circle cx="12" cy="12" r="10" stroke="white" stroke-width="2" fill="#030bfc" />
+          </svg>
+        `;
+      const el = document.createElement('div');
+      el.innerHTML = svg;
+
+      // Tambahkan custom marker ke peta
+      new mapboxgl.Marker(el)
+        .setLngLat(station.geometry.coordinates)
+        .addTo(map.current);
+    });
+    console.log(responseData?.geojson)
+  }
+
   useEffect(() => {
     if (map.current) return; // initialize map only once
     map.current = new mapboxgl.Map({
@@ -110,6 +134,7 @@ function App() {
       })
     );
     fetchApi()
+    MRTStationData()
 
     map.current.on('click', 'polygon-fill', (e) => {
       const coordinates = e.lngLat;
