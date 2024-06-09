@@ -46,7 +46,6 @@ function App() {
   const handleClick = (coordinate) => {
     map.current.setCenter(coordinate)
     map.current.setZoom(15)
-    console.log('ha')
   }
 
   const fetchApi = async () => {
@@ -99,20 +98,33 @@ function App() {
     const responseData = await res.json()
     responseData?.geojson?.features?.forEach(station => {
       // Buat elemen HTML untuk custom marker menggunakan SVG
+      // const svg = `
+      //     <svg height="10" width="10" viewBox="0 0 24 24" fill="#030bfc">
+      //       <circle cx="12" cy="12" r="10" stroke="white" stroke-width="2" fill="#030bfc" />
+      //     </svg>
+      //   `;
       const svg = `
-          <svg height="10" width="10" viewBox="0 0 24 24" fill="#030bfc">
-            <circle cx="12" cy="12" r="10" stroke="white" stroke-width="2" fill="#030bfc" />
-          </svg>
+          <div style="width: 40px; background-color: #030bfc; border-radius: 5px; display: flex; align-items: center; justify-content: center; color:white">
+            ${station?.properties?.lines?.[0]}
+          </div>
         `;
       const el = document.createElement('div');
       el.innerHTML = svg;
+      const marker = new mapboxgl.Marker(el)
 
       // Tambahkan custom marker ke peta
-      new mapboxgl.Marker(el)
-        .setLngLat(station.geometry.coordinates)
+
+      marker.setLngLat(station.geometry.coordinates)
         .addTo(map.current);
+      const popup = new mapboxgl.Popup({ offset: 25 })
+        .setHTML(`
+        <div>
+      <h3>${station?.properties?.name}</h3>
+        </div>`
+        );
+
+      marker.setPopup(popup);
     });
-    console.log(responseData?.geojson)
   }
 
   useEffect(() => {
