@@ -18,7 +18,7 @@ function App() {
   const map = useRef(null);
   const [lng, setLng] = useState(data.geometry.coordinates[0][0]);
   const [lat, setLat] = useState(data.geometry.coordinates[0][1]);
-  const [zoom, setZoom] = useState(9);
+  const [zoom, setZoom] = useState(10);
   const [showMRT, setShowMRT] = useState(false);
   const [dataJson, setDataJson] = useState([]);
   const [filteringData, setFilteringData] = useState([])
@@ -112,6 +112,7 @@ function App() {
       el.innerHTML = svg;
       const marker = new mapboxgl.Marker(el)
 
+
       // Tambahkan custom marker ke peta
 
       marker.setLngLat(station.geometry.coordinates)
@@ -122,8 +123,12 @@ function App() {
       <h3>${station?.properties?.name}</h3>
         </div>`
         );
+      if (zoom < 11) {
+        marker.remove()
+      }
 
       marker.setPopup(popup);
+
     });
   }
 
@@ -146,7 +151,7 @@ function App() {
       })
     );
     fetchApi()
-    MRTStationData()
+    // MRTStationData()
 
     map.current.on('click', 'polygon-fill', (e) => {
       const coordinates = e.lngLat;
@@ -333,7 +338,8 @@ function App() {
   //   },[lng, lat, zoom])
 
   useEffect(() => {
-    if (showMRT) {
+    MRTStationData()
+    if (zoom > 11) {
       MRTLineData()
     } else {
       if (map.current.getLayer('line')) {
@@ -344,7 +350,7 @@ function App() {
       }
     }
 
-  }, [showMRT])
+  }, [zoom])
   return (
 
     <div className="App">
