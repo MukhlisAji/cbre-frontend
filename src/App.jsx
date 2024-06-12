@@ -96,7 +96,7 @@ function App() {
   const MRTStationData = async () => {
     const res = await fetch('http://103.127.134.145:3000/map-transportation/label')
     const responseData = await res.json()
-    responseData?.geojson?.features?.forEach(station => {
+    responseData?.geojson?.features?.forEach((station, i) => {
       // Buat elemen HTML untuk custom marker menggunakan SVG
       // const svg = `
       //     <svg height="10" width="10" viewBox="0 0 24 24" fill="#030bfc">
@@ -104,7 +104,7 @@ function App() {
       //     </svg>
       //   `;
       const svg = `
-          <div style="width: 40px; background-color: #030bfc; border-radius: 5px; display: flex; align-items: center; justify-content: center; color:white">
+          <div class="marker-testing" style="width: 40px; background-color: #030bfc; border-radius: 5px; display: flex; align-items: center; justify-content: center; color:white">
             ${station?.properties?.lines?.[0]}
           </div>
         `;
@@ -124,7 +124,10 @@ function App() {
         </div>`
         );
       if (zoom < 11) {
-        marker.remove()
+        const markerLabel = document.querySelectorAll(".marker-testing")
+        markerLabel.forEach((item) => {
+          item.style.display = "none"
+        })
       }
 
       marker.setPopup(popup);
@@ -315,6 +318,13 @@ function App() {
       // });
       // });
     });
+    map.current.on('zoom', () => {
+      const currentZoom = map.current.getZoom().toFixed(2);
+      const markerLabels = document.querySelectorAll(".marker-testing");
+      markerLabels.forEach((item) => {
+        item.style.display = currentZoom < 11 ? "none" : "flex";
+      });
+    });
   }, []);
 
 
@@ -338,8 +348,14 @@ function App() {
   //   },[lng, lat, zoom])
 
   useEffect(() => {
-    MRTStationData()
     if (zoom > 11) {
+      MRTStationData()
+    }
+
+  }, [zoom])
+
+  useEffect(() => {
+    if (showMRT) {
       MRTLineData()
     } else {
       if (map.current.getLayer('line')) {
@@ -349,8 +365,8 @@ function App() {
         map.current.removeSource('line');
       }
     }
+  }, [showMRT])
 
-  }, [zoom])
   return (
 
     <div className="App">
