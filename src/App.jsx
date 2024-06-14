@@ -24,6 +24,35 @@ function App() {
   const [filteringData, setFilteringData] = useState([])
   const [search, setSearch] = useState('')
 
+  const colorMap = {
+    NE: "#9900aa",
+    DT: "#005ec4",
+    NS: "#d42e12",
+    CC: "#fa9e0d",
+    CE: "#fa9e0d",
+    EW: "#009645",
+    CG: "#009645",
+    TE: "#9d5b25",
+    BP: "#748477",
+    SE: "#748477",
+    SW: "#748477",
+    PE: "#748477",
+    PW: "#748477",
+    PTC: "#748477",
+    STC: "#748477"
+  };
+
+  const colorArray = Object.entries(colorMap);
+
+  function getColor(key) {
+    for (let [prefix, color] of colorArray) {
+      if (key.includes(prefix)) {
+        return color;
+      }
+    }
+    return null;
+  }
+
   const handleSearch = (e) => {
     setSearch(e?.target?.value)
     const lowerSearch = e?.target?.value?.toLowerCase();
@@ -96,7 +125,7 @@ function App() {
   const MRTStationData = async () => {
     const res = await fetch('http://103.127.134.145:3000/map-transportation/label')
     const responseData = await res.json()
-    responseData?.geojson?.features?.forEach((station, i) => {
+    responseData?.geojson?.features?.forEach((station) => {
       // Buat elemen HTML untuk custom marker menggunakan SVG
       // const svg = `
       //     <svg height="10" width="10" viewBox="0 0 24 24" fill="#030bfc">
@@ -104,14 +133,14 @@ function App() {
       //     </svg>
       //   `;
       const svg = `
-          <div class="marker-testing" style="width: 40px; background-color: #030bfc; border-radius: 5px; display: flex; align-items: center; justify-content: center; color:white">
+          <div class="marker-testing" style="padding: 2px 20px; background-color: ${getColor(station.properties.lines[0])}; border-radius: 15px; display: flex; align-items: center; justify-content: center; color:white">
             ${station?.properties?.lines?.[0]}
           </div>
         `;
       const el = document.createElement('div');
       el.innerHTML = svg;
       const marker = new mapboxgl.Marker(el)
-
+      // console.log(getColor(station.properties.lines[0]))
 
       // Tambahkan custom marker ke peta
 
