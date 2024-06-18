@@ -81,3 +81,8 @@ button {
 .pill .gray {
   background-color: #748477;
 }
+.marker-testing {
+  padding: 0.7px 12px !important;
+  border-radius: 5px !important;
+  height: 14px !important;
+}

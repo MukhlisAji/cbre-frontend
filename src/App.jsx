@@ -136,7 +136,7 @@ function App() {
       station?.properties?.lines?.forEach((item, index) => {
 
         const svg = `
-            <div class="marker-testing" style="padding: 2px 20px; background-color: ${getColor(item)}; border-radius: 15px; display: flex; align-items: center; justify-content: center; color:white;transform: translate(${index * 300}px, 0);">
+            <div class="marker-testing" style="background-color: ${getColor(item)}; display: flex; align-items: center; justify-content: center; color:white;transform: translate(${index * 300}px, 0);">
               ${item}
             </div>
           `;
