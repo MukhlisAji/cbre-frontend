@@ -132,34 +132,40 @@ function App() {
       //       <circle cx="12" cy="12" r="10" stroke="white" stroke-width="2" fill="#030bfc" />
       //     </svg>
       //   `;
-      const svg = `
-          <div class="marker-testing" style="padding: 2px 20px; background-color: ${getColor(station.properties.lines[0])}; border-radius: 15px; display: flex; align-items: center; justify-content: center; color:white">
-            ${station?.properties?.lines?.[0]}
-          </div>
-        `;
-      const el = document.createElement('div');
-      el.innerHTML = svg;
-      const marker = new mapboxgl.Marker(el)
-      // console.log(getColor(station.properties.lines[0]))
 
-      // Tambahkan custom marker ke peta
+      station?.properties?.lines?.forEach((item, index) => {
 
-      marker.setLngLat(station.geometry.coordinates)
-        .addTo(map.current);
-      const popup = new mapboxgl.Popup({ offset: 25 })
-        .setHTML(`
-        <div>
-      <h3>${station?.properties?.name}</h3>
-        </div>`
-        );
-      if (zoom < 11) {
-        const markerLabel = document.querySelectorAll(".marker-testing")
-        markerLabel.forEach((item) => {
-          item.style.display = "none"
-        })
-      }
+        const svg = `
+            <div class="marker-testing" style="padding: 2px 20px; background-color: ${getColor(item)}; border-radius: 15px; display: flex; align-items: center; justify-content: center; color:white;transform: translate(${index * 300}px, 0);">
+              ${item}
+            </div>
+          `;
+        const el = document.createElement('div');
+        el.innerHTML = svg;
+        const marker = new mapboxgl.Marker(el)
+        // console.log(getColor(station.properties.lines[0]))
 
-      marker.setPopup(popup);
+        // Tambahkan custom marker ke peta
+
+        marker.setLngLat(station.geometry.coordinates)
+          .addTo(map.current);
+
+
+        const popup = new mapboxgl.Popup({ offset: 25 })
+          .setHTML(`
+          <div>
+        <h3>${station?.properties?.name}</h3>
+          </div>`
+          );
+        if (zoom < 11) {
+          const markerLabel = document.querySelectorAll(".marker-testing")
+          markerLabel.forEach((item) => {
+            item.style.display = "none"
+          })
+        }
+
+        marker.setPopup(popup);
+      })
 
     });
   }
@@ -195,94 +201,6 @@ function App() {
         .addTo(map.current);
     });
 
-    //     const geocoder = new MapboxGeocoder({
-    //       accessToken: mapboxgl.accessToken,
-    //       mapboxgl: mapboxgl,
-    //     });
-
-    //     map.current.addControl(geocoder, 'top-left');
-    // console.log(dataJson)
-    //     geocoder.on('result', (e) => {
-    //       console.log('Input changed: result haha', e);
-    //      const findItem = dataJson.find((item) => item.geometry.coordinates == e.geometry.coordinates)
-    //      e?.geometry?.marker?.coordinates?.remove()
-    //      if(!findItem) {
-    //       alert("Not Found!")
-    //       return
-    //      }
-
-    //       // const markerToRemove = prevMarkers.find(({ coordinates: coords }) => 
-    //       //   coords[0] === coordinates[0] && coords[1] === coordinates[1]);
-    //       // if (markerToRemove) {
-    //       //   markerToRemove.marker.remove();
-    //       // }
-    //     });
-
-    //     geocoder.on('results', async (e) => {
-
-    //       console.log('Input changed: results', e.query[0]);
-    //       const res = await fetch(`http://103.127.134.145:3000/map?q=${e.query[0]}`)
-    //       const responseData = await res.json()
-    //       if(responseData.data.length === 0 && e.query[0].length > 0) {
-    //         alert('Not Found!')
-    //         return
-    //       }
-    //       map.current.setCenter([responseData.data?.[0]?.LONGITUDE, responseData.data?.[0]?.LATITUDE])
-    //       map.current.setZoom(13)
-
-
-    //     });
-
-
-    // Noted: Enable if want to use navigate
-    // map.current.addControl(
-    //   new MapboxDirections({
-    //     accessToken: mapboxgl.accessToken,
-    //   }),
-    //   "top-left"
-    // );
-
-    // data.geometry.coordinates.forEach((location) => {
-    //   new mapboxgl.Marker()
-    //     .setLngLat([location[0], location[1]])
-    //     .addTo(map.current);
-    // });
-
-    // new mapboxgl.Marker()
-    //   .setLngLat([lng, lat])
-    //   .addTo(map.current);
-    // // Add line layer
-    // map.current.on("load", () => {
-    //   map.current.addSource("line", {
-    //     type: "geojson",
-    //     data
-    //   });
-
-    //   map.current.addLayer({
-    //     id: "polygon-fill",
-    //     type: "fill",
-    //     source: "polygon",
-    //     layout: {},
-    //     paint: {
-    //       "fill-color": "rgba(237, 64, 104, 1)",
-    //       "fill-opacity": 0.4,
-    //     },
-    //   });
-
-    //   map.current.addLayer({
-    //     id: "line-layer",
-    //     type: "line",
-    //     source: "line",
-    //     layout: {
-    //       "line-join": "round",
-    //       "line-cap": "round"
-    //     },
-    //     paint: {
-    //       "line-color": "#cc234a",
-    //       "line-width": 1
-    //     }
-    //   });
-    // });
 
     map.current.on("load", () => {
       map.current.addSource("polygon", {
@@ -296,16 +214,6 @@ function App() {
         },
       });
 
-      // map.current.addLayer({
-      //   id: "polygon-fill",
-      //   type: "fill",
-      //   source: "polygon",
-      //   layout: {},
-      //   paint: {
-      //     "fill-color": "rgba(237, 64, 104, 1)",
-      //     "fill-opacity": 0.4,
-      //   },
-      // });
 
       map.current.addLayer({
         id: "line-layer",
@@ -322,30 +230,6 @@ function App() {
       });
 
 
-      // MRTLineData()
-      // fetch('http://103.127.134.145:3000/map-transportation/line')
-      // .then(response => response.json())
-      // .then(data => {
-      //     const geojsonData = data.geojson;
-      //     console.log(geojsonData)
-      //     map.current.addSource('line', {
-      //       'type': 'geojson',
-      //       'data': geojsonData
-      //   });
-      //   map.current.addLayer({
-      //     id: 'line',
-      //     type: 'line',
-      //     source: 'line',
-      //     layout: {
-      //         'line-join': 'round',
-      //         'line-cap': 'round'
-      //     },
-      //     paint: {
-      //         'line-color': ['get', 'color'],
-      //         'line-width': 4
-      //     }
-      // });
-      // });
     });
     map.current.on('zoom', () => {
       const currentZoom = map.current.getZoom().toFixed(2);
@@ -366,15 +250,7 @@ function App() {
     });
   });
 
-  //   const fetchApi = async() => {
-  //     const res = await fetch(`http://103.127.134.145:3000/map?lat=${lat}&lon=${lng}&zoom=${zoom}`)
-  //     const data = await res.json()
-  //     console.log(data)
-  //   }
 
-  //   useEffect(() => {
-  // fetchApi()
-  //   },[lng, lat, zoom])
 
   useEffect(() => {
     if (zoom > 11) {
