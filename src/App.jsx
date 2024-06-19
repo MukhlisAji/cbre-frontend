@@ -42,6 +42,9 @@ function App() {
     STC: "#748477"
   };
 
+    const code2Color = (code) =>
+    colorMap[code.match(/[a-z]+/i)[0].toUpperCase()] || "gray";
+
   const colorArray = Object.entries(colorMap);
 
   function getColor(key) {
@@ -132,16 +135,37 @@ function App() {
       //       <circle cx="12" cy="12" r="10" stroke="white" stroke-width="2" fill="#030bfc" />
       //     </svg>
       //   `;
+      
+     
+      if(station.properties.lines){
+        // console.log(colorMap)
+        // console.log(station.properties.lines.filter(value => value))
+        const values = station.properties.lines.filter(value => value);
+        // const values = ["", "CE1", "DT16", "STC1"].filter(value => value);
+        let output = "";
 
-      station?.properties?.lines?.forEach((item, index) => {
-
-        const svg = `
-            <div class="marker-testing" style="background-color: ${getColor(item)}; display: flex; align-items: center; justify-content: center; color:white;transform: translate(${index * 300}px, 0);">
-              ${item}
-            </div>
-          `;
+        output += `<div style="font-family: sans-serif;font-weight: bold;font-size: 24px;border-radius: 10px/50%;overflow: hidden;word-spacing: -0.15em;white-space: nowrap;border: 1px solid #fff;">`;
+        values.forEach(value => {
+          const prefix = value.match(/^[A-Z]+/)[0];
+          const separated = value.replace(/([A-Z]+)(\d+)/, "$1 $2");
+          const color = colorMap[prefix] || "gray";
+          var colorCss = '';
+          switch(color) {
+            case 'purple': colorCss = 'background-color:#9900aa;'; break;
+            case 'blue': colorCss = 'background-color: #005ec4;'; break;
+            case 'red': colorCss = 'background-color: #d42e12;'; break;
+            case 'yellow': colorCss = 'background-color: #fa9e0d;color: #000;'; break;
+            case 'brown': colorCss = 'background-color: #9D5B25;'; break;
+            case 'gray': colorCss = 'background-color: #748477;'; break;
+          }
+          if (color) {
+            // output += <span class="${color}">${separated}</span>;
+            output += `<span style="padding: 0.3em;line-height: 1;${colorCss}">${separated}</span>`;
+          }
+        });
+        output += `</div>`;
         const el = document.createElement('div');
-        el.innerHTML = svg;
+        el.innerHTML = output;
         const marker = new mapboxgl.Marker(el)
         // console.log(getColor(station.properties.lines[0]))
 
@@ -149,23 +173,50 @@ function App() {
 
         marker.setLngLat(station.geometry.coordinates)
           .addTo(map.current);
+        
+
+        // const bigHTML = values
+        //   .map((v) =>
+        //     console.log(v.split("").join("-"))
+        //     console.log(code2Color)
+        //   )
+
+        //console.log(bigHTML);
+      }
+
+      // station?.properties?.lines?.forEach((item, index) => {
+      //  // console.log(item)
+      //   const svg = `
+      //       <div class="marker-testing" style="background-color: ${getColor(item)}; display: flex; align-items: center; justify-content: center; color:white;transform: translate(${index * 300}px, 0);">
+      //         ${item}
+      //       </div>
+      //     `;
+      //   const el = document.createElement('div');
+      //   el.innerHTML = svg;
+      //   const marker = new mapboxgl.Marker(el)
+      //   // console.log(getColor(station.properties.lines[0]))
+
+      //   // Tambahkan custom marker ke peta
+
+      //   marker.setLngLat(station.geometry.coordinates)
+      //     .addTo(map.current);
 
 
-        const popup = new mapboxgl.Popup({ offset: 25 })
-          .setHTML(`
-          <div>
-        <h3>${station?.properties?.name}</h3>
-          </div>`
-          );
-        if (zoom < 11) {
-          const markerLabel = document.querySelectorAll(".marker-testing")
-          markerLabel.forEach((item) => {
-            item.style.display = "none"
-          })
-        }
+      //   const popup = new mapboxgl.Popup({ offset: 25 })
+      //     .setHTML(`
+      //     <div>
+      //   <h3>${station?.properties?.name}</h3>
+      //     </div>`
+      //     );
+      //   if (zoom < 11) {
+      //     const markerLabel = document.querySelectorAll(".marker-testing")
+      //     markerLabel.forEach((item) => {
+      //       item.style.display = "none"
+      //     })
+      //   }
 
-        marker.setPopup(popup);
-      })
+      //   marker.setPopup(popup);
+      // })
 
     });
   }

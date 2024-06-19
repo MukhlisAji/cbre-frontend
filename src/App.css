@@ -86,3 +86,55 @@ button {
   border-radius: 5px !important;
   height: 14px !important;
 }
+
+
+.pill {
+			font-family: sans-serif;
+			font-weight: bold;
+			font-size: 24px;
+			border-radius: 10px/50%;
+			overflow: hidden;
+			word-spacing: -0.15em;
+			white-space: nowrap;
+			border: 1px solid #fff;
+		}
+		.pill.mini {
+			line-height: 0;
+		}
+		.pill,
+		.pill span {
+			display: inline-block;
+			color: #fff;
+		}
+		.pill span {
+			padding: 0.3em;
+			line-height: 1;
+		}
+		.pill span:first-child {
+			padding-left: 0.4em;
+		}
+		.pill span:last-child {
+			padding-right: 0.4em;
+		}
+		.pill .red {
+			background-color: #d42e12;
+		}
+		.pill .green {
+			background-color: #009645;
+		}
+		.pill .yellow {
+			background-color: #fa9e0d;
+			color: #000;
+		}
+		.pill .brown {
+			background-color: #9D5B25;
+		}
+		.pill .purple {
+			background-color: #9900aa;
+		}
+		.pill .blue {
+			background-color: #005ec4;
+		}
+		.pill .gray {
+			background-color: #748477;
+		}
