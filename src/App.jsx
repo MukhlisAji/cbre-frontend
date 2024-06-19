@@ -42,7 +42,7 @@ function App() {
     STC: "#748477"
   };
 
-    const code2Color = (code) =>
+  const code2Color = (code) =>
     colorMap[code.match(/[a-z]+/i)[0].toUpperCase()] || "gray";
 
   const colorArray = Object.entries(colorMap);
@@ -125,6 +125,30 @@ function App() {
     });
   }
 
+  const generateBackgroundColor = (color) => {
+    switch (color) {
+      case 'purple':
+        return '#9900aa';
+      case 'blue':
+        return ' #005ec4;';
+      case 'red':
+        return ' #d42e12;';
+      case 'yellow':
+        return ' #fa9e0d;';
+      case 'brown':
+        return ' #9D5B25;';
+      case 'gray':
+        return ' #748477;';
+    }
+  }
+
+  const generatedColor = (color) => {
+    if (color == '#fa9e0d') {
+      return "#000;"
+    }
+    return null
+  }
+
   const MRTStationData = async () => {
     const res = await fetch('http://103.127.134.145:3000/map-transportation/label')
     const responseData = await res.json()
@@ -135,45 +159,51 @@ function App() {
       //       <circle cx="12" cy="12" r="10" stroke="white" stroke-width="2" fill="#030bfc" />
       //     </svg>
       //   `;
-      
-     
-      if(station.properties.lines){
+
+
+      if (station.properties.lines) {
         // console.log(colorMap)
         // console.log(station.properties.lines.filter(value => value))
         const values = station.properties.lines.filter(value => value);
         // const values = ["", "CE1", "DT16", "STC1"].filter(value => value);
         let output = "";
 
-        output += `<div style="font-family: sans-serif;font-weight: bold;font-size: 24px;border-radius: 10px/50%;overflow: hidden;word-spacing: -0.15em;white-space: nowrap;border: 1px solid #fff;">`;
+        output += `<div class="tes" style="font-family: sans-serif;font-weight: bold;font-size: 12px;border-radius: 10px/50%;overflow: hidden;word-spacing: -0.15em;white-space: nowrap;">`;
         values.forEach(value => {
           const prefix = value.match(/^[A-Z]+/)[0];
           const separated = value.replace(/([A-Z]+)(\d+)/, "$1 $2");
           const color = colorMap[prefix] || "gray";
-          var colorCss = '';
-          switch(color) {
-            case 'purple': colorCss = 'background-color:#9900aa;'; break;
-            case 'blue': colorCss = 'background-color: #005ec4;'; break;
-            case 'red': colorCss = 'background-color: #d42e12;'; break;
-            case 'yellow': colorCss = 'background-color: #fa9e0d;color: #000;'; break;
-            case 'brown': colorCss = 'background-color: #9D5B25;'; break;
-            case 'gray': colorCss = 'background-color: #748477;'; break;
-          }
+
+
           if (color) {
             // output += <span class="${color}">${separated}</span>;
-            output += `<span style="padding: 0.3em;line-height: 1;${colorCss}">${separated}</span>`;
+            output += `<span class="${color}" style="padding: 0.1em 5px;line-height: 1; background-color: ${color}; color: ${generatedColor(color)}">${separated}</span>`;
           }
         });
         output += `</div>`;
         const el = document.createElement('div');
         el.innerHTML = output;
         const marker = new mapboxgl.Marker(el)
+
+        const name = document.createElement("p")
+        name.innerHTML = `<p style="font-size: 28px">${station.properties.BUILDINGNAME}</p>`
+        const markerName = new mapboxgl.Marker(name)
+        markerName.setLngLat(station.geometry.coordinates)
+        //     .addTo(map.current);
+        // if (zoom < 15) {
+        //   markerName.setLngLat(station.geometry.coordinates)
+        //     .addTo(map.current);
+        //   name.style.display = 'none'
+        // } else if (zoom >= 15) {
+        //   name.style.display = 'block'
+        // }
         // console.log(getColor(station.properties.lines[0]))
 
         // Tambahkan custom marker ke peta
 
         marker.setLngLat(station.geometry.coordinates)
           .addTo(map.current);
-        
+
 
         // const bigHTML = values
         //   .map((v) =>
