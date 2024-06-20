@@ -156,3 +156,18 @@ button {
 .gray {
   background-color: #748477 !important;
 }
+
+.marker-testing {
+  font-family: sans-serif;
+  font-weight: bold;
+  font-size: 12px;
+  border-radius: 100px !important;
+  overflow: hidden;
+  word-spacing: -0.15em;
+  white-space: nowrap;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: max-content;
+  height: max-content;
+}
