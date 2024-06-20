@@ -125,22 +125,6 @@ function App() {
     });
   }
 
-  const generateBackgroundColor = (color) => {
-    switch (color) {
-      case 'purple':
-        return '#9900aa';
-      case 'blue':
-        return ' #005ec4;';
-      case 'red':
-        return ' #d42e12;';
-      case 'yellow':
-        return ' #fa9e0d;';
-      case 'brown':
-        return ' #9D5B25;';
-      case 'gray':
-        return ' #748477;';
-    }
-  }
 
   const generatedColor = (color) => {
     if (color == '#fa9e0d') {
@@ -174,10 +158,7 @@ function App() {
 
 
       if (station.properties.lines) {
-        // console.log(colorMap)
-        // console.log(station.properties.lines.filter(value => value))
         const values = station.properties.lines.filter(value => value);
-        // const values = ["", "CE1", "DT16", "STC1"].filter(value => value);
         let output = "";
 
         output += `<div class="marker-testing" >`;
@@ -325,7 +306,7 @@ function App() {
     });
     map.current.on('zoom', () => {
       const currentZoom = map.current.getZoom().toFixed(2);
-      const markerLabels = document.querySelectorAll(".marker-testing");
+      const markerLabels = document.querySelectorAll(".tes");
       markerLabels.forEach((item) => {
         item.style.display = currentZoom < 11 ? "none" : "flex";
       });
