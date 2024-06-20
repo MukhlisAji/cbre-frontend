@@ -297,7 +297,7 @@ function App() {
       const currentZoom = map.current.getZoom().toFixed(2);
       const markerLabels = document.querySelectorAll(".tes");
       markerLabels.forEach((item) => {
-        item.style.display = currentZoom < 11 ? "none" : "flex";
+        item.style.display = currentZoom < 12 ? "none" : "flex";
       });
     });
   }, []);
@@ -315,7 +315,7 @@ function App() {
 
 
   useEffect(() => {
-    if (zoom > 11) {
+    if (zoom > 12) {
       MRTStationData()
     }
 
