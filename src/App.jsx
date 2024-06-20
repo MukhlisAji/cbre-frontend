@@ -133,6 +133,18 @@ function App() {
     return null
   }
 
+  const generatedRounded = (index, length) => {
+    if (index === 0 && length === 1) {
+      return "border-radius: 100px"
+    } else if (index === length - 1) {
+      return "border-top-right-radius: 100px; border-bottom-right-radius: 100px"
+    } else if (index === 1 && length === 3) {
+      return 'border-radius: 0px'
+    } else if (index === 0 && length === 3) {
+      return "border-top-left-radius: 100px; border-bottom-left-radius: 100px"
+    }
+  }
+
   const MRTStationData = async () => {
     const res = await fetch('http://103.127.134.145:3000/map-transportation/label')
     const responseData = await res.json()
@@ -143,22 +155,37 @@ function App() {
       //       <circle cx="12" cy="12" r="10" stroke="white" stroke-width="2" fill="#030bfc" />
       //     </svg>
       //   `;
+      const element = document.createElement('div');
+      element.innerHTML = `<div class="marker-name-testing" style="margin-top:30px">${station?.properties?.name}</div>`;
+      const markerNameLabel = new mapboxgl.Marker(element)
+      markerNameLabel.setLngLat(station.geometry.coordinates)
+        .addTo(map.current);
 
+      if (zoom < 15) {
+        const markerNameLabel = document.querySelectorAll(".marker-name-testing")
+        markerNameLabel.forEach((item) => {
+          item.style.display = "none"
+        })
+      } else if (zoom >= 15) {
+        const markerNameLabel = document.querySelectorAll(".marker-name-testing")
+        markerNameLabel.forEach((item) => {
+          item.style.display = "block"
+        })
+      }
 
       if (station.properties.lines) {
         const values = station.properties.lines.filter(value => value);
         let output = "";
 
-        output += `<div class="tes" style="font-family: sans-serif;font-weight: bold;font-size: 8px;border-radius: 10px/50%;overflow: hidden;word-spacing: -0.15em;white-space: nowrap;">`;
-        values.forEach(value => {
+        output += `<div class="marker-testing" >`;
+        values.forEach((value, index, array) => {
           const prefix = value.match(/^[A-Z]+/)[0];
           const separated = value.replace(/([A-Z]+)(\d+)/, "$1 $2");
           const color = colorMap[prefix] || "gray";
-
-
+          console.log({ index, array })
           if (color) {
             // output += <span class="${color}">${separated}</span>;
-            output += `<span class="${color}" style="padding: 0.1em 5px;line-height: 1; background-color: ${color}; color: ${generatedColor(color)}">${separated}</span>`;
+            output += `<span class="${color}" style="padding: 0.3em 5px;line-height: 1; background-color: ${color}; color: ${generatedColor(color)}; ${generatedRounded(index, array.length)};">${separated}</span>`;
           }
         });
         output += `</div>`;
@@ -219,12 +246,12 @@ function App() {
       //   <h3>${station?.properties?.name}</h3>
       //     </div>`
       //     );
-      //   if (zoom < 11) {
-      //     const markerLabel = document.querySelectorAll(".marker-testing")
-      //     markerLabel.forEach((item) => {
-      //       item.style.display = "none"
-      //     })
-      //   }
+      if (zoom < 11) {
+        const markerLabel = document.querySelectorAll(".marker-testing")
+        markerLabel.forEach((item) => {
+          item.style.display = "none"
+        })
+      }
 
       //   marker.setPopup(popup);
       // })
