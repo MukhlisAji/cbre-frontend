@@ -155,7 +155,23 @@ function App() {
       //       <circle cx="12" cy="12" r="10" stroke="white" stroke-width="2" fill="#030bfc" />
       //     </svg>
       //   `;
+      const element = document.createElement('div');
+      element.innerHTML = `<div class="marker-name-testing" style="margin-top:30px">${station?.properties?.name}</div>`;
+      const markerNameLabel = new mapboxgl.Marker(element)
+      markerNameLabel.setLngLat(station.geometry.coordinates)
+        .addTo(map.current);
 
+      if (zoom < 15) {
+        const markerNameLabel = document.querySelectorAll(".marker-name-testing")
+        markerNameLabel.forEach((item) => {
+          item.style.display = "none"
+        })
+      } else if (zoom >= 15) {
+        const markerNameLabel = document.querySelectorAll(".marker-name-testing")
+        markerNameLabel.forEach((item) => {
+          item.style.display = "block"
+        })
+      }
 
       if (station.properties.lines) {
         const values = station.properties.lines.filter(value => value);
