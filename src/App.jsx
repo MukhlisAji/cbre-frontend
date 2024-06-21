@@ -21,6 +21,7 @@ function App() {
   const [zoom, setZoom] = useState(10);
   const [showMRT, setShowMRT] = useState(false);
   const [dataJson, setDataJson] = useState([]);
+  const [dataRegionJson, setDataRegionJson] = useState([]);
   const [filteringData, setFilteringData] = useState([])
   const [search, setSearch] = useState('')
 
@@ -81,9 +82,45 @@ function App() {
   }
 
   const fetchApi = async () => {
-    const res = await fetch(`http://103.127.134.145:3000/map`)
+    const res = await fetch(`http://103.127.134.145:3000/map-region/SG04`)
     const responseData = await res.json()
     setDataJson(responseData.geojson.features)
+    if(responseData?.region?.POLYGON) {
+      var filterdata = [
+        {
+          "REGIONCODE": "SG03",
+          "REGIONNAME": "North West"
+        },
+        {
+          "REGIONCODE": "SG04",
+          "REGIONNAME": "South East"
+        },
+        {
+          "REGIONCODE": "SG05",
+          "REGIONNAME": "South West"
+        }
+      ]
+      
+      filterdata.forEach(function(d) {
+        const target = document.getElementById("filter");
+        target.innerHTML += "<button>" + d.REGIONNAME + "</button>";
+      });
+      setDataRegionJson(responseData.region.POLYGON)
+      map.current.addSource('sgregion', {
+        'type': 'geojson',
+        // 'data': 'http://localhost:4000/geojson/default.geojson'
+        'data': responseData.region.POLYGON
+      });
+      map.current.addLayer({
+        'id': 'region',
+        'type': 'fill',
+        'source': 'sgregion',
+        'paint': {
+          'fill-color': ['get', 'color'],
+                  'fill-opacity': 0.5
+        }
+      });
+    }
     responseData.geojson.features.forEach((location) => {
       const marker = new mapboxgl.Marker()
         .setLngLat(location.geometry.coordinates)
@@ -123,6 +160,19 @@ function App() {
       }
 
     });
+
+		
+		// Add click event listener to the map
+		map.on('click', 'region', function (e) {
+			var features = map.queryRenderedFeatures(e.point);
+			if (!features.length) {
+				return;
+			}
+			
+			var f = features[0];
+			$("#console-output").html(``);
+			$("#console-output").html(`> Hey, you're click on -> Region ` + f.properties.name);
+		});
   }
 
 
@@ -149,12 +199,6 @@ function App() {
     const res = await fetch('http://103.127.134.145:3000/map-transportation/label')
     const responseData = await res.json()
     responseData?.geojson?.features?.forEach((station) => {
-      // Buat elemen HTML untuk custom marker menggunakan SVG
-      // const svg = `
-      //     <svg height="10" width="10" viewBox="0 0 24 24" fill="#030bfc">
-      //       <circle cx="12" cy="12" r="10" stroke="white" stroke-width="2" fill="#030bfc" />
-      //     </svg>
-      //   `;
       const element = document.createElement('div');
       element.innerHTML = `<div class="marker-name-testing" style="margin-top:30px">${station?.properties?.name}</div>`;
       const markerNameLabel = new mapboxgl.Marker(element)
@@ -197,55 +241,15 @@ function App() {
         name.innerHTML = `<p style="font-size: 28px">${station.properties.BUILDINGNAME}</p>`
         const markerName = new mapboxgl.Marker(name)
         markerName.setLngLat(station.geometry.coordinates)
-        //     .addTo(map.current);
-        // if (zoom < 15) {
-        //   markerName.setLngLat(station.geometry.coordinates)
-        //     .addTo(map.current);
-        //   name.style.display = 'none'
-        // } else if (zoom >= 15) {
-        //   name.style.display = 'block'
-        // }
-        // console.log(getColor(station.properties.lines[0]))
+      
 
         // Tambahkan custom marker ke peta
 
         marker.setLngLat(station.geometry.coordinates)
           .addTo(map.current);
 
-
-        // const bigHTML = values
-        //   .map((v) =>
-        //     console.log(v.split("").join("-"))
-        //     console.log(code2Color)
-        //   )
-
-        //console.log(bigHTML);
       }
 
-      // station?.properties?.lines?.forEach((item, index) => {
-      //  // console.log(item)
-      //   const svg = `
-      //       <div class="marker-testing" style="background-color: ${getColor(item)}; display: flex; align-items: center; justify-content: center; color:white;transform: translate(${index * 300}px, 0);">
-      //         ${item}
-      //       </div>
-      //     `;
-      //   const el = document.createElement('div');
-      //   el.innerHTML = svg;
-      //   const marker = new mapboxgl.Marker(el)
-      //   // console.log(getColor(station.properties.lines[0]))
-
-      //   // Tambahkan custom marker ke peta
-
-      //   marker.setLngLat(station.geometry.coordinates)
-      //     .addTo(map.current);
-      //rajif
-
-      //   const popup = new mapboxgl.Popup({ offset: 25 })
-      //     .setHTML(`
-      //     <div>
-      //   <h3>${station?.properties?.name}</h3>
-      //     </div>`
-      //     );
       if (zoom < 11) {
         const markerLabel = document.querySelectorAll(".marker-testing")
         markerLabel.forEach((item) => {
@@ -263,7 +267,8 @@ function App() {
     if (map.current) return; // initialize map only once
     map.current = new mapboxgl.Map({
       container: mapContainer.current,
-      style: "mapbox://styles/mapbox/streets-v12",
+      //style: "mapbox://styles/mapbox/streets-v12",
+      style: "mapbox://styles/rajifmahendra/clxou5pwx00mc01pf5duffbp7",
       center: [lng, lat],
       zoom: zoom,
     });
@@ -320,13 +325,15 @@ function App() {
 
 
     });
-    map.current.on('zoom', () => {
-      const currentZoom = map.current.getZoom().toFixed(2);
-      const markerLabels = document.querySelectorAll(".tes");
-      markerLabels.forEach((item) => {
-        item.style.display = currentZoom < 12 ? "none" : "flex";
-      });
-    });
+
+    // // label
+    // map.current.on('zoom', () => {
+    //   const currentZoom = map.current.getZoom().toFixed(2);
+    //   const markerLabels = document.querySelectorAll(".tes");
+    //   markerLabels.forEach((item) => {
+    //     item.style.display = currentZoom < 12 ? "none" : "flex";
+    //   });
+    // });
   }, []);
 
 
@@ -341,12 +348,12 @@ function App() {
 
 
 
-  useEffect(() => {
-    if (zoom > 12) {
-      MRTStationData()
-    }
+  // useEffect(() => {
+  //   if (zoom > 12) {
+  //     MRTStationData()
+  //   }
 
-  }, [zoom])
+  // }, [zoom])
 
   useEffect(() => {
     if (showMRT) {
@@ -361,6 +368,9 @@ function App() {
     }
   }, [showMRT])
 
+  
+ 
+
   return (
 
     <div className="App">
@@ -371,9 +381,14 @@ function App() {
       {!filteringData.length && search.length > 0 && <NotFound />}
 
       {/* Todo: Fix Style so it looks better */}
+      
       <FilterLine onClickAction={() => setShowMRT(!showMRT)} />
       <div className="sidebar">
         Longitude: {lng} | Latitude: {lat} | Zoom: {zoom}
+        {/* Filtering Region Button */}
+        <div id="filter">
+          
+        </div>
       </div>
 
       <div ref={mapContainer} className="map-container" />
