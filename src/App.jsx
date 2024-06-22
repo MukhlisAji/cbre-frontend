@@ -82,7 +82,8 @@ function App() {
   }
 
   const fetchApi = async () => {
-    const res = await fetch(`http://103.127.134.145:3000/map-region/SG04`)
+    const res = await fetch(`http://103.127.134.145:3000/map`)
+    //const res = await fetch(`http://103.127.134.145:3000/map-region/SG04`)
     const responseData = await res.json()
     setDataJson(responseData.geojson.features)
     if(responseData?.region?.POLYGON) {
@@ -267,8 +268,8 @@ function App() {
     if (map.current) return; // initialize map only once
     map.current = new mapboxgl.Map({
       container: mapContainer.current,
-      //style: "mapbox://styles/mapbox/streets-v12",
-      style: "mapbox://styles/rajifmahendra/clxou5pwx00mc01pf5duffbp7",
+      style: "mapbox://styles/mapbox/streets-v12",
+      //style: "mapbox://styles/rajifmahendra/clxou5pwx00mc01pf5duffbp7",
       center: [lng, lat],
       zoom: zoom,
     });
@@ -326,14 +327,14 @@ function App() {
 
     });
 
-    // // label
-    // map.current.on('zoom', () => {
-    //   const currentZoom = map.current.getZoom().toFixed(2);
-    //   const markerLabels = document.querySelectorAll(".tes");
-    //   markerLabels.forEach((item) => {
-    //     item.style.display = currentZoom < 12 ? "none" : "flex";
-    //   });
-    // });
+    // label
+    map.current.on('zoom', () => {
+      const currentZoom = map.current.getZoom().toFixed(2);
+      const markerLabels = document.querySelectorAll(".tes");
+      markerLabels.forEach((item) => {
+        item.style.display = currentZoom < 12 ? "none" : "flex";
+      });
+    });
   }, []);
 
 
@@ -348,12 +349,12 @@ function App() {
 
 
 
-  // useEffect(() => {
-  //   if (zoom > 12) {
-  //     MRTStationData()
-  //   }
+  useEffect(() => {
+    if (zoom > 12) {
+      MRTStationData()
+    }
 
-  // }, [zoom])
+  }, [zoom])
 
   useEffect(() => {
     if (showMRT) {
