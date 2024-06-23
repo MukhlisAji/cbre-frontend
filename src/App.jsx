@@ -24,6 +24,22 @@ function App() {
   const [dataRegionJson, setDataRegionJson] = useState([]);
   const [filteringData, setFilteringData] = useState([])
   const [search, setSearch] = useState('')
+  const [initalRegion, setInitialRegion] = useState([])
+
+  var filterdata = [
+    {
+      "REGIONCODE": "SG03",
+      "REGIONNAME": "North West"
+    },
+    {
+      "REGIONCODE": "SG04",
+      "REGIONNAME": "South East"
+    },
+    {
+      "REGIONCODE": "SG05",
+      "REGIONNAME": "South West"
+    }
+  ]
 
   const colorMap = {
     NE: "#9900aa",
@@ -83,45 +99,45 @@ function App() {
 
   const fetchApi = async () => {
     const res = await fetch(`http://103.127.134.145:3000/map`)
-    //const res = await fetch(`http://103.127.134.145:3000/map-region/SG04`)
+    // const res = await fetch(`http://103.127.134.145:3000/map-region/SG04`)
     const responseData = await res.json()
     setDataJson(responseData.geojson.features)
-    if (responseData?.region?.POLYGON) {
-      var filterdata = [
-        {
-          "REGIONCODE": "SG03",
-          "REGIONNAME": "North West"
-        },
-        {
-          "REGIONCODE": "SG04",
-          "REGIONNAME": "South East"
-        },
-        {
-          "REGIONCODE": "SG05",
-          "REGIONNAME": "South West"
-        }
-      ]
+    // if (responseData?.region?.POLYGON) {
+    //   var filterdata = [
+    //     {
+    //       "REGIONCODE": "SG03",
+    //       "REGIONNAME": "North West"
+    //     },
+    //     {
+    //       "REGIONCODE": "SG04",
+    //       "REGIONNAME": "South East"
+    //     },
+    //     {
+    //       "REGIONCODE": "SG05",
+    //       "REGIONNAME": "South West"
+    //     }
+    //   ]
 
-      filterdata.forEach(function (d) {
-        const target = document.getElementById("filter");
-        target.innerHTML += "<button>" + d.REGIONNAME + "</button>";
-      });
-      setDataRegionJson(responseData.region.POLYGON)
-      map.current.addSource('sgregion', {
-        'type': 'geojson',
-        // 'data': 'http://localhost:4000/geojson/default.geojson'
-        'data': responseData.region.POLYGON
-      });
-      map.current.addLayer({
-        'id': 'region',
-        'type': 'fill',
-        'source': 'sgregion',
-        'paint': {
-          'fill-color': ['get', 'color'],
-          'fill-opacity': 0.5
-        }
-      });
-    }
+    //   filterdata.forEach(function (d) {
+    //     const target = document.getElementById("filter");
+    //     target.innerHTML += "<button>" + d.REGIONNAME + "</button>";
+    //   });
+    //   setDataRegionJson(responseData.region.POLYGON)
+    //   map.current.addSource('sgregion', {
+    //     'type': 'geojson',
+    //     // 'data': 'http://localhost:4000/geojson/default.geojson'
+    //     'data': responseData.region.POLYGON
+    //   });
+    //   map.current.addLayer({
+    //     'id': 'region',
+    //     'type': 'fill',
+    //     'source': 'sgregion',
+    //     'paint': {
+    //       'fill-color': ['get', 'color'],
+    //       'fill-opacity': 0.5
+    //     }
+    //   });
+    // }
     responseData.geojson.features.forEach((location) => {
       const marker = new mapboxgl.Marker()
         .setLngLat(location.geometry.coordinates)
@@ -137,6 +153,60 @@ function App() {
 
       marker.setPopup(popup);
     });
+  }
+  const RegionData = async () => {
+    if (initalRegion.length > 0) {
+      const res = await fetch(`http://103.127.134.145:3000/map-region/${initalRegion[initalRegion.length - 1]}`)
+      const responseData = await res.json()
+      // if (responseData?.REGIONNAME !== initalRegion) {
+      //   map.current.removeLayer({
+      //     'id': `'region-${initalRegion}'`,
+      //     'type': 'fill',
+      //     'source': `sgregion-${initalRegion}`,
+      //   })
+      // }
+      // console.log(initalRegion)
+      if (responseData?.region?.POLYGON) {
+
+        setDataRegionJson(responseData.region.POLYGON)
+
+        // initalRegion.forEach((item) => {
+        //   console.log(item, 'tes-item')
+        //   map.current.addSource(`sgregion-${item}`, {
+        //     'type': 'geojson',
+        //     // 'data': 'http://localhost:4000/geojson/default.geojson'
+        //     'data': responseData.region.POLYGON
+        //   });
+
+        //   map.current.addLayer({
+        //     'id': `'region-${item}'`,
+        //     'type': 'fill',
+        //     'source': `sgregion-${item}`,
+        //     'paint': {
+        //       'fill-color': ['get', 'color'],
+        //       'fill-opacity': 0.5
+        //     }
+        //   });
+        // })
+        map.current.addSource(`sgregion-${initalRegion[initalRegion.length - 1]}`, {
+          'type': 'geojson',
+          // 'data': 'http://localhost:4000/geojson/default.geojson'
+          'data': responseData.region.POLYGON
+        });
+
+        map.current.addLayer({
+          'id': `'region-${initalRegion[initalRegion.length - 1]}'`,
+          'type': 'fill',
+          'source': `sgregion-${initalRegion[initalRegion.length - 1]}`,
+          'paint': {
+            'fill-color': ['get', 'color'],
+            'fill-opacity': 0.5
+          }
+        });
+
+
+      }
+    }
   }
 
   const MRTLineData = async () => {
@@ -183,7 +253,6 @@ function App() {
     }
     return null
   }
-
   const generatedRounded = (index, length) => {
     if (index === 0 && length === 1) {
       return "border-radius: 100px"
@@ -200,6 +269,7 @@ function App() {
     const res = await fetch('http://103.127.134.145:3000/map-transportation/label')
     const responseData = await res.json()
     responseData?.geojson?.features?.forEach((station) => {
+
       const element = document.createElement('div');
       element.innerHTML = `<div class="marker-name-testing" style="margin-top:30px">${station?.properties?.name}</div>`;
       const markerNameLabel = new mapboxgl.Marker(element)
@@ -227,7 +297,7 @@ function App() {
           const prefix = value.match(/^[A-Z]+/)[0];
           const separated = value.replace(/([A-Z]+)(\d+)/, "$1 $2");
           const color = colorMap[prefix] || "gray";
-          console.log({ index, array })
+
           if (color) {
             // output += <span class="${color}">${separated}</span>;
             output += `<span class="${color}" style="padding: 0.3em 5px;line-height: 1; background-color: ${color}; color: ${generatedColor(color)}; ${generatedRounded(index, array.length)};">${separated}</span>`;
@@ -239,7 +309,7 @@ function App() {
         const marker = new mapboxgl.Marker(el)
 
         const name = document.createElement("p")
-        name.innerHTML = `<p style="font-size: 28px">${station.properties.BUILDINGNAME}</p>`
+        name.innerHTML = `<p class="marker-name" style="font-size: 28px">${station.properties.BUILDINGNAME}</p>`
         const markerName = new mapboxgl.Marker(name)
         markerName.setLngLat(station.geometry.coordinates)
 
@@ -249,18 +319,64 @@ function App() {
         marker.setLngLat(station.geometry.coordinates)
           .addTo(map.current);
 
+
       }
       const markerLabel = document.querySelectorAll(".marker-testing")
       markerLabel.forEach((item) => {
         item.style.display = "none"
       })
 
+      const markerName = document.querySelectorAll(".marker-name-testing")
+      markerName.forEach((item) => {
+        item.style.display = "none"
+      })
 
+
+
+
+      if (zoom < 15) {
+        const mLabel = document.querySelectorAll(".marker-testing")
+        mLabel.forEach((item) => {
+          item.style.display = "none"
+        })
+      }
+
+      if (zoom < 17) {
+        const mName = document.querySelectorAll(".marker-name-testing")
+        mName.forEach((item) => {
+          item.style.display = "none"
+        })
+      }
 
       //   marker.setPopup(popup);
       // })
 
     });
+  }
+
+  const handleReset = () => {
+    if (initalRegion.length > 0) {
+      initalRegion.forEach(item => {
+
+        const layerId = `region-${item}`;
+        const sourceId = `sgregion-${item}`;
+
+        // TODO : BUG 
+        // Remove the layer if it exists
+        if (map.current.getLayer(layerId)) {
+          map.current.removeLayer(layerId);
+        }
+
+        // TODO : BUG 
+        // Remove the source if it exists
+        if (map.current.getSource(sourceId)) {
+          map.current.removeSource(sourceId);
+        }
+
+
+
+      })
+    }
   }
 
   useEffect(() => {
@@ -344,33 +460,39 @@ function App() {
       setLat(map.current.getCenter().lat.toFixed(4));
       setZoom(map.current.getZoom().toFixed(2));
     });
-  });
+  }, []);
 
 
 
   useEffect(() => {
     MRTStationData()
 
-    // if (zoom > 12) {
-    //   MRTStationData()
-    // }
 
   }, [])
 
   useEffect(() => {
-
-    if (zoom < 11) {
+    if (zoom < 15) {
       const markerLabel = document.querySelectorAll(".marker-testing")
       markerLabel.forEach((item) => {
         item.style.display = "none"
       })
-      return
-    } else if (zoom >= 11) {
+    } else if (zoom >= 15) {
       const markerLabel = document.querySelectorAll(".marker-testing")
       markerLabel.forEach((item) => {
         item.style.display = "flex"
       })
-      return
+    }
+
+    if (zoom < 17) {
+      const markerName = document.querySelectorAll(".marker-name-testing")
+      markerName.forEach((item) => {
+        item.style.display = "none"
+      })
+    } else if (zoom >= 17) {
+      const markerName = document.querySelectorAll(".marker-name-testing")
+      markerName.forEach((item) => {
+        item.style.display = "block"
+      })
     }
 
 
@@ -389,7 +511,9 @@ function App() {
     }
   }, [showMRT])
 
-
+  useEffect(() => {
+    RegionData()
+  }, [initalRegion])
 
 
   return (
@@ -409,6 +533,16 @@ function App() {
         {/* Filtering Region Button */}
         <div id="filter">
 
+          {/* BUTTON TODO IS ALREADY BUG */}
+          <button onClick={handleReset}>RESET</button>
+          {filterdata.map((item, index) => (
+            <button key={index} onClick={() => setInitialRegion(prev => {
+
+              return [...prev, item.REGIONCODE]
+            })}>
+              {item.REGIONNAME}
+            </button>
+          ))}
         </div>
       </div>
 
