@@ -21,8 +21,25 @@ function App() {
   const [zoom, setZoom] = useState(10);
   const [showMRT, setShowMRT] = useState(false);
   const [dataJson, setDataJson] = useState([]);
+  const [dataRegionJson, setDataRegionJson] = useState([]);
   const [filteringData, setFilteringData] = useState([])
   const [search, setSearch] = useState('')
+  const [initalRegion, setInitialRegion] = useState([])
+
+  var filterdata = [
+    {
+      "REGIONCODE": "SG03",
+      "REGIONNAME": "North West"
+    },
+    {
+      "REGIONCODE": "SG04",
+      "REGIONNAME": "South East"
+    },
+    {
+      "REGIONCODE": "SG05",
+      "REGIONNAME": "South West"
+    }
+  ]
 
   const colorMap = {
     NE: "#9900aa",
@@ -82,8 +99,45 @@ function App() {
 
   const fetchApi = async () => {
     const res = await fetch(`http://103.127.134.145:3000/map`)
+    // const res = await fetch(`http://103.127.134.145:3000/map-region/SG04`)
     const responseData = await res.json()
     setDataJson(responseData.geojson.features)
+    // if (responseData?.region?.POLYGON) {
+    //   var filterdata = [
+    //     {
+    //       "REGIONCODE": "SG03",
+    //       "REGIONNAME": "North West"
+    //     },
+    //     {
+    //       "REGIONCODE": "SG04",
+    //       "REGIONNAME": "South East"
+    //     },
+    //     {
+    //       "REGIONCODE": "SG05",
+    //       "REGIONNAME": "South West"
+    //     }
+    //   ]
+
+    //   filterdata.forEach(function (d) {
+    //     const target = document.getElementById("filter");
+    //     target.innerHTML += "<button>" + d.REGIONNAME + "</button>";
+    //   });
+    //   setDataRegionJson(responseData.region.POLYGON)
+    //   map.current.addSource('sgregion', {
+    //     'type': 'geojson',
+    //     // 'data': 'http://localhost:4000/geojson/default.geojson'
+    //     'data': responseData.region.POLYGON
+    //   });
+    //   map.current.addLayer({
+    //     'id': 'region',
+    //     'type': 'fill',
+    //     'source': 'sgregion',
+    //     'paint': {
+    //       'fill-color': ['get', 'color'],
+    //       'fill-opacity': 0.5
+    //     }
+    //   });
+    // }
     responseData.geojson.features.forEach((location) => {
       const marker = new mapboxgl.Marker()
         .setLngLat(location.geometry.coordinates)
@@ -99,6 +153,60 @@ function App() {
 
       marker.setPopup(popup);
     });
+  }
+  const RegionData = async () => {
+    if (initalRegion.length > 0) {
+      const res = await fetch(`http://103.127.134.145:3000/map-region/${initalRegion[initalRegion.length - 1]}`)
+      const responseData = await res.json()
+      // if (responseData?.REGIONNAME !== initalRegion) {
+      //   map.current.removeLayer({
+      //     'id': `'region-${initalRegion}'`,
+      //     'type': 'fill',
+      //     'source': `sgregion-${initalRegion}`,
+      //   })
+      // }
+      // console.log(initalRegion)
+      if (responseData?.region?.POLYGON) {
+
+        setDataRegionJson(responseData.region.POLYGON)
+
+        // initalRegion.forEach((item) => {
+        //   console.log(item, 'tes-item')
+        //   map.current.addSource(`sgregion-${item}`, {
+        //     'type': 'geojson',
+        //     // 'data': 'http://localhost:4000/geojson/default.geojson'
+        //     'data': responseData.region.POLYGON
+        //   });
+
+        //   map.current.addLayer({
+        //     'id': `'region-${item}'`,
+        //     'type': 'fill',
+        //     'source': `sgregion-${item}`,
+        //     'paint': {
+        //       'fill-color': ['get', 'color'],
+        //       'fill-opacity': 0.5
+        //     }
+        //   });
+        // })
+        map.current.addSource(`sgregion-${initalRegion[initalRegion.length - 1]}`, {
+          'type': 'geojson',
+          // 'data': 'http://localhost:4000/geojson/default.geojson'
+          'data': responseData.region.POLYGON
+        });
+
+        map.current.addLayer({
+          'id': `'region-${initalRegion[initalRegion.length - 1]}'`,
+          'type': 'fill',
+          'source': `sgregion-${initalRegion[initalRegion.length - 1]}`,
+          'paint': {
+            'fill-color': ['get', 'color'],
+            'fill-opacity': 0.5
+          }
+        });
+
+
+      }
+    }
   }
 
   const MRTLineData = async () => {
@@ -123,6 +231,19 @@ function App() {
       }
 
     });
+
+
+    // Add click event listener to the map
+    map.on('click', 'region', function (e) {
+      var features = map.queryRenderedFeatures(e.point);
+      if (!features.length) {
+        return;
+      }
+
+      var f = features[0];
+      $("#console-output").html(``);
+      $("#console-output").html(`> Hey, you're click on -> Region ` + f.properties.name);
+    });
   }
 
 
@@ -132,7 +253,6 @@ function App() {
     }
     return null
   }
-
   const generatedRounded = (index, length) => {
     if (index === 0 && length === 1) {
       return "border-radius: 100px"
@@ -193,11 +313,16 @@ function App() {
         const markerName = new mapboxgl.Marker(name)
         markerName.setLngLat(station.geometry.coordinates)
 
+
+        // Tambahkan custom marker ke peta
+
         marker.setLngLat(station.geometry.coordinates)
           .addTo(map.current);
 
 
       }
+
+
 
 
       if (zoom < 11) {
@@ -213,11 +338,37 @@ function App() {
     });
   }
 
+  const handleReset = () => {
+    if (initalRegion.length > 0) {
+      initalRegion.forEach(item => {
+
+        const layerId = `region-${item}`;
+        const sourceId = `sgregion-${item}`;
+
+        // TODO : BUG 
+        // Remove the layer if it exists
+        if (map.current.getLayer(layerId)) {
+          map.current.removeLayer(layerId);
+        }
+
+        // TODO : BUG 
+        // Remove the source if it exists
+        if (map.current.getSource(sourceId)) {
+          map.current.removeSource(sourceId);
+        }
+
+
+
+      })
+    }
+  }
+
   useEffect(() => {
     if (map.current) return; // initialize map only once
     map.current = new mapboxgl.Map({
       container: mapContainer.current,
       style: "mapbox://styles/mapbox/streets-v12",
+      //style: "mapbox://styles/rajifmahendra/clxou5pwx00mc01pf5duffbp7",
       center: [lng, lat],
       zoom: zoom,
     });
@@ -274,11 +425,13 @@ function App() {
 
 
     });
+
+    // label
     map.current.on('zoom', () => {
       const currentZoom = map.current.getZoom().toFixed(2);
       const markerLabels = document.querySelectorAll(".tes");
       markerLabels.forEach((item) => {
-        item.style.display = currentZoom < 11 ? "none" : "flex";
+        item.style.display = currentZoom < 12 ? "none" : "flex";
       });
     });
   }, []);
@@ -333,6 +486,11 @@ function App() {
     }
   }, [showMRT])
 
+  useEffect(() => {
+    RegionData()
+  }, [initalRegion])
+
+
   return (
 
     <div className="App">
@@ -343,9 +501,24 @@ function App() {
       {!filteringData.length && search.length > 0 && <NotFound />}
 
       {/* Todo: Fix Style so it looks better */}
+
       <FilterLine onClickAction={() => setShowMRT(!showMRT)} />
       <div className="sidebar">
         Longitude: {lng} | Latitude: {lat} | Zoom: {zoom}
+        {/* Filtering Region Button */}
+        <div id="filter">
+
+          {/* BUTTON TODO IS ALREADY BUG */}
+          <button onClick={handleReset}>RESET</button>
+          {filterdata.map((item, index) => (
+            <button key={index} onClick={() => setInitialRegion(prev => {
+              console.log(item.REGIONCODE)
+              return [...prev, item.REGIONCODE]
+            })}>
+              {item.REGIONNAME}
+            </button>
+          ))}
+        </div>
       </div>
 
       <div ref={mapContainer} className="map-container" />
