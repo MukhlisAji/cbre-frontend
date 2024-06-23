@@ -149,12 +149,7 @@ function App() {
     const res = await fetch('http://103.127.134.145:3000/map-transportation/label')
     const responseData = await res.json()
     responseData?.geojson?.features?.forEach((station) => {
-      // Buat elemen HTML untuk custom marker menggunakan SVG
-      // const svg = `
-      //     <svg height="10" width="10" viewBox="0 0 24 24" fill="#030bfc">
-      //       <circle cx="12" cy="12" r="10" stroke="white" stroke-width="2" fill="#030bfc" />
-      //     </svg>
-      //   `;
+
       const element = document.createElement('div');
       element.innerHTML = `<div class="marker-name-testing" style="margin-top:30px">${station?.properties?.name}</div>`;
       const markerNameLabel = new mapboxgl.Marker(element)
@@ -182,7 +177,7 @@ function App() {
           const prefix = value.match(/^[A-Z]+/)[0];
           const separated = value.replace(/([A-Z]+)(\d+)/, "$1 $2");
           const color = colorMap[prefix] || "gray";
-          console.log({ index, array })
+
           if (color) {
             // output += <span class="${color}">${separated}</span>;
             output += `<span class="${color}" style="padding: 0.3em 5px;line-height: 1; background-color: ${color}; color: ${generatedColor(color)}; ${generatedRounded(index, array.length)};">${separated}</span>`;
@@ -197,55 +192,14 @@ function App() {
         name.innerHTML = `<p style="font-size: 28px">${station.properties.BUILDINGNAME}</p>`
         const markerName = new mapboxgl.Marker(name)
         markerName.setLngLat(station.geometry.coordinates)
-        //     .addTo(map.current);
-        // if (zoom < 15) {
-        //   markerName.setLngLat(station.geometry.coordinates)
-        //     .addTo(map.current);
-        //   name.style.display = 'none'
-        // } else if (zoom >= 15) {
-        //   name.style.display = 'block'
-        // }
-        // console.log(getColor(station.properties.lines[0]))
-
-        // Tambahkan custom marker ke peta
 
         marker.setLngLat(station.geometry.coordinates)
           .addTo(map.current);
 
 
-        // const bigHTML = values
-        //   .map((v) =>
-        //     console.log(v.split("").join("-"))
-        //     console.log(code2Color)
-        //   )
-
-        //console.log(bigHTML);
       }
 
-      // station?.properties?.lines?.forEach((item, index) => {
-      //  // console.log(item)
-      //   const svg = `
-      //       <div class="marker-testing" style="background-color: ${getColor(item)}; display: flex; align-items: center; justify-content: center; color:white;transform: translate(${index * 300}px, 0);">
-      //         ${item}
-      //       </div>
-      //     `;
-      //   const el = document.createElement('div');
-      //   el.innerHTML = svg;
-      //   const marker = new mapboxgl.Marker(el)
-      //   // console.log(getColor(station.properties.lines[0]))
 
-      //   // Tambahkan custom marker ke peta
-
-      //   marker.setLngLat(station.geometry.coordinates)
-      //     .addTo(map.current);
-      //rajif
-
-      //   const popup = new mapboxgl.Popup({ offset: 25 })
-      //     .setHTML(`
-      //     <div>
-      //   <h3>${station?.properties?.name}</h3>
-      //     </div>`
-      //     );
       if (zoom < 11) {
         const markerLabel = document.querySelectorAll(".marker-testing")
         markerLabel.forEach((item) => {
@@ -337,15 +291,33 @@ function App() {
       setLat(map.current.getCenter().lat.toFixed(4));
       setZoom(map.current.getZoom().toFixed(2));
     });
-  });
+  }, []);
 
 
 
   useEffect(() => {
-    if (zoom > 11) {
-      MRTStationData()
-    }
+    MRTStationData()
+    // if (zoom > 11) {
+    // }
+    // if (zoom > 11) {
+    //   MRTStationData()
+    // }
 
+  }, [])
+
+  useEffect(() => {
+    if (zoom < 11) {
+      const markerLabel = document.querySelectorAll(".marker-testing")
+      markerLabel.forEach((item) => {
+        item.style.display = "none"
+      })
+    } else if (zoom >= 11) {
+      const markerLabel = document.querySelectorAll(".marker-testing")
+      markerLabel.forEach((item) => {
+        item.style.display = "flex"
+      })
+
+    }
   }, [zoom])
 
   useEffect(() => {
