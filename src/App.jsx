@@ -7,11 +7,9 @@ import FilterLine from "./components/FilterLine";
 import NotFound from "./components/NotFound";
 import SearchList from "./components/SearchList";
 import SearchLocation from "./components/SearchLocation";
-import data from './utils/data.json';
+import data from "./utils/data.json";
 
 mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_KEY;
-
-
 
 function App() {
   const mapContainer = useRef(null);
@@ -21,8 +19,8 @@ function App() {
   const [zoom, setZoom] = useState(10);
   const [showMRT, setShowMRT] = useState(false);
   const [dataJson, setDataJson] = useState([]);
-  const [filteringData, setFilteringData] = useState([])
-  const [search, setSearch] = useState('')
+  const [filteringData, setFilteringData] = useState([]);
+  const [search, setSearch] = useState("");
 
   const colorMap = {
     NE: "#9900aa",
@@ -39,7 +37,7 @@ function App() {
     PE: "#748477",
     PW: "#748477",
     PTC: "#748477",
-    STC: "#748477"
+    STC: "#748477",
   };
 
   const code2Color = (code) =>
@@ -57,97 +55,99 @@ function App() {
   }
 
   const handleSearch = (e) => {
-    setSearch(e?.target?.value)
+    setSearch(e?.target?.value);
     const lowerSearch = e?.target?.value?.toLowerCase();
     const filtering = dataJson?.filter((item) => {
       const lowerTitle = item?.properties?.BUILDINGNAME?.toLowerCase();
 
-      return lowerTitle?.includes(lowerSearch)
-    })
+      return lowerTitle?.includes(lowerSearch);
+    });
     if (filteringData.length > 0) {
-      map.current.setCenter(filtering?.[0]?.geometry?.coordinates)
-      map.current.setZoom(15)
+      map.current.setCenter(filtering?.[0]?.geometry?.coordinates);
+      map.current.setZoom(15);
     }
-    setFilteringData(filtering)
+    setFilteringData(filtering);
     if (e?.target?.value.length === 0) {
-
-      setFilteringData([])
+      setFilteringData([]);
     }
-  }
+  };
 
   const handleClick = (coordinate) => {
-    map.current.setCenter(coordinate)
-    map.current.setZoom(15)
-  }
+    map.current.setCenter(coordinate);
+    map.current.setZoom(15);
+  };
 
   const fetchApi = async () => {
-    const res = await fetch(`http://103.127.134.145:3000/map`)
-    const responseData = await res.json()
-    setDataJson(responseData.geojson.features)
+    const res = await fetch(`http://103.127.134.145:3000/map`);
+    const responseData = await res.json();
+    setDataJson(responseData.geojson.features);
     responseData.geojson.features.forEach((location) => {
       const marker = new mapboxgl.Marker()
         .setLngLat(location.geometry.coordinates)
         .addTo(map.current);
-      const popup = new mapboxgl.Popup({ offset: 25 })
-        .setHTML(`
-        <div>
-        <h3>${location.properties.BUILDINGNAME}</h3>
-        <h4>${location.properties.BUILDINGADDRESS_POSTCODE}</h4>
-        <h5>${location.properties.BUILDINGSTREETNAME}</h5>
-        </div>`
-        );
+      const popup = new mapboxgl.Popup({ offset: 25 }).setHTML(`
+        <div class="info-box">
+      <h3>${location.properties.BUILDINGNAME}</h3>
+      <p><strong>Address:</strong> ${location.properties.BUILDINGNAME}, ${location.properties.BUILDINGADDRESS_POSTCODE}</p>
+      <p><strong>Building Status:</strong> ${location.properties.BUILDINGSTATUS_EN}</p>
+      <p><strong>Gross Floor Area:</strong> ${location.properties.GROSS_FLOOR_AREA} sq ft</p>
+      <p><strong>Net Lettable Area:</strong> ${location.properties.NET_LETTABLE_AREA} sq ft</p>
+      <p><strong>Location:</strong> ${location.properties.MICROMARKET}</p>
+    </div>`);
 
       marker.setPopup(popup);
     });
-  }
+  };
 
   const MRTLineData = async () => {
-    const res = await fetch('http://103.127.134.145:3000/map-transportation/line')
-    const responseData = await res.json()
+    const res = await fetch(
+      "http://103.127.134.145:3000/map-transportation/line"
+    );
+    const responseData = await res.json();
     const geoJson = responseData.geojson;
-    map.current.addSource('line', {
-      'type': 'geojson',
-      'data': geoJson
+    map.current.addSource("line", {
+      type: "geojson",
+      data: geoJson,
     });
     map.current.addLayer({
-      id: 'line',
-      type: 'line',
-      source: 'line',
+      id: "line",
+      type: "line",
+      source: "line",
       layout: {
-        'line-join': 'round',
-        'line-cap': 'round'
+        "line-join": "round",
+        "line-cap": "round",
       },
       paint: {
-        'line-color': ['get', 'color'],
-        'line-width': 4
-      }
-
+        "line-color": ["get", "color"],
+        "line-width": 4,
+      },
     });
-  }
-
+  };
 
   const generatedColor = (color) => {
-    if (color == '#fa9e0d') {
-      return "#000;"
+    if (color == "#fa9e0d") {
+      return "#000;";
     }
-    return null
-  }
+    return null;
+  };
 
   const generatedRounded = (index, length) => {
     if (index === 0 && length === 1) {
-      return "border-radius: 100px"
+      return "border-radius: 100px";
     } else if (index === length - 1) {
-      return "border-top-right-radius: 100px; border-bottom-right-radius: 100px"
+      return "border-top-right-radius: 100px; border-bottom-right-radius: 100px";
     } else if (index === 1 && length === 3) {
-      return 'border-radius: 0px'
+      return "border-radius: 0px";
     } else if (index === 0 && length === 3) {
-      return "border-top-left-radius: 100px; border-bottom-left-radius: 100px"
+      return "border-top-left-radius: 100px; border-bottom-left-radius: 100px";
     }
-  }
+  };
 
   const MRTStationData = async () => {
-    const res = await fetch('http://103.127.134.145:3000/map-transportation/label')
-    const responseData = await res.json()
+    const res = await fetch(
+      "http://103.127.134.145:3000/map-transportation/label"
+    );
+    const responseData = await res.json();
     responseData?.geojson?.features?.forEach((station) => {
       // Buat elemen HTML untuk custom marker menggunakan SVG
       // const svg = `
@@ -155,26 +155,31 @@ function App() {
       //       <circle cx="12" cy="12" r="10" stroke="white" stroke-width="2" fill="#030bfc" />
       //     </svg>
       //   `;
-      const element = document.createElement('div');
+      const element = document.createElement("div");
       element.innerHTML = `<div class="marker-name-testing" style="margin-top:30px">${station?.properties?.name}</div>`;
-      const markerNameLabel = new mapboxgl.Marker(element)
-      markerNameLabel.setLngLat(station.geometry.coordinates)
+      const markerNameLabel = new mapboxgl.Marker(element);
+      markerNameLabel
+        .setLngLat(station.geometry.coordinates)
         .addTo(map.current);
 
       if (zoom < 15) {
-        const markerNameLabel = document.querySelectorAll(".marker-name-testing")
+        const markerNameLabel = document.querySelectorAll(
+          ".marker-name-testing"
+        );
         markerNameLabel.forEach((item) => {
-          item.style.display = "none"
-        })
+          item.style.display = "none";
+        });
       } else if (zoom >= 15) {
-        const markerNameLabel = document.querySelectorAll(".marker-name-testing")
+        const markerNameLabel = document.querySelectorAll(
+          ".marker-name-testing"
+        );
         markerNameLabel.forEach((item) => {
-          item.style.display = "block"
-        })
+          item.style.display = "block";
+        });
       }
 
       if (station.properties.lines) {
-        const values = station.properties.lines.filter(value => value);
+        const values = station.properties.lines.filter((value) => value);
         let output = "";
 
         output += `<div class="marker-testing" >`;
@@ -182,21 +187,23 @@ function App() {
           const prefix = value.match(/^[A-Z]+/)[0];
           const separated = value.replace(/([A-Z]+)(\d+)/, "$1 $2");
           const color = colorMap[prefix] || "gray";
-          console.log({ index, array })
+          console.log({ index, array });
           if (color) {
             // output += <span class="${color}">${separated}</span>;
-            output += `<span class="${color}" style="padding: 0.3em 5px;line-height: 1; background-color: ${color}; color: ${generatedColor(color)}; ${generatedRounded(index, array.length)};">${separated}</span>`;
+            output += `<span class="${color}" style="padding: 0.3em 5px;line-height: 1; background-color: ${color}; color: ${generatedColor(
+              color
+            )}; ${generatedRounded(index, array.length)};">${separated}</span>`;
           }
         });
         output += `</div>`;
-        const el = document.createElement('div');
+        const el = document.createElement("div");
         el.innerHTML = output;
-        const marker = new mapboxgl.Marker(el)
+        const marker = new mapboxgl.Marker(el);
 
-        const name = document.createElement("p")
-        name.innerHTML = `<p style="font-size: 28px">${station.properties.BUILDINGNAME}</p>`
-        const markerName = new mapboxgl.Marker(name)
-        markerName.setLngLat(station.geometry.coordinates)
+        const name = document.createElement("p");
+        name.innerHTML = `<p style="font-size: 28px">${station.properties.BUILDINGNAME}</p>`;
+        const markerName = new mapboxgl.Marker(name);
+        markerName.setLngLat(station.geometry.coordinates);
         //     .addTo(map.current);
         // if (zoom < 15) {
         //   markerName.setLngLat(station.geometry.coordinates)
@@ -209,9 +216,7 @@ function App() {
 
         // Tambahkan custom marker ke peta
 
-        marker.setLngLat(station.geometry.coordinates)
-          .addTo(map.current);
-
+        marker.setLngLat(station.geometry.coordinates).addTo(map.current);
 
         // const bigHTML = values
         //   .map((v) =>
@@ -247,17 +252,16 @@ function App() {
       //     </div>`
       //     );
       if (zoom < 11) {
-        const markerLabel = document.querySelectorAll(".marker-testing")
+        const markerLabel = document.querySelectorAll(".marker-testing");
         markerLabel.forEach((item) => {
-          item.style.display = "none"
-        })
+          item.style.display = "none";
+        });
       }
 
       //   marker.setPopup(popup);
       // })
-
     });
-  }
+  };
 
   useEffect(() => {
     if (map.current) return; // initialize map only once
@@ -277,10 +281,10 @@ function App() {
         trackUserLocation: true,
       })
     );
-    fetchApi()
+    fetchApi();
     // MRTStationData()
 
-    map.current.on('click', 'polygon-fill', (e) => {
+    map.current.on("click", "polygon-fill", (e) => {
       const coordinates = e.lngLat;
       const { title, description } = e.features[0].properties;
 
@@ -289,7 +293,6 @@ function App() {
         .setHTML(<p>${description}</p>)
         .addTo(map.current);
     });
-
 
     map.current.on("load", () => {
       map.current.addSource("polygon", {
@@ -303,24 +306,21 @@ function App() {
         },
       });
 
-
       map.current.addLayer({
         id: "line-layer",
         type: "line",
         source: "polygon",
         layout: {
           "line-join": "round",
-          "line-cap": "round"
+          "line-cap": "round",
         },
         paint: {
           "line-color": "#cc234a",
-          "line-width": 2
-        }
+          "line-width": 2,
+        },
       });
-
-
     });
-    map.current.on('zoom', () => {
+    map.current.on("zoom", () => {
       const currentZoom = map.current.getZoom().toFixed(2);
       const markerLabels = document.querySelectorAll(".tes");
       markerLabels.forEach((item) => {
@@ -328,7 +328,6 @@ function App() {
       });
     });
   }, []);
-
 
   useEffect(() => {
     if (!map.current) return; // wait for map to initialize
@@ -339,35 +338,31 @@ function App() {
     });
   });
 
-
-
   useEffect(() => {
     if (zoom > 11) {
-      MRTStationData()
+      MRTStationData();
     }
-
-  }, [zoom])
+  }, [zoom]);
 
   useEffect(() => {
     if (showMRT) {
-      MRTLineData()
+      MRTLineData();
     } else {
-      if (map.current.getLayer('line')) {
-        map.current.removeLayer('line');
+      if (map.current.getLayer("line")) {
+        map.current.removeLayer("line");
       }
-      if (map.current.getSource('line')) {
-        map.current.removeSource('line');
+      if (map.current.getSource("line")) {
+        map.current.removeSource("line");
       }
     }
-  }, [showMRT])
+  }, [showMRT]);
 
   return (
-
     <div className="App">
-
-
       <SearchLocation onSearchChange={handleSearch} />
-      {filteringData.length > 0 && <SearchList onClickAction={handleClick} filteringData={filteringData} />}
+      {filteringData.length > 0 && (
+        <SearchList onClickAction={handleClick} filteringData={filteringData} />
+      )}
       {!filteringData.length && search.length > 0 && <NotFound />}
 
       {/* Todo: Fix Style so it looks better */}
