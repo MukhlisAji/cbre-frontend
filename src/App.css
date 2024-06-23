@@ -172,7 +172,7 @@ button {
   height: max-content;
 }
 
-.mapboxgl-popup-content{
+.mapboxgl-popup-content {
   background-color: transparent;
   width: max-content;
   padding: 0;
@@ -182,14 +182,34 @@ button {
   outline: none;
 }
 
-.info-box {
-  width: 300px;
-  padding: 15px;
+.marker-testing {
+  color: #fff;
+ }
+
+.popup-container {
+  overflow: hidden;
+  width: 400px;
   background-color: rgba(255, 255, 255, 0.9);
   border: 1px solid #ccc;
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
   border-radius: 10px;
-  transition: opacity 0.3s;
+  overflow-wrap: break-word;
+}
+
+.popup-image {
+  text-align: center;
+  width: 100%;
+  max-height: 200px;
+}
+
+.popup-image img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+}
+
+.info-box {
+  padding: 15px;
 }
 
 .info-box h3 {
@@ -204,4 +224,19 @@ button {
 
 .info-box strong {
   color: #555;
+}
+
+.info-box .other-info {
+  display: grid;
+  grid-template-columns: 50% 50%;
+}
+.info-box a {
+  display: inline-block;
+  margin-top: 10px;
+  color: #007bff;
+  text-decoration: none;
+}
+
+.info-box a:hover {
+  text-decoration: underline;
 }
