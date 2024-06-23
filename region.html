@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>CBRE Extrusion</title>
+<meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+<link href="https://api.mapbox.com/mapbox-gl-js/v3.4.0/mapbox-gl.css" rel="stylesheet">
+<link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.css" type="text/css">
+<style>
+	body { margin: 0; padding: 0; }
+	#map { position: absolute; top: 0; bottom: 0; width: 100%; }
+	.mapboxgl-ctrl-geocoder {
+		margin: 0 auto;
+		position: absolute;
+		top: 20px;
+		right: 0%;
+		z-index: 1;
+		transform: translateX(-680%);
+		width: 50%;
+	}
+	.floating-div {
+		width: 500px;
+		height: 80px;
+		background-color: #ffffff;
+		position: absolute;
+		bottom: 40px;
+		left: 40px;
+		z-index: 1000;
+		overflow: auto;
+		padding: 40px;
+		border-radius: 20px;
+	}
+	.mapboxgl-ctrl-logo {
+		display: none;
+	}
+</style>
+</head>
+<body>
+	<div class="floating-div">
+		<b>Console output:</b><br />
+		<pre id="console-output">> Please click something</pre>
+	</div>
+	<div id="map"></div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://api.mapbox.com/mapbox-gl-js/v3.4.0/mapbox-gl.js"></script>
+<script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.min.js"></script>
+<script>
+	mapboxgl.accessToken = 'pk.eyJ1IjoicmFqaWZtYWhlbmRyYSIsImEiOiJjbHVjYTI2d2MwcnBzMmxxbndnMnNlNTUyIn0.aaCGYQ2OYIcIsAa4X-ILDA';
+	const map = new mapboxgl.Map({
+		container: 'map',
+		style: 'mapbox://styles/mapbox/light-v11', // Ref: https://docs.mapbox.com/mapbox-gl-js/guides/styles
+		center: [
+			103.84533642715844,
+			1.2754694782905098
+		],
+		zoom: 14,
+		pitch: 40,
+		bearing: 20,
+		antialias: true
+	});
+	let hoveredPolygonId = null;
+
+	map.on('load', () => {
+		/*
+		map.addLayer({
+			'id': '3d-buildings',
+			'source': 'composite',
+			'source-layer': 'building',
+			'filter': ['==', 'extrude', 'true'],
+			'type': 'fill-extrusion',
+			'minzoom': 15,
+			'paint': {
+				'fill-extrusion-color': '#FFFFFF',
+				'fill-extrusion-height': [
+					'interpolate',
+					['linear'],
+					['zoom'],
+					15,
+					0,
+					15.05,
+					['get', 'height']
+				],
+				'fill-extrusion-base': [
+					'interpolate',
+					['linear'],
+					['zoom'],
+					15,
+					0,
+					15.05,
+					['get', 'min_height']
+				],
+				'fill-extrusion-opacity': 0.6
+			}
+		});
+		*/
+		map.addSource('sgregion', {
+			'type': 'geojson',
+			// 'data': 'http://localhost:4000/geojson/default.geojson'
+			'data': 'http://localhost:4000/geojson/sg-region.geojson'
+		});
+		map.addLayer({
+			'id': 'region',
+			'type': 'fill',
+			'source': 'sgregion',
+			'paint': {
+				'fill-color': ['get', 'color'],
+                'fill-opacity': 0.5
+			}
+		});
+
+		
+		// Add click event listener to the map
+		map.on('click', 'region', function (e) {
+			var features = map.queryRenderedFeatures(e.point);
+			if (!features.length) {
+				return;
+			}
+			
+			var f = features[0];
+			$("#console-output").html(``);
+			$("#console-output").html(`> Hey, you're click on -> Region ` + f.properties.name);
+		});
+	});
+
+	// Showing navigation
+	map.addControl(new mapboxgl.NavigationControl());
+
+	// Hide copyright
+    $(".mapboxgl-ctrl-logo").hide();
+    $(".mapboxgl-ctrl-attrib").html(`&copy; CBRE`)
+
+</script>
+
+</body>
+</html>
