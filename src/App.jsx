@@ -278,7 +278,7 @@ function App() {
     const responseData = await res.json();
     responseData?.geojson?.features?.forEach((station) => {
       const element = document.createElement("div");
-      element.innerHTML = `<div class="marker-name-testing" style="margin-top:30px">${station?.properties?.name}</div>`;
+      element.innerHTML = `<div class="marker-name-testing" style="margin-top:30px; color: #51B9FF; border: #FFFFFF; font-size:15px;">${station?.properties?.name}</div>`;
       const markerNameLabel = new mapboxgl.Marker(element);
       markerNameLabel
         .setLngLat(station.geometry.coordinates)
@@ -307,7 +307,7 @@ function App() {
           const color = colorMap[prefix] || "gray";
           if (color) {
             // output += <span class="${color}">${separated}</span>;
-            output += `<span class="${color}" style="padding: 0.3em 5px;line-height: 1; background-color: ${color}; color: ${generatedColor(
+            output += `<span class="${color}" style="padding: 0.3em 5px;line-height: 1; background-color: ${color}; font-size: 15px; color: ${generatedColor(
               color
             )}; ${generatedRounded(index, array.length)};">${separated}</span>`;
           }
@@ -488,24 +488,24 @@ function App() {
   }, []);
 
   useEffect(() => {
-    if (zoom < 15) {
+    if (zoom < 14) {
       const markerLabel = document.querySelectorAll(".marker-testing");
       markerLabel.forEach((item) => {
         item.style.display = "none";
       });
-    } else if (zoom >= 15) {
+    } else if (zoom >= 14) {
       const markerLabel = document.querySelectorAll(".marker-testing");
       markerLabel.forEach((item) => {
         item.style.display = "flex";
       });
     }
 
-    if (zoom < 17) {
+    if (zoom < 15) {
       const markerName = document.querySelectorAll(".marker-name-testing");
       markerName.forEach((item) => {
         item.style.display = "none";
       });
-    } else if (zoom >= 17) {
+    } else if (zoom >= 15) {
       const markerName = document.querySelectorAll(".marker-name-testing");
       markerName.forEach((item) => {
         item.style.display = "block";
