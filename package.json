@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@mapbox/mapbox-gl-geocoder": "^5.0.2",
-    "mapbox-gl": "^2.9.2",
+    "mapbox-gl": "^3.4.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.23.1"

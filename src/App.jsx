@@ -2,14 +2,12 @@ import "@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { useEffect, useRef, useState } from "react";
-import { useSearchParams } from "react-router-dom";
 import "./App.css";
 import FilterLine from "./components/FilterLine";
 import NotFound from "./components/NotFound";
 import SearchList from "./components/SearchList";
 import SearchLocation from "./components/SearchLocation";
 import { StyleList } from "./constant";
-import { convertSearchParamsToObject } from './helper/convertSearchParamsToObject';
 import data from "./utils/data.json";
 
 mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_KEY;
@@ -27,8 +25,7 @@ function App() {
   const [search, setSearch] = useState("");
   const [initalRegion, setInitialRegion] = useState([]);
   const [styleMap, setStyleMap] = useState("mapbox://styles/rajifmahendra/clxrims5h002k01pf1imoen80");
-  const [searchParams, setSearchParams] = useSearchParams()
-  const query = convertSearchParamsToObject(searchParams.toString())
+
 
   var filterdata = [
     {
@@ -408,7 +405,7 @@ function App() {
     map.current = new mapboxgl.Map({
       container: mapContainer.current,
       //style: "mapbox://styles/mapbox/streets-v12",
-      style: searchParams.get("style"),
+      style: JSON.parse(localStorage.getItem("styleMap")),
       center: [lng, lat],
       zoom: zoom,
     });
@@ -470,7 +467,7 @@ function App() {
         item.style.display = currentZoom < 12 ? "none" : "flex";
       });
     });
-  }, [styleMap, searchParams.get("style")]);
+  }, [styleMap, localStorage.getItem("styleMap")]);
 
   useEffect(() => {
     if (!map.current) return; // wait for map to initialize
@@ -551,9 +548,8 @@ function App() {
 
 
   const handleChangeStyleMap = (value) => {
-
     setStyleMap(value)
-    setSearchParams({ ...query, style: value })
+    localStorage.setItem('styleMap', JSON.stringify(value))
     window.location.reload()
   }
   return (
