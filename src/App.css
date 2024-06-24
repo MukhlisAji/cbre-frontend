@@ -82,9 +82,7 @@ button {
   background-color: #748477;
 }
 .marker-testing {
-  padding: 0.7px 12px !important;
   border-radius: 5px !important;
-  height: 14px !important;
 }
 
 .pill {
@@ -184,6 +182,13 @@ button {
 
 .marker-testing {
   color: #fff;
+  width: max-content;
+  height: max-content;
+  margin: 25px;
+ }
+
+ .marker-testing span{
+  pointer-events: none;
  }
 
 .popup-container {
@@ -239,4 +244,39 @@ button {
 
 .info-box a:hover {
   text-decoration: underline;
+}
+
+.container-marker-name-testing {
+  padding: 10px;
+  position: absolute;
+  right: 50%;
+  top: 0;
+  transform: translate(50%, 0);
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding-inline: 1em ;
+  justify-content: center;
+  align-items: center;
+  margin-top: 40px;
+}
+
+.marker-name-testing {
+  pointer-events: none;
+  color: #1a73e8;
+  border: #ffffff;
+  font-size: 18px;
+  -webkit-text-stroke: #fff .2px;
+  font-weight:600;
+  letter-spacing: 1px;
+  text-wrap: nowrap;
+}
+
+.icon-wrapper {
+  background-color: #1a73e8;
+  padding: 5px;
+  border-radius: 5px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
