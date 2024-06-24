@@ -105,43 +105,24 @@ function App() {
     // const res = await fetch(`http://103.127.134.145:3000/map-region/SG04`)
     const responseData = await res.json();
     setDataJson(responseData.geojson.features);
-    // if (responseData?.region?.POLYGON) {
-    //   var filterdata = [
-    //     {
-    //       "REGIONCODE": "SG03",
-    //       "REGIONNAME": "North West"
-    //     },
-    //     {
-    //       "REGIONCODE": "SG04",
-    //       "REGIONNAME": "South East"
-    //     },
-    //     {
-    //       "REGIONCODE": "SG05",
-    //       "REGIONNAME": "South West"
-    //     }
-    //   ]
 
-    //   filterdata.forEach(function (d) {
-    //     const target = document.getElementById("filter");
-    //     target.innerHTML += "<button>" + d.REGIONNAME + "</button>";
-    //   });
-    //   setDataRegionJson(responseData.region.POLYGON)
-    //   map.current.addSource('sgregion', {
-    //     'type': 'geojson',
-    //     // 'data': 'http://localhost:4000/geojson/default.geojson'
-    //     'data': responseData.region.POLYGON
-    //   });
-    //   map.current.addLayer({
-    //     'id': 'region',
-    //     'type': 'fill',
-    //     'source': 'sgregion',
-    //     'paint': {
-    //       'fill-color': ['get', 'color'],
-    //       'fill-opacity': 0.5
-    //     }
-    //   });
-    // }
     responseData.geojson.features.forEach((location) => {
+      // Buat elemen HTML untuk marker
+      const el = document.createElement('div');
+      el.className = 'marker';
+
+      // Buat elemen HTML untuk label
+      const label = document.createElement('div');
+      label.className = 'label';
+      label.textContent = location.properties.BUILDINGNAME;
+
+      // Tambahkan marker ke map
+      new mapboxgl.Marker(el)
+        .setLngLat(location.geometry.coordinates)
+        .addTo(map.current);
+
+      // Tambahkan label ke marker
+      el.appendChild(label);
       const marker = new mapboxgl.Marker()
         .setLngLat(location.geometry.coordinates)
         .addTo(map.current);
@@ -159,7 +140,25 @@ function App() {
     `);
 
       marker.setPopup(popup);
+      const mName = document.querySelectorAll(
+        ".label"
+      );
+      mName.forEach((item) => {
+        item.style.display = "none";
+      });
+
+      if (zoom > 14) {
+        const mName = document.querySelectorAll(
+          ".label"
+        );
+        mName.forEach((item) => {
+          item.style.display = "block";
+        });
+      }
+
     });
+
+
   };
   const RegionData = async () => {
     if (initalRegion.length > 0) {
@@ -168,35 +167,10 @@ function App() {
         }`
       );
       const responseData = await res.json();
-      // if (responseData?.REGIONNAME !== initalRegion) {
-      //   map.current.removeLayer({
-      //     'id': `'region-${initalRegion}'`,
-      //     'type': 'fill',
-      //     'source': `sgregion-${initalRegion}`,
-      //   })
-      // }
-      // console.log(initalRegion)
+
       if (responseData?.region?.POLYGON) {
         setDataRegionJson(responseData.region.POLYGON);
 
-        // initalRegion.forEach((item) => {
-        //   console.log(item, 'tes-item')
-        //   map.current.addSource(`sgregion-${item}`, {
-        //     'type': 'geojson',
-        //     // 'data': 'http://localhost:4000/geojson/default.geojson'
-        //     'data': responseData.region.POLYGON
-        //   });
-
-        //   map.current.addLayer({
-        //     'id': `'region-${item}'`,
-        //     'type': 'fill',
-        //     'source': `sgregion-${item}`,
-        //     'paint': {
-        //       'fill-color': ['get', 'color'],
-        //       'fill-opacity': 0.5
-        //     }
-        //   });
-        // })
         map.current.addSource(
           `sgregion-${initalRegion[initalRegion.length - 1]}`,
           {
@@ -304,9 +278,8 @@ function App() {
     <div class="container-marker-name-testing">
       <div class="marker-name-testing">${station?.properties?.name}</div>
       <div class="icon-wrapper">
-       ${
-         station?.properties?.network === "mrt"
-           ? `
+       ${station?.properties?.network === "mrt"
+            ? `
            <svg
              width="15px"
              xmlns="http://www.w3.org/2000/svg"
@@ -317,7 +290,7 @@ function App() {
                d="M96 0C43 0 0 43 0 96V352c0 48 35.2 87.7 81.1 94.9l-46 46C28.1 499.9 33.1 512 43 512H82.7c8.5 0 16.6-3.4 22.6-9.4L160 448H288l54.6 54.6c6 6 14.1 9.4 22.6 9.4H405c10 0 15-12.1 7.9-19.1l-46-46c46-7.1 81.1-46.9 81.1-94.9V96c0-53-43-96-96-96H96zM64 128c0-17.7 14.3-32 32-32h80c17.7 0 32 14.3 32 32v96c0 17.7-14.3 32-32 32H96c-17.7 0-32-14.3-32-32V128zM272 96h80c17.7 0 32 14.3 32 32v96c0 17.7-14.3 32-32 32H272c-17.7 0-32-14.3-32-32V128c0-17.7 14.3-32 32-32zM64 352a32 32 0 1 1 64 0 32 32 0 1 1 -64 0zm288-32a32 32 0 1 1 0 64 32 32 0 1 1 0-64z"
              />
            </svg>`
-           : `<svg
+            : `<svg
            width="15px"
            xmlns="http://www.w3.org/2000/svg"
            viewBox="0 0 448 512"
@@ -327,7 +300,7 @@ function App() {
              d="M86.8 48c-12.2 0-23.6 5.5-31.2 15L42.7 79C34.5 89.3 19.4 91 9 82.7S-3 59.4 5.3 49L18 33C34.7 12.2 60 0 86.8 0H361.2c26.7 0 52 12.2 68.7 33l12.8 16c8.3 10.4 6.6 25.5-3.8 33.7s-25.5 6.6-33.7-3.7L392.5 63c-7.6-9.5-19.1-15-31.2-15H248V96h40c53 0 96 43 96 96V352c0 30.6-14.3 57.8-36.6 75.4l65.5 65.5c7.1 7.1 2.1 19.1-7.9 19.1H365.3c-8.5 0-16.6-3.4-22.6-9.4L288 448H160l-54.6 54.6c-6 6-14.1 9.4-22.6 9.4H43c-10 0-15-12.1-7.9-19.1l65.5-65.5C78.3 409.8 64 382.6 64 352V192c0-53 43-96 96-96h40V48H86.8zM160 160c-17.7 0-32 14.3-32 32v32c0 17.7 14.3 32 32 32H288c17.7 0 32-14.3 32-32V192c0-17.7-14.3-32-32-32H160zm32 192a32 32 0 1 0 -64 0 32 32 0 1 0 64 0zm96 32a32 32 0 1 0 0-64 32 32 0 1 0 0 64z"
            />
          </svg>`
-       }
+          }
       </div>
       </div>
       ${linesOutput}
@@ -374,34 +347,10 @@ function App() {
           }
         });
 
-        // const name = document.createElement("p");
-        // name.innerHTML = `<p class="marker-name" style="font-size: 28px">${station.properties.BUILDINGNAME}</p>`;
-        // const markerName = new mapboxgl.Marker(name);
-        // markerName.setLngLat(station.geometry.coordinates);
-
         markerNameLabel
           .setLngLat(station.geometry.coordinates)
           .addTo(map.current);
       }
-      // const popup = new mapboxgl.Popup({ offset: 25 }).setHTML(`
-      //     <div class="popup-container">
-      //         <div class="popup-image">
-      //             <img src="${station.properties.wikipedia_image_url}" alt="No Image" />
-      //         </div>
-      //         <div class="info-box">
-      //             <h3>${station.properties.name}</h3>
-      //             <div class="other-info">
-      //                 <p><strong>In Hindi:</strong> ${station.properties.name_hi}</p>
-      //                 <p><strong>In Chinese:</strong> ${station.properties.name_zh}</p>
-      //                 <p><strong>Line:</strong> NS23</p>
-      //                 <p><strong>Network:</strong> ${station.properties.network}</p>
-      //             </div>
-      //             <p><strong>Type:</strong> ${station.properties.type}</p>
-      //             <a href="${station.properties.wikipedia_url}" target="_blank">More Info</a>
-      //         </div>
-      //     </div>`);
-
-      // marker.setPopup(popup);
 
       const markerLabel = document.querySelectorAll(".marker-testing");
       markerLabel.forEach((item) => {
@@ -562,6 +511,22 @@ function App() {
       );
       markerName.forEach((item) => {
         item.style.display = "flex";
+      });
+    }
+
+    if (zoom > 14) {
+      const markerName = document.querySelectorAll(
+        ".label"
+      );
+      markerName.forEach((item) => {
+        item.style.display = "block";
+      });
+    } else if (zoom <= 14) {
+      const markerName = document.querySelectorAll(
+        ".label"
+      );
+      markerName.forEach((item) => {
+        item.style.display = "none";
       });
     }
   }, [zoom]);

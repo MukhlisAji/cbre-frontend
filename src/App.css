@@ -185,11 +185,11 @@ button {
   width: max-content;
   height: max-content;
   margin: 25px;
- }
+}
 
- .marker-testing span{
+.marker-testing span {
   pointer-events: none;
- }
+}
 
 .popup-container {
   overflow: hidden;
@@ -255,7 +255,7 @@ button {
   display: flex;
   flex-direction: column;
   gap: 5px;
-  padding-inline: 1em ;
+  padding-inline: 1em;
   justify-content: center;
   align-items: center;
   margin-top: 40px;
@@ -266,8 +266,8 @@ button {
   color: #1a73e8;
   border: #ffffff;
   font-size: 18px;
-  -webkit-text-stroke: #fff .2px;
-  font-weight:600;
+  -webkit-text-stroke: #fff 0.2px;
+  font-weight: 600;
   letter-spacing: 1px;
   text-wrap: nowrap;
 }
@@ -279,4 +279,9 @@ button {
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+.label {
+  position: relative;
+  top: 20px;
 }
