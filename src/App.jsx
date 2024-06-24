@@ -2,11 +2,14 @@ import "@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { useEffect, useRef, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import "./App.css";
 import FilterLine from "./components/FilterLine";
 import NotFound from "./components/NotFound";
 import SearchList from "./components/SearchList";
 import SearchLocation from "./components/SearchLocation";
+import { StyleList } from "./constant";
+import { convertSearchParamsToObject } from './helper/convertSearchParamsToObject';
 import data from "./utils/data.json";
 
 mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_KEY;
@@ -23,6 +26,9 @@ function App() {
   const [filteringData, setFilteringData] = useState([]);
   const [search, setSearch] = useState("");
   const [initalRegion, setInitialRegion] = useState([]);
+  const [styleMap, setStyleMap] = useState("mapbox://styles/rajifmahendra/clxrims5h002k01pf1imoen80");
+  const [searchParams, setSearchParams] = useSearchParams()
+  const query = convertSearchParamsToObject(searchParams.toString())
 
   var filterdata = [
     {
@@ -158,8 +164,7 @@ function App() {
   const RegionData = async () => {
     if (initalRegion.length > 0) {
       const res = await fetch(
-        `http://103.127.134.145:3000/map-region/${
-          initalRegion[initalRegion.length - 1]
+        `http://103.127.134.145:3000/map-region/${initalRegion[initalRegion.length - 1]
         }`
       );
       const responseData = await res.json();
@@ -410,7 +415,7 @@ function App() {
     map.current = new mapboxgl.Map({
       container: mapContainer.current,
       //style: "mapbox://styles/mapbox/streets-v12",
-      style: "mapbox://styles/rajifmahendra/clxrims5h002k01pf1imoen80",
+      style: searchParams.get("style"),
       center: [lng, lat],
       zoom: zoom,
     });
@@ -472,7 +477,7 @@ function App() {
         item.style.display = currentZoom < 12 ? "none" : "flex";
       });
     });
-  }, []);
+  }, [styleMap, searchParams.get("style")]);
 
   useEffect(() => {
     if (!map.current) return; // wait for map to initialize
@@ -530,6 +535,14 @@ function App() {
     RegionData();
   }, [initalRegion]);
 
+
+
+  const handleChangeStyleMap = (value) => {
+
+    setStyleMap(value)
+    setSearchParams({ ...query, style: value })
+    window.location.reload()
+  }
   return (
     <div className="App">
       <SearchLocation onSearchChange={handleSearch} />
@@ -541,6 +554,13 @@ function App() {
       {/* Todo: Fix Style so it looks better */}
 
       <FilterLine onClickAction={() => setShowMRT(!showMRT)} />
+      <div style={{ position: 'absolute', bottom: 0, height: 'max-content', zIndex: 999999, display: 'flex', gap: '10px', }}>
+
+        {StyleList.map((item, index) => (
+          <button key={index} style={{ fontSize: '16px', width: '120px', height: '100px' }} onClick={() => handleChangeStyleMap(item.value)}>{item.label}</button>
+        ))}
+
+      </div>
       <div className="sidebar">
         Longitude: {lng} | Latitude: {lat} | Zoom: {zoom}
         {/* Filtering Region Button */}
