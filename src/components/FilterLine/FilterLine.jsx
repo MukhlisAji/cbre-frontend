@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import IconLine from "../../assets/jalur.png";
+import { StyleStreet } from "../../utils";
 import "./FilterLine.css";
 
 const FilterLine = ({ expandedMenu, subMenu }) => {
@@ -61,7 +61,7 @@ const FilterLine = ({ expandedMenu, subMenu }) => {
       >
         <div className="filter-content">
           <div className="filter-icon">
-            <img src={IconLine} draggable="false" alt="line" />
+            <img src={StyleStreet} draggable="false" alt="line" />
             <p>Layer</p>
           </div>
         </div>
@@ -75,7 +75,7 @@ const FilterLine = ({ expandedMenu, subMenu }) => {
             {subMenu && subMenu.map((item, index) => (
               <div key={index} className="submenu-item" onClick={item.onClick}>
                 <div className="submenu-icon">
-                  <img src={item.icon} draggable="false" alt={item.name} />
+                  <img src={item.icon} width={70} height={70} draggable="false" alt={item.name} />
                 </div>
                 <p>{item.name}</p>
               </div>

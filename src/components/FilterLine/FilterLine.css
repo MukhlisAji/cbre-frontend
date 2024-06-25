@@ -35,6 +35,8 @@
   justify-content: center;
   gap: 10px;
   align-items: center;
+  width: 100%;
+  height: 100%;
 }
 
 .filter-icon {
@@ -42,6 +44,11 @@
   position: relative;
   box-sizing: border-box;
   overflow: hidden;
+}
+
+.filter-content:hover .filter-icon {
+  scale: 0.9;
+  transition: 0.3s;
 }
 
 .filter-icon p {
@@ -55,8 +62,8 @@
 .filter-icon img {
   object-fit: cover;
   border-radius: 10px;
-  width: 100%;
-  height: 100%;
+  width: 90px;
+  height: 90px;
 }
 
 .submenu {
@@ -93,8 +100,8 @@
 }
 
 .submenu-item .submenu-icon img {
-  width: 100%;
-  height: 100%;
+  width: 100% !important;
+  height: 100% !important;
   object-fit: cover;
 }
 

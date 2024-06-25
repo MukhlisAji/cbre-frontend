@@ -1,3 +1,12 @@
+import {
+  NortWest,
+  SouthEast,
+  SouthWest,
+  StyleNavigationDay,
+  StyleSatelliteStreet,
+  StyleStreet,
+} from "../utils";
+
 export const StyleList = [
   // {
   //   value: "mapbox://styles/rajifmahendra/clxrims5h002k01pf1imoen80",
@@ -6,14 +15,17 @@ export const StyleList = [
   {
     value: "mapbox://styles/mapbox/streets-v12",
     label: "Style Street",
+    icon: StyleStreet,
   },
   {
     value: "mapbox://styles/mapbox/satellite-streets-v12",
     label: "Style Satellite Street",
+    icon: StyleSatelliteStreet,
   },
   {
     value: "mapbox://styles/mapbox/navigation-day-v1",
     label: "Style Navigation Day",
+    icon: StyleNavigationDay,
   },
 ];
 
@@ -21,14 +33,17 @@ export const filterdata = [
   {
     REGIONCODE: "SG03",
     REGIONNAME: "North West",
+    ICON: NortWest,
   },
   {
     REGIONCODE: "SG04",
     REGIONNAME: "South East",
+    ICON: SouthEast,
   },
   {
     REGIONCODE: "SG05",
     REGIONNAME: "South West",
+    ICON: SouthWest,
   },
 ];
 

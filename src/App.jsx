@@ -8,10 +8,8 @@ import NotFound from "./components/NotFound";
 import SearchList from "./components/SearchList";
 import SearchLocation from "./components/SearchLocation";
 import { StyleList, filterdata } from "./constant";
-import { useConfig } from "./hooks/useConfig";
-import { useMRTData, useMRTLine } from "./hooks/useMRT";
-import { useMap } from "./hooks/useMap";
-import { useRegion } from "./hooks/useRegion";
+import { useConfig, useMRTData, useMRTLine, useMap, useRegion } from './hooks';
+import { AllRegion, NortWest, SouthEast, StyleSatelliteStreet } from './utils';
 
 
 
@@ -46,18 +44,18 @@ function App() {
     },
     {
       name: "North West",
-      icon: IconLine,
+      icon: NortWest,
       onClick: () => showRegion("SG03"),
     },
     {
       name: "South East",
-      icon: IconLine,
+      icon: SouthEast,
       onClick: () => showRegion("SG04"),
     },
 
     {
       name: "Style Satellite Street",
-      icon: IconLine,
+      icon: StyleSatelliteStreet,
       onClick: () => {
         handleChangeStyleMap("mapbox://styles/mapbox/satellite-streets-v12");
       },
@@ -70,14 +68,14 @@ function App() {
       items: [
         ...filterdata.map((data) => ({
           name: data.REGIONNAME,
-          icon: IconLine,
+          icon: data.ICON,
           onClick: () => {
             showRegion(data.REGIONCODE)
           },
         })),
         {
           name: "All Region",
-          icon: IconLine,
+          icon: AllRegion,
           onClick: showAllRegion,
         },
 
@@ -88,7 +86,7 @@ function App() {
       items: [
         ...StyleList.map((data) => ({
           name: data.label,
-          icon: IconLine,
+          icon: data.icon,
           onClick: () => {
             handleChangeStyleMap(data.value);
           },
