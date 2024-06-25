@@ -285,3 +285,31 @@ button {
   position: relative;
   top: 20px;
 }
+
+.marker-map {
+  position: relative;
+}
+
+.marker-map .label-name-map {
+  position: absolute;
+  bottom: 100%;
+  text-wrap: nowrap;
+  left: 50%;
+  transform: translateX(-50%);
+  pointer-events: none;
+  color: #1a73e8;
+  border: #ffffff;
+  font-size: 18px;
+  -webkit-text-stroke: #fff 0.2px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-wrap: nowrap;
+}
+
+.marker-map .label-address-map {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-55%, -80%);
+  text-wrap: nowrap;
+}
