@@ -1,49 +1,41 @@
 import { useEffect, useState } from "react";
+import { filterdata } from "../constant";
 
 export function useRegion(map) {
   const [initialRegion, setInitialRegion] = useState([]);
   const RegionData = async () => {
     if (initialRegion.length > 0) {
-      const res = await fetch(
-        `http://103.127.134.145:3000/map-region/${
-          initialRegion[initialRegion.length - 1]
-        }`
-      );
-      const responseData = await res.json();
+      initialRegion.forEach(async (item) => {
+        const res = await fetch(
+          `http://103.127.134.145:3000/map-region/${item}`
+        );
+        const responseData = await res.json();
 
-      if (responseData?.region?.POLYGON) {
-        // setDataRegionJson(responseData.region.POLYGON);
+        if (responseData?.region?.POLYGON) {
+          // setDataRegionJson(responseData.region.POLYGON);
 
-        map.current.addSource(
-          `sgregion-${initialRegion[initialRegion.length - 1]}`,
-          {
+          map.current.addSource(`sgregion-${item}`, {
             type: "geojson",
             // 'data': 'http://localhost:4000/geojson/default.geojson'
             data: responseData.region.POLYGON,
-          }
-        );
+          });
 
-        map.current.addLayer({
-          id: `region-${initialRegion[initialRegion.length - 1]}`,
-          type: "fill",
-          source: `sgregion-${initialRegion[initialRegion.length - 1]}`,
-          paint: {
-            "fill-color": ["get", "color"],
-            "fill-opacity": 0.5,
-          },
-        });
-      }
+          map.current.addLayer({
+            id: `region-${item}`,
+            type: "fill",
+            source: `sgregion-${item}`,
+            paint: {
+              "fill-color": ["get", "color"],
+              "fill-opacity": 0.5,
+            },
+          });
+        }
+      });
     }
   };
 
   const resetRegion = () => {
-    console.log({ initialRegion, map: map.current });
-    console.log(map.current.getStyle());
     if (initialRegion.length > 0) {
-      const regionId = initialRegion[initialRegion.length - 1];
-      const layerId = `region-${regionId}`;
-      const sourceId = `sgregion-${regionId}`;
-
       initialRegion.map((item) => {
         if (map.current.getLayer(`region-${item}`)) {
           map.current.removeLayer(`region-${item}`);
@@ -53,13 +45,42 @@ export function useRegion(map) {
         }
       });
     }
+  };
 
-    // window.location.reload();
+  const showRegion = (code) => {
+    if (map.current.getLayer(`region-${code}`)) {
+      map.current.removeLayer(`region-${code}`);
+      if (map.current.getSource(`sgregion-${code}`)) {
+        map.current.removeSource(`sgregion-${code}`);
+        const findCode = initialRegion.find((item) => item === code);
+        if (findCode) {
+          setInitialRegion(initialRegion.filter((item) => item !== code));
+        }
+      }
+    } else {
+      setInitialRegion([...initialRegion, code]);
+    }
+  };
+
+  const showAllRegion = () => {
+    if (initialRegion.length >= 3) {
+      resetRegion();
+      setInitialRegion([]);
+    } else {
+      console.log("tes");
+      setInitialRegion(filterdata.map((data) => data.REGIONCODE));
+    }
   };
 
   useEffect(() => {
     RegionData();
   }, [initialRegion]);
 
-  return { initialRegion, setInitialRegion, resetRegion };
+  return {
+    initialRegion,
+    setInitialRegion,
+    resetRegion,
+    showRegion,
+    showAllRegion,
+  };
 }

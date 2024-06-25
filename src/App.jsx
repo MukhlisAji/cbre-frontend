@@ -21,7 +21,7 @@ function App() {
   const { lat, lng, map, mapContainer, zoom, setLat, setLng, setZoom, styleMap, handleChangeStyleMap } = useConfig()
 
   // region
-  const { initialRegion, setInitialRegion, resetRegion } = useRegion(map)
+  const { setInitialRegion, showAllRegion, showRegion } = useRegion(map)
   // main map
   const { filteringData, handleSearch, search } = useMap(styleMap, map, zoom)
 
@@ -47,20 +47,12 @@ function App() {
     {
       name: "North West",
       icon: IconLine,
-      onClick: () => {
-        setInitialRegion((prev) => {
-          return [...prev, "SG03"];
-        });
-      },
+      onClick: () => showRegion("SG03"),
     },
     {
       name: "South East",
       icon: IconLine,
-      onClick: () => {
-        setInitialRegion((prev) => {
-          return [...prev, "SG04"];
-        });
-      },
+      onClick: () => showRegion("SG04"),
     },
 
     {
@@ -80,28 +72,15 @@ function App() {
           name: data.REGIONNAME,
           icon: IconLine,
           onClick: () => {
-            setInitialRegion((prev) => {
-              return [...prev, data.REGIONCODE];
-            });
+            showRegion(data.REGIONCODE)
           },
         })),
         {
           name: "All Region",
           icon: IconLine,
-          onClick: () => {
-            setInitialRegion((pref) => [
-              ...pref,
-              ...filterdata.map((data) => data.REGIONCODE),
-            ]);
-          },
+          onClick: showAllRegion,
         },
-        {
-          name: "Reset Region",
-          icon: IconLine,
-          onClick: () => {
-            resetRegion();
-          },
-        },
+
       ],
     },
     {
