@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
 
 export function useRegion(map) {
-  const [initalRegion, setInitialRegion] = useState([]);
+  const [initialRegion, setInitialRegion] = useState([]);
   const RegionData = async () => {
-    if (initalRegion.length > 0) {
+    if (initialRegion.length > 0) {
       const res = await fetch(
         `http://103.127.134.145:3000/map-region/${
-          initalRegion[initalRegion.length - 1]
+          initialRegion[initialRegion.length - 1]
         }`
       );
       const responseData = await res.json();
@@ -15,7 +15,7 @@ export function useRegion(map) {
         // setDataRegionJson(responseData.region.POLYGON);
 
         map.current.addSource(
-          `sgregion-${initalRegion[initalRegion.length - 1]}`,
+          `sgregion-${initialRegion[initialRegion.length - 1]}`,
           {
             type: "geojson",
             // 'data': 'http://localhost:4000/geojson/default.geojson'
@@ -24,9 +24,9 @@ export function useRegion(map) {
         );
 
         map.current.addLayer({
-          id: `'region-${initalRegion[initalRegion.length - 1]}'`,
+          id: `region-${initialRegion[initialRegion.length - 1]}`,
           type: "fill",
-          source: `sgregion-${initalRegion[initalRegion.length - 1]}`,
+          source: `sgregion-${initialRegion[initialRegion.length - 1]}`,
           paint: {
             "fill-color": ["get", "color"],
             "fill-opacity": 0.5,
@@ -35,9 +35,31 @@ export function useRegion(map) {
       }
     }
   };
+
+  const resetRegion = () => {
+    console.log({ initialRegion, map: map.current });
+    console.log(map.current.getStyle());
+    if (initialRegion.length > 0) {
+      const regionId = initialRegion[initialRegion.length - 1];
+      const layerId = `region-${regionId}`;
+      const sourceId = `sgregion-${regionId}`;
+
+      initialRegion.map((item) => {
+        if (map.current.getLayer(`region-${item}`)) {
+          map.current.removeLayer(`region-${item}`);
+          if (map.current.getSource(`sgregion-${item}`)) {
+            map.current.removeSource(`sgregion-${item}`);
+          }
+        }
+      });
+    }
+
+    // window.location.reload();
+  };
+
   useEffect(() => {
     RegionData();
-  }, [initalRegion]);
+  }, [initialRegion]);
 
-  return { initalRegion, setInitialRegion };
+  return { initialRegion, setInitialRegion, resetRegion };
 }
