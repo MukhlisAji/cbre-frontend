@@ -21,7 +21,7 @@ function App() {
   const { lat, lng, map, mapContainer, zoom, setLat, setLng, setZoom, styleMap, handleChangeStyleMap } = useConfig()
 
   // region
-  const { setInitialRegion, showAllRegion, showRegion } = useRegion(map)
+  const { showAllRegion, showRegion } = useRegion(map)
   // main map
   const { filteringData, handleSearch, search } = useMap(styleMap, map, zoom)
 
@@ -97,27 +97,6 @@ function App() {
     },
   ];
 
-
-  // const handleReset = () => {
-  //   if (initialRegion.length > 0) {
-  //     initialRegion.forEach((item) => {
-  //       const layerId = `region-${item}`;
-  //       const sourceId = `sgregion-${item}`;
-
-  //       // TODO : BUG
-  //       // Remove the layer if it exists
-  //       if (map.current.getLayer(layerId)) {
-  //         map.current.removeLayer(layerId);
-  //       }
-
-  //       // TODO : BUG
-  //       // Remove the source if it exists
-  //       if (map.current.getSource(sourceId)) {
-  //         map.current.removeSource(sourceId);
-  //       }
-  //     });
-  //   }
-  // };
 
   useEffect(() => {
     if (!map.current) return; // wait for map to initialize
