@@ -2,7 +2,8 @@ import "@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { useEffect } from "react";
 import "./App.css";
-import FilterLine from "./components/FilterLine";
+import IconLine from './assets/jalur.png';
+import FilterLine from "./components/FilterLine/FilterLine";
 import NotFound from "./components/NotFound";
 import SearchList from "./components/SearchList";
 import SearchLocation from "./components/SearchLocation";
@@ -26,7 +27,7 @@ function App() {
 
   // MRT
   useMRTData(zoom, map)
-  const { setShowMRT, showMRT } = useMRTLine(map)
+  const { setShowMRT } = useMRTLine(map)
 
 
 
@@ -34,6 +35,88 @@ function App() {
     map.current.setCenter(coordinate);
     map.current.setZoom(15);
   };
+
+  const subMenu = [
+    {
+      name: "Line MRT/LTR",
+      icon: IconLine,
+      onClick: () => {
+        setShowMRT(prev => !prev);
+      },
+    },
+    {
+      name: "North West",
+      icon: IconLine,
+      onClick: () => {
+        setInitialRegion((prev) => {
+          return [...prev, "SG03"];
+        });
+      },
+    },
+    {
+      name: "South East",
+      icon: IconLine,
+      onClick: () => {
+        setInitialRegion((prev) => {
+          return [...prev, "SG04"];
+        });
+      },
+    },
+
+    {
+      name: "Style Satellite Street",
+      icon: IconLine,
+      onClick: () => {
+        handleChangeStyleMap("mapbox://styles/mapbox/satellite-streets-v12");
+      },
+    },
+  ];
+
+  const expandedMenu = [
+    {
+      label: "Region Map",
+      items: [
+        ...filterdata.map((data) => ({
+          name: data.REGIONNAME,
+          icon: IconLine,
+          onClick: () => {
+            setInitialRegion((prev) => {
+              return [...prev, data.REGIONCODE];
+            });
+          },
+        })),
+        {
+          name: "All Region",
+          icon: IconLine,
+          onClick: () => {
+            setInitialRegion((pref) => [
+              ...pref,
+              ...filterdata.map((data) => data.REGIONCODE),
+            ]);
+          },
+        },
+        {
+          name: "Reset Region",
+          icon: IconLine,
+          onClick: () => {
+            handleReset();
+          },
+        },
+      ],
+    },
+    {
+      label: "Type Map",
+      items: [
+        ...StyleList.map((data) => ({
+          name: data.label,
+          icon: IconLine,
+          onClick: () => {
+            handleChangeStyleMap(data.value);
+          },
+        })),
+      ],
+    },
+  ];
 
 
   const handleReset = () => {
@@ -66,10 +149,6 @@ function App() {
     });
   }, []);
 
-
-
-
-
   return (
     <div className="App">
       <SearchLocation onSearchChange={handleSearch} />
@@ -78,34 +157,15 @@ function App() {
       )}
       {!filteringData.length && search.length > 0 && <NotFound />}
 
-      {/* Todo: Fix Style so it looks better */}
 
-      <FilterLine onClickAction={() => setShowMRT(!showMRT)} />
-      <div style={{ position: 'absolute', bottom: 0, height: 'max-content', zIndex: 999999, display: 'flex', gap: '10px', }}>
 
-        {StyleList.map((item, index) => (
-          <button key={index} style={{ fontSize: '16px', width: '120px', height: '100px' }} onClick={() => handleChangeStyleMap(item.value)}>{item.label}</button>
-        ))}
+      <FilterLine subMenu={subMenu} expandedMenu={expandedMenu} />
 
-      </div>
       <div className="sidebar">
         Longitude: {lng} | Latitude: {lat} | Zoom: {zoom}
-        {/* Filtering Region Button */}
+
         <div id="filter">
-          {/* BUTTON TODO IS ALREADY BUG */}
-          <button onClick={handleReset}>RESET</button>
-          {filterdata.map((item, index) => (
-            <button
-              key={index}
-              onClick={() =>
-                setInitialRegion((prev) => {
-                  return [...prev, item.REGIONCODE];
-                })
-              }
-            >
-              {item.REGIONNAME}
-            </button>
-          ))}
+
         </div>
       </div>
 

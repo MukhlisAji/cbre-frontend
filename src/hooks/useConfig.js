@@ -112,12 +112,12 @@ export function useConfig() {
     }
 
     if (zoom > 14) {
-      const markerName = document.querySelectorAll(".label");
+      const markerName = document.querySelectorAll(".label-name-map");
       markerName.forEach((item) => {
         item.style.display = "block";
       });
     } else if (zoom <= 14) {
-      const markerName = document.querySelectorAll(".label");
+      const markerName = document.querySelectorAll(".label-name-map");
       markerName.forEach((item) => {
         item.style.display = "none";
       });
