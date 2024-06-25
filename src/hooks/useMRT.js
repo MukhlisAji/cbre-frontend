@@ -1,8 +1,7 @@
 import mapboxgl from "mapbox-gl";
 import { useEffect, useState } from "react";
 import { colorMap } from "../constant";
-import { generatedColor } from "../helper/generatedColor";
-import { generatedRounded } from "../helper/generatedRounded";
+import { generatedColor, generatedRounded } from "../helper";
 
 export function useMRTData(zoom, map) {
   const MRTData = async () => {
