@@ -6,9 +6,9 @@ export function useMap(styleMap, map, zoom) {
   const [filteringData, setFilteringData] = useState([]);
   const [search, setSearch] = useState("");
 
-  const handleSearch = (e) => {
-    setSearch(e?.target?.value);
-    const lowerSearch = e?.target?.value?.toLowerCase();
+  const handleSearch = (searchValue) => {
+    setSearch(searchValue);
+    const lowerSearch = searchValue?.toLowerCase();
     const filtering = dataMap?.filter((item) => {
       const lowerTitle = item?.properties?.BUILDINGNAME?.toLowerCase();
 
@@ -19,7 +19,7 @@ export function useMap(styleMap, map, zoom) {
       map.current.setZoom(15);
     }
     setFilteringData(filtering);
-    if (e?.target?.value.length === 0) {
+    if (searchValue.length === 0) {
       setFilteringData([]);
     }
   };

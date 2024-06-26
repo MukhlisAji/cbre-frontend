@@ -6,10 +6,11 @@ import IconLine from './assets/jalur.png';
 import FilterLine from "./components/FilterLine/FilterLine";
 import NotFound from "./components/NotFound";
 import SearchList from "./components/SearchList";
-import SearchLocation from "./components/SearchLocation";
+// import SearchLocation from "./components/SearchLocation";
 import { StyleList, filterdata } from "./constant";
 import { useConfig, useMRTData, useMRTLine, useMap, useRegion } from './hooks';
 import { AllRegion, NortWest, SouthEast, StyleSatelliteStreet } from './utils';
+import SearchLocation from "./components/SearchLocation/SearchLocation";
 
 
 
@@ -107,11 +108,12 @@ function App() {
 
   return (
     <div className="App">
-      <SearchLocation onSearchChange={handleSearch} />
+      <SearchLocation onSearchChange={handleSearch} filteringData={filteringData} search={search} onClickAction={handleClick} />
+      {/* <SearchLocation onSearchChange={handleSearch} />
       {filteringData.length > 0 && (
         <SearchList onClickAction={handleClick} filteringData={filteringData} />
       )}
-      {!filteringData.length && search.length > 0 && <NotFound />}
+      {!filteringData.length && search.length > 0 && <NotFound />} */}
 
 
 

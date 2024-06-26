@@ -10,6 +10,8 @@ import StyleStreet from "../assets/style_street.png";
 import ImageMore from "../assets/more.svg";
 import StyleNavigationNight from "../assets/style_navigation_night.png";
 import ZooningStyle from "../assets/zooning_style.png";
+import History from "../assets/history.svg";
+import PinSearch from "../assets/pin-search.svg";
 
 
 export {
@@ -24,5 +26,7 @@ export {
   StyleStreet,
   ImageMore,
   StyleNavigationNight, 
-  ZooningStyle
+  ZooningStyle,
+  History,
+  PinSearch
 };
