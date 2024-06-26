@@ -44,6 +44,18 @@
   position: relative;
   box-sizing: border-box;
   overflow: hidden;
+  position: relative;
+}
+
+.filter-icon::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.3);
+  border-radius: 10px;
 }
 
 .filter-content:hover .filter-icon {
@@ -52,11 +64,13 @@
 }
 
 .filter-icon p {
+  color: #fff;
   position: absolute;
   bottom: 0;
   width: 100%;
   font-size: 20px;
   font-weight: 600;
+  z-index: 10;
 }
 
 .filter-icon img {
@@ -97,11 +111,6 @@
   box-sizing: border-box;
   overflow: hidden;
   user-select: none;
-}
-
-.submenu-item .submenu-icon img {
-  width: 100% !important;
-  height: 100% !important;
   object-fit: cover;
 }
 

@@ -5,6 +5,7 @@ import {
   StyleNavigationDay,
   StyleSatelliteStreet,
   StyleStreet,
+  StyleNavigationNight, ZooningStyle
 } from "../utils";
 
 export const StyleList = [
@@ -23,9 +24,19 @@ export const StyleList = [
     icon: StyleSatelliteStreet,
   },
   {
+    value: "mapbox://styles/rajifmahendra/clxsl7nxe00mo01o7di1f2fvw",
+    label: "Zooning Style",
+    icon: ZooningStyle,
+  },
+  {
     value: "mapbox://styles/mapbox/navigation-day-v1",
     label: "Style Navigation Day",
     icon: StyleNavigationDay,
+  },
+  {
+    value: "mapbox://styles/mapbox/navigation-night-v1",
+    label: "Style Navigation Night",
+    icon: StyleNavigationNight,
   },
 ];
 

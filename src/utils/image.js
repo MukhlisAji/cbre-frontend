@@ -7,6 +7,10 @@ import SouthWest from "../assets/south_west.png";
 import StyleNavigationDay from "../assets/style_navigation_day.png";
 import StyleSatelliteStreet from "../assets/style_satellite_street.png";
 import StyleStreet from "../assets/style_street.png";
+import ImageMore from "../assets/more.svg";
+import StyleNavigationNight from "../assets/style_navigation_night.png";
+import ZooningStyle from "../assets/zooning_style.png";
+
 
 export {
   AllRegion,
@@ -18,4 +22,7 @@ export {
   StyleNavigationDay,
   StyleSatelliteStreet,
   StyleStreet,
+  ImageMore,
+  StyleNavigationNight, 
+  ZooningStyle
 };

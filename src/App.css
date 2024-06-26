@@ -310,6 +310,9 @@ button {
   position: absolute;
   top: 50%;
   left: 50%;
-  transform: translate(-55%, -80%);
+  transform: translate(-50%, -80%);
   text-wrap: nowrap;
+  color: #fff;
+  font-weight: 600;
+  font-size: 14px;
 }

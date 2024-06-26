@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { StyleStreet } from "../../utils";
+import { StyleStreet, ImageMore } from "../../utils";
 import "./FilterLine.css";
 
 const FilterLine = ({ expandedMenu, subMenu }) => {
@@ -81,6 +81,9 @@ const FilterLine = ({ expandedMenu, subMenu }) => {
               </div>
             ))}
             <div className="submenu-item" onClick={() => setExpanded(true)}>
+              <div className="submenu-icon" style={{ padding: "10px" }}>
+                <img src={ImageMore} width={70} height={70} draggable="false" alt="line" />
+              </div>
               <p>Lainnya</p>
             </div>
           </div>
