@@ -84,7 +84,7 @@ const FilterLine = ({ expandedMenu, subMenu }) => {
               <div className="submenu-icon" style={{ padding: "10px" }}>
                 <img src={ImageMore} width={70} height={70} draggable="false" alt="line" />
               </div>
-              <p>Lainnya</p>
+              <p>More</p>
             </div>
           </div>
         )}

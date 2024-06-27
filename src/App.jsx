@@ -36,7 +36,7 @@ function App() {
 
   const subMenu = [
     {
-      name: "Line MRT/LTR",
+      name: "Line MRT/LRT",
       icon: IconLine,
       onClick: () => {
         setShowMRT(prev => !prev);
