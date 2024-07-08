@@ -3,7 +3,12 @@ import { History, PinSearch } from "../../utils/image";
 
 import "./SearchLocation.css";
 
-const SearchLocation = ({onSearchChange, filteringData, onClickAction, search}) => {
+const SearchLocation = ({
+  onSearchChange,
+  filteringData,
+  onClickAction,
+  search,
+}) => {
   const [isFocused, setIsFocused] = useState(false);
   const [history, setHistory] = useState([]);
 
@@ -49,12 +54,20 @@ const SearchLocation = ({onSearchChange, filteringData, onClickAction, search}) 
       result = history;
     } else {
       const historyMatch = history.filter((item) =>
-        item.properties.BUILDINGNAME.toLowerCase().includes(search.toLowerCase())
+        item.properties.BUILDINGNAME.toLowerCase().includes(
+          search.toLowerCase()
+        )
       );
-      
-      const dataMatch = history.length === 0 ? filteringData.filter(
-        (item) => history.length === 0 ? item : !history.properties.BUILDINGNAME.includes(item.properties.BUILDINGNAME)
-      ) : [];
+
+      const dataMatch = filteringData?.filter((item) =>
+        history.length === 0
+          ? item
+          : !history.some(
+              (historyItem) =>
+                historyItem.properties.BUILDINGNAME ===
+                item.properties.BUILDINGNAME
+            )
+      );
 
       result = historyMatch.concat(dataMatch);
     }
@@ -69,7 +82,10 @@ const SearchLocation = ({onSearchChange, filteringData, onClickAction, search}) 
         <div
           key={index}
           className="result-item"
-          onClick={() => {handleAddHistory(item); onClickAction(item.geometry.coordinates);}}
+          onClick={() => {
+            handleAddHistory(item);
+            onClickAction(item.geometry.coordinates);
+          }}
         >
           <span
             className="result-label-name"
@@ -91,7 +107,7 @@ const SearchLocation = ({onSearchChange, filteringData, onClickAction, search}) 
               width="16"
               height="16"
               fill="currentColor"
-              class="bi bi-x"
+              className="bi bi-x"
               viewBox="0 0 16 16"
             >
               <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708" />
@@ -106,7 +122,9 @@ const SearchLocation = ({onSearchChange, filteringData, onClickAction, search}) 
     <div className="search-location" ref={searchRef}>
       <form
         className={`search-bar ${
-          isFocused && (history.length > 0 || search) ? "search-bar-focused" : ""
+          isFocused && (history.length > 0 || search)
+            ? "search-bar-focused"
+            : ""
         }`}
       >
         <input
@@ -123,7 +141,7 @@ const SearchLocation = ({onSearchChange, filteringData, onClickAction, search}) 
             width="16"
             height="16"
             fill="currentColor"
-            class="bi bi-x-lg"
+            className="bi bi-x-lg"
             viewBox="0 0 16 16"
           >
             <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z" />
@@ -134,7 +152,7 @@ const SearchLocation = ({onSearchChange, filteringData, onClickAction, search}) 
           width="16"
           height="16"
           fill="currentColor"
-          class="bi bi-search"
+          className="bi bi-search"
           viewBox="0 0 16 16"
         >
           <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0" />
