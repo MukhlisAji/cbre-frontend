@@ -14,21 +14,26 @@ export function useRegion(map) {
         if (responseData?.region?.POLYGON) {
           // setDataRegionJson(responseData.region.POLYGON);
 
-          map.current.addSource(`sgregion-${item}`, {
-            type: "geojson",
-            // 'data': 'http://localhost:4000/geojson/default.geojson'
-            data: responseData.region.POLYGON,
-          });
 
-          map.current.addLayer({
-            id: `region-${item}`,
-            type: "fill",
-            source: `sgregion-${item}`,
-            paint: {
-              "fill-color": ["get", "color"],
-              "fill-opacity": 0.5,
-            },
-          });
+          if (!map.current.getLayer(`region-${item}`)) {
+            if (!map.current.getSource(`sgregion-${item}`)) {
+              map.current.addSource(`sgregion-${item}`, {
+                type: "geojson",
+                // 'data': 'http://localhost:4000/geojson/default.geojson'
+                data: responseData.region.POLYGON,
+              });
+
+              map.current.addLayer({
+                id: `region-${item}`,
+                type: "fill",
+                source: `sgregion-${item}`,
+                paint: {
+                  "fill-color": ["get", "color"],
+                  "fill-opacity": 0.5,
+                },
+              });
+            }
+          }
         }
       });
     }
