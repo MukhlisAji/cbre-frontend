@@ -2,7 +2,7 @@ import "@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { useEffect } from "react";
 import "./App.css";
-import IconLine from './assets/jalur.png';
+import IconLine from "./assets/jalur.png";
 import FilterLine from "./components/FilterLine/FilterLine";
 // import SearchLocation from "./components/SearchLocation";
 import SearchLocation from "./components/SearchLocation/SearchLocation";
@@ -11,22 +11,40 @@ import { useConfig, useMRTData, useMRTLine, useMap, useRegion } from './hooks';
 import { AllRegion, NortWest, SouthEast, StyleSatelliteStreet } from './utils';
 
 
+import DataBrowser from "./components/DataBrowser/DataBrowser";
+import { useMicromarket } from "./hooks/useMicromarket";
+import { useZoning } from "./hooks/useZoning";
 
 function App() {
-
   // config map
-  const { lat, lng, map, mapContainer, zoom, setLat, setLng, setZoom, styleMap, handleChangeStyleMap } = useConfig()
+  const {
+    lat,
+    lng,
+    map,
+    mapContainer,
+    zoom,
+    setLat,
+    setLng,
+    setZoom,
+    styleMap,
+    handleChangeStyleMap,
+  } = useConfig();
 
   // region
-  const { showAllRegion, showRegion } = useRegion(map)
+  const { showAllRegion, showRegion } = useRegion(map);
+
+  // Micro Market
+  const { triggerMicromarket, resetMicromarket } = useMicromarket(map);
+
+  // Zoning
+  const { triggerZoning, resetZoning } = useZoning(map);
+
   // main map
-  const { filteringData, handleSearch, search } = useMap(styleMap, map, zoom)
+  const { filteringData, handleSearch, search } = useMap(styleMap, map, zoom);
 
   // MRT
-  useMRTData(zoom, map)
-  const { setShowMRT } = useMRTLine(map)
-
-
+  useMRTData(zoom, map);
+  const { setShowMRT } = useMRTLine(map);
 
   const handleClick = (coordinate) => {
     map.current.setCenter(coordinate);
@@ -39,7 +57,7 @@ function App() {
       name: "Line MRT/LRT",
       icon: IconLine,
       onClick: () => {
-        setShowMRT(prev => !prev);
+        setShowMRT((prev) => !prev);
       },
     },
     {
@@ -70,7 +88,7 @@ function App() {
           name: data.REGIONNAME,
           icon: data.ICON,
           onClick: () => {
-            showRegion(data.REGIONCODE)
+            showRegion(data.REGIONCODE);
           },
         })),
         {
@@ -78,7 +96,6 @@ function App() {
           icon: AllRegion,
           onClick: showAllRegion,
         },
-
       ],
     },
     {
@@ -95,7 +112,6 @@ function App() {
     },
   ];
 
-
   useEffect(() => {
     if (!map.current) return; // wait for map to initialize
     map.current.on("move", () => {
@@ -107,23 +123,26 @@ function App() {
 
   return (
     <div className="App">
-      <SearchLocation onSearchChange={handleSearch} filteringData={filteringData} search={search} onClickAction={handleClick} />
+      <div className="filtering">
+        <SearchLocation
+          onSearchChange={handleSearch}
+          filteringData={filteringData}
+          search={search}
+          onClickAction={handleClick}
+        />
+        <DataBrowser triggerMicromarket={triggerMicromarket} resetMicromarket={resetMicromarket} triggerZoning={triggerZoning} resetZoning={resetZoning} />
+      </div>
       {/* <SearchLocation onSearchChange={handleSearch} />
       {filteringData.length > 0 && (
         <SearchList onClickAction={handleClick} filteringData={filteringData} />
       )}
       {!filteringData.length && search.length > 0 && <NotFound />} */}
 
-
-
       <FilterLine subMenu={subMenu} expandedMenu={expandedMenu} />
 
       <div className="sidebar">
         Longitude: {lng} | Latitude: {lat} | Zoom: {zoom}
-
-        <div id="filter">
-
-        </div>
+        <div id="filter"></div>
       </div>
 
       <div ref={mapContainer} className="map-container" />

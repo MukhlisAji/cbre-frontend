@@ -1,23 +1,28 @@
+.filtering {
+  z-index: 999999;
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  display: flex;
+  gap: 10px;
+}
+
 .search-location * {
   box-sizing: content-box;
 }
 
 .search-location {
-  z-index: 999;
-  position: absolute;
-  top: 10px;
-  left: 10px;
+  box-sizing: border-box;
   width: 400px;
   border-radius: 20px;
   display: flex;
   flex-direction: column;
   overflow: hidden;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-  border: 1px solid #ddd;
   box-sizing: content-box;
 }
 
-.search-bar {
+.search-location .search-bar {
   display: flex;
   gap: 15px;
   align-items: center;
@@ -27,11 +32,11 @@
   background-color: white;
 }
 
-.search-bar-focused {
+.search-location .search-bar-focused {
   border-radius: 20px 20px 0 0;
 }
 
-.search-bar input {
+.search-location .search-bar input {
   width: 100%;
   flex: 1;
   border: none;
@@ -40,24 +45,24 @@
   padding: 10px 10px;
 }
 
-.search-bar svg {
+.search-location .search-bar svg {
   cursor: pointer;
   font-size: 20px;
   color: #000;
   padding-inline: 4px;
 }
 
-.search-bar .fa-times {
+.search-location .search-bar .fa-times {
   margin-right: 10px;
 }
 
-.search-results {
+.search-location .search-results {
   padding-block: 5px;
   background: white;
   border-top: none;
 }
 
-.result-item {
+.search-location .result-item {
   padding: 15px 20px;
   display: flex;
   align-items: center;
@@ -66,29 +71,29 @@
   cursor: pointer;
 }
 
-.result-item svg {
+.search-location .result-item svg {
   font-size: 18px;
   color: #888;
   padding: 10px;
   border-radius: 50%;
 }
 
-.result-item svg:hover {
+.search-location .result-item svg:hover {
   background-color: #ddd;
 }
 
-.result-item:hover {
+.search-location .result-item:hover {
   background: #f0f0f0;
   scale: 1.01;
 }
 
-.result-label-name {
+.search-location .result-label-name {
   display: flex;
   align-items: center;
   gap: 20px;
 }
 
-.result-item button {
+.search-location .result-item button {
   background: none;
   border: none;
   cursor: pointer;
@@ -96,12 +101,12 @@
   font-size: 12px;
 }
 
-.result-icon {
+.search-location .result-icon {
   display: flex;
   align-items: center;
   width: 20px;
 }
-.result-icon img {
+.search-location .result-icon img {
   width: 100%;
   /* height: 100%; */
 }

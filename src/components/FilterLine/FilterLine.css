@@ -30,7 +30,7 @@
   padding: 5px;
 }
 
-.filter-content {
+.filter-container .filter-content {
   display: flex;
   justify-content: center;
   gap: 10px;
@@ -39,7 +39,7 @@
   height: 100%;
 }
 
-.filter-icon {
+.filter-container .filter-icon {
   cursor: pointer;
   position: relative;
   box-sizing: border-box;
@@ -47,7 +47,7 @@
   position: relative;
 }
 
-.filter-icon::after {
+.filter-container .filter-icon::after {
   content: "";
   position: absolute;
   top: 0;
@@ -58,12 +58,12 @@
   border-radius: 10px;
 }
 
-.filter-content:hover .filter-icon {
+.filter-container .filter-content:hover .filter-icon {
   scale: 0.9;
   transition: 0.3s;
 }
 
-.filter-icon p {
+.filter-container .filter-icon p {
   color: #fff;
   position: absolute;
   bottom: 0;
@@ -73,14 +73,14 @@
   z-index: 10;
 }
 
-.filter-icon img {
+.filter-container .filter-icon img {
   object-fit: cover;
   border-radius: 10px;
   width: 90px;
   height: 90px;
 }
 
-.submenu {
+.filter-container .submenu {
   position: absolute;
   left: 110%;
   top: 0;
@@ -95,7 +95,8 @@
   align-items: start;
 }
 
-.submenu-item {
+.filter-container .submenu-item,
+.expanded-menu .submenu-item {
   width: 70px;
   cursor: pointer;
   display: flex;
@@ -104,7 +105,8 @@
   justify-content: center;
 }
 
-.submenu-item .submenu-icon {
+.filter-container .submenu-item .submenu-icon,
+.expanded-menu .submenu-item .submenu-icon {
   width: 70px;
   height: 70px;
   border-radius: 10px;
@@ -114,7 +116,8 @@
   object-fit: cover;
 }
 
-.submenu-item:hover .submenu-icon {
+.filter-container .submenu-item:hover .submenu-icon,
+.expanded-menu .submenu-item:hover .submenu-icon {
   outline: 3px solid rgb(72, 72, 255);
 }
 
@@ -128,7 +131,7 @@
   overflow: auto;
 }
 
-.close-btn {
+.expanded-menu .close-btn {
   position: absolute;
   top: 10px;
   right: 10px;
@@ -138,17 +141,17 @@
   cursor: pointer;
 }
 
-.expanded-section h3 {
+.expanded-menu .expanded-section h3 {
   font-size: 20px;
   font-weight: bold;
   margin-bottom: 20px;
 }
 
-.expanded-section hr {
+.expanded-menu .expanded-section hr {
   margin-block: 20px;
 }
 
-.expanded-items {
+.expanded-menu .expanded-items {
   z-index: 10;
   display: flex;
   flex-direction: row;

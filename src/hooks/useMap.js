@@ -1,6 +1,12 @@
+import MapboxDraw from "@mapbox/mapbox-gl-draw";
 import mapboxgl from "mapbox-gl";
+import {
+  CircleMode,
+  DirectMode,
+  DragCircleMode,
+  SimpleSelectMode,
+} from "mapbox-gl-draw-circle";
 import { useEffect, useState } from "react";
-import { createGeoJSONCircle } from "../helper";
 
 export function useMap(styleMap, map, zoom) {
   const [dataMap, setDataMap] = useState();
@@ -25,65 +31,110 @@ export function useMap(styleMap, map, zoom) {
     }
   };
 
-  map.current?.addSource(
-    "polygon-radius-tes",
-    createGeoJSONCircle([103.885863, 1.3434299], 0.5)
-  );
-
-  map.current?.addLayer({
-    id: "polygon-radiusss",
-    type: "fill",
-    source: "polygon-radius-tes",
-    layout: {},
-    paint: {
-      "fill-color": "blue",
-      "fill-opacity": 0.6,
+  // userProperties has to be enabled
+  const draw = new MapboxDraw({
+    defaultMode: "draw_circle",
+    userProperties: true,
+    modes: {
+      ...MapboxDraw.modes,
+      draw_circle: CircleMode,
+      drag_circle: DragCircleMode,
+      direct_select: DirectMode,
+      simple_select: SimpleSelectMode,
     },
   });
 
-  const drawRadiusGeoJSON = (center, radius) => {
-    const options = { steps: 64, units: "meters" };
-    const circle = turf.circle(center, radius, options);
+  // Add this draw object to the map when map loads
+  map.current?.addControl(draw);
 
-    // Menambahkan atau memperbarui sumber radius
-    addOrUpdateSource("polygon-radius-tes", circle);
+  function createCircle(center, radius) {
+    const steps = 64;
+    const circleCoordinates = [];
 
-    // Menambahkan atau memperbarui lapisan radius
-    addOrUpdateLayer("polygon-radiusss", "polygon-radius-tes", "fill", {
-      "fill-color": "blue",
-      "fill-opacity": 0.6,
+    for (let i = 0; i < dataMap.length; i++) {
+      const angle = (i * 360) / steps;
+      const radians = angle * (Math.PI / 180);
+      const dx = radius * Math.cos(radians);
+      const dy = radius * Math.sin(radians);
+
+      const deltaLat = dy / 111320;
+      const deltaLng = dx / (111320 * Math.cos((center[1] * Math.PI) / 180)); // Longitude
+
+      circleCoordinates.push([center[0] + deltaLng, center[1] + deltaLat]);
+    }
+    circleCoordinates.push(circleCoordinates[0]);
+    return {
+      type: "Feature",
+      geometry: {
+        type: "Polygon",
+        coordinates: [circleCoordinates],
+      },
+    };
+  }
+  let circleLayer = null;
+  map.current?.on("click", function (e) {
+    const center = [e.lngLat.lng, e.lngLat.lat];
+    const radius = 2000;
+
+    if (circleLayer) {
+      map.current?.removeLayer(circleLayer);
+      map.current?.removeSource(circleLayer);
+    }
+    const circleFeature = createCircle(center, radius);
+
+    map.current?.addSource("circlesource", {
+      type: "geojson",
+      data: {
+        type: "FeatureCollection",
+        features: [circleFeature],
+      },
     });
 
-    // Menambahkan atau memperbarui lapisan outline radius
-    addOrUpdateLayer("polygon-radius-outline", "polygon-radius-tes", "line", {
-      "line-color": "blue",
-      "line-width": 2,
+    map.current?.addLayer({
+      id: "circle",
+      type: "fill",
+      source: "circlesource",
+      layout: {},
+      paint: {
+        "fill-color": "#F3C294",
+        "fill-opacity": 0.4,
+      },
     });
-  };
 
-  // const drawRadius = (center, radius) => {
-  //   const options = { steps: 64, units: "meters" };
-  //   const circle = turf.circle(center, radius, options);
-  //   const lineString = turf.polygonToLineString(circle);
+    circleLayer = "circle";
+  });
 
-  //   // Add radius circle to map
-  //   if (map.current.getSource("radius")) {
-  //     map.current.getSource("radius").setData(lineString);
-  //   } else {
-  //     map.current.addLayer({
-  //       id: "radius",
-  //       type: "line",
-  //       source: {
-  //         type: "geojson",
-  //         data: lineString,
-  //       },
-  //       layout: {},
-  //       paint: {
-  //         "line-color": "#007cbf",
-  //         "line-width": 2,
-  //       },
-  //     });
-  //   }
+  // const drawRadiusGeoJSON = (center, radius) => {
+  //   //  const circleFeature = createCircle(center, radius);
+
+  //   map.current.addSource("circlesource", {
+  //     type: "geojson",
+  //     data: {
+  //       type: "FeatureCollection",
+  //       features: [
+  //         {
+  //           type: "Feature",
+  //           geometry: {
+  //             type: "Polygon",
+  //             coordinates: [106.827183, -6.175394],
+  //           },
+  //         },
+  //       ],
+  //     },
+  //   });
+
+  //   map.current.addLayer({
+  //     id: "circleid",
+  //     type: "fill",
+  //     source: "circlesource",
+  //     layout: {},
+  //     paint: {
+  //       "fill-color": "#F3C294",
+  //       "fill-opacity": 0.4,
+  //     },
+  //   });
+
+  //   console.log("Added new source and layers");
   // };
 
   const fetchApi = async () => {
@@ -155,8 +206,29 @@ export function useMap(styleMap, map, zoom) {
   useEffect(() => {
     fetchApi();
     // if (map.current) {
-    //   map.current.on("load", () => {
-    //     drawRadius([106.827183, -6.175394], 1000); // Pusat Monas, Jakarta dengan radius 1000 meter
+    //   map.current?.on("load", () => {
+    //     const draw = new MapboxDraw({
+    //       displayControlsDefault: false,
+    //       controls: {
+    //         polygon: true,
+    //         trash: true,
+    //       },
+    //     });
+
+    //     map.current?.addControl(draw);
+
+    //     // Add a circle to the map for demonstration purposes
+    //     const center = [106.827183, -6.175394]; // Example center point
+    //     const radius = 1000; // Example radius in meters
+    //     const circleFeature = turf.circle(center, radius, {
+    //       steps: 64,
+    //       units: "meters",
+    //     });
+
+    //     draw.add({
+    //       type: "FeatureCollection",
+    //       features: [circleFeature],
+    //     });
     //   });
     // }
   }, [styleMap, localStorage.getItem("styleMap")]);
