@@ -1,5 +1,6 @@
 import mapboxgl from "mapbox-gl";
 import { useEffect, useState } from "react";
+import { createGeoJSONCircle } from "../helper";
 
 export function useMap(styleMap, map, zoom) {
   const [dataMap, setDataMap] = useState();
@@ -23,6 +24,67 @@ export function useMap(styleMap, map, zoom) {
       setFilteringData([]);
     }
   };
+
+  map.current?.addSource(
+    "polygon-radius-tes",
+    createGeoJSONCircle([103.885863, 1.3434299], 0.5)
+  );
+
+  map.current?.addLayer({
+    id: "polygon-radiusss",
+    type: "fill",
+    source: "polygon-radius-tes",
+    layout: {},
+    paint: {
+      "fill-color": "blue",
+      "fill-opacity": 0.6,
+    },
+  });
+
+  const drawRadiusGeoJSON = (center, radius) => {
+    const options = { steps: 64, units: "meters" };
+    const circle = turf.circle(center, radius, options);
+
+    // Menambahkan atau memperbarui sumber radius
+    addOrUpdateSource("polygon-radius-tes", circle);
+
+    // Menambahkan atau memperbarui lapisan radius
+    addOrUpdateLayer("polygon-radiusss", "polygon-radius-tes", "fill", {
+      "fill-color": "blue",
+      "fill-opacity": 0.6,
+    });
+
+    // Menambahkan atau memperbarui lapisan outline radius
+    addOrUpdateLayer("polygon-radius-outline", "polygon-radius-tes", "line", {
+      "line-color": "blue",
+      "line-width": 2,
+    });
+  };
+
+  // const drawRadius = (center, radius) => {
+  //   const options = { steps: 64, units: "meters" };
+  //   const circle = turf.circle(center, radius, options);
+  //   const lineString = turf.polygonToLineString(circle);
+
+  //   // Add radius circle to map
+  //   if (map.current.getSource("radius")) {
+  //     map.current.getSource("radius").setData(lineString);
+  //   } else {
+  //     map.current.addLayer({
+  //       id: "radius",
+  //       type: "line",
+  //       source: {
+  //         type: "geojson",
+  //         data: lineString,
+  //       },
+  //       layout: {},
+  //       paint: {
+  //         "line-color": "#007cbf",
+  //         "line-width": 2,
+  //       },
+  //     });
+  //   }
+  // };
 
   const fetchApi = async () => {
     const res = await fetch(`http://103.127.134.145:3000/map`);
@@ -92,6 +154,11 @@ export function useMap(styleMap, map, zoom) {
 
   useEffect(() => {
     fetchApi();
+    // if (map.current) {
+    //   map.current.on("load", () => {
+    //     drawRadius([106.827183, -6.175394], 1000); // Pusat Monas, Jakarta dengan radius 1000 meter
+    //   });
+    // }
   }, [styleMap, localStorage.getItem("styleMap")]);
 
   return {

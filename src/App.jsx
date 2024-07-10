@@ -4,13 +4,11 @@ import { useEffect } from "react";
 import "./App.css";
 import IconLine from './assets/jalur.png';
 import FilterLine from "./components/FilterLine/FilterLine";
-import NotFound from "./components/NotFound";
-import SearchList from "./components/SearchList";
 // import SearchLocation from "./components/SearchLocation";
+import SearchLocation from "./components/SearchLocation/SearchLocation";
 import { StyleList, filterdata } from "./constant";
 import { useConfig, useMRTData, useMRTLine, useMap, useRegion } from './hooks';
 import { AllRegion, NortWest, SouthEast, StyleSatelliteStreet } from './utils';
-import SearchLocation from "./components/SearchLocation/SearchLocation";
 
 
 
@@ -34,6 +32,7 @@ function App() {
     map.current.setCenter(coordinate);
     map.current.setZoom(15);
   };
+
 
   const subMenu = [
     {
