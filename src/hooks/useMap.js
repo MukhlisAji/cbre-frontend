@@ -6,8 +6,8 @@ import mapboxgl from "mapbox-gl";
 //   DragCircleMode,
 //   SimpleSelectMode,
 // } from "mapbox-gl-draw-circle";
+import * as turf from "@turf/turf";
 import { useEffect, useState } from "react";
-import * as turf from '@turf/turf';
 
 export function useMap(styleMap, map, zoom) {
   const [dataMap, setDataMap] = useState();
@@ -147,8 +147,19 @@ export function useMap(styleMap, map, zoom) {
   //   console.log("Added new source and layers");
   // };
 
+  function createCircle(center, radius) {
+    const options = { steps: 64, units: "meters" };
+    const circle = turf.circle(center, radius, options);
+    return circle;
+  }
+
+  function updateCircle(center, radius) {
+    const updatedCircle = createCircle(center, radius);
+    map.current.getSource("circle").setData(updatedCircle);
+  }
 
   useEffect(() => {
+    console.log("tes");
     if (map.current) {
       // add circle part 2
       let circleFeature = null;
@@ -157,73 +168,62 @@ export function useMap(styleMap, map, zoom) {
       let isDragging = false;
       let resizing = false;
 
-      function createCircle(center, radius) {
-        const options = { steps: 64, units: 'meters' };
-        const circle = turf.circle(center, radius, options);
-        return circle;
-      }
-
-      function updateCircle(center, radius) {
-        const updatedCircle = createCircle(center, radius);
-        map.current.getSource('circle').setData(updatedCircle);
-      }
-
       function addCircle(center, radius) {
         // Cek apakah source dengan ID "circle" sudah ada
-        console.log('coba');
-        if (map.current.getSource('circle')) {
+        console.log("coba");
+        if (map.current.getSource("circle")) {
           // console.log('Source "circle" already exists.');
           return;
         }
 
         circleFeature = createCircle(center, radius);
 
-        map.current.addSource('circle', {
-          'type': 'geojson',
-          'data': circleFeature
+        map.current.addSource("circle", {
+          type: "geojson",
+          data: circleFeature,
         });
 
         map.current.addLayer({
-          'id': 'circle',
-          'type': 'fill',
-          'source': 'circle',
-          'layout': {},
-          'paint': {
-            'fill-color': '#F3C294',
-            'fill-opacity': 0.4
-          }
+          id: "circle",
+          type: "fill",
+          source: "circle",
+          layout: {},
+          paint: {
+            "fill-color": "#F3C294",
+            "fill-opacity": 0.4,
+          },
         });
 
         map.current.addLayer({
-          'id': 'circle-outline',
-          'type': 'line',
-          'source': 'circle',
-          'layout': {},
-          'paint': {
-            'line-color': '#000',
-            'line-width': 2
-          }
+          id: "circle-outline",
+          type: "line",
+          source: "circle",
+          layout: {},
+          paint: {
+            "line-color": "#000",
+            "line-width": 2,
+          },
         });
       }
 
-
-      map.current.on('click', function (e) {
+      map.current.on("click", function (e) {
         if (resizing) {
           resizing = false;
           return;
         }
 
         if (circleFeature && !isDragging) {
-          const coordinates = map.current.getSource('circle')._data.geometry.coordinates[0];
+          const coordinates =
+            map.current.getSource("circle")._data.geometry.coordinates[0];
           const point = [e.lngLat.lng, e.lngLat.lat];
           if (turf.booleanPointInPolygon(point, turf.polygon([coordinates]))) {
-            console.log('Center:', centerPoint);
-            console.log('Radius (meters):', radius);
+            console.log("Center:", centerPoint);
+            console.log("Radius (meters):", radius);
             return;
           }
-          map.current.removeLayer('circle');
-          map.current.removeLayer('circle-outline');
-          map.current.removeSource('circle');
+          map.current.removeLayer("circle");
+          map.current.removeLayer("circle-outline");
+          map.current.removeSource("circle");
           circleFeature = null;
           return;
         }
@@ -233,9 +233,9 @@ export function useMap(styleMap, map, zoom) {
         radius = 2000;
 
         if (circleFeature) {
-          map.current.removeLayer('circle');
-          map.current.removeLayer('circle-outline');
-          map.current.removeSource('circle');
+          map.current.removeLayer("circle");
+          map.current.removeLayer("circle-outline");
+          map.current.removeSource("circle");
         }
 
         addCircle(center, radius);
@@ -244,62 +244,68 @@ export function useMap(styleMap, map, zoom) {
         map.current.dragPan.disable();
       });
 
-      map.current.on('mousemove', function (e) {
+      map.current.on("mousemove", function (e) {
         if (!circleFeature) return;
 
-        const coordinates = map.current.getSource('circle')._data.geometry.coordinates[0];
+        const coordinates =
+          map.current.getSource("circle")._data.geometry.coordinates[0];
         const point = [e.lngLat.lng, e.lngLat.lat];
 
         if (turf.booleanPointInPolygon(point, turf.polygon([coordinates]))) {
-          map.current.getCanvas().style.cursor = 'move';
+          map.current.getCanvas().style.cursor = "move";
           map.current.dragPan.disable(); // Disable map dragPan when mouse is inside circle
         } else {
-          map.current.getCanvas().style.cursor = '';
+          map.current.getCanvas().style.cursor = "";
           map.current.dragPan.enable(); // Enable map dragPan when mouse is outside circle
         }
 
         if (isDragging) {
-          const dragRadius = turf.distance(centerPoint, [e.lngLat.lng, e.lngLat.lat], { units: 'meters' });
+          const dragRadius = turf.distance(
+            centerPoint,
+            [e.lngLat.lng, e.lngLat.lat],
+            { units: "meters" }
+          );
           radius = dragRadius;
           updateCircle(centerPoint, radius);
         }
       });
 
-      map.current.on('mousedown', function (e) {
+      map.current.on("mousedown", function (e) {
         if (!circleFeature) return;
 
-        const coordinates = map.current.getSource('circle')._data.geometry.coordinates[0];
+        const coordinates =
+          map.current.getSource("circle")._data.geometry.coordinates[0];
         const point = [e.lngLat.lng, e.lngLat.lat];
 
         if (turf.booleanPointInPolygon(point, turf.polygon([coordinates]))) {
           isDragging = true;
           resizing = true;
-          map.current.getCanvas().style.cursor = 'nwse-resize';
+          map.current.getCanvas().style.cursor = "nwse-resize";
           map.current.dragPan.disable(); // Disable map dragPan when resizing starts
         }
       });
 
-      map.current.on('mouseup', function () {
+      map.current.on("mouseup", function () {
         if (isDragging) {
           isDragging = false;
           resizing = false;
-          map.current.getCanvas().style.cursor = '';
-          console.log('Updated Radius (meters):', radius);
-          console.log('Center:', centerPoint);
+          map.current.getCanvas().style.cursor = "";
+          console.log("Updated Radius (meters):", radius);
+          console.log("Center:", centerPoint);
           map.current.dragPan.enable(); // Enable map dragPan when resizing ends
         }
       });
 
-      map.current.on('mouseleave', function () {
+      map.current.on("mouseleave", function () {
         if (isDragging) {
           isDragging = false;
           resizing = false;
-          map.current.getCanvas().style.cursor = '';
+          map.current.getCanvas().style.cursor = "";
           map.current.dragPan.enable(); // Enable map dragPan when mouse leaves map
         }
       });
     }
-  }, [map.current]);
+  }, [map]);
 
   const fetchApi = async () => {
     const res = await fetch(`http://103.127.134.145:3000/map`);
