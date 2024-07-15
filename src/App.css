@@ -316,3 +316,26 @@ button {
   font-weight: 600;
   font-size: 14px;
 }
+
+.search-buttonradius-container {
+  position: absolute;
+  bottom: 20px;
+  left: 40px;
+  z-index: 1000000;
+}
+
+.search-buttonradius-container #search-buttonradius {
+  padding: 5px 20px;
+  background-color: #009645;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 18px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  display: none;
+}
+
+.search-buttonradius-container #search-buttonradius:hover {
+  opacity: 0.8;
+}

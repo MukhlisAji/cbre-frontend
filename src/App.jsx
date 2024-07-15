@@ -7,9 +7,8 @@ import FilterLine from "./components/FilterLine/FilterLine";
 // import SearchLocation from "./components/SearchLocation";
 import SearchLocation from "./components/SearchLocation/SearchLocation";
 import { StyleList, filterdata } from "./constant";
-import { useConfig, useMRTData, useMRTLine, useMap, useRegion } from './hooks';
-import { AllRegion, NortWest, SouthEast, StyleSatelliteStreet } from './utils';
-
+import { useConfig, useMRTData, useMRTLine, useMap, useRegion } from "./hooks";
+import { AllRegion, NortWest, SouthEast, StyleSatelliteStreet } from "./utils";
 
 import DataBrowser from "./components/DataBrowser/DataBrowser";
 import { useMicromarket } from "./hooks/useMicromarket";
@@ -50,7 +49,6 @@ function App() {
     map.current.setCenter(coordinate);
     map.current.setZoom(15);
   };
-
 
   const subMenu = [
     {
@@ -130,14 +128,21 @@ function App() {
           search={search}
           onClickAction={handleClick}
         />
-        <DataBrowser triggerMicromarket={triggerMicromarket} resetMicromarket={resetMicromarket} triggerZoning={triggerZoning} resetZoning={resetZoning} />
+        <DataBrowser
+          triggerMicromarket={triggerMicromarket}
+          resetMicromarket={resetMicromarket}
+          triggerZoning={triggerZoning}
+          resetZoning={resetZoning}
+        />
       </div>
       {/* <SearchLocation onSearchChange={handleSearch} />
       {filteringData.length > 0 && (
         <SearchList onClickAction={handleClick} filteringData={filteringData} />
       )}
       {!filteringData.length && search.length > 0 && <NotFound />} */}
-
+      <div className="search-buttonradius-container">
+        <button id="search-buttonradius">Search</button>
+      </div>
       <FilterLine subMenu={subMenu} expandedMenu={expandedMenu} />
 
       <div className="sidebar">
