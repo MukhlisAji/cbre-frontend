@@ -147,17 +147,6 @@ export function useMap(styleMap, map, zoom) {
   //   console.log("Added new source and layers");
   // };
 
-  function createCircle(center, radius) {
-    const options = { steps: 64, units: "meters" };
-    const circle = turf.circle(center, radius, options);
-    return circle;
-  }
-
-  function updateCircle(center, radius) {
-    const updatedCircle = createCircle(center, radius);
-    map.current.getSource("circle").setData(updatedCircle);
-  }
-
   useEffect(() => {
     if (map.current) {
       // add circle part 2
@@ -217,11 +206,6 @@ export function useMap(styleMap, map, zoom) {
         removeMarkers();
 
         document.getElementById('search-buttonradius').style.display = 'block';
-      }
-
-      function removeMarkers() {
-        const markers = document.querySelectorAll(".marker-map");
-        markers.forEach(marker => marker.remove());
       }
 
       map.current.on('click', function (e) {
@@ -314,7 +298,7 @@ export function useMap(styleMap, map, zoom) {
       });
 
       document.getElementById('search-buttonradius').addEventListener('click', function () {
-        console.log(centerPoint);
+        removeMarkers();
         fetchApi(
           centerPoint[0],
           centerPoint[1],
@@ -324,6 +308,10 @@ export function useMap(styleMap, map, zoom) {
     }
   }, [map]);
 
+  function removeMarkers() {
+    const markers = document.querySelectorAll(".marker-map");
+    markers.forEach(marker => marker.remove());
+  }
 
   const fetchApi = async (longitude, latitude, meter_radius) => {
     const res = await fetch('http://103.127.134.145:3000/map-radius-circle', {
@@ -339,6 +327,7 @@ export function useMap(styleMap, map, zoom) {
     });
     const responseData = await res.json();
     console.log(responseData);
+    removeMarkers();
     setDataMap(responseData.geojson.features);
 
     responseData.geojson.features.forEach((location, index) => {
