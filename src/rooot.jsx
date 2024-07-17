@@ -33,6 +33,8 @@ import ContactNew from "./components/components/sf-dummy/ContactNew";
 import ContactUpdate from "./components/components/sf-dummy/ContactUpdate";
 import DataEntryLayout from "./components/components/shared/DataEntryLayout";
 import Layout from "./components/components/shared/Layout";
+import Map2D from './pages/Map2D';
+import MapLayout from './components/components/shared/MapLayout';
 
 Modal.setAppElement('#root');
 
@@ -52,6 +54,12 @@ function App() {
                         <Route path="contact/template" element={<ContactNew />} />
                         <Route path="contact/update" element={<ContactUpdate />} />
                         <Route path="contact/search" element={<AccAndConSearch />} />
+
+
+                        <Route path="*" element={<NotFound />} />
+                    </Route>
+                    <Route path="map" element={<MapLayout />}>
+                        <Route path="2d-map" element={<Map2D />} />
 
 
                         <Route path="*" element={<NotFound />} />

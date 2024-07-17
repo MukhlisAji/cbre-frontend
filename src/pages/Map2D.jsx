@@ -1,20 +1,21 @@
 import "@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { useEffect } from "react";
-import "./App.css";
-import IconLine from "./assets/jalur.png";
-import FilterLine from "./components/FilterLine/FilterLine";
+import "../App.css";
+import IconLine from "../assets/jalur.png";
+import FilterLine from "../components/FilterLine/FilterLine";
 // import SearchLocation from "./components/SearchLocation";
-import SearchLocation from "./components/SearchLocation/SearchLocation";
-import { StyleList, filterdata } from "./constant";
-import { useConfig, useMRTData, useMRTLine, useMap, useRegion } from "./hooks";
-import { AllRegion, NortWest, SouthEast, StyleSatelliteStreet } from "./utils";
+import SearchLocation from "../components/SearchLocation/SearchLocation";
+import { StyleList, filterdata } from "../constant";
+import { useConfig, useMRTData, useMRTLine, useMap, useRegion } from "../hooks";
+import { AllRegion, NortWest, SouthEast, StyleSatelliteStreet } from "../utils";
 
-import DataBrowser from "./components/DataBrowser/DataBrowser";
-import { useMicromarket } from "./hooks/useMicromarket";
-import { useZoning } from "./hooks/useZoning";
+import DataBrowser from "../components/DataBrowser/DataBrowser";
+import { useMicromarket } from "../hooks/useMicromarket";
+import { useZoning } from "../hooks/useZoning";
+import React from "react";
 
-function App() {
+function Map2D() {
   // config map
   const {
     lat,
@@ -120,7 +121,7 @@ function App() {
   }, []);
 
   return (
-    <div className="App">
+    <div className="App relative h-full">
       <div className="filtering">
         <SearchLocation
           onSearchChange={handleSearch}
@@ -150,9 +151,9 @@ function App() {
         <div id="filter"></div>
       </div>
 
-      <div ref={mapContainer} className="map-container" />
+      <div ref={mapContainer} className="h-full" />
     </div>
   );
 }
 
-export default App;
+export default Map2D;

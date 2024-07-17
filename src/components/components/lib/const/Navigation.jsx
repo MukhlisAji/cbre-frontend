@@ -27,7 +27,11 @@ const DASHBOARD_SIDEBAR_LINKS = [
     label: '2D & 3D Map',
     path: '/map',
     icon: <PiMapTrifoldDuotone />,
-    isOpen: false
+    isOpen: false,
+    submenu: [
+      { key: 'map2D', label: 'Map 2D', path: '/map/2d-map' },
+      { key: 'map3D', label: 'Map 3D', path: '/map/3d-map' }
+    ]
   },
   {
     key: 'reportGeneration',
