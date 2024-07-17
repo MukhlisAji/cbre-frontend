@@ -16,7 +16,7 @@ import { useZoning } from "../hooks/useZoning";
 import React from "react";
 
 function Map2D() {
-  // config map
+  // config map template 2d
   const {
     lat,
     lng,
