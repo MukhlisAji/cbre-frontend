@@ -3,38 +3,36 @@ import Modal from 'react-modal';
 import { Navigate, Route, BrowserRouter as Router, Routes } from "react-router-dom";
 import './App.css';
 import { AppProvider } from "./AppContext";
-import Dashboard from "./components/components/Dashboard";
-import NotFound from "./components/components/NotFound";
-import PropertyDatabase from "./components/components/PropertyDatabase";
-import PropertySearch from "./components/components/PropertySearch";
-import AccContactMassUpload from "./components/components/data entry/AccContactMassUpload";
-import AccountSubmit from "./components/components/data entry/AccountSubmit";
-import AccountSubmitError from "./components/components/data entry/AccountSubmitError";
-import AccountTemplate from "./components/components/data entry/AccountTemplate";
-import BuildingMassUpload from "./components/components/data entry/BuildingMassUpload";
-import BuildingSubmit from "./components/components/data entry/BuildingSubmit";
-import BuildingSubmitError from "./components/components/data entry/BuildingSubmitError";
-import BuildingTemplate from "./components/components/data entry/BuildingTemplate";
-import ContactSubmit from "./components/components/data entry/ContactSubmit";
-import ContactSubmitError from "./components/components/data entry/ContactSubmitError";
-import ContactTemplate from "./components/components/data entry/ContactTemplate";
-import DataEntry from "./components/components/data entry/DataEntry";
-import LeaseMassUpload from "./components/components/data entry/LeaseMassUpload";
-import LeaseSubmit from "./components/components/data entry/LeaseSubmit";
-import LeaseSubmitError from "./components/components/data entry/LeaseSubmitError";
-import LeaseTemplate from "./components/components/data entry/LeaseTemplate";
-import SpaceMassUpload from "./components/components/data entry/SpaceMassUpload";
-import SpaceSubmit from "./components/components/data entry/SpaceSubmit";
-import SpaceSubmitError from "./components/components/data entry/SpaceSubmitError";
-import SpaceTemplate from "./components/components/data entry/SpaceTemplate";
-import AccAndConSearch from "./components/components/sf-dummy/AccAndConSearch";
-import ContactMassUpload from "./components/components/sf-dummy/ContactMassUpload";
-import ContactNew from "./components/components/sf-dummy/ContactNew";
-import ContactUpdate from "./components/components/sf-dummy/ContactUpdate";
-import DataEntryLayout from "./components/components/shared/DataEntryLayout";
-import Layout from "./components/components/shared/Layout";
-import Map2D from './pages/Map2D';
-import MapLayout from './components/components/shared/MapLayout';
+import Dashboard from "./components/Dashboard";
+import NotFound from "./components/NotFound";
+import PropertyDatabase from "./components/PropertyDatabase";
+import PropertySearch from "./components/PropertySearch";
+import AccContactMassUpload from "./components/data-entry/AccContactMassUpload";
+import AccountSubmit from "./components/data-entry/AccountSubmit";
+import AccountSubmitError from "./components/data-entry/AccountSubmitError";
+import AccountTemplate from "./components/data-entry/AccountTemplate";
+import BuildingMassUpload from "./components/data-entry/BuildingMassUpload";
+import BuildingSubmit from "./components/data-entry/BuildingSubmit";
+import BuildingSubmitError from "./components/data-entry/BuildingSubmitError";
+import BuildingTemplate from "./components/data-entry/BuildingTemplate";
+import ContactSubmit from "./components/data-entry/ContactSubmit";
+import ContactSubmitError from "./components/data-entry/ContactSubmitError";
+import ContactTemplate from "./components/data-entry/ContactTemplate";
+import DataEntry from "./components/data-entry/DataEntry";
+import LeaseMassUpload from "./components/data-entry/LeaseMassUpload";
+import LeaseSubmit from "./components/data-entry/LeaseSubmit";
+import LeaseSubmitError from "./components/data-entry/LeaseSubmitError";
+import LeaseTemplate from "./components/data-entry/LeaseTemplate";
+import SpaceMassUpload from "./components/data-entry/SpaceMassUpload";
+import SpaceSubmit from "./components/data-entry/SpaceSubmit";
+import SpaceSubmitError from "./components/data-entry/SpaceSubmitError";
+import SpaceTemplate from "./components/data-entry/SpaceTemplate";
+import DataEntryLayout from "./components/shared/DataEntryLayout";
+import Layout from "./components/shared/Layout";
+import MapViewer from './components/map-viewer/pages/MapViewer';
+import PropertyLayout from './components/property/PropertyLayout';
+import Account from './components/property/Account';
+import Contact from './components/property/Contact';
 
 Modal.setAppElement('#root');
 
@@ -49,18 +47,11 @@ function App() {
                         <Route index path="home" element={<Dashboard />} />
                         <Route path="property-search" element={<PropertySearch />} />
                         <Route path="data-entry-portal/property-database" element={<PropertyDatabase />} />
-
-                        <Route path="contact" element={<ContactMassUpload />} />
-                        <Route path="contact/template" element={<ContactNew />} />
-                        <Route path="contact/update" element={<ContactUpdate />} />
-                        <Route path="contact/search" element={<AccAndConSearch />} />
-
-
-                        <Route path="*" element={<NotFound />} />
-                    </Route>
-                    <Route path="map" element={<MapLayout />}>
-                        <Route path="2d-map" element={<Map2D />} />
-
+                        <Route path="property" element={<PropertyLayout />}>
+                            <Route path="accounts" element={<Account />} />
+                            <Route path="contacts" element={<Contact />} />
+                        </Route>
+                        <Route path="map" element={<MapViewer />} />
 
                         <Route path="*" element={<NotFound />} />
                     </Route>

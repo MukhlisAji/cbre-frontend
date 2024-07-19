@@ -1,11 +1,12 @@
-import React from 'react'
+import React from 'react';
 
-const NotFound = () => {
-    return (
-        <div style={{ position: 'absolute', top: "55px", left: "10px", backgroundColor: "white", padding: "2px", color: "white", zIndex: 999, width: '300px', height: '200px', overflow: 'auto', borderRadius: '5px', paddingInline: '5px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <p style={{ color: 'black' }}>Not Found</p>
-        </div>
-    )
+function NotFound() {
+  return (
+    <div className="flex flex-col items-center justify-center h-screen">
+      <h1 className="text-4xl font-bold text-red-500 mb-4">404 - Not Found</h1>
+      <p className="text-lg text-gray-700">The page you are looking for does not exist.</p>
+    </div>
+  );
 }
 
-export default NotFound
+export default NotFound;
