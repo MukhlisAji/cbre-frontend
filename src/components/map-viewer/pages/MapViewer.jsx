@@ -4,7 +4,7 @@ import Map2D from './Map2D';
 
 export default function MapViewer() {
   return (
-    <div className="flex flex-col">
+    <div className="relative">
       <Map2D />
       <div className="absolute top-0 z-40">
         <TwoDSearch />
