@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { History, PinSearch } from "../utils/image";
 
 import "./SearchLocation.css";
@@ -63,10 +63,10 @@ const SearchLocation = ({
         history.length === 0
           ? item
           : !history.some(
-              (historyItem) =>
-                historyItem.properties.BUILDINGNAME ===
-                item.properties.BUILDINGNAME
-            )
+            (historyItem) =>
+              historyItem.properties.BUILDINGNAME ===
+              item.properties.BUILDINGNAME
+          )
       );
 
       result = historyMatch.concat(dataMatch);
@@ -98,7 +98,7 @@ const SearchLocation = ({
                 <img src={PinSearch} alt="pin" />
               )}
             </span>
-            {item.properties.BUILDINGNAME}
+            {item?.properties?.BUILDINGNAME}
           </span>
           {isHistory && (
             <svg
@@ -121,11 +121,10 @@ const SearchLocation = ({
   return (
     <div className="search-location" ref={searchRef}>
       <form
-        className={`search-bar ${
-          isFocused && (history.length > 0 || search)
-            ? "search-bar-focused"
-            : ""
-        }`}
+        className={`search-bar ${isFocused && (history.length > 0 || search)
+          ? "search-bar-focused"
+          : ""
+          }`}
       >
         <input
           type="text"
@@ -158,6 +157,9 @@ const SearchLocation = ({
           <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0" />
         </svg>
       </form>
+      <div className="z-[9999999]">
+        <button>TES</button>
+      </div>
       {isFocused && (history.length > 0 || search.length > 0) && (
         <div className="search-results">{renderList()}</div>
       )}
