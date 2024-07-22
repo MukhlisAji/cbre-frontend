@@ -1,46 +1,55 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
-import classnames from 'classnames';
-import { DASHBOARD_SIDEBAR_BOTTOM_LINKS, DASHBOARD_SIDEBAR_LINKS } from '../lib/const/Navigation';
-import { useAppContext } from '../../AppContext';
-import { MdOutlineKeyboardArrowDown, MdKeyboardArrowLeft } from 'react-icons/md';
-import WarningModal from './WarningModal';
+import React, { useState, useEffect, useRef } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import classnames from "classnames";
+import {
+  DASHBOARD_SIDEBAR_BOTTOM_LINKS,
+  DASHBOARD_SIDEBAR_LINKS,
+} from "../lib/const/Navigation";
+import { useAppContext } from "../../AppContext";
+import {
+  MdOutlineKeyboardArrowDown,
+  MdKeyboardArrowLeft,
+} from "react-icons/md";
+import WarningModal from "./WarningModal";
 
-const linkClasses = 'flex items-center gap-2 px-2.5 hover:bg-c-weldon-blue hover:no-underline hover:text-white active:bg-c-teal rounded-sm text-sm';
+const linkClasses =
+  "flex items-center max-w-full gap-2 px-2.5 hover:bg-c-weldon-blue hover:no-underline hover:text-white active:bg-c-teal rounded-sm text-sm";
 
 export default function Sidebar() {
   const [isOpen, setIsOpen] = useState(window.innerWidth >= 780);
   const [submenuStates, setSubmenuStates] = useState({});
-  const [activeMenu, setActiveMenu] = useState('');
+  const [activeMenu, setActiveMenu] = useState("");
   const location = useLocation();
   const currentPath = location.pathname;
   const navigate = useNavigate();
   const { isSidebarOpen, setIsSidebarOpen } = useAppContext();
 
   useEffect(() => {
-    let activeMenuPath = '';
+    let activeMenuPath = "";
 
-    DASHBOARD_SIDEBAR_LINKS.forEach(item => {
+    DASHBOARD_SIDEBAR_LINKS.forEach((item) => {
       if (currentPath.startsWith(item.path)) {
         activeMenuPath = item.path;
       }
     });
 
-    DASHBOARD_SIDEBAR_BOTTOM_LINKS.forEach(item => {
+    DASHBOARD_SIDEBAR_BOTTOM_LINKS.forEach((item) => {
       if (currentPath.startsWith(item.path)) {
         activeMenuPath = item.path;
       }
     });
 
-    if (activeMenuPath === '' && currentPath !== '/') {
-      const fallbackItem = DASHBOARD_SIDEBAR_LINKS.find(item => item.path === '/');
-      activeMenuPath = fallbackItem ? fallbackItem.path : '';
+    if (activeMenuPath === "" && currentPath !== "/") {
+      const fallbackItem = DASHBOARD_SIDEBAR_LINKS.find(
+        (item) => item.path === "/"
+      );
+      activeMenuPath = fallbackItem ? fallbackItem.path : "";
     }
 
     setActiveMenu(activeMenuPath);
 
     // Check if currentPath is '/map' and close sidebar
-    if (currentPath === '/map') {
+    if (currentPath === "/map") {
       setIsOpen(false);
       setIsSidebarOpen(false);
     }
@@ -52,9 +61,9 @@ export default function Sidebar() {
   };
 
   const toggleSubmenu = (key) => {
-    setSubmenuStates(prevState => ({
+    setSubmenuStates((prevState) => ({
       ...prevState,
-      [key]: !prevState[key]
+      [key]: !prevState[key],
     }));
   };
 
@@ -64,20 +73,41 @@ export default function Sidebar() {
   };
 
   return (
-    <div className='flex'>
-      <div className={`bg-white p-3 h-screen text-neutral-700 shadow-xl z-10 ${isOpen ? 'w-64' : 'w-16'} duration-300 relative flex flex-col justify-between`}>
+    <div className="flex relative">
+      <MdKeyboardArrowLeft
+        className={`bg-white z-[60] text-c-teal text-2xl rounded-full absolute -right-3 top-2 border border-neutral-300 cursor-pointer hover:text-white hover:bg-c-teal ${
+          !isOpen && "rotate-180"
+        }`}
+        onClick={toggleSidebar}
+      />
+      <div
+        className={`bg-white px-3 overflow-x-visible overflow-y-auto h-screen text-neutral-700 shadow-xl z-10 ${
+          isOpen ? "w-64" : ""
+        } duration-300 relative flex flex-col`}
+      >
         <div>
-          <MdKeyboardArrowLeft
-            className={`bg-white text-c-teal text-2xl rounded-full absolute -right-3 top-2 border border-neutral-300 cursor-pointer hover:text-white hover:bg-c-teal ${!isOpen && "rotate-180"}`}
-            onClick={toggleSidebar}
-          />
           <div className="flex justify-between items-center mb-4">
             <div className="flex flex-col items-center px-1 mx-auto">
-              <a href="/" className="flex flex-col cursor-pointer focus:outline-none hover:no-underline">
+              <a
+                href="/"
+                className="flex flex-col cursor-pointer focus:outline-none hover:no-underline"
+              >
                 <div className="flex gap-2">
-                  <span className={`text-c-dark-grayish font-logo ${isOpen ? 'text-7xl font-semibold' : 'text-2xl mt-6 -ml-1 font-bold'} `}>one</span>
+                  <span
+                    className={`text-c-dark-grayish font-logo ${
+                      isOpen
+                        ? "text-7xl font-semibold"
+                        : "text-2xl mt-6 -ml-1 font-bold"
+                    } `}
+                  >
+                    one
+                  </span>
                 </div>
-                {isOpen && <span className="text-xs text-c-dark-grayish ml-auto">by CBRE</span>}
+                {isOpen && (
+                  <span className="text-xs text-c-dark-grayish ml-auto">
+                    by CBRE
+                  </span>
+                )}
               </a>
             </div>
           </div>
@@ -113,7 +143,14 @@ export default function Sidebar() {
   );
 }
 
-function SidebarLink({ item, isOpen, isActive, onClick, onSubmenuClick, submenuOpen }) {
+function SidebarLink({
+  item,
+  isOpen,
+  isActive,
+  onClick,
+  onSubmenuClick,
+  submenuOpen,
+}) {
   const { pathname } = useLocation();
   const submenuRef = useRef(null);
   const [submenuHeight, setSubmenuHeight] = useState(0);
@@ -159,40 +196,51 @@ function SidebarLink({ item, isOpen, isActive, onClick, onSubmenuClick, submenuO
       <Link
         to={item.path}
         className={classnames(
-          'py-3 cursor-pointer flex items-center w-full',
-          isActive ? 'bg-c-teal text-white' : 'text-c-dark-grayish',
+          "py-3 cursor-pointer flex items-center w-full",
+          !isOpen && "justify-center",
+          isActive ? "bg-c-teal text-white" : "text-c-dark-grayish",
           linkClasses
         )}
         onClick={hasSubmenu ? handleSubmenuClick : handleLinkClick}
       >
-        <span className='text-xl'>{item.icon}</span>
+        <span className="text-xl">{item.icon}</span>
         {isOpen && (
-          <span className={`whitespace-nowrap transition-opacity duration-300 delay-300 ${isOpen ? 'opacity-100' : 'opacity-0'} flex-grow`}>
+          <span
+            className={`whitespace-nowrap transition-opacity duration-300 delay-300 ${
+              isOpen ? "opacity-100" : "opacity-0"
+            } flex-grow`}
+          >
             {item.label}
           </span>
         )}
-        {hasSubmenu && <MdOutlineKeyboardArrowDown className="ml-auto" fontSize={13} />}
+        {hasSubmenu && (
+          <MdOutlineKeyboardArrowDown className="ml-auto" fontSize={13} />
+        )}
       </Link>
       {hasSubmenu && (
         <div
           ref={submenuRef}
-          className={`mt-0.5 flex flex-col shadow-sm bg-white z-11 gap-0.5 transition-all duration-300 ease-in-out overflow-hidden ${isOpen ? " " : "ml-2 -pl-9"} `}
+          className={`mt-0.5 flex flex-col shadow-sm bg-white z-11 gap-0.5 transition-all duration-300 ease-in-out overflow-hidden ${
+            isOpen ? " " : "ml-2 -pl-9"
+          } `}
           style={{
             height: submenuHeight,
-            position: isOpen ? 'relative' : 'absolute',
-            left: isOpen ? '0' : '100%',
-            top: '0',
-            minWidth: '200px'
+            position: isOpen ? "relative" : "absolute",
+            left: isOpen ? "0" : "100%",
+            top: "0",
+            minWidth: "200px",
           }}
         >
-          {item.submenu.map(submenuItem => (
+          {item.submenu.map((submenuItem) => (
             <Link
               key={submenuItem.key}
               to={submenuItem.path}
               className={classnames(
-                'py-2',
-                isOpen ? 'pl-12' : 'pl-3',
-                pathname === submenuItem.path ? 'bg-c-teal text-white' : 'text-c-dark-grayish',
+                "py-2",
+                isOpen ? "pl-12" : "pl-3",
+                pathname === submenuItem.path
+                  ? "bg-c-teal text-white"
+                  : "text-c-dark-grayish",
                 linkClasses
               )}
               title={submenuItem.label}

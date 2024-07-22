@@ -32,7 +32,7 @@ export default function Header() {
   }, []);
 
   return (
-    <div className='shadow-sm'>
+    <div className='shadow-sm w-full'>
       {/* Header */}
       <div className='z-10 bg-gradient-to-r from-c-dark-grayish via-c-dark-grayish to-c-light-grayish h-12 px-4 flex justify-between items-center border-b border-gray-200 shadow shadow-lg'>
         {/* Left Section */}

@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { BiSearch, BiChevronLeft, BiChevronRight } from 'react-icons/bi';
 import CustomDropdown from '../../shared/CustomDropdown';
+import { useAppContext } from '../../../AppContext';
 
 export default function TwoDSearch() {
-  const [collapsed, setCollapsed] = useState(false);
+  const { isCollapsed2dSearchOpen, setIsCollapsed2dSearchOpen } = useAppContext();
+  // const [collapsed, setCollapsed] = useState(false);
   const [activeTab, setActiveTab] = useState('buildings');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedNLA, setSelectedNLA] = useState('Select');
@@ -19,7 +21,7 @@ export default function TwoDSearch() {
   const usageOptions = ['Select Property Usage', 'Usage 1', 'Usage 2'];
 
   const toggleCollapse = () => {
-    setCollapsed(!collapsed);
+    setIsCollapsed2dSearchOpen(!isCollapsed2dSearchOpen);
   };
 
   const handleSearch = () => {
@@ -54,16 +56,16 @@ export default function TwoDSearch() {
       {/* Sidebar */}
       <div className='flex relative'>
         <div
-          className={`flex flex-col overflow-hidden bg-white shadow-md rounded-md transition-all duration-300 ease-in-out z-10 ${collapsed ? 'w-0.5' : 'w-80'}`}
+          className={`flex flex-col overflow-hidden bg-white shadow-md rounded-md transition-all duration-300 ease-in-out z-10 ${isCollapsed2dSearchOpen ? 'w-0.5' : 'w-80'}`}
         >
-          <div className={`flex flex-col p-4 transition-opacity duration-300 ease-in-out ${collapsed ? 'opacity-0' : 'opacity-100'}`}>
+          <div className={`flex flex-col p-4 transition-opacity duration-300 ease-in-out ${isCollapsed2dSearchOpen ? 'opacity-0' : 'opacity-100'}`}>
             <div className="relative mb-4 w-full">
               <input
                 type="text"
                 placeholder="Search"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full p-1.5 shadow shadow-md border border-gray-300 rounded-md pr-10"
+                className="w-full p-1.5 shadow-md border border-gray-300 rounded-md pr-10"
               />
               <BiSearch
                 className="absolute right-3 top-2 text-gray-500 cursor-pointer"
@@ -73,16 +75,16 @@ export default function TwoDSearch() {
             </div>
 
             {/* Tabs */}
-            <div className="flex mb-4 w-full  text-sm rounded gap-1 px-1 rounded-md bg-gray-200">
+            <div className="flex mb-4 w-full  text-sm gap-1 px-1 rounded-md bg-gray-200">
               <button
                 onClick={() => setActiveTab('buildings')}
-                className={`flex-grow p-2 rounded rounded-md my-1 ${activeTab === 'buildings' ? 'bg-white text-black border-gray-300 shadow shadow-md' : 'bg-gray-200 text-gray-700 border-gray-300'}`}
+                className={`flex-grow p-2 rounded-md my-1 ${activeTab === 'buildings' ? 'bg-white text-black border-gray-300 shadow-md' : 'bg-gray-200 text-gray-700 border-gray-300'}`}
               >
                 Buildings
               </button>
               <button
                 onClick={() => setActiveTab('tenant')}
-                className={`flex-grow p-2  rounded rounded-md my-1 ${activeTab === 'tenant' ? 'bg-white text-black border-gray-300 shadow shadow-md' : 'bg-gray-200 text-gray-700 border-gray-300'}`}
+                className={`flex-grow p-2  rounded-md my-1 ${activeTab === 'tenant' ? 'bg-white text-black border-gray-300 shadow-md' : 'bg-gray-200 text-gray-700 border-gray-300'}`}
               >
                 Tenant
               </button>
@@ -96,14 +98,14 @@ export default function TwoDSearch() {
                 <div className="flex mb-4 w-full">
                   <button
                     onClick={() => handleButtonClick('all')}
-                    className={`flex-grow p-1 w-1/2 rounded-l-md shadow shadow-md ${activeButton === 'all' ? 'bg-c-teal text-white' : 'bg-gray-200 text-neutral-700 hover:bg-gray-300'
+                    className={`flex-grow p-1 w-1/2 rounded-l-md shadow-md ${activeButton === 'all' ? 'bg-c-teal text-white' : 'bg-gray-200 text-neutral-700 hover:bg-gray-300'
                       } `}
                   >
                     All Buildings
                   </button>
                   <button
                     onClick={() => handleButtonClick('available')}
-                    className={`flex-grow p-1 w-1/2 rounded-r-md shadow shadow-md ${activeButton === 'available' ? 'bg-c-teal text-white' : 'bg-gray-200 text-neutral-700 hover:bg-gray-300'
+                    className={`flex-grow p-1 w-1/2 rounded-r-md shadow-md ${activeButton === 'available' ? 'bg-c-teal text-white' : 'bg-gray-200 text-neutral-700 hover:bg-gray-300'
                       } `}
                   >
                     Available Buildings
@@ -192,7 +194,7 @@ export default function TwoDSearch() {
             onClick={toggleCollapse}
             className="bg-white rounded-lg p-3 hover:bg-gray-300 transition-all duration-300 ease-in-out"
           >
-            {collapsed ? <BiChevronRight size={24} /> : <BiChevronLeft size={24} />}
+            {isCollapsed2dSearchOpen ? <BiChevronRight size={24} /> : <BiChevronLeft size={24} />}
           </button>
         </div>
       </div>

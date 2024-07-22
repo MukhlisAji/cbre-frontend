@@ -1,6 +1,6 @@
 import "@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css";
 import "mapbox-gl/dist/mapbox-gl.css";
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect } from "react";
 import "../../../App.css";
 import IconLine from "../../../assets/jalur.png";
 import FilterLine from "../FilterLine/FilterLine";
@@ -11,9 +11,7 @@ import { AllRegion, NortWest, SouthEast, StyleSatelliteStreet } from "../utils";
 import DataBrowser from "../DataBrowser/DataBrowser";
 import { useMicromarket } from "../hooks/useMicromarket";
 import { useZoning } from "../hooks/useZoning";
-import { useAppContext } from '../../../AppContext';
-import { debounce } from 'lodash';
-import React from "react";
+import { useAppContext } from "../../../AppContext";
 
 function Map2D() {
   const {
@@ -29,41 +27,31 @@ function Map2D() {
     handleChangeStyleMap,
   } = useConfig();
 
-  const [sidebarWidth, setSidebarWidth] = useState(256); // Default sidebar width
-  // const [isSidebarOpen, setIsSidebarOpen] = useState(true); // Track sidebar state
-
-  const mapContainerRef = useRef(null);
-
-  const { isSidebarOpen } = useAppContext();
-
-  const [mapDimensions, setMapDimensions] = useState({
-    width: window.innerWidth - (isSidebarOpen ? 255 : 64),
-    height: window.innerHeight - 47,
-  });
-
-  const handleResize = debounce(() => {
-    setMapDimensions({
-      width: window.innerWidth - (isSidebarOpen ? 255 : 64),
-      height: window.innerHeight - 47,
-    });
-  }, 200); // Debounce with a 200ms delay
+  const { isSidebarOpen, isCollapsed2dSearchOpen } = useAppContext();
 
   useEffect(() => {
-    handleResize(); // Initial call to set dimensions
+    if (!map.current || !mapContainer.current) return;
 
-    window.addEventListener('resize', handleResize);
+    // Resize map when sidebar or collapsed search state changes
+    setTimeout(() => {
+      map.current.resize();
+    }, 300);
+  }, [isSidebarOpen, isCollapsed2dSearchOpen]);
+
+  // Ensure map resizes correctly when window size changes
+  useEffect(() => {
+    const handleResize = () => {
+      if (map.current) {
+        map.current.resize();
+      }
+    };
+
+    window.addEventListener("resize", handleResize);
 
     return () => {
-      window.removeEventListener('resize', handleResize);
+      window.removeEventListener("resize", handleResize);
     };
-  }, [isSidebarOpen]);
-
-
-  useEffect(() => {
-    if (!map.current || !mapContainerRef.current) return;
-
-    map.current.resize(); // Ensure the map resizes correctly
-  }, [mapDimensions]);
+  }, []);
 
   // Region
   const { showAllRegion, showRegion } = useRegion(map);
@@ -155,7 +143,7 @@ function Map2D() {
   }, []);
 
   return (
-    <div className="relative" >
+    <div className="relative w-full min-h-full overflow-hidden">
       <div className="filtering">
         <SearchLocation
           onSearchChange={handleSearch}
@@ -171,18 +159,21 @@ function Map2D() {
         />
       </div>
       <div className="search-buttonradius-container z-10">
-        <button id="search-buttonradius" className="p-2 bg-blue-500 text-white rounded-full">Search</button>
+        <button
+          id="search-buttonradius"
+          className="p-2 bg-blue-500 text-white rounded-full"
+        >
+          Search
+        </button>
       </div>
       <FilterLine subMenu={subMenu} expandedMenu={expandedMenu} />
       <div className="bg-[rgba(35,55,75,0.9)] text-white p-2 font-mono z-10 fixed bottom-0 right-0 m-3 rounded-md">
         Longitude: {lng} | Latitude: {lat} | Zoom: {zoom}
         <div id="filter"></div>
       </div>
-
       <div
         ref={mapContainer}
-        className="transition-all duration-300 ease-in-out"
-        style={{ height: `${mapDimensions.height}px`, width: `${mapDimensions.width}px` }}
+        className="transition-all duration-300 ease-in-out overflow-hidden w-full h-full"
       />
     </div>
   );
