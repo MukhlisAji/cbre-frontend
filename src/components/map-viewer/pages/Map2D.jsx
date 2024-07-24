@@ -1,17 +1,17 @@
 import "@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css";
 import "mapbox-gl/dist/mapbox-gl.css";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import "../../../App.css";
+import { useAppContext } from "../../../AppContext";
 import IconLine from "../../../assets/jalur.png";
+import DataBrowser from "../DataBrowser/DataBrowser";
 import FilterLine from "../FilterLine/FilterLine";
 import SearchLocation from "../SearchLocation/SearchLocation";
 import { StyleList, filterdata } from "../constant";
 import { useConfig, useMRTData, useMRTLine, useMap, useRegion } from "../hooks";
-import { AllRegion, NortWest, SouthEast, StyleSatelliteStreet } from "../utils";
-import DataBrowser from "../DataBrowser/DataBrowser";
 import { useMicromarket } from "../hooks/useMicromarket";
 import { useZoning } from "../hooks/useZoning";
-import { useAppContext } from "../../../AppContext";
+import { AllRegion, NortWest, SouthEast, StyleSatelliteStreet } from "../utils";
 
 function Map2D() {
   const {
@@ -62,8 +62,9 @@ function Map2D() {
   // Zoning
   const { triggerZoning, resetZoning } = useZoning(map);
 
+  const [triggerRadius, setTriggerRadius] = useState(false);
   // Main map
-  const { filteringData, handleSearch, search } = useMap(styleMap, map, zoom);
+  const { filteringData, handleSearch, search } = useMap(styleMap, map, zoom, triggerRadius);
 
   // MRT
   useMRTData(zoom, map);
@@ -132,7 +133,7 @@ function Map2D() {
       ],
     },
   ];
-
+  console.log(triggerRadius)
   useEffect(() => {
     if (!map.current) return; // Wait for map to initialize
     map.current.on("move", () => {
@@ -157,8 +158,11 @@ function Map2D() {
           triggerZoning={triggerZoning}
           resetZoning={resetZoning}
         />
+        <button onClick={() => setTriggerRadius(prev => !prev)} className="px-2 py-3 bg-green-600 h-16 w-max text-white rounded-lg flex justify-center items-center text-lg font-bold">
+          RADIUS
+        </button>
       </div>
-      <div className="search-buttonradius-container z-10">
+      <div className="search-buttonradius-container z-[9999999]">
         <button
           id="search-buttonradius"
           className="p-2 bg-blue-500 text-white rounded-full"

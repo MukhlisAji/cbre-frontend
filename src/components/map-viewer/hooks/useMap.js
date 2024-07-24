@@ -10,10 +10,11 @@ import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder';
 import * as turf from "@turf/turf";
 import { useEffect, useState } from "react";
 
-export function useMap(styleMap, map, zoom) {
+export function useMap(styleMap, map, zoom, triggerRadius) {
   const [dataMap, setDataMap] = useState();
   const [filteringData, setFilteringData] = useState([]);
   const [search, setSearch] = useState("");
+  console.log("triggerRadius", triggerRadius);
 
   const handleSearch = (searchValue) => {
     setSearch(searchValue);
@@ -158,14 +159,14 @@ export function useMap(styleMap, map, zoom) {
       let resizing = false;
 
       function createCircle(center, radius) {
-        const options = { steps: 64, units: 'meters' };
+        const options = { steps: 64, units: "meters" };
         const circle = turf.circle(center, radius, options);
         return circle;
       }
 
       function updateCircle(center, radius) {
         const updatedCircle = createCircle(center, radius);
-        map.current.getSource('circle').setData(updatedCircle);
+        map.current.getSource("circle").setData(updatedCircle);
       }
 
       function addCircle(center, radius) {
@@ -173,59 +174,61 @@ export function useMap(styleMap, map, zoom) {
           // console.log('Source "circle" already exists.');
           return;
         }
+        console.log({ triggerRadius });
+        if (triggerRadius) {
+          circleFeature = createCircle(center, radius);
+        }
 
-
-        circleFeature = createCircle(center, radius);
-
-        map.current.addSource('circle', {
-          'type': 'geojson',
-          'data': circleFeature
+        map.current.addSource("circle", {
+          type: "geojson",
+          data: circleFeature,
         });
 
         map.current.addLayer({
-          'id': 'circle',
-          'type': 'fill',
-          'source': 'circle',
-          'layout': {},
-          'paint': {
-            'fill-color': '#F3C294',
-            'fill-opacity': 0.4
-          }
+          id: "circle",
+          type: "fill",
+          source: "circle",
+          layout: {},
+          paint: {
+            "fill-color": "#F3C294",
+            "fill-opacity": 0.4,
+          },
         });
 
         map.current.addLayer({
-          'id': 'circle-outline',
-          'type': 'line',
-          'source': 'circle',
-          'layout': {},
-          'paint': {
-            'line-color': '#000',
-            'line-width': 2
-          }
+          id: "circle-outline",
+          type: "line",
+          source: "circle",
+          layout: {},
+          paint: {
+            "line-color": "#000",
+            "line-width": 2,
+          },
         });
 
         removeMarkers();
 
-        document.getElementById('search-buttonradius').style.display = 'block';
+        document.getElementById("search-buttonradius").style.display = "block";
       }
-
-      map.current.on('click', function (e) {
+      console.log(circleFeature);
+      map.current.on("click", function (e) {
         if (resizing) {
           resizing = false;
           return;
         }
 
         if (circleFeature && !isDragging) {
-          const coordinates = map.current.getSource('circle')._data.geometry.coordinates[0];
+          const coordinates =
+            map.current.getSource("circle")._data.geometry.coordinates[0];
           const point = [e.lngLat.lng, e.lngLat.lat];
           if (turf.booleanPointInPolygon(point, turf.polygon([coordinates]))) {
             return;
           }
-          map.current.removeLayer('circle');
-          map.current.removeLayer('circle-outline');
-          map.current.removeSource('circle');
+          map.current.removeLayer("circle");
+          map.current.removeLayer("circle-outline");
+          map.current.removeSource("circle");
           circleFeature = null;
-          document.getElementById('search-buttonradius').style.display = 'none'; // Hide search button
+          document.getElementById("search-buttonradius").style.display = "none"; // Hide search button
           return;
         }
 
@@ -234,9 +237,9 @@ export function useMap(styleMap, map, zoom) {
         radius = 2000;
 
         if (circleFeature) {
-          map.current.removeLayer('circle');
-          map.current.removeLayer('circle-outline');
-          map.current.removeSource('circle');
+          map.current.removeLayer("circle");
+          map.current.removeLayer("circle-outline");
+          map.current.removeSource("circle");
         }
 
         addCircle(center, radius);
@@ -245,55 +248,61 @@ export function useMap(styleMap, map, zoom) {
         map.current.dragPan.disable();
       });
 
-      map.current.on('mousemove', function (e) {
+      map.current.on("mousemove", function (e) {
         if (!circleFeature) return;
 
-        const coordinates = map.current.getSource('circle')._data.geometry.coordinates[0];
+        const coordinates =
+          map.current.getSource("circle")._data.geometry.coordinates[0];
         const point = [e.lngLat.lng, e.lngLat.lat];
 
         if (turf.booleanPointInPolygon(point, turf.polygon([coordinates]))) {
-          map.current.getCanvas().style.cursor = 'move';
+          map.current.getCanvas().style.cursor = "move";
           map.current.dragPan.disable(); // Disable map dragPan when mouse is inside circle
         } else {
-          map.current.getCanvas().style.cursor = '';
+          map.current.getCanvas().style.cursor = "";
           map.current.dragPan.enable(); // Enable map dragPan when mouse is outside circle
         }
 
         if (isDragging) {
-          const dragRadius = turf.distance(centerPoint, [e.lngLat.lng, e.lngLat.lat], { units: 'meters' });
+          const dragRadius = turf.distance(
+            centerPoint,
+            [e.lngLat.lng, e.lngLat.lat],
+            { units: "meters" }
+          );
           radius = dragRadius;
           updateCircle(centerPoint, radius);
         }
       });
 
-      map.current.on('mousedown', function (e) {
+      map.current.on("mousedown", function (e) {
         if (!circleFeature) return;
 
-        const coordinates = map.current.getSource('circle')._data.geometry.coordinates[0];
+        const coordinates =
+          map.current.getSource("circle")._data.geometry.coordinates[0];
         const point = [e.lngLat.lng, e.lngLat.lat];
 
         if (turf.booleanPointInPolygon(point, turf.polygon([coordinates]))) {
           isDragging = true;
           resizing = true;
-          map.current.getCanvas().style.cursor = 'nwse-resize';
+          map.current.getCanvas().style.cursor = "nwse-resize";
           map.current.dragPan.disable(); // Disable map dragPan when resizing starts
         }
       });
 
-      map.current.on('mouseup', function () {
+      map.current.on("mouseup", function () {
         if (isDragging) {
           isDragging = false;
           resizing = false;
-          map.current.getCanvas().style.cursor = '';
+          map.current.getCanvas().style.cursor = "";
           map.current.dragPan.enable(); // Enable map dragPan when resizing ends
         }
       });
 
-      map.current.on('mouseleave', function () {
+      map.current.on("mouseleave", function () {
         if (isDragging) {
           isDragging = false;
           resizing = false;
-          map.current.getCanvas().style.cursor = '';
+          map.current.getCanvas().style.cursor = "";
           map.current.dragPan.enable(); // Enable map dragPan when mouse leaves map
         }
       });
@@ -335,24 +344,36 @@ export function useMap(styleMap, map, zoom) {
         filteringDiv.insertBefore(mapboxglCtrlGeocoder, filteringDiv.firstChild);
       }
     }
-  }, [map]);
+  }, [map, triggerRadius]);
+
+  // useEffect(() => {
+  //   if (!triggerRadius && map.current.getLayer(`circle`)) {
+  //     map.current.removeLayer(`circle`);
+  //     if (!triggerRadius && map.current.getSource(`circle`)) {
+  //       map.current.removeSource(`circle`);
+  //     }
+  //   }
+  //   if (!triggerRadius && map.current.getLayer(`circle-outline`)) {
+  //     map.current.removeLayer(`circle`);
+  //   }
+  // }, [setTriggerRadius, triggerRadius]);
 
   function removeMarkers() {
     const markers = document.querySelectorAll(".marker-map");
-    markers.forEach(marker => marker.remove());
+    markers.forEach((marker) => marker.remove());
   }
 
   const fetchApi = async (longitude, latitude, meter_radius) => {
-    const res = await fetch('http://103.127.134.145:3000/map-radius-circle', {
-      method: 'POST',
+    const res = await fetch("http://103.127.134.145:3000/map-radius-circle", {
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json'
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({
         latitude,
         longitude,
-        meter_radius
-      })
+        meter_radius,
+      }),
     });
     const responseData = await res.json();
     console.log(responseData);
