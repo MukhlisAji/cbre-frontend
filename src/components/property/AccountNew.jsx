@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
+import { BsQuestionCircle } from 'react-icons/bs';
+import { useNavigate } from 'react-router-dom';
 
-export default function ContactNew({ onClose }) {
+export default function AccountNew({ onClose }) {
     const [accountName, setAccountName] = useState('');
     const [website, setWebsite] = useState('');
     const [type, setType] = useState('');
@@ -17,11 +19,14 @@ export default function ContactNew({ onClose }) {
     const [shippingState, setShippingState] = useState('');
     const [shippingPostalCode, setShippingPostalCode] = useState('');
     const [shippingCountry, setShippingCountry] = useState('');
-    const [setShowSuccessModal] = useState(false);
+    const [showSuccessModal, setShowSuccessModal] = useState(false);
+    const [confirmationDialogVisible, setConfirmationDialogVisible] = useState(false);
+    const [isSavingNew, setIsSavingNew] = useState(false);
+    const [accessToken] = useState('');
+    const navigate = useNavigate();
     const [accountInformationVisible, setAccountInformationVisible] = useState(true);
     const [addressInformationVisible, setAddressInformationVisible] = useState(true);
     const [additionalInformationVisible, setAdditionalInformationVisible] = useState(true);
-    const [accessToken] = useState('');
 
     useEffect(() => {
         toggleBodyOverflow(true);
@@ -45,6 +50,24 @@ export default function ContactNew({ onClose }) {
                 console.log(`Section '${section}' not handled`);
                 break;
         }
+    };
+
+    const handleSave = () => {
+        setConfirmationDialogVisible(true);
+    };
+
+    const handleConfirmSave = async () => {
+        setConfirmationDialogVisible(false);
+        if (isSavingNew) {
+            resetData();
+        }
+        await handleSubmit();
+
+        navigate('/property/contacts', { state: { openModal: true } });
+    };
+
+    const handleCancelSave = () => {
+        setConfirmationDialogVisible(false);
     };
 
     const handleSubmit = async () => {
@@ -91,27 +114,33 @@ export default function ContactNew({ onClose }) {
 
             if (responseData.success) {
                 setShowSuccessModal(true);
-                setAccountName('');
-                setPhone('');
-                setBillingCity('');
-                setBillingCountry('');
-                setBillingPostalCode('');
-                setBillingState('');
-                setBillingStreet('');
-                setDescription('');
-                setParentAccount('');
-                setPhone('');
-                setShippingCity('');
-                setShippingCountry('');
-                setShippingState('');
-                setShippingPostalCode('');
-                setShippingStreet('');
-                setType('');
-                setWebsite('');
+                if (isSavingNew) {
+                    resetData();
+                }
             }
         } catch (error) {
             console.error('Error occurred while contacting Salesforce:', error.message);
         }
+    };
+
+    const resetData = () => {
+        setAccountName('');
+        setPhone('');
+        setBillingCity('');
+        setBillingCountry('');
+        setBillingPostalCode('');
+        setBillingState('');
+        setBillingStreet('');
+        setDescription('');
+        setParentAccount('');
+        setPhone('');
+        setShippingCity('');
+        setShippingCountry('');
+        setShippingState('');
+        setShippingPostalCode('');
+        setShippingStreet('');
+        setType('');
+        setWebsite('');
     };
 
     return (
@@ -125,11 +154,10 @@ export default function ContactNew({ onClose }) {
                     >
                         &times;
                     </button>
-                    <h2 className="text-lg font-bold text-c-dark-grayish text-align-center">NEW CONTACT</h2>
+                    <h2 className="text-lg font-bold text-c-dark-grayish text-align-center">NEW ACCOUNT</h2>
                 </header>
 
                 <main className="flex-1 overflow-y-auto">
-                    {/* Body content */}
                     <div className="bg-white relative p-4">
                         {/* Account Information */}
 
@@ -140,7 +168,7 @@ export default function ContactNew({ onClose }) {
                         <div className="my-4">
                             <div className="flex justify-between items-center cursor-pointer" onClick={() => toggleVisibility('accountInformation')}>
                                 <h2 className="text-lg font-semibold text-neutral-700 mb-2">
-                                    <span>{accountInformationVisible ? '▼' : '►'}</span> Contact Information
+                                    <span>{accountInformationVisible ? '▼' : '►'}</span> Account Information
                                 </h2>
                                 <span>{accountInformationVisible ? '-' : '+'}</span>
                             </div>
@@ -396,8 +424,8 @@ export default function ContactNew({ onClose }) {
                             )}
                         </div>
 
-                    </div>
-                </main>
+                    </div>                </main>
+
                 <footer className="sticky bottom-0 bg-neutral-100 py-3 flex items-center gap-2 justify-center border-t border-neutral-500 shadow-md z-10 rounded-b-lg">
                     <button
                         onClick={onClose}
@@ -406,18 +434,49 @@ export default function ContactNew({ onClose }) {
                         Cancel
                     </button>
                     <button
-                        onClick={handleSubmit}
+                        onClick={() => { setIsSavingNew(true); handleSave(); }}
                         className="px-4 py-2 rounded-lg bg-white text-blue-600 border border-neutral-500 text-xs hover:text-neutral-700 hover:bg-neutral-100"
                     >
                         Save & New
                     </button>
                     <button
-                        onClick={handleSubmit}
+                        onClick={() => { setIsSavingNew(false); handleSave(); }}
                         className="px-4 py-2 text-white rounded-lg bg-c-teal text-xs text-white hover:text-white hover:bg-c-weldon-blue"
                     >
                         Save
                     </button>
                 </footer>
+
+                {/* Confirmation Dialog */}
+                {confirmationDialogVisible && (
+                    <div className="fixed inset-0 flex items-center justify-center z-60">
+                        <div className="absolute inset-0 bg-black opacity-50"></div>
+                        <div className="relative bg-white p-6 rounded-lg shadow-lg w-80 max-w-md">
+                            <div className="flex flex-col items-center">
+                                <BsQuestionCircle className="text-yellow-500 text-4xl mb-4" />
+                                <h3 className="text-lg font-bold text-center">Confirm Save</h3>
+                                <p className="mt-2 text-center">Do you want to proceed to create new contact with this set of Account data?
+                                </p>
+                                <div className="flex gap-4 mt-4">
+                                    <button
+                                        onClick={handleCancelSave}
+                                        className="px-4 py-1.5 rounded-lg bg-white text-blue-600 border border-neutral-500 text-xs hover:text-neutral-700 hover:bg-neutral-100"
+                                    >
+                                        No
+                                    </button>
+                                    <button
+                                        onClick={handleConfirmSave}
+                                        className="px-4 py-1.5 text-white rounded-lg bg-c-teal text-xs text-white hover:text-white hover:bg-c-weldon-blue"
+                                    >
+                                        Yes
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                )}
+
             </div>
         </div>
     );

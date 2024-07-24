@@ -33,6 +33,7 @@ import MapViewer from './components/map-viewer/pages/MapViewer';
 import PropertyLayout from './components/property/PropertyLayout';
 import Account from './components/property/Account';
 import Contact from './components/property/Contact';
+import AccountDetails from './components/property/AccountDetails';
 
 Modal.setAppElement('#root');
 
@@ -49,6 +50,8 @@ function App() {
                         <Route path="data-entry-portal/property-database" element={<PropertyDatabase />} />
                         <Route path="property" element={<PropertyLayout />}>
                             <Route path="accounts" element={<Account />} />
+                            <Route path="accounts/details" element={<AccountDetails />} />
+
                             <Route path="contacts" element={<Contact />} />
                         </Route>
                         <Route path="map" element={<MapViewer />} />

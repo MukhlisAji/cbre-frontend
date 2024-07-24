@@ -1,77 +1,59 @@
-import React, { useMemo } from 'react';
-import { FaSearch, FaPlus, FaList, FaFilter, FaSyncAlt, FaCog } from 'react-icons/fa';
+import React, { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom'; // Import useLocation
 import DataTable from '../shared/CustomTableMUI';
+import { CONTACTCOLUMNDUMMY, CONTACTDATADUMMY } from '../lib/const/DummyData';
+import { RiContactsBook3Line } from "react-icons/ri";
+import { IoMdArrowDropdown } from "react-icons/io";
+import ContactNew from './ContactNew';
 
 const Contact = () => {
-    const columns = useMemo(
-        () => [
-            { Header: 'Name', accessor: 'name' },
-            { Header: 'Mailing Address', accessor: 'contactmailingaddress' },
-            { Header: 'Account Name', accessor: 'accountname' },
-            { Header: 'Business Phone', accessor: 'businessphone' },
-            { Header: 'Mobile', accessor: 'mobile' },
-            { Header: 'Email', accessor: 'email' },
-            { Header: 'Status', accessor: 'status' },
-        ],
-        []
-    );
-    
-    const data = useMemo(
-        () => [
-            { name: 'John Doe', contactmailingaddress: '123 Main St, Anytown, USA', accountname: 'ABC Company', businessphone: '(555) 123-4567', mobile: '(555) 987-6543', email: 'john.doe@example.com', status: 'Active' },
-            { name: 'Jane Smith', contactmailingaddress: '456 Elm St, Another Town, USA', accountname: 'XYZ Corporation', businessphone: '(555) 222-3333', mobile: '(555) 999-8888', email: 'jane.smith@example.com', status: 'Inactive' },
-        ],
-        []
-    );
+    const location = useLocation();
+    const [isModalOpen, setIsModalOpen] = useState(false); // State for modal visibility
+
+    useEffect(() => {
+        // Check if the state indicates that the modal should be open
+        if (location.state?.openModal) {
+            setIsModalOpen(true);
+        }
+    }, [location.state]);
+
+    // Function to open the modal
+    const openModal = () => {
+        setIsModalOpen(true);
+    };
+
+    // Function to close the modal
+    const closeModal = () => {
+        setIsModalOpen(false);
+    };
+
     return (
-        <div className="p-4">
-            <div className="flex items-center justify-between mb-4">
-                <h1 className="text-2xl font-semibold">Contacts</h1>
-                <button className="flex items-center space-x-2 p-2 bg-blue-600 text-white rounded">
-                    <FaPlus />
-                    <span>New</span>
-                </button>
-            </div>
-            <div className="bg-gray-100 p-4 rounded">
+        <div className="h-screen flex flex-col flex-grow mb-4">
+            <div className="bg-neutral-100 rounded flex-grow">
                 <div className="flex items-center justify-between mb-4">
-                    <div>
-                        <h2 className="text-xl font-semibold">Recently Viewed</h2>
-                        <p className="text-gray-600">1 item • Updated a few seconds ago</p>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                        <button className="p-2 bg-gray-200 rounded">
-                            <FaSyncAlt />
-                        </button>
-                        <button className="p-2 bg-gray-200 rounded">
-                            <FaCog />
-                        </button>
-                    </div>
-                </div>
-                <div className="flex items-center justify-between mb-4">
-                    <div className="flex space-x-2">
-                        <button className="p-2 bg-gray-200 rounded">Import</button>
-                        <button className="p-2 bg-gray-200 rounded">Add to Campaign</button>
-                        <button className="p-2 bg-gray-200 rounded">Send List Email</button>
-                        <button className="p-2 bg-gray-200 rounded">Add to Cadence</button>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                        <div className="relative">
-                            <input
-                                type="text"
-                                placeholder="Search this list..."
-                                className="pl-10 pr-4 py-2 border border-gray-300 rounded"
-                            />
-                            <FaSearch className="absolute left-2 top-2 text-gray-500" />
+                    <div className='flex items-center space-x-2'>
+                        <div className="p-1 rounded-full border-2 border-purple-500 bg-purple-600">
+                            <RiContactsBook3Line className="text-white text-xl font-bold" />
                         </div>
-                        <button className="p-2 bg-gray-200 rounded">
-                            <FaList />
-                        </button>
-                        <button className="p-2 bg-gray-200 rounded">
-                            <FaFilter />
+                        <div>
+                            <h1 className="text-xs font-normal">Contacts</h1>
+                            <h2 className="flex items-center py-1 cursor-pointer text-2xl text-neutral-600 border-b border-neutral-100 hover:border-b hover:border-neutral-500">
+                                Recently Viewed
+                                <IoMdArrowDropdown className='ml-1 active:rounded-lg active:border active:border-neutral-500' />
+                            </h2>
+                        </div>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                        <button
+                            onClick={openModal}
+                            className="flex items-center space-x-2 px-6 py-1.5 text-xs hover:bg-neutral-100 hover:text-neutral-700 border border-neutral-500 bg-white text-blue-500 rounded rounded-full"
+                        >
+                            <span>New</span>
                         </button>
                     </div>
                 </div>
-                <DataTable columns={columns} data={data} />
+                <DataTable column={CONTACTCOLUMNDUMMY} dataTable={CONTACTDATADUMMY} />
+                {isModalOpen && <ContactNew onClose={closeModal} />}
             </div>
         </div>
     );

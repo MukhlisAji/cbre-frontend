@@ -17,6 +17,9 @@ export default {
         "c-dark-grayish": "#485558",
         "c-light-grayish": "#7A8A98",
       },
+      height: {
+        'row-height': '19px', // Custom row height
+      },
     },
   },
   plugins: [],

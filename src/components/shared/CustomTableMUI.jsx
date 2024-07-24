@@ -1,149 +1,352 @@
-import React, { useState } from 'react';
-import { useTable, useSortBy, useRowSelect, useFilters } from 'react-table';
-import { FaEllipsisV, FaCheckSquare, FaSquare } from 'react-icons/fa';
-import Menu from '@mui/material/Menu';
-import MenuItem from '@mui/material/MenuItem';
-import IconButton from '@mui/material/IconButton';
-import Checkbox from '@mui/material/Checkbox';
+import React, { useEffect, useRef, useState } from 'react';
+import { Table, HeaderRow, HeaderCell, Row, Cell } from '@table-library/react-table-library/table';
+import { useSort } from '@table-library/react-table-library/sort';
+import {
+    useRowSelect,
+    HeaderCellSelect,
+    CellSelect
+} from '@table-library/react-table-library/select';
+import { useTheme } from '@table-library/react-table-library/theme';
+import { Virtualized } from "@table-library/react-table-library/virtualized";
+import { FaList } from 'react-icons/fa';
+import { IoIosSearch } from 'react-icons/io';
 
-const DataTable = ({ columns, data }) => {
-    const [hiddenColumns, setHiddenColumns] = useState([]);
-    const [anchorEl, setAnchorEl] = useState(null);
-    const open = Boolean(anchorEl);
+import UnfoldMoreOutlinedIcon from "@mui/icons-material/UnfoldMoreOutlined";
+import KeyboardArrowUpOutlinedIcon from "@mui/icons-material/KeyboardArrowUpOutlined";
+import KeyboardArrowDownOutlinedIcon from "@mui/icons-material/KeyboardArrowDownOutlined";
+import { createTheme as createMaterialTheme } from "@mui/material/styles";
+import { ThemeProvider as MaterialThemeProvider } from "@mui/material/styles";
+import Button from "@mui/material/Button";
 
-    const handleClick = (event) => {
-        setAnchorEl(event.currentTarget);
+const ROW_HEIGHT = 40;
+
+const AccountTable = ({ dataTable, column }) => {
+    const [search, setSearch] = useState("");
+    const [visibleColumns, setVisibleColumns] = useState(column.slice(0, 7));
+    const [editing, setEditing] = useState(null);
+    const [data, setData] = useState(dataTable);
+    const [showDropdown, setShowDropdown] = useState(false);
+    const buttonRef = useRef(null);
+    const dropdownRef = useRef(null);
+
+    const handleClickOutside = (event) => {
+        if (
+            dropdownRef.current &&
+            !dropdownRef.current.contains(event.target) &&
+            buttonRef.current &&
+            !buttonRef.current.contains(event.target)
+        ) {
+            setShowDropdown(false);
+        }
     };
 
-    const handleClose = () => {
-        setAnchorEl(null);
+    useEffect(() => {
+        document.addEventListener('mousedown', handleClickOutside);
+
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, []);
+
+    const handleSearch = (event) => {
+        setSearch(event.target.value);
     };
 
-    const handleToggleColumn = (columnId) => {
-        toggleHideColumn(columnId, !hiddenColumns.includes(columnId));
-        setHiddenColumns(prev =>
-            prev.includes(columnId) ? prev.filter(id => id !== columnId) : [...prev, columnId]
-        );
-    };
-
-    const defaultColumn = {
-        Cell: ({ value }) => (
-            <input
-                value={value}
-                onChange={(e) => console.log('Cell value changed: ', e.target.value)}
-            />
-        ),
-    };
-
-    const {
-        getTableProps,
-        getTableBodyProps,
-        headerGroups,
-        rows,
-        prepareRow,
-        allColumns,
-        toggleHideColumn,
-    } = useTable(
-        {
-            columns,
-            data,
-            defaultColumn,
-            initialState: {
-                hiddenColumns: hiddenColumns,
+    const handleColumnToggle = (column) => {
+        setVisibleColumns((prev) => {
+            const isSelected = prev.some(col => col.accessor === column.accessor);
+            if (isSelected) {
+                return prev.filter(col => col.accessor !== column.accessor);
+            } else if (prev.length < 7) {
+                return [...prev, column];
+            } else {
+                return prev; // Ignore if already 7 columns are selected
             }
+        });
+    };
+
+    const handleCellClick = (item, accessor) => {
+        setEditing({ id: item.id, accessor, value: item[accessor] });
+    };
+
+    const handleChange = (event) => {
+        setEditing((prev) => ({
+            ...prev,
+            value: event.target.value
+        }));
+    };
+
+    const handleBlur = () => {
+        if (editing) {
+            const updatedData = data.map((item) =>
+                item.id === editing.id
+                    ? { ...item, [editing.accessor]: editing.value }
+                    : item
+            );
+            setData(updatedData);
+            setEditing(null);
+        }
+    };
+
+    const handleKeyPress = (event) => {
+        if (event.key === 'Enter') {
+            handleBlur();
+        }
+    };
+
+    // Filter data based on search input
+    const filteredData = data.filter((item) =>
+        Object.values(item).some(value =>
+            value.toString().toLowerCase().includes(search.toLowerCase())
+        )
+    );
+
+    const theme = useTheme({
+        Table: `
+            --data-table-library_grid-template-columns: 30px repeat(${visibleColumns.length}, minmax(0, 1fr));
+            font-family: "Salesforce Sans", Arial, sans-serif; /* Font similar to Salesforce */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow for elevation */
+        `,
+        HeaderRow: `
+            background-color: #f4f6f9; /* Light gray background for header */
+            color: #5e5e5e; /* Dark gray text color */
+        `,
+        Cell: `
+            padding: 4px 8px; /* Padding inside cells */
+            color: #333; /* Dark text color */
+            display: flex;
+            align-items: center; /* Center align text vertically */
+            font-size: 13px
+
+        `,
+        HeaderCell: `
+            // background-color: rgb(245 245 245); /* Light gray background for header cells */
+            // font-weight: bold; /* Bold text for header cells */
+            // padding: 0px 12px; /* Padding inside header cells */
+            // border-bottom: 2px solid #d8dde6; /* Bottom border for header cells */
+            border-top: 2px solid #d8dde6; /* Bottom border for header cells */
+            border-right: 1px solid #d8dde6; /* Border between header cells horizontally */
+            // font-size: 13px
+
+        `,
+        BaseCell: `
+            // padding: 0px 8px;
+            border-bottom: 1px solid #d8dde6;
+        `,
+    });
+
+    // Initialize row selection
+    const select = useRowSelect({ nodes: filteredData }, {
+        onChange: onSelectChange,
+    });
+
+    function onSelectChange(action, state) {
+        console.log(action, state);
+    }
+
+    // Initialize sorting
+    const sort = useSort(
+        { nodes: filteredData },
+        {
+            onChange: onSortChange,
         },
-        useFilters,
-        useSortBy,
-        useRowSelect,
-        hooks => {
-            hooks.visibleColumns.push(columns => [
-                {
-                    id: 'selection',
-                    Header: ({ getToggleAllRowsSelectedProps }) => (
-                        <Checkbox {...getToggleAllRowsSelectedProps()} icon={<FaSquare />} checkedIcon={<FaCheckSquare />} />
-                    ),
-                    Cell: ({ row }) => (
-                        <Checkbox {...row.getToggleRowSelectedProps()} icon={<FaSquare />} checkedIcon={<FaCheckSquare />} />
-                    ),
-                },
-                ...columns,
-            ]);
+        {
+            sortFns: column.reduce((acc, col) => {
+                acc[col.accessor] = (array) =>
+                    array.sort((a, b) => {
+                        if (typeof a[col.accessor] === 'string') {
+                            return a[col.accessor].localeCompare(b[col.accessor]);
+                        } else {
+                            return a[col.accessor] - b[col.accessor];
+                        }
+                    });
+                return acc;
+            }, {})
         }
     );
 
-    const CustomCheckbox = ({ checked, ...props }) => (
-        <span {...props}>
-            {checked ? <FaCheckSquare /> : <FaSquare />}
-        </span>
-    );
+    function onSortChange(action, state) {
+        console.log(action, state);
+    }
+
+    const getIcon = (sortKey) => {
+        if (sort.state.sortKey === sortKey && sort.state.reverse) {
+            return <KeyboardArrowDownOutlinedIcon />;
+        }
+
+        if (sort.state.sortKey === sortKey && !sort.state.reverse) {
+            return <KeyboardArrowUpOutlinedIcon />;
+        }
+
+        return <UnfoldMoreOutlinedIcon />;
+    };
+
+    const [sectionHeight, setSectionHeight] = useState(0);
+
+    useEffect(() => {
+        const handleResize = () => {
+            const screenHeight = window.innerHeight;
+            const newHeight = screenHeight - 280; // Subtract 200px for any other fixed content
+            setSectionHeight(newHeight);
+        };
+
+        handleResize();
+
+        // Add event listener to handle window resize
+        window.addEventListener('resize', handleResize);
+
+        // Clean up event listener on component unmount
+        return () => {
+            window.removeEventListener('resize', handleResize);
+        };
+    }, []);
+
+    const resize = { resizerHighlight: "#3b82f6", resizerWidth: 3 };
 
     return (
-        <div>
-            <IconButton
-                aria-label="more"
-                aria-controls="long-menu"
-                aria-haspopup="true"
-                onClick={handleClick}
-                style={{ float: 'right' }}
-            >
-                <FaEllipsisV />
-            </IconButton>
-            <Menu
-                id="long-menu"
-                anchorEl={anchorEl}
-                keepMounted
-                open={open}
-                onClose={handleClose}
-            >
-                {allColumns.map(column => (
-                    <MenuItem key={column.id} onClick={() => handleToggleColumn(column.id)}>
-                        <CustomCheckbox
-                            checked={!hiddenColumns.includes(column.id)}
-                            onChange={() => handleToggleColumn(column.id)}
-                        />
-                        <span>{column.id}</span>
-                    </MenuItem>
-                ))}
-            </Menu>
-            <table {...getTableProps()} className="min-w-full bg-white border border-gray-300 rounded">
-                <thead>
-                    {headerGroups.map(headerGroup => (
-                        <tr {...headerGroup.getHeaderGroupProps()}>
-                            {headerGroup.headers.map(column => (
-                                <th
-                                    {...column.getHeaderProps(column.getSortByToggleProps())}
-                                    className="px-4 py-2 border-b capitalize"
+        <div className="space-y-4">
+            <style>
+                {`
+                    .header-cell:hover {
+                        background-color: #e0e5e0;
+                        color: #333;
+                    }
+                `}
+            </style>
+            <div className="flex flex-col h-full">
+                <div className="flex flex-grow items-center space-x-2 justify-between">
+
+                    <p className="text-neutral-500 text-xs mt-auto pl-2">
+                        1 item • Updated a few seconds ago
+                    </p>
+                    <div className='flex flex-row gap-2'>
+
+                        <div className="relative">
+                            <input
+                                id="search"
+                                type="text"
+                                value={search}
+                                onChange={handleSearch}
+                                placeholder="Search this list..."
+                                className="rounded-lg md:w-80 text-sm text-neutral-500 pl-10 pr-4 py-1.5 border border-neutral-400 hover:ring-1 hover:ring-c-teal focus:ring-c-teal focus:outline-none"
+                            />
+                            <IoIosSearch className="absolute left-2 top-2 text-xl text-neutral-600 font-semibold" />
+                        </div>
+                        <div className="relative">
+                            <button
+                                ref={buttonRef}
+                                id="menu-button"
+                                aria-expanded={showDropdown}
+                                aria-haspopup="true"
+                                onClick={() => setShowDropdown(!showDropdown)}
+                                className="p-2 bg-white text-blue-500 rounded-full border border-neutral-500 hover:border-c-teal hover:bg-neutral-100 hover:text-neutral-700"
+                            >
+                                <FaList />
+                            </button>
+                            {showDropdown && (
+                                <div ref={dropdownRef}
+                                    className="origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-40"
+                                    role="menu"
+                                    aria-orientation="vertical"
+                                    aria-labelledby="menu-button"
+                                    tabIndex="-1"
                                 >
-                                    {column.render('Header')}
-                                    <span>
-                                        {column.isSorted
-                                            ? column.isSortedDesc
-                                                ? ' 🔽'
-                                                : ' 🔼'
-                                            : ''}
-                                    </span>
-                                </th>
-                            ))}
-                        </tr>
-                    ))}
-                </thead>
-                <tbody {...getTableBodyProps()}>
-                    {rows.map(row => {
-                        prepareRow(row);
-                        return (
-                            <tr {...row.getRowProps()}>
-                                {row.cells.map(cell => (
-                                    <td {...cell.getCellProps()} className="px-4 py-2 border-b">
-                                        {cell.render('Cell')}
-                                    </td>
-                                ))}
-                            </tr>
-                        );
-                    })}
-                </tbody>
-            </table>
+                                    <div className="py-1" role="none">
+                                        {column.map((column) => (
+                                            <label
+                                                key={column.accessor}
+                                                className="flex text-xs items-center space-x-2 text-gray-700 px-4 py-2 hover:bg-gray-100"
+                                            >
+                                                <input
+                                                    type="checkbox"
+                                                    checked={visibleColumns.some(col => col.accessor === column.accessor)}
+                                                    onChange={() => handleColumnToggle(column)}
+                                                    disabled={!visibleColumns.some(col => col.accessor === column.accessor) && visibleColumns.length >= 7}
+                                                    className="form-checkbox h-3 w-3 text-blue-600"
+                                                />
+                                                <span>{column.label}</span>
+                                            </label>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div style={{ height: `${sectionHeight}px` }} className="bg-white overflow-auto">
+                <MaterialThemeProvider theme={createMaterialTheme({})}>
+                    <Table
+                        data={{ nodes: filteredData }}
+                        theme={theme}
+                        layout={{ isDiv: true, fixedHeader: true, custom: true }}
+                        select={select}
+                        sort={sort}
+                    >
+                        {(tableList) => (
+                            <Virtualized
+                                tableList={tableList}
+                                rowHeight={ROW_HEIGHT}
+                                header={() => (
+                                    <HeaderRow className="header-cel">
+                                        <HeaderCellSelect
+                                            style={{
+                                                margin: '0 auto',  // Center the component horizontally
+                                                backgroundColor: '#f4f6f9',  // Background color
+                                                borderTop: '2px solid #d9dde6',  // Top border style
+                                                padding: '8px',  // Padding inside the component
+                                            }} />
+
+                                        {visibleColumns.map((col) => (
+                                            <HeaderCell resize={resize} key={col.accessor}>
+                                                <Button
+                                                    fullWidth
+                                                    style={{ justifyContent: "flex-start" }}
+                                                    endIcon={getIcon(col.accessor)}
+                                                    onClick={() =>
+                                                        sort.fns.onToggleSort({
+                                                            sortKey: col.accessor,
+                                                        })
+                                                    }
+                                                >
+                                                    {col.label}
+                                                </Button>
+                                            </HeaderCell>
+                                        ))}
+                                    </HeaderRow>
+                                )}
+                                body={(item, index) => (
+                                    <Row key={index} item={item} className="hover:bg-blue-50">
+                                        <CellSelect item={item} />
+                                        {visibleColumns.map((col) => (
+                                            <Cell
+                                                key={col.accessor}
+                                                onClick={() => handleCellClick(item, col.accessor)}
+                                            >
+                                                {editing && editing.id === item.id && editing.accessor === col.accessor ? (
+                                                    <input
+                                                        type="text"
+                                                        value={editing.value}
+                                                        onChange={handleChange}
+                                                        onBlur={handleBlur}
+                                                        onKeyPress={handleKeyPress}
+                                                        autoFocus
+                                                    />
+                                                ) : (
+                                                    item[col.accessor]
+                                                )}
+                                            </Cell>
+                                        ))}
+                                    </Row>
+                                )}
+                            />
+                        )}
+                    </Table>
+                </MaterialThemeProvider>
+            </div>
         </div>
     );
 };
 
-export default DataTable;
+export default AccountTable;
