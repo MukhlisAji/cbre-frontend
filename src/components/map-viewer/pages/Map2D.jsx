@@ -145,12 +145,12 @@ function Map2D() {
   return (
     <div className="relative w-full min-h-full overflow-hidden">
       <div className="filtering">
-        <SearchLocation
+        {/* <SearchLocation
           onSearchChange={handleSearch}
           filteringData={filteringData}
           search={search}
           onClickAction={handleClick}
-        />
+        /> */}
         <DataBrowser
           triggerMicromarket={triggerMicromarket}
           resetMicromarket={resetMicromarket}

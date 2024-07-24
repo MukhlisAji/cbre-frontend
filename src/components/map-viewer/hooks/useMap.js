@@ -1,5 +1,6 @@
 // import MapboxDraw from "@mapbox/mapbox-gl-draw";
 import mapboxgl from "mapbox-gl";
+import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder';
 // import {
 //   CircleMode,
 //   DirectMode,
@@ -305,6 +306,34 @@ export function useMap(styleMap, map, zoom) {
           radius
         );
       });
+
+      // Add MapboxGeocoder to the map if it doesn't already exist
+      if (!document.querySelector('.mapboxgl-ctrl-geocoder')) {
+        const geocoder = new MapboxGeocoder({
+          accessToken: mapboxgl.accessToken,
+          mapboxgl: mapboxgl,
+          marker: false
+        });
+
+        map.current.addControl(geocoder);
+
+        geocoder.on('result', (e) => {
+          const center = e.result.center;
+          map.current.flyTo({
+            center: center,
+            zoom: 14
+          });
+        });
+
+        const filteringDiv = document.querySelector(".filtering");
+        const mapboxglCtrlGeocoder = document.querySelector(".mapboxgl-ctrl-geocoder.mapboxgl-ctrl");
+        mapboxglCtrlGeocoder.firstChild.style.height = '100%'
+        mapboxglCtrlGeocoder.firstChild.style.top = '0'
+        mapboxglCtrlGeocoder.style.display = "flex"
+        mapboxglCtrlGeocoder.style.justifyContent = "center"
+        mapboxglCtrlGeocoder.style.alignItems = "center"
+        filteringDiv.insertBefore(mapboxglCtrlGeocoder, filteringDiv.firstChild);
+      }
     }
   }, [map]);
 
