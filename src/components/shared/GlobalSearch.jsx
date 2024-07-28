@@ -15,14 +15,11 @@ export default function GlobalSearchResult() {
   };
 
   const handleSearch = () => {
-    setIsExpanded(false);
-    const currentPath = location.pathname + location.search;
+    // const currentPath = location.pathname + location.search;
     const newSearchPath = `/search/result?search=${encodeURIComponent(query)}`;
-    if (currentPath === newSearchPath) {
-      window.location.reload();
-    } else {
-      navigate(newSearchPath);
-    }
+
+    navigate(newSearchPath);
+    setIsExpanded(false);
   };
 
   const handleSearchClick = () => {
@@ -52,11 +49,11 @@ export default function GlobalSearchResult() {
   const results = ['Result 1', 'Result 2', 'Result 3'];
 
   return (
-    <div className="relative flex justify-center">
-      <div className="relative w-full flex justify-center">
+    <div className="relative flex justify-center"
+    >
+      <div className="relative w-1/2 flex justify-center" ref={containerRef}>
         <div
-          ref={containerRef}
-          className={`relative transition-all duration-300 ease-in-out ${isExpanded ? 'h-10 w-1/2 rounded-md' : 'h-8 w-96 rounded-full'}`}
+          className={`relative transition-all duration-300 ease-in-out ${isExpanded ? 'h-10 w-full rounded-md' : 'h-8 w-96 rounded-full'}`}
         >
           <input
             type="text"
@@ -77,7 +74,7 @@ export default function GlobalSearchResult() {
           </button>
         </div>
         {isExpanded && (
-          <div className="absolute top-12 left-1/4 w-1/2 bg-white border rounded-md shadow-lg z-10 p-4 flex">
+          <div className="absolute top-12 w-full bg-white border rounded-md shadow-lg z-10 p-4 flex">
             <div className="w-1/2 border-r pr-2">
               {suggestions.length > 0 && (
                 <div className="mb-4">

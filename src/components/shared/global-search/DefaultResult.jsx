@@ -14,7 +14,7 @@ export default function DefaultResult() {
         <div className='bg-neutral-200'>
             <div className="rounded-md border bg-neutral-100 shadow-md mb-4">
                 {/* Header Section */}
-                <div className="flex px-4 justify-between items-center p-2">
+                <div className="flex p-4 justify-between items-center">
                     <div className="flex items-center bg-neutral-100">
                         <div className="bg-blue-800 text-white rounded-full w-8 h-8 flex items-center justify-center">
                             <HiBuildingOffice2 />
@@ -25,10 +25,10 @@ export default function DefaultResult() {
                         </div>
                     </div>
                     <div className="flex text-neutral-600 bg-neutral-100 mt-auto">
-                        <button className="bg-gray-200 text-xs font-normal px-2 py-1 rounded-sm border border-neutral-400 mr-2 hover:bg-gray-300">+ Follow</button>
-                        <button className="bg-gray-200 text-xs font-normal px-2 py-1 rounded-l-sm border border-neutral-400 hover:bg-gray-300">New Private Note</button>
-                        <button className="bg-gray-200 text-xs font-normal px-2 py-1 border border-neutral-400 hover:bg-gray-300">Clone</button>
-                        <button className="bg-gray-200 text-xs font-normal px-2 py-1 rounded-r-sm border border-neutral-400 hover:bg-gray-300">New Referral</button>
+                        <button className="bg-gray-200 text-xs font-normal px-2 py-1 rounded-sm rounded-l-full border border-neutral-400 mr-2 hover:bg-gray-300">+ Follow</button>
+                        <button className="bg-gray-200 text-xs font-normal px-2 py-1 rounded-l-sm border-y border-l border-neutral-400 hover:bg-gray-300">New Private Note</button>
+                        <button className="bg-gray-200 text-xs font-normal px-2 py-1 border-y border-l border-neutral-400 hover:bg-gray-300">Clone</button>
+                        <button className="bg-gray-200 text-xs font-normal px-2 py-1 rounded-r-sm rounded-r-full border border-neutral-400 hover:bg-gray-300">New Referral</button>
                     </div>
                 </div>
 
@@ -117,7 +117,7 @@ export default function DefaultResult() {
                     <div className='bg-neutral-100'>
                         <span className="text-xs text-neutral-700">5+ results · Sorted by relevance </span>
                     </div>
-                    <span className='text-xs text-blue-700 cursor-pointer px-2'>View more</span>
+                    <span className='text-xs text-blue-700 cursor-pointer px-4'>View more</span>
                 </div>
 
                 <CustomTableMUI column={ACCOUNTCOLUMNDUMMY} dataTable={firstFiveAccounts} isHeader={false} tableHeight={549} />
@@ -128,7 +128,7 @@ export default function DefaultResult() {
                     <div className='bg-neutral-100'>
                         <span className="text-xs text-neutral-700">5+ results · Sorted by relevance </span>
                     </div>
-                    <span className='text-xs text-blue-700 cursor-pointer px-2'>View more</span>
+                    <span className='text-xs text-blue-700 cursor-pointer px-4'>View more</span>
                 </div>
 
                 <CustomTableMUI column={ACCOUNTCOLUMNDUMMY} dataTable={firstFiveAccounts} isHeader={false} tableHeight={549} />
