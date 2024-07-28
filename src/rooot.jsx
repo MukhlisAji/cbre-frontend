@@ -34,6 +34,8 @@ import PropertyLayout from './components/property/PropertyLayout';
 import Account from './components/property/Account';
 import Contact from './components/property/Contact';
 import AccountDetails from './components/property/AccountDetails';
+import ContactDetails from './components/property/ContactDetails';
+import GlobalSearchResult from './components/shared/global-search/GlobalSearchResult';
 
 Modal.setAppElement('#root');
 
@@ -53,8 +55,11 @@ function App() {
                             <Route path="accounts/details" element={<AccountDetails />} />
 
                             <Route path="contacts" element={<Contact />} />
+                            <Route path="contacts/details" element={<ContactDetails />} />
+
                         </Route>
                         <Route path="map" element={<MapViewer />} />
+                        <Route path="search/result" element={<GlobalSearchResult />} />
 
                         <Route path="*" element={<NotFound />} />
                     </Route>

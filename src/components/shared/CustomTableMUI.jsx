@@ -20,7 +20,7 @@ import Button from "@mui/material/Button";
 
 const ROW_HEIGHT = 40;
 
-const AccountTable = ({ dataTable, column }) => {
+const CustomTableMUI = ({ dataTable, column, openModal, isHeader, tableHeight }) => {
     const [search, setSearch] = useState("");
     const [visibleColumns, setVisibleColumns] = useState(column.slice(0, 7));
     const [editing, setEditing] = useState(null);
@@ -28,6 +28,12 @@ const AccountTable = ({ dataTable, column }) => {
     const [showDropdown, setShowDropdown] = useState(false);
     const buttonRef = useRef(null);
     const dropdownRef = useRef(null);
+    const [activeButton, setActiveButton] = useState('all');
+
+    const handleButtonClick = (button) => {
+        setActiveButton(button);
+    };
+
 
     const handleClickOutside = (event) => {
         if (
@@ -186,7 +192,7 @@ const AccountTable = ({ dataTable, column }) => {
     useEffect(() => {
         const handleResize = () => {
             const screenHeight = window.innerHeight;
-            const newHeight = screenHeight - 280; // Subtract 200px for any other fixed content
+            const newHeight = screenHeight - tableHeight; // Subtract 200px for any other fixed content
             setSectionHeight(newHeight);
         };
 
@@ -211,14 +217,35 @@ const AccountTable = ({ dataTable, column }) => {
                         background-color: #e0e5e0;
                         color: #333;
                     }
+                    .header-title {
+                        color: rgb(115 115 115); /* Set text color to black */
+                        text-transform: none; /* Transform text to lowercase */
+                        font-weight: semibold; /* Make the text bold */
+                        font-size: 13px
+                    }
                 `}
             </style>
-            <div className="flex flex-col h-full">
-                <div className="flex flex-grow items-center space-x-2 justify-between">
 
-                    <p className="text-neutral-500 text-xs mt-auto pl-2">
-                        1 item • Updated a few seconds ago
-                    </p>
+
+            {isHeader && <div className="flex flex-col h-full">
+                <p className="text-neutral-500 text-xs mt-auto py-2">
+                    1 item • Updated a few seconds ago
+                </p>
+                <div className="flex flex-grow items-center space-x-2 justify-between">
+                    <div className="flex w-48 text-sm rounded gap-1 px-1 rounded-md bg-gray-200">
+                        <button
+                            onClick={() => handleButtonClick('all')}
+                            className={`flex-grow p-1 text-sm text-neutral-500 rounded rounded-md my-1 ${activeButton === 'all' ? 'bg-white text-black border-gray-300 shadow shadow-md' : 'bg-gray-200 text-gray-700 border-gray-300'}`}
+                        >
+                            All
+                        </button>
+                        <button
+                            onClick={() => handleButtonClick('recentlyViewed')}
+                            className={`flex-grow p-1 text-sm text-neutral-500 rounded rounded-md my-1 ${activeButton === 'recentlyViewed' ? 'bg-white text-black border-gray-300 shadow shadow-md' : 'bg-gray-200 text-gray-700 border-gray-300'}`}
+                        >
+                            Recently Viewed
+                        </button>
+                    </div>
                     <div className='flex flex-row gap-2'>
 
                         <div className="relative">
@@ -232,6 +259,17 @@ const AccountTable = ({ dataTable, column }) => {
                             />
                             <IoIosSearch className="absolute left-2 top-2 text-xl text-neutral-600 font-semibold" />
                         </div>
+                        <div className='relative'>
+                            <div className="flex items-center space-x-2">
+                                <button
+                                    onClick={openModal}
+                                    className="flex items-center font-normal text-sm space-x-2 px-6 py-1.5 hover:bg-neutral-100 hover:text-neutral-700 border border-neutral-500 bg-white text-blue-700 rounded rounded-full transition duration-150 ease-in-out"
+
+                                >
+                                    <span>New</span>
+                                </button>
+                            </div>
+                        </div>
                         <div className="relative">
                             <button
                                 ref={buttonRef}
@@ -239,9 +277,9 @@ const AccountTable = ({ dataTable, column }) => {
                                 aria-expanded={showDropdown}
                                 aria-haspopup="true"
                                 onClick={() => setShowDropdown(!showDropdown)}
-                                className="p-2 bg-white text-blue-500 rounded-full border border-neutral-500 hover:border-c-teal hover:bg-neutral-100 hover:text-neutral-700"
+                                className="p-2.5 bg-white text-blue-700 rounded-full border border-neutral-500 hover:border-c-teal hover:bg-neutral-100 hover:text-neutral-700"
                             >
-                                <FaList />
+                                <FaList className="text-sm" />
                             </button>
                             {showDropdown && (
                                 <div ref={dropdownRef}
@@ -271,9 +309,11 @@ const AccountTable = ({ dataTable, column }) => {
                                 </div>
                             )}
                         </div>
+
                     </div>
                 </div>
             </div>
+            }
 
             <div style={{ height: `${sectionHeight}px` }} className="bg-white overflow-auto">
                 <MaterialThemeProvider theme={createMaterialTheme({})}>
@@ -296,12 +336,13 @@ const AccountTable = ({ dataTable, column }) => {
                                                 backgroundColor: '#f4f6f9',  // Background color
                                                 borderTop: '2px solid #d9dde6',  // Top border style
                                                 padding: '8px',  // Padding inside the component
-                                            }} />
-
+                                            }}
+                                        />
                                         {visibleColumns.map((col) => (
-                                            <HeaderCell resize={resize} key={col.accessor}>
+                                            <HeaderCell resize={resize} key={col.accessor} className="header-cell">
                                                 <Button
                                                     fullWidth
+                                                    className="header-title" // Apply the custom CSS class
                                                     style={{ justifyContent: "flex-start" }}
                                                     endIcon={getIcon(col.accessor)}
                                                     onClick={() =>
@@ -349,4 +390,4 @@ const AccountTable = ({ dataTable, column }) => {
     );
 };
 
-export default AccountTable;
+export default CustomTableMUI;

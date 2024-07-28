@@ -55,16 +55,19 @@ export default function AccountNew({ onClose }) {
     const handleSave = () => {
         setConfirmationDialogVisible(true);
     };
+    const handleSaveNew = () => {
+        setConfirmationDialogVisible(false);
+        resetData();
+        navigate('/property/accounts/details');
+
+    };
 
     const handleConfirmSave = async () => {
         setConfirmationDialogVisible(false);
-        if (isSavingNew) {
-            resetData();
-        }
         await handleSubmit();
-
         navigate('/property/contacts', { state: { openModal: true } });
     };
+
 
     const handleCancelSave = () => {
         setConfirmationDialogVisible(false);
@@ -434,7 +437,7 @@ export default function AccountNew({ onClose }) {
                         Cancel
                     </button>
                     <button
-                        onClick={() => { setIsSavingNew(true); handleSave(); }}
+                        onClick={() => { handleSaveNew(); }}
                         className="px-4 py-2 rounded-lg bg-white text-blue-600 border border-neutral-500 text-xs hover:text-neutral-700 hover:bg-neutral-100"
                     >
                         Save & New
@@ -449,7 +452,7 @@ export default function AccountNew({ onClose }) {
 
                 {/* Confirmation Dialog */}
                 {confirmationDialogVisible && (
-                    <div className="fixed inset-0 flex items-center justify-center z-60">
+                    <div className="fixed inset-0 flex items-center justify-center z-50">
                         <div className="absolute inset-0 bg-black opacity-50"></div>
                         <div className="relative bg-white p-6 rounded-lg shadow-lg w-80 max-w-md">
                             <div className="flex flex-col items-center">

@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 export default function ContactNew({ onClose }) {
     const [accountName, setAccountName] = useState('');
@@ -22,6 +23,7 @@ export default function ContactNew({ onClose }) {
     const [addressInformationVisible, setAddressInformationVisible] = useState(true);
     const [additionalInformationVisible, setAdditionalInformationVisible] = useState(true);
     const [accessToken] = useState('');
+    const navigate = useNavigate();
 
     useEffect(() => {
         toggleBodyOverflow(true);
@@ -46,6 +48,13 @@ export default function ContactNew({ onClose }) {
                 break;
         }
     };
+
+    const handleSaveNew = () => {
+        resetData();
+        navigate('/property/contacts/details');
+
+    };
+
 
     const handleSubmit = async () => {
         const url = 'https://java-flow-2230.my.salesforce.com/services/data/v61.0/sobjects/Account';
@@ -91,27 +100,31 @@ export default function ContactNew({ onClose }) {
 
             if (responseData.success) {
                 setShowSuccessModal(true);
-                setAccountName('');
-                setPhone('');
-                setBillingCity('');
-                setBillingCountry('');
-                setBillingPostalCode('');
-                setBillingState('');
-                setBillingStreet('');
-                setDescription('');
-                setParentAccount('');
-                setPhone('');
-                setShippingCity('');
-                setShippingCountry('');
-                setShippingState('');
-                setShippingPostalCode('');
-                setShippingStreet('');
-                setType('');
-                setWebsite('');
+                resetData();
             }
         } catch (error) {
             console.error('Error occurred while contacting Salesforce:', error.message);
         }
+    };
+
+    const resetData = () => {
+        setAccountName('');
+        setPhone('');
+        setBillingCity('');
+        setBillingCountry('');
+        setBillingPostalCode('');
+        setBillingState('');
+        setBillingStreet('');
+        setDescription('');
+        setParentAccount('');
+        setPhone('');
+        setShippingCity('');
+        setShippingCountry('');
+        setShippingState('');
+        setShippingPostalCode('');
+        setShippingStreet('');
+        setType('');
+        setWebsite('');
     };
 
     return (
@@ -412,7 +425,7 @@ export default function ContactNew({ onClose }) {
                         Save & New
                     </button>
                     <button
-                        onClick={handleSubmit}
+                        onClick={handleSaveNew}
                         className="px-4 py-2 text-white rounded-lg bg-c-teal text-xs text-white hover:text-white hover:bg-c-weldon-blue"
                     >
                         Save
