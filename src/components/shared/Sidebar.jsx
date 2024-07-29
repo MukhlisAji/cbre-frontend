@@ -48,8 +48,8 @@ export default function Sidebar() {
 
     setActiveMenu(activeMenuPath);
 
-    // Check if currentPath is '/map' and close sidebar
-    if (currentPath === "/map") {
+    // Check if currentPath is '/map' and close sidebarr
+    if (currentPath === '/map' || currentPath === '/search/result') {
       setIsOpen(false);
       setIsSidebarOpen(false);
     }
