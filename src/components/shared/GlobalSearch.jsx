@@ -1,127 +1,127 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { FaSearch } from 'react-icons/fa';
-import 'tailwindcss/tailwind.css';
+import { useNavigate, useLocation } from 'react-router-dom';
 
-const GlobalSearch = ({ width, isVisible }) => {
+export default function GlobalSearchResult() {
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [query, setQuery] = useState('');
   const [hoveredItem, setHoveredItem] = useState(null);
-  const [show, setShow] = useState(false);
-  const inputRef = useRef(null); // Create a ref for the input element
+  const navigate = useNavigate();
+  const location = useLocation();
+  const containerRef = useRef(null);
 
-  useEffect(() => {
-    if (isVisible) {
-      setShow(true);
-    } else {
-      const timer = setTimeout(() => setShow(false), 300); // Match this duration with the transition duration
-      return () => clearTimeout(timer);
-    }
-  }, [isVisible]);
-
-  useEffect(() => {
-    if (isVisible && inputRef.current) {
-      inputRef.current.focus(); // Focus the input when the modal becomes visible
-    }
-  }, [isVisible]);
-
-  const recentlySearched = [
-    'Dummy 4 contacts',
-    'contacts with lead source advertisement',
-    'my contacts',
-  ];
-  const suggestions = [
-    'test new contact last',
-    'Dummy 4',
-    'Home Page Service Dashboard',
-    'test new account',
-    'test 3 aaaa',
-  ];
-  const details = {
-    'test new contact last': 'Contact',
-    'Dummy 4': 'Account • 08927892',
-    'Home Page Service Dashboard': 'Dashboard',
-    'test new account': 'Account • 08362744',
-    'test 3 aaaa': 'Account • 08362744',
+  const handleSearchChange = (e) => {
+    setQuery(e.target.value);
   };
 
-  return (
-    <div
-      className={`absolute top-0 left-1/2 transform -translate-x-1/2 p-6 bg-white border rounded-lg shadow-2xl z-50 transition-all duration-300 ease-in-out ${
-        isVisible ? 'opacity-100 scale-100' : 'opacity-0 scale-95'
-      }`}
-      style={{ width: width * 2, display: show ? 'block' : 'none' }}
-    >
-      <div className="flex items-center mb-4">
-        <select className="border p-2 rounded-l-lg text-gray-700">
-          <option>All</option>
-          <option>Contacts</option>
-          <option>Accounts</option>
-          <option>Opportunities</option>
-        </select>
-        <input
-          type="text"
-          className="border p-2 flex-grow rounded-none text-gray-700"
-          placeholder="Search..."
-          ref={inputRef} // Attach the ref to the input element
-        />
-        <div className="bg-blue-500 text-white p-2 rounded-r-lg flex items-center justify-center">
-          <FaSearch />
-        </div>
-      </div>
+  const handleSearch = () => {
+    // const currentPath = location.pathname + location.search;
+    const newSearchPath = `/search/result?search=${encodeURIComponent(query)}`;
 
-      <div className="flex">
-        <div className="w-1/2 border-r p-4">
-          <h2 className="font-bold mb-2 text-gray-700">Recently Searched</h2>
-          <ul>
-            {recentlySearched.map((item, index) => (
-              <li
-                key={index}
-                className="py-1 cursor-pointer hover:bg-gray-100 text-gray-600"
-                onMouseEnter={() => setHoveredItem(item)}
-                onMouseLeave={() => setHoveredItem(null)}
-              >
-                {item}
-              </li>
-            ))}
-          </ul>
-          <h2 className="font-bold mt-4 mb-2 text-gray-700">Suggestions</h2>
-          <ul>
-            {suggestions.map((item, index) => (
-              <li
-                key={index}
-                className="py-1 cursor-pointer hover:bg-gray-100 text-gray-600"
-                onMouseEnter={() => setHoveredItem(item)}
-                onMouseLeave={() => setHoveredItem(null)}
-              >
-                {item}
-              </li>
-            ))}
-          </ul>
+    navigate(newSearchPath);
+    setIsExpanded(false);
+  };
+
+  const handleSearchClick = () => {
+    handleSearch();
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      handleSearch();
+    }
+  };
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (containerRef.current && !containerRef.current.contains(event.target)) {
+        setIsExpanded(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
+  const suggestions = ['Suggestion 1', 'Suggestion 2', 'Suggestion 3'];
+  const results = ['Result 1', 'Result 2', 'Result 3'];
+
+  return (
+    <div className="relative flex justify-center"
+    >
+      <div className="relative w-1/2 flex justify-center" ref={containerRef}>
+        <div
+          className={`relative transition-all duration-300 ease-in-out ${isExpanded ? 'h-10 w-full rounded-md' : 'h-8 w-96 rounded-full'}`}
+        >
+          <input
+            type="text"
+            className={`transition-all w-full duration-300 ease-in-out ${isExpanded ? 'h-10 px-4 rounded-md' : 'h-8 px-2 rounded-full'} border `}
+            placeholder="Search..."
+            onFocus={() => setIsExpanded(true)}
+            value={query}
+            onChange={handleSearchChange}
+            onKeyDown={handleKeyDown}
+          />
+          <button
+            type="button"
+            onClick={handleSearchClick}
+            className={`absolute right-0 top-1/2 transform -translate-y-1/2 p-2 text-neutral-600 hover:text-neutral-800 ${!isExpanded ? 'pointer-events-none opacity-50' : ''}`}
+            aria-label="Search"
+          >
+            <FaSearch className='p-1.5 text-neutral-500 hover:text-neutral-700' />
+          </button>
         </div>
-        <div className="w-1/2 p-4">
-          {hoveredItem ? (
-            <div>
-              <h3 className="font-bold text-gray-700">{hoveredItem}</h3>
-              <p className="text-gray-600">{details[hoveredItem]}</p>
+        {isExpanded && (
+          <div className="absolute top-12 w-full bg-white border rounded-md shadow-lg z-10 p-4 flex">
+            <div className="w-1/2 border-r pr-2">
+              {suggestions.length > 0 && (
+                <div className="mb-4">
+                  <h4 className="text-sm font-semibold mb-2">Suggestions</h4>
+                  <ul>
+                    {suggestions.map((suggestion, index) => (
+                      <li
+                        key={index}
+                        className="p-1 hover:bg-gray-100 cursor-pointer"
+                        onMouseEnter={() => setHoveredItem(suggestion)}
+                        onMouseLeave={() => setHoveredItem(null)}
+                      >
+                        {suggestion}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+              {results.length > 0 && (
+                <div>
+                  <h4 className="text-sm font-semibold mb-2">Results</h4>
+                  <ul>
+                    {results.map((result, index) => (
+                      <li
+                        key={index}
+                        className="p-1 hover:bg-gray-100 cursor-pointer"
+                        onMouseEnter={() => setHoveredItem(result)}
+                        onMouseLeave={() => setHoveredItem(null)}
+                      >
+                        {result}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
             </div>
-          ) : (
-            <div>
-              <h3 className="font-bold text-gray-700">Do more with Search!</h3>
-              <p className="text-gray-600">Get the right answers by searching...</p>
-              <ul className="list-disc list-inside text-gray-600">
-                <li>"[user name] contacts"</li>
-                <li>"[account name] leads"</li>
-              </ul>
-              <p className="text-gray-600">Get insights</p>
-              <ul className="list-disc list-inside text-gray-600">
-                <li>"open cases this week"</li>
-                <li>"leads last week"</li>
-              </ul>
-              {/* <a href="#" className="text-blue-500">Learn More</a> */}
+            <div className="w-1/2 pl-2">
+              {hoveredItem && (
+                <div>
+                  <h4 className="text-lg font-semibold mb-2">Sample Content</h4>
+                  <p>{hoveredItem} content goes here...</p>
+                </div>
+              )}
             </div>
-          )}
-        </div>
+          </div>
+        )}
       </div>
     </div>
   );
-};
-
-export default GlobalSearch;
+}
