@@ -1,9 +1,10 @@
 import mapboxgl from "mapbox-gl";
 import { useEffect, useRef, useState } from "react";
 import data from "../utils/data.json";
+import { CONFIG_APP } from "../config/app";
 
 export function useConfig() {
-  mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_KEY;
+  mapboxgl.accessToken = CONFIG_APP.MAPBOX_KEY;
   const mapContainer = useRef(null);
   const map = useRef(null);
   const [lng, setLng] = useState(data.geometry.coordinates[0][0]);

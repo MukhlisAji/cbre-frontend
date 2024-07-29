@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
+import { CONFIG_APP } from "../config/app";
 
 export function useMicromarket(map) {
   const [initialMicromarket, setInitialMicromarket] = useState([]);
   const MicromarketData = async () => {
     if (initialMicromarket.length > 0) {
       initialMicromarket.forEach(async (item) => {
-        const res = await fetch(`http://103.127.134.145:3000/data/micromarket`, {
+        const res = await fetch(`${CONFIG_APP.MAPBOX_API}/data/micromarket`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'

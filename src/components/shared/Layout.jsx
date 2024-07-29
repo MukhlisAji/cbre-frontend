@@ -11,7 +11,7 @@ export default function Layout() {
       </div>
       <div className='flex flex-col w-full overflow-hidden items-stretch justify-stretch'>
         <Header />
-        <div className='w-full'>{<Outlet />}</div>
+        <div className='w-full h-full overflow-hidden'>{<Outlet />}</div>
       </div>
     </div>
   )

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { filterdata } from "../constant";
+import { CONFIG_APP } from "../config/app";
 
 export function useRegion(map) {
   const [initialRegion, setInitialRegion] = useState([]);
@@ -7,7 +8,7 @@ export function useRegion(map) {
     if (initialRegion.length > 0) {
       initialRegion.forEach(async (item) => {
         const res = await fetch(
-          `http://103.127.134.145:3000/map-region/${item}`
+          `${CONFIG_APP.MAPBOX_API}/map-region/${item}`
         );
         const responseData = await res.json();
 

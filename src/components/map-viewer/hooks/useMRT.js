@@ -2,11 +2,13 @@ import mapboxgl from "mapbox-gl";
 import { useEffect, useState } from "react";
 import { colorMap } from "../constant";
 import { generatedColor, generatedRounded } from "../helper";
+import { CONFIG_APP } from "../config/app";
 
 export function useMRTData(zoom, map) {
   const MRTData = async () => {
+    console.log("Fetching MRT data...");
     const res = await fetch(
-      "http://103.127.134.145:3000/map-transportation/label"
+      `${CONFIG_APP.MAPBOX_API}/map-transportation/label`
     );
     const responseData = await res.json();
     responseData?.geojson?.features?.forEach((station) => {
@@ -145,7 +147,7 @@ export function useMRTLine(map) {
   const [showMRT, setShowMRT] = useState(false);
   const MRTLineData = async () => {
     const res = await fetch(
-      "http://103.127.134.145:3000/map-transportation/line"
+      `${CONFIG_APP.MAPBOX_API}/map-transportation/line`
     );
     const responseData = await res.json();
     const geoJson = responseData.geojson;

@@ -133,7 +133,6 @@ function Map2D() {
       ],
     },
   ];
-  console.log(triggerRadius)
   useEffect(() => {
     if (!map.current) return; // Wait for map to initialize
     map.current.on("move", () => {

@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
+import { CONFIG_APP } from "../config/app";
 
 export function useZoning(map) {
   const [initialZoning, setInitialZoning] = useState([]);
   const ZoningData = async () => {
     if (initialZoning.length > 0) {
       initialZoning.forEach(async (item) => {
-        const res = await fetch(`http://103.127.134.145:3000/data/zoning`, {
+        const res = await fetch(`${CONFIG_APP.MAPBOX_API}/data/zoning`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
