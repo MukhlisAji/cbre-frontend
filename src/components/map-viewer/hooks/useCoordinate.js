@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { CONFIG_APP } from "../config/app";
 
+// create coordinat
 export function useCoordinate() {
     const query = useQuery({
         queryKey: ["coordinate"],
