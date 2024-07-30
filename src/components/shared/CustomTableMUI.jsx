@@ -20,6 +20,25 @@ import Button from "@mui/material/Button";
 
 const ROW_HEIGHT = 40;
 
+const RECENTLY_VIEWED_KEY = 'recentlyViewedItems';
+
+const getRecentlyViewed = () => {
+    const storedItems = localStorage.getItem(RECENTLY_VIEWED_KEY);
+    return storedItems ? JSON.parse(storedItems) : [];
+};
+
+const setRecentlyViewed = (item) => {
+    const recentlyViewed = getRecentlyViewed();
+    if (!recentlyViewed.some(viewedItem => viewedItem.id === item.id)) {
+        if (recentlyViewed.length >= 5) {
+            recentlyViewed.shift(); // Remove the oldest item
+        }
+        recentlyViewed.push(item);
+        localStorage.setItem(RECENTLY_VIEWED_KEY, JSON.stringify(recentlyViewed));
+    }
+};
+
+
 const CustomTableMUI = ({ dataTable, column, openModal, isHeader, tableHeight }) => {
     const [search, setSearch] = useState("");
     const [visibleColumns, setVisibleColumns] = useState(column.slice(0, 7));
@@ -29,10 +48,18 @@ const CustomTableMUI = ({ dataTable, column, openModal, isHeader, tableHeight })
     const buttonRef = useRef(null);
     const dropdownRef = useRef(null);
     const [activeButton, setActiveButton] = useState('all');
+    const [recentlyViewed, setRecentlyViewedState] = useState(getRecentlyViewed());
+    const [showRecentlyViewed, setShowRecentlyViewed] = useState(false);
 
     const handleButtonClick = (button) => {
         setActiveButton(button);
+        if (button === 'recentlyViewed') {
+            setShowRecentlyViewed(true);
+        } else {
+            setShowRecentlyViewed(false);
+        }
     };
+
 
 
     const handleClickOutside = (event) => {
@@ -73,7 +100,10 @@ const CustomTableMUI = ({ dataTable, column, openModal, isHeader, tableHeight })
 
     const handleCellClick = (item, accessor) => {
         setEditing({ id: item.id, accessor, value: item[accessor] });
+        setRecentlyViewed(item);
+        setRecentlyViewedState(getRecentlyViewed());
     };
+
 
     const handleChange = (event) => {
         setEditing((prev) => ({
@@ -318,7 +348,7 @@ const CustomTableMUI = ({ dataTable, column, openModal, isHeader, tableHeight })
             <div style={{ height: `${sectionHeight}px` }} className="bg-white overflow-auto">
                 <MaterialThemeProvider theme={createMaterialTheme({})}>
                     <Table
-                        data={{ nodes: filteredData }}
+                        data={{ nodes: showRecentlyViewed ? recentlyViewed : filteredData }}
                         theme={theme}
                         layout={{ isDiv: true, fixedHeader: true, custom: true }}
                         select={select}
@@ -332,17 +362,17 @@ const CustomTableMUI = ({ dataTable, column, openModal, isHeader, tableHeight })
                                     <HeaderRow className="header-cel">
                                         <HeaderCellSelect
                                             style={{
-                                                margin: '0 auto',  // Center the component horizontally
-                                                backgroundColor: '#f4f6f9',  // Background color
-                                                borderTop: '2px solid #d9dde6',  // Top border style
-                                                padding: '8px',  // Padding inside the component
+                                                margin: '0 auto',
+                                                backgroundColor: '#f4f6f9',
+                                                borderTop: '2px solid #d9dde6',
+                                                padding: '8px',
                                             }}
                                         />
                                         {visibleColumns.map((col) => (
                                             <HeaderCell resize={resize} key={col.accessor} className="header-cell">
                                                 <Button
                                                     fullWidth
-                                                    className="header-title" // Apply the custom CSS class
+                                                    className="header-title"
                                                     style={{ justifyContent: "flex-start" }}
                                                     endIcon={getIcon(col.accessor)}
                                                     onClick={() =>
@@ -367,6 +397,7 @@ const CustomTableMUI = ({ dataTable, column, openModal, isHeader, tableHeight })
                                             >
                                                 {editing && editing.id === item.id && editing.accessor === col.accessor ? (
                                                     <input
+                                                        className='p-2 w-full border border-c-teal rounded-md'
                                                         type="text"
                                                         value={editing.value}
                                                         onChange={handleChange}
@@ -374,7 +405,7 @@ const CustomTableMUI = ({ dataTable, column, openModal, isHeader, tableHeight })
                                                         onKeyPress={handleKeyPress}
                                                         autoFocus
                                                     />
-                                                ) : (
+                                                ) : ( 
                                                     item[col.accessor]
                                                 )}
                                             </Cell>

@@ -26,13 +26,13 @@ export default function CustomDropdown({ label, options, selectedOption, onSelec
 
     return (
         <div className="relative" ref={dropdownRef}>
-            <label className="block mt-2 text-xs font-semibold leading-6 text-neutral-700">{label}</label>
+            <label className="block mt-2 text-xs font-semibold leading-6 text-neutral-500">{label}</label>
             <Listbox value={selectedOption} onChange={handleOptionClick}>
                 {({ open }) => (
                     <>
                         <div className="relative">
                             <Listbox.Button
-                                className="relative w-full cursor-pointer rounded-md bg-white py-1.5 pl-3 pr-10 text-left text-xs text-neutral-700 shadow-sm ring-1 ring-inset ring-gray-300 focus:outline-none focus:ring-1 focus:ring-c-teal hover:ring-1 hover:ring-c-teal"
+                                className="relative w-full cursor-pointer rounded-md bg-white py-1.5 pl-3 pr-10 text-left text-xs text-neutral-600 shadow-sm ring-1 ring-inset ring-gray-300 focus:outline-none focus:ring-1 focus:ring-c-teal hover:ring-1 hover:ring-c-teal"
                             >
                                 <span className="flex items-center">
                                     <span className="ml-1 block truncate">{selectedOption}</span>

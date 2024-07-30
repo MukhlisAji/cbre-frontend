@@ -55,14 +55,14 @@ const DataBrowser = ({ triggerMicromarket, resetMicromarket, triggerZoning, rese
   return (
     <>
       <button
-        className={`data-browser-btn ${
+        className={`data-browser-btn text-neutral-600 ${
           dataBrowser ? "data-browser-btn-active" : ""
         }`}
         onClick={() => setDataBrowser(true)}
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
-          height="16"
+          height="14"
           fill="#000"
           className="bi bi-layers-fill"
           viewBox="0 0 16 16"

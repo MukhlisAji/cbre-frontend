@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { FaUser, FaAddressBook, FaBuilding, FaBullseye, FaChartLine, FaTasks, FaCalendarAlt } from 'react-icons/fa';
 import { useLocation } from 'react-router-dom';
 import DefaultResult from './DefaultResult';
-import Einstein from '../../lib/einstein.png';
+import Einstein from '../../../assets/einstein.png';
 
 export default function GlobalSearchResult() {
     const [selectedMenu, setSelectedMenu] = useState('default');

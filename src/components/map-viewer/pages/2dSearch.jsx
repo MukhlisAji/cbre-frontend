@@ -78,13 +78,13 @@ export default function TwoDSearch() {
             <div className="flex mb-4 w-full  text-sm gap-1 px-1 rounded-md bg-gray-200">
               <button
                 onClick={() => setActiveTab('buildings')}
-                className={`flex-grow p-2 rounded-md my-1 ${activeTab === 'buildings' ? 'bg-white text-black border-gray-300 shadow-md' : 'bg-gray-200 text-gray-700 border-gray-300'}`}
+                className={`flex-grow p-2 rounded-md my-1 text-sm text-neutral-500 ${activeTab === 'buildings' ? 'bg-white text-black border-gray-300 shadow-md' : 'bg-gray-200 text-gray-700 border-gray-300'}`}
               >
                 Buildings
               </button>
               <button
                 onClick={() => setActiveTab('tenant')}
-                className={`flex-grow p-2  rounded-md my-1 ${activeTab === 'tenant' ? 'bg-white text-black border-gray-300 shadow-md' : 'bg-gray-200 text-gray-700 border-gray-300'}`}
+                className={`flex-grow p-2  rounded-md my-1 text-sm text-neutral-500 ${activeTab === 'tenant' ? 'bg-white text-black border-gray-300 shadow-md' : 'bg-gray-200 text-gray-700 border-gray-300'}`}
               >
                 Tenant
               </button>
@@ -98,14 +98,14 @@ export default function TwoDSearch() {
                 <div className="flex mb-4 w-full">
                   <button
                     onClick={() => handleButtonClick('all')}
-                    className={`flex-grow p-1 w-1/2 rounded-l-md shadow-md ${activeButton === 'all' ? 'bg-c-teal text-white' : 'bg-gray-200 text-neutral-700 hover:bg-gray-300'
+                    className={`flex-grow p-1 w-1/2 rounded-l-md shadow-md text-sm ${activeButton === 'all' ? 'bg-c-teal text-white' : 'bg-gray-200 text-neutral-500 hover:bg-gray-300'
                       } `}
                   >
                     All Buildings
                   </button>
                   <button
                     onClick={() => handleButtonClick('available')}
-                    className={`flex-grow p-1 w-1/2 rounded-r-md shadow-md ${activeButton === 'available' ? 'bg-c-teal text-white' : 'bg-gray-200 text-neutral-700 hover:bg-gray-300'
+                    className={`flex-grow p-1 w-1/2 rounded-r-md shadow-md text-sm ${activeButton === 'available' ? 'bg-c-teal text-white' : 'bg-gray-200 text-neutral-500 hover:bg-gray-300'
                       } `}
                   >
                     Available Buildings
