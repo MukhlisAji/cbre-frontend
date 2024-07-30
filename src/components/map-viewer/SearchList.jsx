@@ -8,7 +8,7 @@ const SearchListItem = ({ onClickAction, name }) => {
     )
 }
 
-// Search
+// Search list
 const SearchList = ({ filteringData, onClickAction }) => {
     return (
         <div style={{ position: 'absolute', top: "55px", left: "10px", backgroundColor: "white", padding: "2px", color: "white", zIndex: 999, width: '300px', height: 'max-content', maxHeight: '100px', overflow: 'auto', borderRadius: '5px', paddingInline: '5px' }}>
