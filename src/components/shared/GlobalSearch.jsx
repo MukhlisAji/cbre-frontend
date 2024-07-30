@@ -74,7 +74,7 @@ export default function GlobalSearchResult() {
           </button>
         </div>
         {isExpanded && (
-          <div className="absolute top-12 w-full bg-white border rounded-md shadow-lg z-10 p-4 flex">
+          <div className="absolute top-12 w-full bg-white border rounded-md shadow-lg z-40 p-4 flex">
             <div className="w-1/2 border-r pr-2">
               {suggestions.length > 0 && (
                 <div className="mb-4">

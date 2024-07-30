@@ -169,9 +169,9 @@ function Map2D() {
           >
             RADIUS
           </button>
-          <div className="z-[9999999]">
+          <div className="z-10">
             <button
-              className="px-2 py-4 bg-white hover:bg-c-teal text-neutral-600 hover:text-white border shadow-md text-sm rounded-lg font-bold flex justify-center items-center"
+              className="px-2 py-4 bg-white hover:bg-c-teal text-neutral-600 hover:text-white border  hover:border-c-teal shadow-md text-sm rounded-lg font-bold flex justify-center items-center"
               id="search-buttonradius"
             >
               Search
