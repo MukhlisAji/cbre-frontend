@@ -181,10 +181,10 @@ function Map2D() {
       </div>
 
       <FilterLine subMenu={subMenu} expandedMenu={expandedMenu} />
-      <div className="bg-[rgba(35,55,75,0.9)] text-white p-2 font-mono z-10 fixed bottom-0 right-0 m-3 rounded-md">
+      {/* <div className="bg-[rgba(35,55,75,0.9)] text-white p-2 font-mono z-10 fixed bottom-0 right-0 m-3 rounded-md">
         Longitude: {lng} | Latitude: {lat} | Zoom: {zoom}
         <div id="filter"></div>
-      </div>
+      </div> */}
       <div
         ref={mapContainer}
         className="transition-all duration-300 ease-in-out overflow-hidden w-full h-full"
