@@ -4,6 +4,10 @@ import CustomDropdown from '../../../shared/CustomDropdown';
 import { useAppContext } from '../../../../AppContext';
 import { useNavigate } from 'react-router-dom';
 import SearchResult from './SearchResult';
+import { Description, Field, Input, Label } from '@headlessui/react';
+import clsx from 'clsx';
+import { Box, FormControlLabel, Slider, Switch } from '@mui/material';
+
 
 export default function TwoDSearch() {
   const { isCollapsed2dSearchOpen, setIsCollapsed2dSearchOpen } = useAppContext();
@@ -17,6 +21,22 @@ export default function TwoDSearch() {
   const [selectedUsage, setSelectedUsage] = useState('Select');
   const [sectionHeight, setSectionHeight] = useState(0);
   const [showResults, setShowResults] = useState(false);
+  const [value, setValue] = useState(50);
+
+  const handleSliderChange = (event, newValue) => {
+    setValue(newValue);
+  };
+
+  const marks = [
+    {
+      value: 0,
+      label: '0',
+    },
+    {
+      value: 100,
+      label: '100',
+    }
+  ];
 
   const nlaOptions = ['Select NLA', 'NLA 1', 'NLA 2'];
   const rentOptions = ['Select Asking Rent', 'Rent 1', 'Rent 2'];
@@ -114,6 +134,109 @@ export default function TwoDSearch() {
                         Available Buildings
                       </button>
                     </div>
+                    <div style={{ height: `${sectionHeight}px` }} className="overflow-y-auto pr-3">
+                      <CustomDropdown
+                        label="Space Status"
+                        options={nlaOptions}
+                        selectedOption={selectedNLA}
+                        onSelect={setSelectedNLA}
+                      />
+                      <CustomDropdown
+                        label="Asset Class"
+                        options={rentOptions}
+                        selectedOption={selectedRent}
+                        onSelect={setSelectedRent}
+                      />
+                      <CustomDropdown
+                        label="Region/Micromarket"
+                        options={dateOptions}
+                        selectedOption={selectedDate}
+                        onSelect={setSelectedDate}
+                      />
+                      <CustomDropdown
+                        label="Zioning"
+                        options={usageOptions}
+                        selectedOption={selectedUsage}
+                        onSelect={setSelectedUsage}
+                      />
+                      <CustomDropdown
+                        label="Size"
+                        options={nlaOptions}
+                        selectedOption={selectedNLA}
+                        onSelect={setSelectedNLA}
+                      />
+                      <CustomDropdown
+                        label="NLA"
+                        options={nlaOptions}
+                        selectedOption={selectedNLA}
+                        onSelect={setSelectedNLA}
+                      />
+                      <CustomDropdown
+                        label="Asking Rent"
+                        options={rentOptions}
+                        selectedOption={selectedRent}
+                        onSelect={setSelectedRent}
+                      />
+                      <CustomDropdown
+                        label="Available Dates"
+                        options={dateOptions}
+                        selectedOption={selectedDate}
+                        onSelect={setSelectedDate}
+                      />
+                      <CustomDropdown
+                        label="Property Usage"
+                        options={usageOptions}
+                        selectedOption={selectedUsage}
+                        onSelect={setSelectedUsage}
+                      />
+                      <div className='flex space-x-2 py-2 mt-2'>
+                        <FormControlLabel control={<Switch defaultChecked size="small" />} />
+                        <label className=" text-xs font-semibold leading-6 text-neutral-500">
+                          Transaction Amount
+                        </label>
+                      </div>
+
+                      <div className="flex flex-col items-center w-full mt-2">
+                        <label className=" text-xs font-semibold leading-6 text-neutral-500">
+                          Transaction Amount
+                        </label>
+                        <Box className="w-full pl-6 pr-4">
+                          <Slider
+                            // value={value}
+                            // onChange={handleSliderChange}
+                            aria-label="Default"
+                            valueLabelDisplay="auto"
+                            min={0}
+                            max={100}
+                            marks={marks}
+                          />
+                          {/* <div className="flex justify-between text-sm text-neutral-500">
+                            <span>0</span>
+                            <span>100</span>
+                          </div> */}
+                        </Box>
+                      </div>
+                      <div className="flex flex-col items-center w-full mt-2">
+                        <label className=" text-xs font-semibold leading-6 text-neutral-500">
+                          Transaction Period
+                        </label>
+                        <Box className="w-full pl-6 pr-4">
+                          <Slider
+                            value={value}
+                            onChange={handleSliderChange}
+                            aria-label="Default"
+                            valueLabelDisplay="auto"
+                            min={0}
+                            max={100}
+                            marks={marks}
+                          />
+                          {/* <div className="flex justify-between text-sm text-neutral-500">
+                            <span>0</span>
+                            <span>100</span>
+                          </div> */}
+                        </Box>
+                      </div>
+                    </div>
                   </div>
                 )}
                 {activeTab === 'account' && (
@@ -131,6 +254,33 @@ export default function TwoDSearch() {
                       >
                         Available Buildings
                       </button>
+                    </div>
+                    <div style={{ height: `${sectionHeight}px` }} className="overflow-y-auto pr-3">
+                      <div>
+                        <label className="block mt-2 text-xs font-semibold leading-6 text-neutral-500">Account Name</label>
+                        <input
+                          className="relative pl-4 w-full cursor-pointer rounded-md bg-white py-1.5 text-semibold pr-10 text-left text-xs text-neutral-600 shadow-sm ring-1 ring-inset ring-gray-300 focus:outline-none focus:ring-1 focus:ring-c-teal hover:ring-1 hover:ring-c-teal"
+                        />
+                      </div>
+                      <div>
+                        <label className="block mt-2 text-xs font-semibold leading-6 text-neutral-500">Parent Account</label>
+                        <input
+                          className="relative pl-4 w-full cursor-pointer rounded-md bg-white py-1.5 text-semibold pr-10 text-left text-xs text-neutral-600 shadow-sm ring-1 ring-inset ring-gray-300 focus:outline-none focus:ring-1 focus:ring-c-teal hover:ring-1 hover:ring-c-teal"
+                        />
+                      </div>
+
+                      <CustomDropdown
+                        label="Space Status"
+                        options={nlaOptions}
+                        selectedOption={selectedNLA}
+                        onSelect={setSelectedNLA}
+                      />
+                      <CustomDropdown
+                        label="Asset Class"
+                        options={rentOptions}
+                        selectedOption={selectedRent}
+                        onSelect={setSelectedRent}
+                      />
                     </div>
                   </div>
                 )}
