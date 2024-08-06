@@ -79,11 +79,11 @@ export default function TwoDSearch() {
   };
 
   return (
-    <div className="flex h-full relative">
+    <div className="flex bg-neutral-150 h-full relative">
       {/* Sidebar */}
       <div className='flex relative'>
         <div
-          className={`flex flex-col overflow-hidden bg-white shadow-md rounded-md transition-all duration-300 ease-in-out z-10 ${isCollapsed2dSearchOpen ? 'w-0.5' : 'w-72'}`}
+          className={`flex flex-col overflow-hidden bg-neutral-100 shadow-md rounded-md transition-all duration-300 ease-in-out z-10 ${isCollapsed2dSearchOpen ? 'w-0.5' : 'w-72'}`}
         >
           <div className={`flex flex-col p-4 transition-opacity duration-300 ease-in-out ${isCollapsed2dSearchOpen ? 'opacity-0' : 'opacity-100'}`}>
             {!showResults ? (
@@ -189,15 +189,13 @@ export default function TwoDSearch() {
                         selectedOption={selectedUsage}
                         onSelect={setSelectedUsage}
                       />
-                      <div className='flex space-x-2 py-2 mt-2'>
+                      <div className='flex items-center space-x-2 py-2 mt-2'>
+                      <label className="block text-xs font-semibold leading-6 text-neutral-500">Transaction</label>
                         <FormControlLabel control={<Switch defaultChecked size="small" />} />
-                        <label className=" text-xs font-semibold leading-6 text-neutral-500">
-                          Transaction Amount
-                        </label>
                       </div>
 
                       <div className="flex flex-col items-center w-full mt-2">
-                        <label className=" text-xs font-semibold leading-6 text-neutral-500">
+                        <label className="mr-auto text-xs font-semibold leading-6 text-neutral-500">
                           Transaction Amount
                         </label>
                         <Box className="w-full pl-6 pr-4">
@@ -217,7 +215,7 @@ export default function TwoDSearch() {
                         </Box>
                       </div>
                       <div className="flex flex-col items-center w-full mt-2">
-                        <label className=" text-xs font-semibold leading-6 text-neutral-500">
+                        <label className="mr-auto text-xs font-semibold leading-6 text-neutral-500">
                           Transaction Period
                         </label>
                         <Box className="w-full pl-6 pr-4">

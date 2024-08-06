@@ -8,7 +8,7 @@ export default function DetailedView({ building, onClose }) {
         switch (activeTab) {
             case 'Details':
                 return (
-                    <div className="p-2 text-xs text-gray-700 space-y-1">
+                    <div className="p-2 text-sm text-gray-700 space-y-2">
                         <div className="flex justify-between">
                             <span className="font-semibold">Floor:</span>
                             <span>01</span>
@@ -49,10 +49,10 @@ export default function DetailedView({ building, onClose }) {
                 );
             case 'Availability':
                 return (
-                    <div className="p-2 text-xs text-gray-700 space-y-1">
+                    <div className="p-2 text-sm text-gray-700 space-y-2">
                         <div className="flex justify-between">
                             <span className="font-semibold">Available Spaces:</span>
-                            <span>2</span>
+                            <span>{building.space}</span>
                         </div>
                         <div className="flex justify-between">
                             <span className="font-semibold">Next Availability:</span>
@@ -62,7 +62,7 @@ export default function DetailedView({ building, onClose }) {
                 );
             case 'Tenant Stack':
                 return (
-                    <div className="p-2 text-xs text-gray-700 space-y-1">
+                    <div className="p-2 text-sm text-gray-700 space-y-2">
                         <div className="flex justify-between">
                             <span className="font-semibold">Tenant 1:</span>
                             <span>ABC Corp</span>
@@ -96,19 +96,19 @@ export default function DetailedView({ building, onClose }) {
             />
             <div className="flex justify-around border-b">
                 <button
-                    className={`p-2 text-neutral-500 text-xs ${activeTab === 'Details' ? 'border-b-2 border-black text-neutral-700' : ''}`}
+                    className={`p-2 text-neutral-500 text-sm ${activeTab === 'Details' ? 'border-b-2 border-black text-neutral-700' : ''}`}
                     onClick={() => setActiveTab('Details')}
                 >
                     Details
                 </button>
                 <button
-                    className={`p-2 text-neutral-500 text-xs ${activeTab === 'Availability' ? 'border-b-2 border-black text-neutral-700' : ''}`}
+                    className={`p-2 text-neutral-500 text-sm ${activeTab === 'Availability' ? 'border-b-2 border-black text-neutral-700' : ''}`}
                     onClick={() => setActiveTab('Availability')}
                 >
-                    Availability
+                    Availability ({building.space})
                 </button>
                 <button
-                    className={`p-2 text-neutral-500 text-xs ${activeTab === 'Tenant Stack' ? 'border-b-2 border-black text-neutral-700' : ''}`}
+                    className={`p-2 text-neutral-500 text-sm ${activeTab === 'Tenant Stack' ? 'border-b-2 border-black text-neutral-700' : ''}`}
                     onClick={() => setActiveTab('Tenant Stack')}
                 >
                     Tenant Stack

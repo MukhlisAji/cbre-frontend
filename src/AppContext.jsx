@@ -10,14 +10,35 @@ export const AppProvider = ({ children }) => {
     const [isCollapsed2dSearchOpen, setIsCollapsed2dSearchOpen] = useState(false);
     const [selectedBuildings, setSelectedBuildings] = useState([]);
     const [droppedBuildings, setDroppedBuildings] = useState([]);
+    const [drawerContent, setDrawerContent] = useState('default');
+    const [openProject, setOpenProject] = useState(false);
+    const [confirmSave, setConfirmSave] = useState(false);
+
+
+
+    const toggleDrawer = (content = 'default') => {
+        if (openProject) {
+            if (drawerContent === content) {
+                setOpenProject(false); // Close the drawer if the content is the same
+            } else {
+                setDrawerContent(content); // Update the content if it's different
+            }
+        } else {
+            setDrawerContent(content);
+            setOpenProject(true); // Open the drawer if it was closed
+        }
+    };
+    
 
     return (
-        <AppContext.Provider value={{ 
-            isDirty, setIsDirty, 
-            isSidebarOpen, setIsSidebarOpen, 
-            isCollapsed2dSearchOpen, setIsCollapsed2dSearchOpen, 
-            selectedBuildings, setSelectedBuildings, 
-            droppedBuildings, setDroppedBuildings 
+        <AppContext.Provider value={{
+            isDirty, setIsDirty,
+            isSidebarOpen, setIsSidebarOpen,
+            isCollapsed2dSearchOpen, setIsCollapsed2dSearchOpen,
+            selectedBuildings, setSelectedBuildings,
+            droppedBuildings, setDroppedBuildings,
+            openProject, toggleDrawer, drawerContent,
+            confirmSave, setConfirmSave
         }}>
             {children}
         </AppContext.Provider>
