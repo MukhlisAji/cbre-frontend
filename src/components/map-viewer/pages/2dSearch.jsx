@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import { BiSearch, BiChevronLeft, BiChevronRight } from 'react-icons/bi';
-import CustomDropdown from '../../shared/CustomDropdown';
+import React, { useEffect, useState } from 'react';
+import { BiChevronLeft, BiChevronRight, BiSearch } from 'react-icons/bi';
 import { useAppContext } from '../../../AppContext';
+import { spaceStatus } from '../../lib/api/spaceStatus';
+import CustomDropdown from '../../shared/CustomDropdown';
 
 export default function TwoDSearch() {
   const { isCollapsed2dSearchOpen, setIsCollapsed2dSearchOpen } = useAppContext();
@@ -34,11 +35,11 @@ export default function TwoDSearch() {
   const handleButtonClick = (button) => {
     setActiveButton(button);
   };
-
+  const { data } = spaceStatus()
   useEffect(() => {
     const handleResize = () => {
       const screenHeight = window.innerHeight;
-      const newHeight = screenHeight - 250; 
+      const newHeight = screenHeight - 250;
       setSectionHeight(newHeight);
     };
 
@@ -50,7 +51,7 @@ export default function TwoDSearch() {
     };
   }, []);
 
-
+  console.log(data)
   return (
     <div className="flex h-screen bg-gray-100 relative">
       {/* Sidebar */}
@@ -176,7 +177,7 @@ export default function TwoDSearch() {
                 {/* Add content for Tenant Account tab here */}
                 <div className="relative">
                   <label className="block mb-1">Account Status</label>
-                  <input className="w-full p-1.5 border border-gray-300 rounded-md hover:border-c-teal focus:border-c-teal focus:outline-none focus:ring-0"/>
+                  <input className="w-full p-1.5 border border-gray-300 rounded-md hover:border-c-teal focus:border-c-teal focus:outline-none focus:ring-0" />
                 </div>
               </div>
             )}
