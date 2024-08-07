@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
+import { CONFIG_APP } from "../config/app";
 import "./DataBrowser.css";
 // import { useMicromarket } from "../../hooks/useMicromarket";
 
@@ -16,9 +17,9 @@ const DataBrowser = ({ triggerMicromarket, resetMicromarket, triggerZoning, rese
   const fetchData = (type) => {
     let apiUrl;
     if (type === "micromarket") {
-      apiUrl = "http://103.127.134.145:3000/data/micromarket";
+      apiUrl = `${CONFIG_APP}/data/micromarket`;
     } else if (type === "zoning") {
-      apiUrl = "http://103.127.134.145:3000/data/zoning";
+      apiUrl = `${CONFIG_APP}/data/zoning`;
     }
 
     fetch(apiUrl)
@@ -55,9 +56,8 @@ const DataBrowser = ({ triggerMicromarket, resetMicromarket, triggerZoning, rese
   return (
     <>
       <button
-        className={`data-browser-btn text-neutral-600 ${
-          dataBrowser ? "data-browser-btn-active" : ""
-        }`}
+        className={`data-browser-btn text-neutral-600 ${dataBrowser ? "data-browser-btn-active" : ""
+          }`}
         onClick={() => setDataBrowser(true)}
       >
         <svg
@@ -88,17 +88,15 @@ const DataBrowser = ({ triggerMicromarket, resetMicromarket, triggerZoning, rese
               >
                 Micromarket Data ({micromarketData.length || 0}){" "}
                 <span
-                  className={`arrow ${
-                    selectedDropdown === "micromarket" ? "rotate" : ""
-                  }`}
+                  className={`arrow ${selectedDropdown === "micromarket" ? "rotate" : ""
+                    }`}
                 >
                   &#9662;
                 </span>
               </button>
               <div
-                className={`dropdown-content ${
-                  selectedDropdown === "micromarket" ? "open" : ""
-                }`}
+                className={`dropdown-content ${selectedDropdown === "micromarket" ? "open" : ""
+                  }`}
               >
                 {micromarketData.map((item, index) => (
                   <div onClick={() => triggerMicromarket(item)} key={index}>
@@ -114,17 +112,15 @@ const DataBrowser = ({ triggerMicromarket, resetMicromarket, triggerZoning, rese
               >
                 Zoning Data ({zoningData.length || 0}){" "}
                 <span
-                  className={`arrow ${
-                    selectedDropdown === "zoning" ? "rotate" : ""
-                  }`}
+                  className={`arrow ${selectedDropdown === "zoning" ? "rotate" : ""
+                    }`}
                 >
                   &#9662;
                 </span>
               </button>
               <div
-                className={`dropdown-content ${
-                  selectedDropdown === "zoning" ? "open" : ""
-                }`}
+                className={`dropdown-content ${selectedDropdown === "zoning" ? "open" : ""
+                  }`}
               >
                 {zoningData.map((item, index) => (
                   <div onClick={() => triggerZoning(item)} key={index}>{item}</div>
