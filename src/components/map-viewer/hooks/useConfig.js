@@ -48,6 +48,74 @@ export function useConfig() {
         .setHTML(`<p>${description}</p>`)
         .addTo(map.current);
     });
+    // Add Building
+    function duplicatePolygonByFloors(
+      featureCollection,
+      index,
+      floors,
+      max_height
+    ) {
+      if (
+        !featureCollection.features ||
+        !Array.isArray(featureCollection.features)
+      ) {
+        throw new Error("Invalid GeoJSON feature collection format");
+      }
+
+      const originalPolygon = featureCollection.features[index];
+      const duplicatedFeatureCollection = {
+        type: "FeatureCollection",
+        features: []
+      };
+
+      const heightIncrement = max_height / floors;
+
+      for (let i = 0; i < floors; i++) {
+        const base_height = i * heightIncrement;
+        const height = (i + 1) * heightIncrement;
+
+        const duplicatedPolygon = {
+          type: "Feature",
+          geometry: originalPolygon.geometry,
+          properties: {
+            base_height: base_height,
+            height: height,
+            index: i
+          }
+        };
+
+        duplicatedFeatureCollection.features.push(duplicatedPolygon);
+      }
+
+      return duplicatedFeatureCollection;
+    }
+
+    const plane = {
+      type: "FeatureCollection",
+      features: [
+        {
+          type: "Feature",
+          properties: {},
+          geometry: {
+            coordinates: [
+              [
+                [103.84517017500667, 1.2754928191363604],
+                [103.84513721544442, 1.2754522635716654],
+                [103.84570513405743, 1.2749732009204422],
+                [103.84608036599838, 1.275439589958097],
+                [103.84595866915294, 1.275571395540922],
+                [103.84517017500667, 1.2754928191363604]
+              ]
+            ],
+            type: "Polygon"
+          }
+        }
+      ]
+    };
+
+    const new_fc = duplicatePolygonByFloors(plane, 0, 10, 70);
+
+
     map.current.on("load", () => {
       map.current.addSource("polygon", {
         type: "geojson",
@@ -71,6 +139,40 @@ export function useConfig() {
           "line-color": "#cc234a",
           "line-width": 2,
         },
+      });
+
+      // Add Building
+      map.current.addSource("plane", {
+        type: "geojson",
+        data: new_fc
+      });
+
+      map.current.addLayer({
+        id: "extrusion",
+        type: "fill-extrusion",
+        source: "plane",
+        paint: {
+          "fill-extrusion-color": [
+            "match",
+            ["get", "index"],
+            1,
+            "red",
+            2,
+            "red",
+            "green"
+          ],
+          "fill-extrusion-base": ["get", "base_height"],
+          "fill-extrusion-height": ["-", ["get", "height"], 1],
+          "fill-extrusion-opacity": [
+            "interpolate",
+            ["linear"],
+            ["zoom"],
+            15,
+            0.5,
+            16.5,
+            1
+          ]
+        }
       });
     });
     // label
