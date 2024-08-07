@@ -1,5 +1,5 @@
-# Use an official Node.js runtime as a parent image
-FROM node:16-alpine
+# Stage 1: Build the Vite project
+FROM node:16-alpine AS builder
 
 # Set the working directory in the container
 WORKDIR /app
@@ -16,11 +16,14 @@ COPY . .
 # Build the application
 RUN npm run build
 
-# Use a lightweight web server to serve the built application
-FROM nginx:alpine
+# Stage 2: Serve with Nginx
+FROM nginx:1.27.0-alpine
 
-# Copy the built application files
-COPY --from=0 /app/dist /usr/share/nginx/html
+# Copy your Nginx configuration file
+COPY nginx/default.conf /etc/nginx/conf.d/default.conf
+
+# Copy the built application files from the builder stage
+COPY --from=builder /app/dist /usr/share/nginx/html
 
 # Expose port 80
 EXPOSE 80
