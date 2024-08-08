@@ -64,58 +64,56 @@ const ACCOUNTDATADUMMY = [
   { "id": 29, "accountName": "Cyber Security", "accountStatusWithSite": "Active", "localAccountName": "Cyber Local", "ofActiveOpportunity": 6, "spoc": "Jeff Bezos", "billingCity": "Seattle", "billingStateProvince": "WA" },
 ]
 
-const manyNodes = [
-  {
-    id: 1,
-    name: "Task 1",
-    deadline: new Date(2023, 6, 22),
-    type: "Feature",
-    isComplete: false,
-    nodes: [
-      {
-        id: 2,
-        name: "Sub-task 1.1",
-        deadline: new Date(2023, 7, 15),
-        type: "Bugfix",
-        isComplete: true,
-        nodes: [],
-      },
-      {
-        id: 3,
-        name: "Sub-task 1.2",
-        deadline: new Date(2023, 7, 20),
-        type: "Documentation",
-        isComplete: false,
-        nodes: [],
-      },
-    ],
+const BUILDINGDATADUMMY = [{
+  "id": 1,
+  "name": "Building Name",
+  "address": "Building Address",
+  "space":2,
+  "details": {
+    "floor": "01",
+    "spaceName": "Entire",
+    "spaceStatus": "For Sale",
+    "possessionStatus": "Vacant",
+    "spaceSize": "28,656 sq ft",
+    "tenantName": "Rent",
+    "leaseType": "Negotiator",
+    "commencement": "Immediate",
+    "expiry": "Landlord"
   },
-  {
-    id: 4,
-    name: "Task 2",
-    deadline: new Date(2023, 8, 10),
-    type: "Improvement",
-    isComplete: false,
-    nodes: [],
+  "availability": {
+    "availableSpaces": "2",
+    "nextAvailability": "Immediate"
   },
-  {
-    id: 5,
-    name: "Task 3",
-    deadline: new Date(2023, 9, 5),
-    type: "Feature",
-    isComplete: true,
-    nodes: [
-      {
-        id: 6,
-        name: "Sub-task 3.1",
-        deadline: new Date(2023, 9, 15),
-        type: "Bugfix",
-        isComplete: false,
-        nodes: [],
-      },
-    ],
+  "tenantStack": {
+    "tenant1": "ABC Corp",
+    "tenant2": "XYZ Ltd"
+  }
+},
+{
+  "id": 2,
+  "name": "Building Name 2",
+  "address": "Building Address 2",
+  "space":7,
+  "details": {
+    "floor": "01",
+    "spaceName": "Entire",
+    "spaceStatus": "For Sale",
+    "possessionStatus": "Vacant",
+    "spaceSize": "28,656 sq ft",
+    "tenantName": "Rent",
+    "leaseType": "Negotiator",
+    "commencement": "Immediate",
+    "expiry": "Landlord"
   },
-];
+  "availability": {
+    "availableSpaces": "2",
+    "nextAvailability": "Immediate"
+  },
+  "tenantStack": {
+    "tenant1": "ABC Corp",
+    "tenant2": "XYZ Ltd"
+  }
+}
+]
 
-
-export { CONTACTDATADUMMY, ACCOUNTDATADUMMY, ACCOUNTCOLUMNDUMMY , manyNodes, CONTACTCOLUMNDUMMY};
+export { CONTACTDATADUMMY, ACCOUNTDATADUMMY, ACCOUNTCOLUMNDUMMY, BUILDINGDATADUMMY, CONTACTCOLUMNDUMMY };
