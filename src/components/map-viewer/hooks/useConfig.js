@@ -156,9 +156,9 @@ export function useConfig() {
             "match",
             ["get", "index"],
             1,
-            "red",
+            "green",
             2,
-            "red",
+            "green",
             "green"
           ],
           "fill-extrusion-base": ["get", "base_height"],
@@ -173,6 +173,61 @@ export function useConfig() {
             1
           ]
         }
+      });
+      let previousHoveredIndex = null;
+
+      map.current.on("mousemove", "extrusion", (e) => {
+        map.current.getCanvas().style.cursor = "pointer";
+
+        if (e.features.length > 0) {
+          const feature = e.features[0];
+          const index = feature.properties.index;
+
+          if (previousHoveredIndex !== null && previousHoveredIndex !== index) {
+            // Kembalikan warna lantai sebelumnya ke warna semula
+            map.current.setPaintProperty("extrusion", "fill-extrusion-color", [
+              "match",
+              ["get", "index"],
+              index,
+              "yellow",
+              "green"
+            ]);
+          } else if (previousHoveredIndex === null) {
+            // Ubah warna lantai yang di-hover menjadi kuning
+            map.current.setPaintProperty("extrusion", "fill-extrusion-color", [
+              "match",
+              ["get", "index"],
+              index,
+              "yellow",
+              "green"
+            ]);
+          }
+
+          // Perbarui index lantai yang dihover
+          previousHoveredIndex = index;
+        }
+      });
+
+      map.current.on("mouseleave", "extrusion", () => {
+        // Kembalikan semua warna ke kondisi semula ketika mouse keluar dari layer
+        map.current.setPaintProperty("extrusion", "fill-extrusion-color", [
+          "match",
+          ["get", "index"],
+          1,
+          "green",
+          2,
+          "green",
+          "green"
+        ]);
+
+        previousHoveredIndex = null;
+        map.current.getCanvas().style.cursor = "";
+      });
+
+      // Event listener untuk klik
+      map.current.on("click", "extrusion", (e) => {
+        const properties = e.features[0].properties;
+        console.log(`LT ${properties.index + 1}`);
       });
     });
     // label
