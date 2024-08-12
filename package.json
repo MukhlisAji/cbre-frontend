@@ -20,6 +20,7 @@
     "@turf/turf": "^7.0.0",
     "axios": "^1.7.3",
     "classnames": "^2.5.1",
+    "jotai": "^2.9.2",
     "lodash": "^4.17.21",
     "mapbox-gl": "^3.4.0",
     "mapbox-gl-draw-circle": "^1.1.2",

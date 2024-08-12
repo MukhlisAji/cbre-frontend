@@ -14,8 +14,7 @@ export default function TwoDSearch() {
   const [selectedDate, setSelectedDate] = useState('Select');
   const [selectedUsage, setSelectedUsage] = useState('Select');
   const [sectionHeight, setSectionHeight] = useState(0);
-
-
+  console.log({ tes })
   const nlaOptions = ['Select NLA', 'NLA 1', 'NLA 2'];
   const rentOptions = ['Select Asking Rent', 'Rent 1', 'Rent 2'];
   const dateOptions = ['Select Available Dates', 'Date 1', 'Date 2'];
@@ -24,6 +23,8 @@ export default function TwoDSearch() {
   const toggleCollapse = () => {
     setIsCollapsed2dSearchOpen(!isCollapsed2dSearchOpen);
   };
+
+
 
   const handleSearch = () => {
     // Implement your search logic here
@@ -35,7 +36,20 @@ export default function TwoDSearch() {
   const handleButtonClick = (button) => {
     setActiveButton(button);
   };
-  const { data } = spaceStatus()
+  const { data } = spaceStatus(
+    {
+      sub_type: "",
+      region: "",
+      micromarket: "",
+      zoning: "",
+      property_usage: "",
+      building_nla: null,
+      space_status: "",
+      vacant_space: null,
+      asking_rent: null,
+      available_date: "",
+    }
+  )
   useEffect(() => {
     const handleResize = () => {
       const screenHeight = window.innerHeight;
@@ -52,6 +66,7 @@ export default function TwoDSearch() {
   }, []);
 
   console.log(data)
+
   return (
     <div className="flex h-screen bg-gray-100 relative">
       {/* Sidebar */}

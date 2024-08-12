@@ -4,11 +4,9 @@ import React, { useEffect, useState } from "react";
 import "../../../App.css";
 import { useAppContext } from "../../../AppContext";
 import IconLine from "../../../assets/jalur.png";
-import DataBrowser from "../DataBrowser/DataBrowser";
 import FilterLine from "../FilterLine/FilterLine";
-import SearchLocation from "../SearchLocation/SearchLocation";
 import { StyleList, filterdata } from "../constant";
-import { useConfig, useMRTData, useMRTLine, useMap, useRegion } from "../hooks";
+import { useConfig, useMap, useRegion } from "../hooks";
 import { useMicromarket } from "../hooks/useMicromarket";
 import { useZoning } from "../hooks/useZoning";
 import { AllRegion, NortWest, SouthEast, StyleSatelliteStreet } from "../utils";
@@ -69,8 +67,8 @@ function Map2D() {
 
 
   // MRT
-  useMRTData(zoom, map);
-  const { setShowMRT } = useMRTLine(map);
+  // useMRTData(zoom, map);
+  // const { setShowMRT } = useMRTLine(map);
 
   const handleClick = (coordinate) => {
     map.current.setCenter(coordinate);
@@ -154,17 +152,17 @@ function Map2D() {
           onClickAction={handleClick}
         /> */}
         <div className="flex items-center space-x-2">
-          <DataBrowser
+          {/* <DataBrowser
             triggerMicromarket={triggerMicromarket}
             resetMicromarket={resetMicromarket}
             triggerZoning={triggerZoning}
             resetZoning={resetZoning}
-          />
+          /> */}
           <button
             onClick={() => setTriggerRadius(prev => !prev)}
             className={`px-2 py-4 shadow-md text-sm rounded-lg font-bold flex justify-center items-center border ${triggerRadius
-                ? 'bg-c-teal text-white border-c-teal'
-                : 'bg-white text-neutral-600 hover:bg-c-teal hover:text-white hover:border-c-teal'
+              ? 'bg-c-teal text-white border-c-teal'
+              : 'bg-white text-neutral-600 hover:bg-c-teal hover:text-white hover:border-c-teal'
               }`}
           >
             RADIUS

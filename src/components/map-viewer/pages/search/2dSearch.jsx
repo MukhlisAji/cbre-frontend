@@ -1,14 +1,23 @@
-import React, { useState, useEffect } from 'react';
-import { BiSearch, BiChevronLeft, BiChevronRight } from 'react-icons/bi';
-import CustomDropdown from '../../../shared/CustomDropdown';
-import { useAppContext } from '../../../../AppContext';
+import { Box, FormControlLabel, Slider, Switch } from '@mui/material';
+import React, { useEffect, useState } from 'react';
+import { BiChevronLeft, BiChevronRight, BiSearch } from 'react-icons/bi';
 import { useNavigate } from 'react-router-dom';
+import { useAppContext } from '../../../../AppContext';
+import { api } from '../../../lib/api/api';
+import { useTest } from '../../../lib/api/spaceStatus';
+import CustomDropdown from '../../../shared/CustomDropdown';
 import SearchResult from './SearchResult';
 import {
-  SearchUtils, fetchNlaOptions, fetchRentOptions, fetchDateOptions, fetchUsageOptions, fetchRegionOptions, fetchStatusOptions,
-  fetchZoningOptions, fetchPropertyUsageOptions
+  SearchUtils,
+  fetchDateOptions,
+  fetchNlaOptions,
+  fetchPropertyUsageOptions,
+  fetchRegionOptions,
+  fetchRentOptions,
+  fetchStatusOptions,
+  fetchUsageOptions,
+  fetchZoningOptions
 } from './SearchUtils'; // Import the hook
-import { Box, FormControlLabel, Slider, Switch } from '@mui/material';
 
 export default function TwoDSearch() {
   const { isCollapsed2dSearchOpen, setIsCollapsed2dSearchOpen } = useAppContext();
@@ -75,6 +84,25 @@ export default function TwoDSearch() {
   const handleBackToSearch = () => {
     setShowResults(false);
   };
+  const { data } = useTest(
+    {
+      sub_type: "",
+      region: "",
+      micromarket: "",
+      zoning: selectedZoning,
+      property_usage: "",
+      building_nla: null,
+      space_status: selectedStatus,
+      vacant_space: null,
+      asking_rent: null,
+      available_date: "",
+    }
+  )
+
+  const { data: status } = api.spaceStatus()
+  const { data: zoning } = api.zoning()
+  const { data: propertyUsage } = api.propertyUsage()
+  const { data: micromarket } = api.micromarket()
 
   return (
     <div className="flex bg-neutral-150 h-full relative">
@@ -116,10 +144,13 @@ export default function TwoDSearch() {
                       <button onClick={() => handleButtonClick('available')} className={`flex-grow p-1 w-1/2 rounded-r-md shadow-md text-sm ${activeButton === 'available' ? 'bg-c-teal text-white' : 'bg-neutral-200 text-neutral-500 hover:bg-neutral-300'}`}>Available Buildings</button>
                     </div>
                     <div style={{ height: `${sectionHeight}px` }} className="overflow-y-auto pr-3">
-                      <CustomDropdown label="Space Status" options={statusOptions} selectedOption={selectedStatus} onSelect={setSelectedStatus} />
+                      <CustomDropdown label="Space Status" options={status ? status.map(item => item?.
+                        SPACESTATUS_EN) : []} selectedOption={selectedStatus} onSelect={setSelectedStatus} />
                       <CustomDropdown label="Asset Class" options={rentOptions} selectedOption={selectedStatus} onSelect={setSelectedRent} />
-                      <CustomDropdown label="Region/Micromarket" options={regionOptions} selectedOption={selectedRegion} onSelect={setSelectedRegion} />
-                      <CustomDropdown label="Zioning" options={zoningOptions} selectedOption={selectedZoning} onSelect={setSelectedZoning} />
+                      <CustomDropdown label="Region/Micromarket" options={micromarket ? micromarket.map(item => item?.
+                        LOCATIONTAG_EN) : []} selectedOption={selectedRegion} onSelect={setSelectedRegion} />
+                      <CustomDropdown label="Zioning" options={zoning ? zoning.map(item => item?.
+                        BUILDINGTYPE_EN) : []} selectedOption={selectedZoning} onSelect={setSelectedZoning} />
                       <CustomDropdown
                         label="Size"
                         options={nlaOptions}
@@ -146,7 +177,8 @@ export default function TwoDSearch() {
                       />
                       <CustomDropdown
                         label="Property Usage"
-                        options={propUsageOptions}
+                        options={propertyUsage ? propertyUsage.map(item => item?.
+                          USAGESECTORTYPE_EN) : []}
                         selectedOption={selectedPropUsage}
                         onSelect={setSelectedPropUsage}
                       />
@@ -157,6 +189,9 @@ export default function TwoDSearch() {
                         />
                       </div>
 
+                      <button className='text-sm bg-c-teal rounded-md text-white'>
+                        SEARCH
+                      </button>
                       {isTransactionEnabled && (
                         <>
                           <div className="flex flex-col items-center w-full mt-2">
@@ -195,8 +230,10 @@ export default function TwoDSearch() {
                         </>
                       )}
                     </div>
+
                   </div>
                 )}
+
                 {activeTab === 'account' && (
                   <div className="space-y-4 w-full text-sm">
                     <div className="flex mb-4 w-full">
@@ -204,7 +241,9 @@ export default function TwoDSearch() {
                       <button onClick={() => handleButtonClick('available')} className={`flex-grow p-1 w-1/2 rounded-r-md shadow-md text-sm ${activeButton === 'available' ? 'bg-c-teal text-white' : 'bg-neutral-200 text-neutral-500 hover:bg-neutral-300'}`}>Available Buildings</button>
                     </div>
                     <div style={{ height: `${sectionHeight}px` }} className="overflow-y-auto pr-3">
-                      <CustomDropdown label="Space Status" options={nlaOptions} selectedOption={selectedNLA} onSelect={setSelectedNLA} />
+                      <CustomDropdown label="Space Status" options={
+                        status ? status.map(item => item?.
+                          SPACESTATUS_EN) : []} selectedOption={selectedNLA} onSelect={setSelectedNLA} />
                       <CustomDropdown label="Asset Class" options={rentOptions} selectedOption={selectedRent} onSelect={setSelectedRent} />
                     </div>
                   </div>
@@ -214,7 +253,10 @@ export default function TwoDSearch() {
               <SearchResult onBack={handleBackToSearch} />
             )}
           </div>
+
         </div>
+
+
         <div className={`absolute -right-10 top-1/2 -mt-16 transform -translate-y-1/2 z-0`}>
           <button
             onClick={toggleCollapse}
@@ -223,6 +265,7 @@ export default function TwoDSearch() {
             {isCollapsed2dSearchOpen ? <BiChevronRight size={24} /> : <BiChevronLeft size={24} />}
           </button>
         </div>
+
       </div>
     </div>
   );
