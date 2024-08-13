@@ -1,23 +1,21 @@
-import { Box, FormControlLabel, Slider, Switch } from "@mui/material";
-import React, { useEffect, useState } from "react";
-import { BiChevronLeft, BiChevronRight, BiSearch } from "react-icons/bi";
-import { useNavigate } from "react-router-dom";
-import { useAppContext } from "../../../../AppContext";
-import { api } from "../../../lib/api/api";
-import { useTest } from "../../../lib/api/spaceStatus";
+import React, { useState, useEffect } from "react";
+import { BiSearch, BiChevronLeft, BiChevronRight } from "react-icons/bi";
 import CustomDropdown from "../../../shared/CustomDropdown";
+import { useAppContext } from "../../../../AppContext";
+import { useNavigate } from "react-router-dom";
 import SearchResult from "./SearchResult";
 import {
   SearchUtils,
-  fetchDateOptions,
   fetchNlaOptions,
-  fetchPropertyUsageOptions,
-  fetchRegionOptions,
   fetchRentOptions,
-  fetchStatusOptions,
+  fetchDateOptions,
   fetchUsageOptions,
+  fetchRegionOptions,
+  fetchStatusOptions,
   fetchZoningOptions,
+  fetchPropertyUsageOptions,
 } from "./SearchUtils"; // Import the hook
+import { Box, FormControlLabel, Slider, Switch } from "@mui/material";
 
 export default function TwoDSearch({ mapApi }) {
   const { isCollapsed2dSearchOpen, setIsCollapsed2dSearchOpen } =
@@ -117,23 +115,6 @@ export default function TwoDSearch({ mapApi }) {
   const handleBackToSearch = () => {
     setShowResults(false);
   };
-  const { data } = useTest({
-    sub_type: "",
-    region: "",
-    micromarket: "",
-    zoning: selectedZoning,
-    property_usage: "",
-    building_nla: null,
-    space_status: selectedStatus,
-    vacant_space: null,
-    asking_rent: null,
-    available_date: "",
-  });
-
-  const { data: status } = api.spaceStatus();
-  const { data: zoning } = api.zoning();
-  const { data: propertyUsage } = api.propertyUsage();
-  const { data: micromarket } = api.micromarket();
 
   const handleSearchButton = () => {
     console.log("Searching for:", searchQuery);
@@ -141,9 +122,9 @@ export default function TwoDSearch({ mapApi }) {
     //   sub_type: ,});
     mapApi({
       sub_type: null,
-      region: "CBD",
+      region: selectedRegion === "Select" ? null : selectedRegion,
       micromarket: null,
-      zoning: null,
+      zoning: selectedZoning === "Select" ? null : selectedZoning,
       property_usage: null,
       building_nla: 10000,
       space_status: null,
@@ -237,11 +218,7 @@ export default function TwoDSearch({ mapApi }) {
                     >
                       <CustomDropdown
                         label="Space Status"
-                        options={
-                          status
-                            ? status.map((item) => item?.SPACESTATUS_EN)
-                            : []
-                        }
+                        options={statusOptions}
                         selectedOption={selectedStatus}
                         onSelect={setSelectedStatus}
                       />
@@ -253,21 +230,13 @@ export default function TwoDSearch({ mapApi }) {
                       />
                       <CustomDropdown
                         label="Region/Micromarket"
-                        options={
-                          micromarket
-                            ? micromarket.map((item) => item?.LOCATIONTAG_EN)
-                            : []
-                        }
+                        options={regionOptions}
                         selectedOption={selectedRegion}
                         onSelect={setSelectedRegion}
                       />
                       <CustomDropdown
                         label="Zioning"
-                        options={
-                          zoning
-                            ? zoning.map((item) => item?.BUILDINGTYPE_EN)
-                            : []
-                        }
+                        options={zoningOptions}
                         selectedOption={selectedZoning}
                         onSelect={setSelectedZoning}
                       />
@@ -297,13 +266,7 @@ export default function TwoDSearch({ mapApi }) {
                       />
                       <CustomDropdown
                         label="Property Usage"
-                        options={
-                          propertyUsage
-                            ? propertyUsage.map(
-                                (item) => item?.USAGESECTORTYPE_EN
-                              )
-                            : []
-                        }
+                        options={propUsageOptions}
                         selectedOption={selectedPropUsage}
                         onSelect={setSelectedPropUsage}
                       />
@@ -321,6 +284,7 @@ export default function TwoDSearch({ mapApi }) {
                           }
                         />
                       </div>
+
                       {isTransactionEnabled && (
                         <>
                           <div className="flex flex-col items-center w-full mt-2">
@@ -373,7 +337,6 @@ export default function TwoDSearch({ mapApi }) {
                     </div>
                   </div>
                 )}
-
                 {activeTab === "account" && (
                   <div className="space-y-4 w-full text-sm">
                     <div className="flex mb-4 w-full">
@@ -404,11 +367,7 @@ export default function TwoDSearch({ mapApi }) {
                     >
                       <CustomDropdown
                         label="Space Status"
-                        options={
-                          status
-                            ? status.map((item) => item?.SPACESTATUS_EN)
-                            : []
-                        }
+                        options={nlaOptions}
                         selectedOption={selectedNLA}
                         onSelect={setSelectedNLA}
                       />
@@ -427,7 +386,6 @@ export default function TwoDSearch({ mapApi }) {
             )}
           </div>
         </div>
-
         <div
           className={`absolute -right-10 top-1/2 -mt-16 transform -translate-y-1/2 z-0`}
         >
