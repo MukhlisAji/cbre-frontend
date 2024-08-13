@@ -476,21 +476,27 @@ export function useMap(styleMap, map, zoom, triggerRadius) {
     });
   };
 
-  const mapApi = async () => {
-    const res = await axios(`${CONFIG_APP.MAPBOX_API}/test2`, {
+  const mapApi = async (body) => {
+    const res = await fetch(`${CONFIG_APP.MAPBOX_API}/test2`, {
       method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(body),
     });
     // const res = await fetch(`http://103.127.134.145:3000/map-region/SG04`)
     const responseData = await res.json();
-    setDataMap(responseData.geojson.features);
-    responseData.geojson.features.forEach((location, index) => {
+    removeMarkers();
+    setDataMap(responseData.data);
+    responseData.data.forEach((item, index) => {
       // Create HTML element for the marker
       const el = document.createElement("div");
       el.className = "label-marker-map";
+
       // Create SVG element
       const svg = `
       <div class="marker-map">
-      <div class="label-name-map">${location.properties.BUILDINGNAME}</div>
+      <div class="label-name-map">${item.BUILDINGNAME}</div>
         <div class="label-icon-wrapper">
           <svg display="block" height="41px" width="27px" viewBox="0 0 27 41">
               <defs>
@@ -507,28 +513,29 @@ export function useMap(styleMap, map, zoom, triggerRadius) {
           </div>
         </div>
       `;
+
       // Append SVG and custom circle to marker element
       el.innerHTML = svg;
+
       // Add marker to map
       const marker = new mapboxgl.Marker(el);
-      marker.setLngLat(location.geometry.coordinates).addTo(map.current);
+      marker.setLngLat(
+        [item.LONGITUDE, item.LATITUDE]).addTo(map.current);
       const popup = new mapboxgl.Popup({ offset: 25 }).setHTML(`
       <div class="popup-container">
         <div class="info-box">
-      <h3>${location.properties.BUILDINGNAME}</h3>
-      <p><strong>Address:</strong> ${location.properties.BUILDINGNAME}, ${location.properties.BUILDINGADDRESS_POSTCODE}</p>
-      <p><strong>Building Status:</strong> ${location.properties.BUILDINGSTATUS_EN}</p>
-      <p><strong>Gross Floor Area:</strong> ${location.properties.GROSS_FLOOR_AREA} sq ft</p>
-      <p><strong>Net Lettable Area:</strong> ${location.properties.NET_LETTABLE_AREA} sq ft</p>
-      <p><strong>Location:</strong> ${location.properties.MICROMARKET}</p>
+      <h3>${item.BUILDINGNAME}</h3>
+      <p><strong>Address:</strong> ${item.BUILDINGNAME}, ${item.BUILDINGADDRESS_POSTCODE}</p>
     </div>
     </div>
     `);
+
       marker.setPopup(popup);
       const mName = document.querySelectorAll(".label-name-map");
       mName.forEach((item) => {
         item.style.display = "none";
       });
+
       if (zoom > 14) {
         const mName = document.querySelectorAll(".label-name-map");
         mName.forEach((item) => {
@@ -538,9 +545,20 @@ export function useMap(styleMap, map, zoom, triggerRadius) {
     });
   };
 
-  useEffect(() => {
-    mapApi();
-  });
+  // useEffect(() => {
+  //   mapApi({
+  //     sub_type: null,
+  //     region: "CBD",
+  //     micromarket: null,
+  //     zoning: null,
+  //     property_usage: null,
+  //     building_nla: 10000,
+  //     space_status: null,
+  //     vacant_space: 5000,
+  //     asking_rent: 15,
+  //     available_date: "2024-01-01"
+  //   });
+  // }, []);
 
   // useEffect(() => {
   //   fetchApi();
@@ -579,5 +597,6 @@ export function useMap(styleMap, map, zoom, triggerRadius) {
     setFilteringData,
     handleSearch,
     search,
+    mapApi
   };
 }

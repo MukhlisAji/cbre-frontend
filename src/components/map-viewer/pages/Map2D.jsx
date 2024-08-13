@@ -10,6 +10,7 @@ import { useConfig, useMap, useRegion } from "../hooks";
 import { useMicromarket } from "../hooks/useMicromarket";
 import { useZoning } from "../hooks/useZoning";
 import { AllRegion, NortWest, SouthEast, StyleSatelliteStreet } from "../utils";
+import TwoDSearch from "./search/2dSearch";
 
 function Map2D() {
   const {
@@ -26,7 +27,6 @@ function Map2D() {
   } = useConfig();
 
   const { isSidebarOpen, isCollapsed2dSearchOpen } = useAppContext();
-
 
   useEffect(() => {
     if (!map.current || !mapContainer.current) return;
@@ -63,8 +63,12 @@ function Map2D() {
 
   const [triggerRadius, setTriggerRadius] = useState(false);
   // Main map
-  const { filteringData, handleSearch, search } = useMap(styleMap, map, zoom, triggerRadius);
-
+  const { filteringData, handleSearch, search, mapApi } = useMap(
+    styleMap,
+    map,
+    zoom,
+    triggerRadius
+  );
 
   // MRT
   // useMRTData(zoom, map);
@@ -143,51 +147,57 @@ function Map2D() {
   }, []);
 
   return (
-    <div className="relative w-full min-h-full overflow-hidden">
-      <div className="filtering">
-        {/* <SearchLocation
+    <>
+      <div className="relative top-0 z-30">
+        <TwoDSearch mapApi={mapApi} />
+      </div>
+      <div className="relative w-full min-h-full overflow-hidden">
+        <div className="filtering">
+          {/* <SearchLocation
           onSearchChange={handleSearch}
           filteringData={filteringData}
           search={search}
           onClickAction={handleClick}
         /> */}
-        <div className="flex items-center space-x-2">
-          {/* <DataBrowser
+          <div className="flex items-center space-x-2">
+            {/* <DataBrowser
             triggerMicromarket={triggerMicromarket}
             resetMicromarket={resetMicromarket}
             triggerZoning={triggerZoning}
             resetZoning={resetZoning}
           /> */}
-          <button
-            onClick={() => setTriggerRadius(prev => !prev)}
-            className={`px-2 py-4 shadow-md text-sm rounded-lg font-bold flex justify-center items-center border ${triggerRadius
-              ? 'bg-c-teal text-white border-c-teal'
-              : 'bg-white text-neutral-600 hover:bg-c-teal hover:text-white hover:border-c-teal'
-              }`}
-          >
-            RADIUS
-          </button>
-          <div className="z-10">
             <button
-              className="px-2 py-4 bg-white hover:bg-c-teal text-neutral-600 hover:text-white border  hover:border-c-teal shadow-md text-sm rounded-lg font-bold flex justify-center items-center"
-              id="search-buttonradius"
+              onClick={() => setTriggerRadius((prev) => !prev)}
+              className={`px-2 py-4 shadow-md text-sm rounded-lg font-bold flex justify-center items-center border ${
+                triggerRadius
+                  ? "bg-c-teal text-white border-c-teal"
+                  : "bg-white text-neutral-600 hover:bg-c-teal hover:text-white hover:border-c-teal"
+              }`}
             >
-              Search
+              RADIUS
             </button>
+            <div className="z-10">
+              <button
+                className="px-2 py-4 bg-white hover:bg-c-teal text-neutral-600 hover:text-white border  hover:border-c-teal shadow-md text-sm rounded-lg font-bold flex justify-center items-center"
+                id="search-buttonradius"
+              >
+                Search
+              </button>
+            </div>
           </div>
         </div>
-      </div>
 
-      <FilterLine subMenu={subMenu} expandedMenu={expandedMenu} />
-      {/* <div className="bg-[rgba(35,55,75,0.9)] text-white p-2 font-mono z-10 fixed bottom-0 right-0 m-3 rounded-md">
+        <FilterLine subMenu={subMenu} expandedMenu={expandedMenu} />
+        {/* <div className="bg-[rgba(35,55,75,0.9)] text-white p-2 font-mono z-10 fixed bottom-0 right-0 m-3 rounded-md">
         Longitude: {lng} | Latitude: {lat} | Zoom: {zoom}
         <div id="filter"></div>
       </div> */}
-      <div
-        ref={mapContainer}
-        className="transition-all duration-300 ease-in-out overflow-hidden w-full h-full"
-      />
-    </div >
+        <div
+          ref={mapContainer}
+          className="transition-all duration-300 ease-in-out overflow-hidden w-full h-full"
+        />
+      </div>
+    </>
   );
 }
 
