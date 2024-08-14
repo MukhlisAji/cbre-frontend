@@ -1,0 +1,28 @@
+.mapboxgl-ctrl-geocoder.mapboxgl-ctrl {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    /* width: 300px; */
+    /* padding-right: 40px; */
+  }
+  
+  
+  .mapboxgl-ctrl-geocoder input[type="text"] {
+    width: 100%;
+    padding-right: 40px;
+    height: 40px; 
+    box-sizing: border-box;
+  }
+  
+  .mapboxgl-ctrl-geocoder .mapboxgl-ctrl-geocoder--icon {
+    position: absolute;
+    right: 10px;
+    top: 30%;
+    transform: translateY(-10%);
+    cursor: pointer;
+    padding: 2px;
+    background: transparent;
+    border: none;
+  }
+  

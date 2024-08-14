@@ -11,6 +11,7 @@ import * as turf from "@turf/turf";
 import axios from "axios";
 import { useEffect, useRef, useState } from "react";
 import { CONFIG_APP } from "../config/app";
+import './mapboxGeocoder.css';
 
 export function useMap(styleMap, map, zoom, triggerRadius) {
   const [dataMap, setDataMap] = useState();
@@ -165,34 +166,50 @@ export function useMap(styleMap, map, zoom, triggerRadius) {
       });
     }
 
-    if (!document.querySelector(".mapboxgl-ctrl-geocoder")) {
+    if (!document.querySelector('.mapboxgl-ctrl-geocoder')) {
       const geocoder = new MapboxGeocoder({
         accessToken: mapboxgl.accessToken,
         mapboxgl: mapboxgl,
-        marker: false,
+        marker: false
       });
 
       map.current.addControl(geocoder);
 
-      geocoder.on("result", (e) => {
+      geocoder.on('result', (e) => {
         const center = e.result.center;
         map.current.flyTo({
           center: center,
-          zoom: 14,
+          zoom: 14
         });
       });
 
-      const filteringDiv = document.querySelector(".filtering");
-      const mapboxglCtrlGeocoder = document.querySelector(
-        ".mapboxgl-ctrl-geocoder.mapboxgl-ctrl"
-      );
-      mapboxglCtrlGeocoder.firstChild.style.height = "100%";
-      mapboxglCtrlGeocoder.firstChild.style.top = "0";
-      mapboxglCtrlGeocoder.style.display = "flex";
-      mapboxglCtrlGeocoder.style.justifyContent = "center";
-      mapboxglCtrlGeocoder.style.alignItems = "center";
+      const filteringDiv = document.querySelector('.filtering');
+      const mapboxglCtrlGeocoder = document.querySelector('.mapboxgl-ctrl-geocoder.mapboxgl-ctrl');
+
+      // Apply styles to geocoder container
+      Object.assign(mapboxglCtrlGeocoder.style, {
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        width: '100%', // Adjust width as needed
+        margin: '0 auto', // Center horizontally if required
+      });
+
+      // Apply styles to geocoder input
+      const geocoderInput = mapboxglCtrlGeocoder.querySelector('input');
+      if (geocoderInput) {
+        Object.assign(geocoderInput.style, {
+          height: '2rem', // Adjust height as needed
+          padding: '0.5rem', // Add padding for better appearance
+          borderRadius: '4px', // Add border radius for rounded corners
+          border: '1px solid #ccc', // Adjust border style
+          width: '100%', // Ensure full width usage
+        });
+      }
+
       filteringDiv.insertBefore(mapboxglCtrlGeocoder, filteringDiv.firstChild);
     }
+
 
     const addCircleEvents = () => {
       let circleFeature = null;
