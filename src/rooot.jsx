@@ -3,7 +3,7 @@ import Modal from 'react-modal';
 import { Navigate, Route, BrowserRouter as Router, Routes } from "react-router-dom";
 import './App.css';
 import { AppProvider } from "./AppContext";
-import Dashboard from "./components/Dashboard";
+import Dashboard from "./components/dashboard/Dashboard";
 import NotFound from "./components/NotFound";
 import PropertyDatabase from "./components/PropertyDatabase";
 import PropertySearch from "./components/PropertySearch";

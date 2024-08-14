@@ -18,6 +18,9 @@ import {
   
 } from "./SearchUtils"; // Import the hook
 import { Box, FormControlLabel, Slider, Switch } from "@mui/material";
+import { IoAddOutline, IoSaveOutline } from "react-icons/io5";
+import { TbZoomReset } from "react-icons/tb";
+import { IoMdSearch } from "react-icons/io";
 
 export default function TwoDSearch({ mapApi }) {
   const { isCollapsed2dSearchOpen, setIsCollapsed2dSearchOpen } =
@@ -118,7 +121,7 @@ export default function TwoDSearch({ mapApi }) {
   useEffect(() => {
     const handleResize = () => {
       const screenHeight = window.innerHeight;
-      const newHeight = screenHeight - 250;
+      const newHeight = screenHeight - 300;
       setSectionHeight(newHeight);
     };
 
@@ -157,14 +160,12 @@ export default function TwoDSearch({ mapApi }) {
     <div className="flex bg-neutral-150 h-full relative">
       <div className="flex relative">
         <div
-          className={`flex flex-col overflow-hidden bg-neutral-100 shadow-md rounded-md transition-all duration-300 ease-in-out z-10 ${
-            isCollapsed2dSearchOpen ? "w-0.5" : "w-72"
-          }`}
+          className={`flex flex-col overflow-hidden bg-neutral-100 shadow-md rounded-md transition-all duration-300 ease-in-out z-10 ${isCollapsed2dSearchOpen ? "w-0.5" : "w-72"
+            }`}
         >
           <div
-            className={`flex flex-col p-4 transition-opacity duration-300 ease-in-out ${
-              isCollapsed2dSearchOpen ? "opacity-0" : "opacity-100"
-            }`}
+            className={`flex flex-col p-4 transition-opacity duration-300 ease-in-out ${isCollapsed2dSearchOpen ? "opacity-0" : "opacity-100"
+              }`}
           >
             {!showResults ? (
               <>
@@ -186,21 +187,19 @@ export default function TwoDSearch({ mapApi }) {
                 <div className="flex mb-4 w-full text-sm gap-1 px-1 rounded-md bg-neutral-200">
                   <button
                     onClick={() => setActiveTab("buildings")}
-                    className={`flex-grow p-2 rounded-md my-1 text-sm text-neutral-500 ${
-                      activeTab === "buildings"
-                        ? "bg-white text-black border-neutral-300 shadow-md"
-                        : "bg-neutral-200 text-neutral-700 border-neutral-300"
-                    }`}
+                    className={`flex-grow p-2 rounded-md my-1 text-sm text-neutral-500 ${activeTab === "buildings"
+                      ? "bg-white text-black border-neutral-300 shadow-md"
+                      : "bg-neutral-200 text-neutral-700 border-neutral-300"
+                      }`}
                   >
                     Buildings
                   </button>
                   <button
                     onClick={() => setActiveTab("account")}
-                    className={`flex-grow p-2 rounded-md my-1 text-sm text-neutral-500 ${
-                      activeTab === "account"
-                        ? "bg-white text-black border-neutral-300 shadow-md"
-                        : "bg-neutral-200 text-neutral-700 border-neutral-300"
-                    }`}
+                    className={`flex-grow p-2 rounded-md my-1 text-sm text-neutral-500 ${activeTab === "account"
+                      ? "bg-white text-black border-neutral-300 shadow-md"
+                      : "bg-neutral-200 text-neutral-700 border-neutral-300"
+                      }`}
                   >
                     Account
                   </button>
@@ -211,21 +210,19 @@ export default function TwoDSearch({ mapApi }) {
                     <div className="flex mb-4 w-full">
                       <button
                         onClick={() => handleButtonClick("all")}
-                        className={`flex-grow p-1 w-1/2 rounded-l-md shadow-md text-sm ${
-                          activeButton === "all"
-                            ? "bg-c-teal text-white"
-                            : "bg-neutral-200 text-neutral-500 hover:bg-neutral-300"
-                        }`}
+                        className={`flex-grow p-1 w-1/2 rounded-l-md shadow-md text-sm ${activeButton === "all"
+                          ? "bg-c-teal text-white"
+                          : "bg-neutral-200 text-neutral-500 hover:bg-neutral-300"
+                          }`}
                       >
                         All Buildings
                       </button>
                       <button
                         onClick={() => handleButtonClick("available")}
-                        className={`flex-grow p-1 w-1/2 rounded-r-md shadow-md text-sm ${
-                          activeButton === "available"
-                            ? "bg-c-teal text-white"
-                            : "bg-neutral-200 text-neutral-500 hover:bg-neutral-300"
-                        }`}
+                        className={`flex-grow p-1 w-1/2 rounded-r-md shadow-md text-sm ${activeButton === "available"
+                          ? "bg-c-teal text-white"
+                          : "bg-neutral-200 text-neutral-500 hover:bg-neutral-300"
+                          }`}
                       >
                         Available Buildings
                       </button>
@@ -355,12 +352,30 @@ export default function TwoDSearch({ mapApi }) {
                           </div>
                         </>
                       )}
-                      <button
+
+                      <div className="absolute bottom-0 left-0 w-full flex justify-center space-x-4 p-2 pl-4 pr-8 bg-neutral-200 shadow-md">
+                        <button
+                          // onClick={}
+                          className="flex items-center font-thin w-1/2 px-4 py-2 text-blue-700 border rounded-md bg-white text-xs hover:bg-neutral-100 hover:text-neutral-700 transition-all duration-300"
+                        >
+                          <TbZoomReset className="mr-2 text-lg" />
+                          Reset
+                        </button>
+                        <button
+                          onClick={handleSearchButton}
+                          className="flex items-center font-thin w-1/2 px-4 py-2 text-white rounded-md bg-c-teal text-xs hover:bg-c-weldon-blue transition-all duration-300"
+                        >
+                          <IoMdSearch className="mr-2 text-lg" />
+                          Search
+                        </button>
+                      </div>
+
+                      {/* <button
                         className="text-sm bg-c-teal rounded-md text-white"
                         onClick={handleSearchButton}
                       >
                         SEARCH
-                      </button>
+                      </button> */}
                     </div>
                   </div>
                 )}
@@ -369,21 +384,19 @@ export default function TwoDSearch({ mapApi }) {
                     <div className="flex mb-4 w-full">
                       <button
                         onClick={() => handleButtonClick("all")}
-                        className={`flex-grow p-1 w-1/2 rounded-l-md shadow-md text-sm ${
-                          activeButton === "all"
-                            ? "bg-c-teal text-white"
-                            : "bg-neutral-200 text-neutral-500 hover:bg-neutral-300"
-                        }`}
+                        className={`flex-grow p-1 w-1/2 rounded-l-md shadow-md text-sm ${activeButton === "all"
+                          ? "bg-c-teal text-white"
+                          : "bg-neutral-200 text-neutral-500 hover:bg-neutral-300"
+                          }`}
                       >
                         All Buildings
                       </button>
                       <button
                         onClick={() => handleButtonClick("available")}
-                        className={`flex-grow p-1 w-1/2 rounded-r-md shadow-md text-sm ${
-                          activeButton === "available"
-                            ? "bg-c-teal text-white"
-                            : "bg-neutral-200 text-neutral-500 hover:bg-neutral-300"
-                        }`}
+                        className={`flex-grow p-1 w-1/2 rounded-r-md shadow-md text-sm ${activeButton === "available"
+                          ? "bg-c-teal text-white"
+                          : "bg-neutral-200 text-neutral-500 hover:bg-neutral-300"
+                          }`}
                       >
                         Available Buildings
                       </button>

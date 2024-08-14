@@ -152,53 +152,36 @@ function Map2D() {
         <TwoDSearch mapApi={mapApi} />
       </div>
       <div className="relative w-full min-h-full overflow-hidden">
-        <div className="filtering">
-          {/* <SearchLocation
-          onSearchChange={handleSearch}
-          filteringData={filteringData}
-          search={search}
-          onClickAction={handleClick}
-        /> */}
-          <div className="flex items-center space-x-2">
-            {/* <DataBrowser
-            triggerMicromarket={triggerMicromarket}
-            resetMicromarket={resetMicromarket}
-            triggerZoning={triggerZoning}
-            resetZoning={resetZoning}
-          /> */}
-            <button
-              onClick={() => setTriggerRadius((prev) => !prev)}
-              className={`px-2 py-4 shadow-md text-sm rounded-lg font-bold flex justify-center items-center border ${
-                triggerRadius
-                  ? "bg-c-teal text-white border-c-teal"
-                  : "bg-white text-neutral-600 hover:bg-c-teal hover:text-white hover:border-c-teal"
-              }`}
-            >
-              RADIUS
-            </button>
-            <div className="z-10">
-              <button
-                className="px-2 py-4 bg-white hover:bg-c-teal text-neutral-600 hover:text-white border  hover:border-c-teal shadow-md text-sm rounded-lg font-bold flex justify-center items-center"
-                id="search-buttonradius"
-              >
-                Search
-              </button>
-            </div>
-          </div>
+        <div className="filtering absolute top-2 left-4 z-40 flex items-center space-x-2 bg-white bg-opacity-75 p-2 rounded-lg shadow-md">
+          <button
+            onClick={() => setTriggerRadius((prev) => !prev)}
+            className={`px-2 py-1.5 shadow-md text-sm rounded-lg font-bold flex justify-center items-center border ${
+              triggerRadius
+                ? "bg-c-teal text-white border-c-teal"
+                : "bg-white text-neutral-600 hover:bg-c-teal hover:text-white hover:border-c-teal"
+            }`}
+          >
+            Radius
+          </button>
+          <button
+            className="px-2 py-1.5 bg-white hover:bg-c-teal text-neutral-600 hover:text-white border hover:border-c-teal shadow-md text-sm rounded-lg font-bold flex justify-center items-center"
+            id="search-buttonradius"
+          >
+            Search
+          </button>
         </div>
-
+  
         <FilterLine subMenu={subMenu} expandedMenu={expandedMenu} />
-        {/* <div className="bg-[rgba(35,55,75,0.9)] text-white p-2 font-mono z-10 fixed bottom-0 right-0 m-3 rounded-md">
-        Longitude: {lng} | Latitude: {lat} | Zoom: {zoom}
-        <div id="filter"></div>
-      </div> */}
+  
+        {/* Map Container */}
         <div
           ref={mapContainer}
-          className="transition-all duration-300 ease-in-out overflow-hidden w-full h-full"
+          className="w-full h-full transition-all duration-300 ease-in-out overflow-hidden"
         />
       </div>
     </>
   );
+  
 }
 
 export default Map2D;
