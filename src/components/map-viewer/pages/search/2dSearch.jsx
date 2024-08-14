@@ -6,9 +6,6 @@ import { useNavigate } from "react-router-dom";
 import SearchResult from "./SearchResult";
 import {
   SearchUtils,
-  fetchRentOptions,
-  fetchDateOptions,
-  fetchUsageOptions,
   fetchRegionOptions,
   fetchStatusOptions,
   fetchZoningOptions,
@@ -33,25 +30,12 @@ export default function TwoDSearch({ mapApi }) {
   const [showResults, setShowResults] = useState(false);
   const [buildingNLA, setBuildingNla] = useState(50);
   const [vacantSpace, setVacantSpace] = useState(50);
+
   const [askingRent, setAskingRent] = useState(50);
   const [activeButton, setActiveButton] = useState("all");
   const [isTransactionEnabled, setIsTransactionEnabled] = useState(false);
 
-  const {
-    options: rentOptions,
-    selectedOption: selectedRent,
-    setSelectedOption: setSelectedRent,
-  } = SearchUtils(fetchRentOptions);
-  const {
-    options: dateOptions,
-    selectedOption: selectedDate,
-    setSelectedOption: setSelectedDate,
-  } = SearchUtils(fetchDateOptions);
-  const {
-    options: usageOptions,
-    selectedOption: selectedUsage,
-    setSelectedOption: setSelectedUsage,
-  } = SearchUtils(fetchUsageOptions);
+ 
   const {
     options: statusOptions,
     selectedOption: selectedStatus,
@@ -267,12 +251,12 @@ export default function TwoDSearch({ mapApi }) {
                         selectedOption={selectedStatus}
                         onSelect={setSelectedStatus}
                       />
-                      <CustomDropdown
+                      {/* <CustomDropdown
                         label="Available Dates"
                         options={dateOptions}
                         selectedOption={selectedDate}
                         onSelect={setSelectedDate}
-                      />
+                      /> */}
                       
                       <div className="flex items-center space-x-2 py-2 mt-2">
                         <label className="block text-xs font-semibold leading-6 text-neutral-500">

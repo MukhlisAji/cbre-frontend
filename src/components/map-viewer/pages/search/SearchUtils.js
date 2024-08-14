@@ -19,9 +19,6 @@ export const SearchUtils = (fetchOptions) => {
         getOptions();
     }, [fetchOptions]);
 
-    console.log(options)
-    console.log(selectedOption)
-
     return {
         options,
         selectedOption,
@@ -61,20 +58,7 @@ const fetchWithCache = async (key, fetchFunction, cacheDuration = 24 * 60 * 60 *
 //     return ['Select NLA', 'NLA 1', 'NLA 2'];
 // };
 
-// Fetch Rent options
-export const fetchRentOptions = async () => {
-    return ['Select Asking Rent', 'Rent 1', 'Rent 2'];
-};
 
-// Fetch Date options
-export const fetchDateOptions = async () => {
-    return ['Select Available Dates', 'Date 1', 'Date 2'];
-};
-
-// Fetch Usage options
-export const fetchUsageOptions = async () => {
-    return ['Select Property Usage', 'Usage 1', 'Usage 2'];
-};
 
 // Fetch Region options from API
 export const fetchRegionOptions = async () => {
@@ -115,6 +99,7 @@ export const fetchSubTypeOptions = async () => {
 export const fetchMicromarketeOptions = async () => {
     return fetchWithCache('micromarketOptions', async () => {
         const response = await axios.get(`${CONFIG_APP.MAPBOX_API}/master/micromarket`);
+        console.log(response)
         return response.data.map(item => item.LOCATIONTAG_EN);
     });
 };
