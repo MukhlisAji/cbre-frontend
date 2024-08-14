@@ -12,12 +12,14 @@ import {
   fetchPropertyUsageOptions,
   fetchMicromarketeOptions,
   fetchSubTypeOptions,
-  
 } from "./SearchUtils"; // Import the hook
 import { Box, FormControlLabel, Slider, Switch } from "@mui/material";
 import { IoAddOutline, IoSaveOutline } from "react-icons/io5";
 import { TbZoomReset } from "react-icons/tb";
 import { IoMdSearch } from "react-icons/io";
+import { DatePicker } from "@mui/x-date-pickers";
+import { format } from "date-fns";
+
 
 export default function TwoDSearch({ mapApi }) {
   const { isCollapsed2dSearchOpen, setIsCollapsed2dSearchOpen } =
@@ -32,10 +34,10 @@ export default function TwoDSearch({ mapApi }) {
   const [vacantSpace, setVacantSpace] = useState(50);
 
   const [askingRent, setAskingRent] = useState(50);
+  const [availableDate, setAvailableDate] = useState(null);
   const [activeButton, setActiveButton] = useState("all");
   const [isTransactionEnabled, setIsTransactionEnabled] = useState(false);
 
- 
   const {
     options: statusOptions,
     selectedOption: selectedStatus,
@@ -60,27 +62,26 @@ export default function TwoDSearch({ mapApi }) {
     options: micromarketOptions,
     selectedOption: selectedMicromarket,
     setSelectedOption: setSelectedMicromarket,
-  } =  SearchUtils(fetchMicromarketeOptions);
+  } = SearchUtils(fetchMicromarketeOptions);
   const {
     options: subTypeOptions,
     selectedOption: selectedSubType,
     setSelectedOption: setSelectedSubType,
-  } =  SearchUtils(fetchSubTypeOptions);
-
+  } = SearchUtils(fetchSubTypeOptions);
 
   const handleToggleChange = (event) => {
     setIsTransactionEnabled(event.target.checked);
   };
 
-  const handleNLAChange = (event, newValue ) => {
+  const handleNLAChange = (event, newValue) => {
     setBuildingNla(newValue);
   };
 
-  const handleRentChange = (event, newValue ) => {
+  const handleRentChange = (event, newValue) => {
     setAskingRent(newValue);
   };
 
-  const handleSpaceChange = (event, newValue ) => {
+  const handleSpaceChange = (event, newValue) => {
     setVacantSpace(newValue);
   };
 
@@ -128,14 +129,15 @@ export default function TwoDSearch({ mapApi }) {
     mapApi({
       sub_type: selectedSubType === "Select" ? null : selectedSubType,
       region: selectedRegion === "Select" ? null : selectedRegion,
-      micromarket: selectedMicromarket === "Select" ? null : selectedMicromarket,
+      micromarket:
+        selectedMicromarket === "Select" ? null : selectedMicromarket,
       zoning: selectedZoning === "Select" ? null : selectedZoning,
       property_usage: selectedPropUsage === "Select" ? null : selectedPropUsage,
       building_nla: buildingNLA,
       space_status: selectedStatus === "Select" ? null : selectedStatus,
       vacant_space: vacantSpace,
       asking_rent: askingRent,
-      available_date: "2024-01-01",     
+      available_date: availableDate ? format(availableDate, 'yyyy-MM-dd') : null,
     });
     // setShowResults(true);
   };
@@ -144,12 +146,14 @@ export default function TwoDSearch({ mapApi }) {
     <div className="flex bg-neutral-150 h-full relative">
       <div className="flex relative">
         <div
-          className={`flex flex-col overflow-hidden bg-neutral-100 shadow-md rounded-md transition-all duration-300 ease-in-out z-10 ${isCollapsed2dSearchOpen ? "w-0.5" : "w-72"
-            }`}
+          className={`flex flex-col overflow-hidden bg-neutral-100 shadow-md rounded-md transition-all duration-300 ease-in-out z-10 ${
+            isCollapsed2dSearchOpen ? "w-0.5" : "w-72"
+          }`}
         >
           <div
-            className={`flex flex-col p-4 transition-opacity duration-300 ease-in-out ${isCollapsed2dSearchOpen ? "opacity-0" : "opacity-100"
-              }`}
+            className={`flex flex-col p-4 transition-opacity duration-300 ease-in-out ${
+              isCollapsed2dSearchOpen ? "opacity-0" : "opacity-100"
+            }`}
           >
             {!showResults ? (
               <>
@@ -171,19 +175,21 @@ export default function TwoDSearch({ mapApi }) {
                 <div className="flex mb-4 w-full text-sm gap-1 px-1 rounded-md bg-neutral-200">
                   <button
                     onClick={() => setActiveTab("buildings")}
-                    className={`flex-grow p-2 rounded-md my-1 text-sm text-neutral-500 ${activeTab === "buildings"
-                      ? "bg-white text-black border-neutral-300 shadow-md"
-                      : "bg-neutral-200 text-neutral-700 border-neutral-300"
-                      }`}
+                    className={`flex-grow p-2 rounded-md my-1 text-sm text-neutral-500 ${
+                      activeTab === "buildings"
+                        ? "bg-white text-black border-neutral-300 shadow-md"
+                        : "bg-neutral-200 text-neutral-700 border-neutral-300"
+                    }`}
                   >
                     Buildings
                   </button>
                   <button
                     onClick={() => setActiveTab("account")}
-                    className={`flex-grow p-2 rounded-md my-1 text-sm text-neutral-500 ${activeTab === "account"
-                      ? "bg-white text-black border-neutral-300 shadow-md"
-                      : "bg-neutral-200 text-neutral-700 border-neutral-300"
-                      }`}
+                    className={`flex-grow p-2 rounded-md my-1 text-sm text-neutral-500 ${
+                      activeTab === "account"
+                        ? "bg-white text-black border-neutral-300 shadow-md"
+                        : "bg-neutral-200 text-neutral-700 border-neutral-300"
+                    }`}
                   >
                     Account
                   </button>
@@ -194,19 +200,21 @@ export default function TwoDSearch({ mapApi }) {
                     <div className="flex mb-4 w-full">
                       <button
                         onClick={() => handleButtonClick("all")}
-                        className={`flex-grow p-1 w-1/2 rounded-l-md shadow-md text-sm ${activeButton === "all"
-                          ? "bg-c-teal text-white"
-                          : "bg-neutral-200 text-neutral-500 hover:bg-neutral-300"
-                          }`}
+                        className={`flex-grow p-1 w-1/2 rounded-l-md shadow-md text-sm ${
+                          activeButton === "all"
+                            ? "bg-c-teal text-white"
+                            : "bg-neutral-200 text-neutral-500 hover:bg-neutral-300"
+                        }`}
                       >
                         All Buildings
                       </button>
                       <button
                         onClick={() => handleButtonClick("available")}
-                        className={`flex-grow p-1 w-1/2 rounded-r-md shadow-md text-sm ${activeButton === "available"
-                          ? "bg-c-teal text-white"
-                          : "bg-neutral-200 text-neutral-500 hover:bg-neutral-300"
-                          }`}
+                        className={`flex-grow p-1 w-1/2 rounded-r-md shadow-md text-sm ${
+                          activeButton === "available"
+                            ? "bg-c-teal text-white"
+                            : "bg-neutral-200 text-neutral-500 hover:bg-neutral-300"
+                        }`}
                       >
                         Available Buildings
                       </button>
@@ -257,7 +265,14 @@ export default function TwoDSearch({ mapApi }) {
                         selectedOption={selectedDate}
                         onSelect={setSelectedDate}
                       /> */}
-                      
+
+                      <div className="relative">
+                        <label className="block mt-2 text-xs font-semibold leading-6 text-neutral-500">
+                          Available Date
+                        </label>
+                        <DatePicker className="rounded-md" value={availableDate} onChange={setAvailableDate} />
+                      </div>
+
                       <div className="flex items-center space-x-2 py-2 mt-2">
                         <label className="block text-xs font-semibold leading-6 text-neutral-500">
                           Transaction
@@ -368,19 +383,21 @@ export default function TwoDSearch({ mapApi }) {
                     <div className="flex mb-4 w-full">
                       <button
                         onClick={() => handleButtonClick("all")}
-                        className={`flex-grow p-1 w-1/2 rounded-l-md shadow-md text-sm ${activeButton === "all"
-                          ? "bg-c-teal text-white"
-                          : "bg-neutral-200 text-neutral-500 hover:bg-neutral-300"
-                          }`}
+                        className={`flex-grow p-1 w-1/2 rounded-l-md shadow-md text-sm ${
+                          activeButton === "all"
+                            ? "bg-c-teal text-white"
+                            : "bg-neutral-200 text-neutral-500 hover:bg-neutral-300"
+                        }`}
                       >
                         All Buildings
                       </button>
                       <button
                         onClick={() => handleButtonClick("available")}
-                        className={`flex-grow p-1 w-1/2 rounded-r-md shadow-md text-sm ${activeButton === "available"
-                          ? "bg-c-teal text-white"
-                          : "bg-neutral-200 text-neutral-500 hover:bg-neutral-300"
-                          }`}
+                        className={`flex-grow p-1 w-1/2 rounded-r-md shadow-md text-sm ${
+                          activeButton === "available"
+                            ? "bg-c-teal text-white"
+                            : "bg-neutral-200 text-neutral-500 hover:bg-neutral-300"
+                        }`}
                       >
                         Available Buildings
                       </button>

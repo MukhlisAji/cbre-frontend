@@ -1,7 +1,12 @@
-import React from 'react';
-import Modal from 'react-modal';
-import { Navigate, Route, BrowserRouter as Router, Routes } from "react-router-dom";
-import './App.css';
+import React from "react";
+import Modal from "react-modal";
+import {
+  Navigate,
+  Route,
+  BrowserRouter as Router,
+  Routes,
+} from "react-router-dom";
+import "./App.css";
 import { AppProvider } from "./AppContext";
 import Dashboard from "./components/dashboard/Dashboard";
 import NotFound from "./components/NotFound";
@@ -29,72 +34,103 @@ import SpaceSubmitError from "./components/data-entry/SpaceSubmitError";
 import SpaceTemplate from "./components/data-entry/SpaceTemplate";
 import DataEntryLayout from "./components/shared/DataEntryLayout";
 import Layout from "./components/shared/Layout";
-import MapViewer from './components/map-viewer/pages/MapViewer';
-import PropertyLayout from './components/property/PropertyLayout';
-import Account from './components/property/Account';
-import Contact from './components/property/Contact';
-import AccountDetails from './components/property/AccountDetails';
-import ContactDetails from './components/property/ContactDetails';
-import GlobalSearchResult from './components/shared/global-search/GlobalSearchResult';
+import MapViewer from "./components/map-viewer/pages/MapViewer";
+import PropertyLayout from "./components/property/PropertyLayout";
+import Account from "./components/property/Account";
+import Contact from "./components/property/Contact";
+import AccountDetails from "./components/property/AccountDetails";
+import ContactDetails from "./components/property/ContactDetails";
+import GlobalSearchResult from "./components/shared/global-search/GlobalSearchResult";
+import { LocalizationProvider } from "@mui/x-date-pickers";
+import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 
-Modal.setAppElement('#root');
-
+Modal.setAppElement("#root");
 
 function App() {
-    return (
-        <AppProvider>
-            <Router>
-                <Routes>
-                    <Route path="/" element={<Navigate to="/home" replace />} />
-                    <Route path="/" element={<Layout />}>
-                        <Route index path="home" element={<Dashboard />} />
-                        <Route path="property-search" element={<PropertySearch />} />
-                        <Route path="data-entry-portal/property-database" element={<PropertyDatabase />} />
-                        <Route path="property" element={<PropertyLayout />}>
-                            <Route path="accounts" element={<Account />} />
-                            <Route path="accounts/details" element={<AccountDetails />} />
+  return (
+    <AppProvider>
+      <LocalizationProvider dateAdapter={AdapterDateFns}>
+        <Router>
+          <Routes>
+            <Route path="/" element={<Navigate to="/home" replace />} />
+            <Route path="/" element={<Layout />}>
+              <Route index path="home" element={<Dashboard />} />
+              <Route path="property-search" element={<PropertySearch />} />
+              <Route
+                path="data-entry-portal/property-database"
+                element={<PropertyDatabase />}
+              />
+              <Route path="property" element={<PropertyLayout />}>
+                <Route path="accounts" element={<Account />} />
+                <Route path="accounts/details" element={<AccountDetails />} />
 
-                            <Route path="contacts" element={<Contact />} />
-                            <Route path="contacts/details" element={<ContactDetails />} />
+                <Route path="contacts" element={<Contact />} />
+                <Route path="contacts/details" element={<ContactDetails />} />
+              </Route>
+              <Route path="map" element={<MapViewer />} />
+              <Route path="search/result" element={<GlobalSearchResult />} />
 
-                        </Route>
-                        <Route path="map" element={<MapViewer />} />
-                        <Route path="search/result" element={<GlobalSearchResult />} />
+              <Route path="*" element={<NotFound />} />
+            </Route>
+            <Route
+              path="data-entry-portal/mass-upload/*"
+              element={<DataEntryLayout />}
+            >
+              <Route path="" element={<DataEntry />} />
+              <Route path="building" element={<BuildingMassUpload />} />
+              <Route path="building/template" element={<BuildingTemplate />} />
+              <Route
+                path="building/submit/error"
+                element={<BuildingSubmitError />}
+              />
+              <Route path="building/submit" element={<BuildingSubmit />} />
 
-                        <Route path="*" element={<NotFound />} />
-                    </Route>
-                    <Route path="data-entry-portal/mass-upload/*" element={<DataEntryLayout />}>
-                        <Route path="" element={<DataEntry />} />
-                        <Route path="building" element={<BuildingMassUpload />} />
-                        <Route path="building/template" element={<BuildingTemplate />} />
-                        <Route path="building/submit/error" element={<BuildingSubmitError />} />
-                        <Route path="building/submit" element={<BuildingSubmit />} />
+              <Route path="space" element={<SpaceMassUpload />} />
+              <Route path="space/template" element={<SpaceTemplate />} />
+              <Route path="space/submit/error" element={<SpaceSubmitError />} />
+              <Route path="space/submit" element={<SpaceSubmit />} />
 
-                        <Route path="space" element={<SpaceMassUpload />} />
-                        <Route path="space/template" element={<SpaceTemplate />} />
-                        <Route path="space/submit/error" element={<SpaceSubmitError />} />
-                        <Route path="space/submit" element={<SpaceSubmit />} />
+              <Route path="lease" element={<LeaseMassUpload />} />
+              <Route path="lease/template" element={<LeaseTemplate />} />
+              <Route path="lease/submit/error" element={<LeaseSubmitError />} />
+              <Route path="lease/submit" element={<LeaseSubmit />} />
 
-                        <Route path="lease" element={<LeaseMassUpload />} />
-                        <Route path="lease/template" element={<LeaseTemplate />} />
-                        <Route path="lease/submit/error" element={<LeaseSubmitError />} />
-                        <Route path="lease/submit" element={<LeaseSubmit />} />
+              <Route
+                path="account-contact"
+                element={<AccContactMassUpload />}
+              />
+              <Route
+                path="account-contact/acc/template"
+                element={<AccountTemplate />}
+              />
+              <Route
+                path="account-contact/acc/submit/error"
+                element={<AccountSubmitError />}
+              />
+              <Route
+                path="account-contact/acc/submit"
+                element={<AccountSubmit />}
+              />
+              <Route
+                path="account-contact/con/template"
+                element={<ContactTemplate />}
+              />
+              <Route
+                path="account-contact/con/submit/error"
+                element={<ContactSubmitError />}
+              />
+              <Route
+                path="account-contact/con/submit"
+                element={<ContactSubmit />}
+              />
 
-                        <Route path="account-contact" element={<AccContactMassUpload />} />
-                        <Route path="account-contact/acc/template" element={<AccountTemplate />} />
-                        <Route path="account-contact/acc/submit/error" element={<AccountSubmitError />} />
-                        <Route path="account-contact/acc/submit" element={<AccountSubmit />} />
-                        <Route path="account-contact/con/template" element={<ContactTemplate />} />
-                        <Route path="account-contact/con/submit/error" element={<ContactSubmitError />} />
-                        <Route path="account-contact/con/submit" element={<ContactSubmit />} />
-
-                        <Route path="*" element={<NotFound />} />
-                    </Route>
-                </Routes>
-            </Router>
-        </AppProvider>
-
-    );
+              <Route path="*" element={<NotFound />} />
+            </Route>
+          </Routes>
+        </Router>
+      </LocalizationProvider>
+    </AppProvider>
+  );
 }
 
 export default App;
