@@ -6,7 +6,6 @@ import { useNavigate } from "react-router-dom";
 import SearchResult from "./SearchResult";
 import {
   SearchUtils,
-  fetchNlaOptions,
   fetchRentOptions,
   fetchDateOptions,
   fetchUsageOptions,
@@ -14,6 +13,9 @@ import {
   fetchStatusOptions,
   fetchZoningOptions,
   fetchPropertyUsageOptions,
+  fetchMicromarketeOptions,
+  fetchSubTypeOptions,
+  
 } from "./SearchUtils"; // Import the hook
 import { Box, FormControlLabel, Slider, Switch } from "@mui/material";
 
@@ -26,15 +28,12 @@ export default function TwoDSearch({ mapApi }) {
   const [searchQuery, setSearchQuery] = useState("");
   const [sectionHeight, setSectionHeight] = useState(0);
   const [showResults, setShowResults] = useState(false);
-  const [value, setValue] = useState(50);
+  const [buildingNLA, setBuildingNla] = useState(50);
+  const [vacantSpace, setVacantSpace] = useState(50);
+  const [askingRent, setAskingRent] = useState(50);
   const [activeButton, setActiveButton] = useState("all");
   const [isTransactionEnabled, setIsTransactionEnabled] = useState(false);
 
-  const {
-    options: nlaOptions,
-    selectedOption: selectedNLA,
-    setSelectedOption: setSelectedNLA,
-  } = SearchUtils(fetchNlaOptions);
   const {
     options: rentOptions,
     selectedOption: selectedRent,
@@ -70,13 +69,32 @@ export default function TwoDSearch({ mapApi }) {
     selectedOption: selectedPropUsage,
     setSelectedOption: setSelectedPropUsage,
   } = SearchUtils(fetchPropertyUsageOptions);
+  const {
+    options: micromarketOptions,
+    selectedOption: selectedMicromarket,
+    setSelectedOption: setSelectedMicromarket,
+  } =  SearchUtils(fetchMicromarketeOptions);
+  const {
+    options: subTypeOptions,
+    selectedOption: selectedSubType,
+    setSelectedOption: setSelectedSubType,
+  } =  SearchUtils(fetchSubTypeOptions);
+
 
   const handleToggleChange = (event) => {
     setIsTransactionEnabled(event.target.checked);
   };
 
-  const handleSliderChange = (event, newValue) => {
-    setValue(newValue);
+  const handleNLAChange = (event, newValue ) => {
+    setBuildingNla(newValue);
+  };
+
+  const handleRentChange = (event, newValue ) => {
+    setAskingRent(newValue);
+  };
+
+  const handleSpaceChange = (event, newValue ) => {
+    setVacantSpace(newValue);
   };
 
   const marks = [
@@ -121,16 +139,16 @@ export default function TwoDSearch({ mapApi }) {
     // console.log({
     //   sub_type: ,});
     mapApi({
-      sub_type: null,
+      sub_type: selectedSubType === "Select" ? null : selectedSubType,
       region: selectedRegion === "Select" ? null : selectedRegion,
-      micromarket: null,
+      micromarket: selectedMicromarket === "Select" ? null : selectedMicromarket,
       zoning: selectedZoning === "Select" ? null : selectedZoning,
-      property_usage: null,
-      building_nla: 10000,
-      space_status: null,
-      vacant_space: 5000,
-      asking_rent: 15,
-      available_date: "2024-01-01",
+      property_usage: selectedPropUsage === "Select" ? null : selectedPropUsage,
+      building_nla: buildingNLA,
+      space_status: selectedStatus === "Select" ? null : selectedStatus,
+      vacant_space: vacantSpace,
+      asking_rent: askingRent,
+      available_date: "2024-01-01",     
     });
     // setShowResults(true);
   };
@@ -217,52 +235,28 @@ export default function TwoDSearch({ mapApi }) {
                       className="overflow-y-auto pr-3"
                     >
                       <CustomDropdown
-                        label="Space Status"
-                        options={statusOptions}
-                        selectedOption={selectedStatus}
-                        onSelect={setSelectedStatus}
+                        label="Sub Type"
+                        options={subTypeOptions}
+                        selectedOption={selectedSubType}
+                        onSelect={setSelectedSubType}
                       />
                       <CustomDropdown
-                        label="Asset Class"
-                        options={rentOptions}
-                        selectedOption={selectedStatus}
-                        onSelect={setSelectedRent}
-                      />
-                      <CustomDropdown
-                        label="Region/Micromarket"
+                        label="Region"
                         options={regionOptions}
                         selectedOption={selectedRegion}
                         onSelect={setSelectedRegion}
                       />
                       <CustomDropdown
-                        label="Zioning"
+                        label="Micromarket"
+                        options={micromarketOptions}
+                        selectedOption={selectedMicromarket}
+                        onSelect={setSelectedMicromarket}
+                      />
+                      <CustomDropdown
+                        label="Zoning"
                         options={zoningOptions}
                         selectedOption={selectedZoning}
                         onSelect={setSelectedZoning}
-                      />
-                      <CustomDropdown
-                        label="Size"
-                        options={nlaOptions}
-                        selectedOption={selectedNLA}
-                        onSelect={setSelectedNLA}
-                      />
-                      <CustomDropdown
-                        label="NLA"
-                        options={nlaOptions}
-                        selectedOption={selectedNLA}
-                        onSelect={setSelectedNLA}
-                      />
-                      <CustomDropdown
-                        label="Asking Rent"
-                        options={rentOptions}
-                        selectedOption={selectedRent}
-                        onSelect={setSelectedRent}
-                      />
-                      <CustomDropdown
-                        label="Available Dates"
-                        options={dateOptions}
-                        selectedOption={selectedDate}
-                        onSelect={setSelectedDate}
                       />
                       <CustomDropdown
                         label="Property Usage"
@@ -270,6 +264,19 @@ export default function TwoDSearch({ mapApi }) {
                         selectedOption={selectedPropUsage}
                         onSelect={setSelectedPropUsage}
                       />
+                      <CustomDropdown
+                        label="Space Status"
+                        options={statusOptions}
+                        selectedOption={selectedStatus}
+                        onSelect={setSelectedStatus}
+                      />
+                      <CustomDropdown
+                        label="Available Dates"
+                        options={dateOptions}
+                        selectedOption={selectedDate}
+                        onSelect={setSelectedDate}
+                      />
+                      
                       <div className="flex items-center space-x-2 py-2 mt-2">
                         <label className="block text-xs font-semibold leading-6 text-neutral-500">
                           Transaction
@@ -289,19 +296,20 @@ export default function TwoDSearch({ mapApi }) {
                         <>
                           <div className="flex flex-col items-center w-full mt-2">
                             <label className="mr-auto text-xs font-semibold leading-6 text-neutral-500">
-                              Transaction Amount
+                              Building NLA
                             </label>
                             <Box className="w-full pl-6 pr-4">
                               <Slider
-                                value={value}
-                                onChange={handleSliderChange}
+                                value={buildingNLA}
+                                onChange={handleNLAChange}
                                 aria-label="Default"
                                 valueLabelDisplay="auto"
                                 min={0}
-                                max={100}
+                                max={10000}
                                 marks={[
                                   { value: 0, label: "0" },
-                                  { value: 100, label: "100" },
+                                  { value: 5000, label: "5000" },
+                                  { value: 10000, label: "10000" },
                                 ]} // Adjust marks as needed
                               />
                             </Box>
@@ -309,19 +317,38 @@ export default function TwoDSearch({ mapApi }) {
 
                           <div className="flex flex-col items-center w-full mt-2">
                             <label className="mr-auto text-xs font-semibold leading-6 text-neutral-500">
-                              Transaction Period
+                              Vacant Space
                             </label>
                             <Box className="w-full pl-6 pr-4">
                               <Slider
-                                value={value}
-                                onChange={handleSliderChange}
+                                value={vacantSpace}
+                                onChange={handleSpaceChange}
+                                aria-label="Default"
+                                valueLabelDisplay="auto"
+                                min={0}
+                                max={5000}
+                                marks={[
+                                  { value: 0, label: "0" },
+                                  { value: 5000, label: "5000" },
+                                ]} // Adjust marks as needed
+                              />
+                            </Box>
+                          </div>
+                          <div className="flex flex-col items-center w-full mt-2">
+                            <label className="mr-auto text-xs font-semibold leading-6 text-neutral-500">
+                              Asking Rent
+                            </label>
+                            <Box className="w-full pl-6 pr-4">
+                              <Slider
+                                value={askingRent}
+                                onChange={handleRentChange}
                                 aria-label="Default"
                                 valueLabelDisplay="auto"
                                 min={0}
                                 max={100}
                                 marks={[
                                   { value: 0, label: "0" },
-                                  { value: 100, label: "100" },
+                                  { value: 500, label: "500" },
                                 ]} // Adjust marks as needed
                               />
                             </Box>

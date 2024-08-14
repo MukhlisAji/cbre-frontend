@@ -19,6 +19,9 @@ export const SearchUtils = (fetchOptions) => {
         getOptions();
     }, [fetchOptions]);
 
+    console.log(options)
+    console.log(selectedOption)
+
     return {
         options,
         selectedOption,
@@ -53,12 +56,10 @@ const fetchWithCache = async (key, fetchFunction, cacheDuration = 24 * 60 * 60 *
         return [];
     }
 };
-
-
-// Fetch NLA options
-export const fetchNlaOptions = async () => {
-    return ['Select NLA', 'NLA 1', 'NLA 2'];
-};
+// // Fetch NLA options
+// export const fetchNlaOptions = async () => {
+//     return ['Select NLA', 'NLA 1', 'NLA 2'];
+// };
 
 // Fetch Rent options
 export const fetchRentOptions = async () => {
@@ -104,4 +105,16 @@ export const fetchPropertyUsageOptions = async () => {
     });
 };
 
+export const fetchSubTypeOptions = async () => {
+    return fetchWithCache('subTypeOptions', async () => {
+        const response = await axios.get(`${CONFIG_APP.MAPBOX_API}/master/sub-type`);
+        return response.data.map(item => item.PROPERTYSUBTYPE_EN);
+    });
+};
 
+export const fetchMicromarketeOptions = async () => {
+    return fetchWithCache('micromarketOptions', async () => {
+        const response = await axios.get(`${CONFIG_APP.MAPBOX_API}/master/micromarket`);
+        return response.data.map(item => item.LOCATIONTAG_EN);
+    });
+};
