@@ -146,14 +146,12 @@ export default function TwoDSearch({ mapApi }) {
     <div className="flex bg-neutral-150 h-full relative">
       <div className="flex relative">
         <div
-          className={`flex flex-col overflow-hidden bg-neutral-100 shadow-md rounded-md transition-all duration-300 ease-in-out z-10 ${
-            isCollapsed2dSearchOpen ? "w-0.5" : "w-72"
-          }`}
+          className={`flex flex-col overflow-hidden bg-neutral-100 shadow-md rounded-md transition-all duration-300 ease-in-out z-10 ${isCollapsed2dSearchOpen ? "w-0.5" : "w-72"
+            }`}
         >
           <div
-            className={`flex flex-col p-4 transition-opacity duration-300 ease-in-out ${
-              isCollapsed2dSearchOpen ? "opacity-0" : "opacity-100"
-            }`}
+            className={`flex flex-col p-4 transition-opacity duration-300 ease-in-out ${isCollapsed2dSearchOpen ? "opacity-0" : "opacity-100"
+              }`}
           >
             {!showResults ? (
               <>
@@ -175,21 +173,19 @@ export default function TwoDSearch({ mapApi }) {
                 <div className="flex mb-4 w-full text-sm gap-1 px-1 rounded-md bg-neutral-200">
                   <button
                     onClick={() => setActiveTab("buildings")}
-                    className={`flex-grow p-2 rounded-md my-1 text-sm text-neutral-500 ${
-                      activeTab === "buildings"
+                    className={`flex-grow p-2 rounded-md my-1 text-sm text-neutral-500 ${activeTab === "buildings"
                         ? "bg-white text-black border-neutral-300 shadow-md"
                         : "bg-neutral-200 text-neutral-700 border-neutral-300"
-                    }`}
+                      }`}
                   >
                     Buildings
                   </button>
                   <button
                     onClick={() => setActiveTab("account")}
-                    className={`flex-grow p-2 rounded-md my-1 text-sm text-neutral-500 ${
-                      activeTab === "account"
+                    className={`flex-grow p-2 rounded-md my-1 text-sm text-neutral-500 ${activeTab === "account"
                         ? "bg-white text-black border-neutral-300 shadow-md"
                         : "bg-neutral-200 text-neutral-700 border-neutral-300"
-                    }`}
+                      }`}
                   >
                     Account
                   </button>
@@ -200,21 +196,19 @@ export default function TwoDSearch({ mapApi }) {
                     <div className="flex mb-4 w-full">
                       <button
                         onClick={() => handleButtonClick("all")}
-                        className={`flex-grow p-1 w-1/2 rounded-l-md shadow-md text-sm ${
-                          activeButton === "all"
+                        className={`flex-grow p-1 w-1/2 rounded-l-md shadow-md text-sm ${activeButton === "all"
                             ? "bg-c-teal text-white"
                             : "bg-neutral-200 text-neutral-500 hover:bg-neutral-300"
-                        }`}
+                          }`}
                       >
                         All Buildings
                       </button>
                       <button
                         onClick={() => handleButtonClick("available")}
-                        className={`flex-grow p-1 w-1/2 rounded-r-md shadow-md text-sm ${
-                          activeButton === "available"
+                        className={`flex-grow p-1 w-1/2 rounded-r-md shadow-md text-sm ${activeButton === "available"
                             ? "bg-c-teal text-white"
                             : "bg-neutral-200 text-neutral-500 hover:bg-neutral-300"
-                        }`}
+                          }`}
                       >
                         Available Buildings
                       </button>
@@ -383,21 +377,19 @@ export default function TwoDSearch({ mapApi }) {
                     <div className="flex mb-4 w-full">
                       <button
                         onClick={() => handleButtonClick("all")}
-                        className={`flex-grow p-1 w-1/2 rounded-l-md shadow-md text-sm ${
-                          activeButton === "all"
+                        className={`flex-grow p-1 w-1/2 rounded-l-md shadow-md text-sm ${activeButton === "all"
                             ? "bg-c-teal text-white"
                             : "bg-neutral-200 text-neutral-500 hover:bg-neutral-300"
-                        }`}
+                          }`}
                       >
                         All Buildings
                       </button>
                       <button
                         onClick={() => handleButtonClick("available")}
-                        className={`flex-grow p-1 w-1/2 rounded-r-md shadow-md text-sm ${
-                          activeButton === "available"
+                        className={`flex-grow p-1 w-1/2 rounded-r-md shadow-md text-sm ${activeButton === "available"
                             ? "bg-c-teal text-white"
                             : "bg-neutral-200 text-neutral-500 hover:bg-neutral-300"
-                        }`}
+                          }`}
                       >
                         Available Buildings
                       </button>
@@ -408,15 +400,15 @@ export default function TwoDSearch({ mapApi }) {
                     >
                       <CustomDropdown
                         label="Space Status"
-                        options={nlaOptions}
-                        selectedOption={selectedNLA}
-                        onSelect={setSelectedNLA}
+                        options={statusOptions}
+                        selectedOption={selectedStatus}
+                        onSelect={setSelectedStatus}
                       />
                       <CustomDropdown
                         label="Asset Class"
-                        options={rentOptions}
-                        selectedOption={selectedRent}
-                        onSelect={setSelectedRent}
+                        options={statusOptions}
+                        selectedOption={selectedStatus}
+                        onSelect={setSelectedStatus}
                       />
                     </div>
                   </div>

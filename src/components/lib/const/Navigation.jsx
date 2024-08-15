@@ -2,9 +2,9 @@ import React from 'react';
 import { GoDatabase } from 'react-icons/go';
 import { PiMapTrifoldDuotone } from 'react-icons/pi';
 import { TbDeviceIpadHorizontalSearch, TbReport } from 'react-icons/tb';
-import { IoAnalytics } from 'react-icons/io5';
+import { IoAnalytics, IoEyeOutline } from 'react-icons/io5';
 // import { MdContactPhone } from 'react-icons/md';
-import { HiOutlineCog, HiOutlineQuestionMarkCircle } from 'react-icons/hi';
+import { AiOutlineQuestionCircle } from "react-icons/ai";
 
 const DASHBOARD_SIDEBAR_LINKS = [
   
@@ -59,16 +59,16 @@ const DASHBOARD_SIDEBAR_LINKS = [
 const DASHBOARD_SIDEBAR_BOTTOM_LINKS = [
   {
     key: 'settings',
-    label: 'Settings',
-    path: '/settings',
-    icon: <HiOutlineCog />,
+    label: 'View Bugs',
+    path: '/bug/view',
+    icon: <IoEyeOutline />,
     isOpen: false
   },
   {
     key: 'support',
-    label: 'Help & Support',
-    path: '/support',
-    icon: <HiOutlineQuestionMarkCircle />,
+    label: 'Report a Bug',
+    path: '/bug/report',
+    icon: <AiOutlineQuestionCircle />,
     isOpen: false
   }
 ];
