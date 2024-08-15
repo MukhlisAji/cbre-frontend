@@ -191,19 +191,18 @@ export function useMap(styleMap, map, zoom, triggerRadius) {
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
-        width: '100%', // Adjust width as needed
-        margin: '0 auto', // Center horizontally if required
+        width: '100%', 
+        margin: '0 auto', 
       });
 
       // Apply styles to geocoder input
       const geocoderInput = mapboxglCtrlGeocoder.querySelector('input');
       if (geocoderInput) {
         Object.assign(geocoderInput.style, {
-          height: '2rem', // Adjust height as needed
-          padding: '0.5rem', // Add padding for better appearance
-          borderRadius: '4px', // Add border radius for rounded corners
-          border: '1px solid #ccc', // Adjust border style
-          width: '100%', // Ensure full width usage
+          height: '2rem', 
+          padding: '0.5rem', 
+          borderRadius: '4px', 
+          width: '100%', 
         });
       }
 
