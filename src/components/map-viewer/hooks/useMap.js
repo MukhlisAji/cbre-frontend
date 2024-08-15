@@ -1,6 +1,6 @@
 // import MapboxDraw from "@mapbox/mapbox-gl-draw";
+import MapboxGeocoder from "@mapbox/mapbox-gl-geocoder";
 import mapboxgl from "mapbox-gl";
-import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder';
 // import {
 //   CircleMode,
 //   DirectMode,
@@ -8,8 +8,10 @@ import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder';
 //   SimpleSelectMode,
 // } from "mapbox-gl-draw-circle";
 import * as turf from "@turf/turf";
+import axios from "axios";
 import { useEffect, useRef, useState } from "react";
 import { CONFIG_APP } from "../config/app";
+import './mapboxGeocoder.css';
 
 export function useMap(styleMap, map, zoom, triggerRadius) {
   const [dataMap, setDataMap] = useState();
@@ -158,9 +160,9 @@ export function useMap(styleMap, map, zoom, triggerRadius) {
     if (!map.current) {
       map.current = new mapboxgl.Map({
         container: mapContainerRef.current,
-        style: 'mapbox://styles/mapbox/streets-v11',
+        style: "mapbox://styles/mapbox/streets-v11",
         center: [-74.5, 40],
-        zoom: 9
+        zoom: 9,
       });
     }
 
@@ -183,13 +185,30 @@ export function useMap(styleMap, map, zoom, triggerRadius) {
 
       const filteringDiv = document.querySelector('.filtering');
       const mapboxglCtrlGeocoder = document.querySelector('.mapboxgl-ctrl-geocoder.mapboxgl-ctrl');
-      mapboxglCtrlGeocoder.firstChild.style.height = '100%';
-      mapboxglCtrlGeocoder.firstChild.style.top = '0';
-      mapboxglCtrlGeocoder.style.display = 'flex';
-      mapboxglCtrlGeocoder.style.justifyContent = 'center';
-      mapboxglCtrlGeocoder.style.alignItems = 'center';
+
+      // Apply styles to geocoder container
+      Object.assign(mapboxglCtrlGeocoder.style, {
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        width: '100%', 
+        margin: '0 auto', 
+      });
+
+      // Apply styles to geocoder input
+      const geocoderInput = mapboxglCtrlGeocoder.querySelector('input');
+      if (geocoderInput) {
+        Object.assign(geocoderInput.style, {
+          height: '2rem', 
+          padding: '0.5rem', 
+          borderRadius: '4px', 
+          width: '100%', 
+        });
+      }
+
       filteringDiv.insertBefore(mapboxglCtrlGeocoder, filteringDiv.firstChild);
     }
+
 
     const addCircleEvents = () => {
       let circleFeature = null;
@@ -199,52 +218,52 @@ export function useMap(styleMap, map, zoom, triggerRadius) {
       let resizing = false;
 
       const createCircle = (center, radius) => {
-        const options = { steps: 64, units: 'meters' };
+        const options = { steps: 64, units: "meters" };
         const circle = turf.circle(center, radius, options);
         return circle;
       };
 
       const updateCircle = (center, radius) => {
         const updatedCircle = createCircle(center, radius);
-        map.current.getSource('circle').setData(updatedCircle);
+        map.current.getSource("circle").setData(updatedCircle);
       };
 
       const addCircle = (center, radius) => {
-        if (map.current.getSource('circle')) {
+        if (map.current.getSource("circle")) {
           return;
         }
 
         circleFeature = createCircle(center, radius);
 
-        map.current.addSource('circle', {
-          type: 'geojson',
-          data: circleFeature
+        map.current.addSource("circle", {
+          type: "geojson",
+          data: circleFeature,
         });
 
         map.current.addLayer({
-          id: 'circle',
-          type: 'fill',
-          source: 'circle',
+          id: "circle",
+          type: "fill",
+          source: "circle",
           layout: {},
           paint: {
-            'fill-color': '#F3C294',
-            'fill-opacity': 0.4
-          }
+            "fill-color": "#F3C294",
+            "fill-opacity": 0.4,
+          },
         });
 
         map.current.addLayer({
-          id: 'circle-outline',
-          type: 'line',
-          source: 'circle',
+          id: "circle-outline",
+          type: "line",
+          source: "circle",
           layout: {},
           paint: {
-            'line-color': '#000',
-            'line-width': 2
-          }
+            "line-color": "#000",
+            "line-width": 2,
+          },
         });
 
         removeMarkers();
-        document.getElementById('search-buttonradius').style.display = 'block';
+        document.getElementById("search-buttonradius").style.display = "block";
       };
 
       handleClick.current = function (e) {
@@ -258,16 +277,17 @@ export function useMap(styleMap, map, zoom, triggerRadius) {
         }
 
         if (circleFeature && !isDragging) {
-          const coordinates = map.current.getSource('circle')._data.geometry.coordinates[0];
+          const coordinates =
+            map.current.getSource("circle")._data.geometry.coordinates[0];
           const point = [e.lngLat.lng, e.lngLat.lat];
           if (turf.booleanPointInPolygon(point, turf.polygon([coordinates]))) {
             return;
           }
-          map.current.removeLayer('circle');
-          map.current.removeLayer('circle-outline');
-          map.current.removeSource('circle');
+          map.current.removeLayer("circle");
+          map.current.removeLayer("circle-outline");
+          map.current.removeSource("circle");
           circleFeature = null;
-          document.getElementById('search-buttonradius').style.display = 'none';
+          document.getElementById("search-buttonradius").style.display = "none";
           return;
         }
 
@@ -276,9 +296,9 @@ export function useMap(styleMap, map, zoom, triggerRadius) {
         radius = 2000;
 
         if (circleFeature) {
-          map.current.removeLayer('circle');
-          map.current.removeLayer('circle-outline');
-          map.current.removeSource('circle');
+          map.current.removeLayer("circle");
+          map.current.removeLayer("circle-outline");
+          map.current.removeSource("circle");
         }
 
         addCircle(center, radius);
@@ -290,19 +310,24 @@ export function useMap(styleMap, map, zoom, triggerRadius) {
           return;
         }
 
-        const coordinates = map.current.getSource('circle')._data.geometry.coordinates[0];
+        const coordinates =
+          map.current.getSource("circle")._data.geometry.coordinates[0];
         const point = [e.lngLat.lng, e.lngLat.lat];
 
         if (turf.booleanPointInPolygon(point, turf.polygon([coordinates]))) {
-          map.current.getCanvas().style.cursor = 'move';
+          map.current.getCanvas().style.cursor = "move";
           map.current.dragPan.disable();
         } else {
-          map.current.getCanvas().style.cursor = '';
+          map.current.getCanvas().style.cursor = "";
           map.current.dragPan.enable();
         }
 
         if (isDragging) {
-          const dragRadius = turf.distance(centerPoint, [e.lngLat.lng, e.lngLat.lat], { units: 'meters' });
+          const dragRadius = turf.distance(
+            centerPoint,
+            [e.lngLat.lng, e.lngLat.lat],
+            { units: "meters" }
+          );
           radius = dragRadius;
           updateCircle(centerPoint, radius);
         }
@@ -313,13 +338,14 @@ export function useMap(styleMap, map, zoom, triggerRadius) {
           return;
         }
 
-        const coordinates = map.current.getSource('circle')._data.geometry.coordinates[0];
+        const coordinates =
+          map.current.getSource("circle")._data.geometry.coordinates[0];
         const point = [e.lngLat.lng, e.lngLat.lat];
 
         if (turf.booleanPointInPolygon(point, turf.polygon([coordinates]))) {
           isDragging = true;
           resizing = true;
-          map.current.getCanvas().style.cursor = 'nwse-resize';
+          map.current.getCanvas().style.cursor = "nwse-resize";
           map.current.dragPan.disable();
         }
       };
@@ -331,7 +357,7 @@ export function useMap(styleMap, map, zoom, triggerRadius) {
         if (isDragging) {
           isDragging = false;
           resizing = false;
-          map.current.getCanvas().style.cursor = '';
+          map.current.getCanvas().style.cursor = "";
           map.current.dragPan.enable();
         }
       };
@@ -343,29 +369,31 @@ export function useMap(styleMap, map, zoom, triggerRadius) {
         if (isDragging) {
           isDragging = false;
           resizing = false;
-          map.current.getCanvas().style.cursor = '';
+          map.current.getCanvas().style.cursor = "";
           map.current.dragPan.enable();
         }
       };
 
-      map.current.on('click', handleClick.current);
-      map.current.on('mousemove', handleMouseMove.current);
-      map.current.on('mousedown', handleMouseDown.current);
-      map.current.on('mouseup', handleMouseUp.current);
-      map.current.on('mouseleave', handleMouseLeave.current);
+      map.current.on("click", handleClick.current);
+      map.current.on("mousemove", handleMouseMove.current);
+      map.current.on("mousedown", handleMouseDown.current);
+      map.current.on("mouseup", handleMouseUp.current);
+      map.current.on("mouseleave", handleMouseLeave.current);
 
-      document.getElementById('search-buttonradius').addEventListener('click', function () {
-        removeMarkers();
-        fetchApi(centerPoint[0], centerPoint[1], radius);
-      });
+      document
+        .getElementById("search-buttonradius")
+        .addEventListener("click", function () {
+          removeMarkers();
+          fetchApi(centerPoint[0], centerPoint[1], radius);
+        });
     };
 
     const removeCircleEvents = () => {
-      map.current.off('click', handleClick.current);
-      map.current.off('mousemove', handleMouseMove.current);
-      map.current.off('mousedown', handleMouseDown.current);
-      map.current.off('mouseup', handleMouseUp.current);
-      map.current.off('mouseleave', handleMouseLeave.current);
+      map.current.off("click", handleClick.current);
+      map.current.off("mousemove", handleMouseMove.current);
+      map.current.off("mousedown", handleMouseDown.current);
+      map.current.off("mouseup", handleMouseUp.current);
+      map.current.off("mouseleave", handleMouseLeave.current);
     };
 
     if (triggerRadius) {
@@ -373,20 +401,19 @@ export function useMap(styleMap, map, zoom, triggerRadius) {
     } else {
       removeCircleEvents();
       removeMarkers();
-      if (map.current.getSource('circle')) {
-        map.current.removeLayer('circle');
-        map.current.removeLayer('circle-outline');
-        map.current.removeSource('circle');
+      if (map.current.getSource("circle")) {
+        map.current.removeLayer("circle");
+        map.current.removeLayer("circle-outline");
+        map.current.removeSource("circle");
       }
-      document.getElementById('search-buttonradius').style.display = 'none';
+      document.getElementById("search-buttonradius").style.display = "none";
     }
   }, [map.current, triggerRadius]);
 
   function removeMarkers() {
-    const markers = document.querySelectorAll('.marker-map');
-    markers.forEach(marker => marker.remove());
+    const markers = document.querySelectorAll(".marker-map");
+    markers.forEach((marker) => marker.remove());
   }
-
 
   const fetchApi = async (longitude, latitude, meter_radius) => {
     const res = await fetch(`${CONFIG_APP.MAPBOX_API}/map-radius-circle`, {
@@ -465,6 +492,93 @@ export function useMap(styleMap, map, zoom, triggerRadius) {
     });
   };
 
+  const mapApi = async (body) => {
+    const res = await fetch(`${CONFIG_APP.MAPBOX_API}/test2`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(body),
+    });
+    // const res = await fetch(`http://103.127.134.145:3000/map-region/SG04`)
+    const responseData = await res.json();
+    removeMarkers();
+    setDataMap(responseData.data);
+    responseData.data.forEach((item, index) => {
+      // Create HTML element for the marker
+      const el = document.createElement("div");
+      el.className = "label-marker-map";
+
+      // Create SVG element
+      const svg = `
+      <div class="marker-map">
+      <div class="label-name-map">${item.BUILDINGNAME}</div>
+        <div class="label-icon-wrapper">
+          <svg display="block" height="41px" width="27px" viewBox="0 0 27 41">
+              <defs>
+                  <radialGradient id="shadowGradient">
+                      <stop offset="10%" stop-opacity="0.4"></stop>
+                      <stop offset="100%" stop-opacity="0.05"></stop>
+                  </radialGradient>
+              </defs>
+              <ellipse cx="13.5" cy="34.8" rx="10.5" ry="5.25" fill="url(#shadowGradient)"></ellipse>
+              <path fill="#1b72e5" d="M27,13.5C27,19.07 20.25,27 14.75,34.5C14.02,35.5 12.98,35.5 12.25,34.5C6.75,27 0,19.22 0,13.5C0,6.04 6.04,0 13.5,0C20.96,0 27,6.04 27,13.5Z"></path>
+              <path opacity="0.25" d="M13.5,0C6.04,0 0,6.04 0,13.5C0,19.22 6.75,27 12.25,34.5C13,35.52 14.02,35.5 14.75,34.5C20.25,27 27,19.07 27,13.5C27,6.04 20.96,0 13.5,0ZM13.5,1C20.42,1 26,6.58 26,13.5C26,15.9 24.5,19.18 22.22,22.74C19.95,26.3 16.71,30.14 13.94,33.91C13.74,34.18 13.61,34.32 13.5,34.44C13.39,34.32 13.26,34.18 13.06,33.91C10.28,30.13 7.41,26.31 5.02,22.77C2.62,19.23 1,15.95 1,13.5C1,6.58 6.58,1 13.5,1Z"></path>
+          </svg>
+          <div class="label-address-map">${index + 1}</div>
+          </div>
+        </div>
+      `;
+
+      // Append SVG and custom circle to marker element
+      el.innerHTML = svg;
+
+      // Add marker to map
+      const marker = new mapboxgl.Marker(el);
+      console.log(item)
+      marker.setLngLat(
+        [item.LONGITUDE, item.LATITUDE]).addTo(map.current);
+      const popup = new mapboxgl.Popup({ offset: 25 }).setHTML(`
+      <div class="popup-container">
+        <div class="info-box">
+      <h3>${item.BUILDINGNAME}</h3>
+      <p><strong>Address:</strong> ${item.BUILDINGNAME}, ${item.POSTCODE}</p>
+      <p><strong>Street No:</strong> ${item.STREETNO}</p>
+      <p><strong>Street Name:</strong> ${item.STREETNAME}</p>
+    </div>
+    </div>
+    `);
+
+      marker.setPopup(popup);
+      const mName = document.querySelectorAll(".label-name-map");
+      mName.forEach((item) => {
+        item.style.display = "none";
+      });
+
+      if (zoom > 14) {
+        const mName = document.querySelectorAll(".label-name-map");
+        mName.forEach((item) => {
+          item.style.display = "block";
+        });
+      }
+    });
+  };
+
+  // useEffect(() => {
+  //   mapApi({
+  //     sub_type: null,
+  //     region: "CBD",
+  //     micromarket: null,
+  //     zoning: null,
+  //     property_usage: null,
+  //     building_nla: 10000,
+  //     space_status: null,
+  //     vacant_space: 5000,
+  //     asking_rent: 15,
+  //     available_date: "2024-01-01"
+  //   });
+  // }, []);
+
   // useEffect(() => {
   //   fetchApi();
   //   // if (map.current) {
@@ -502,5 +616,6 @@ export function useMap(styleMap, map, zoom, triggerRadius) {
     setFilteringData,
     handleSearch,
     search,
+    mapApi
   };
 }
