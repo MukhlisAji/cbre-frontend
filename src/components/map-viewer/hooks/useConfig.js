@@ -49,17 +49,17 @@ export function useConfig() {
         .addTo(map.current);
     });
     // Add Building
-    function duplicatePolygonByFloors(
-      featureCollection,
-      index,
-      floors,
-      max_height
-    ) {
+    function duplicatePolygonByFloors(featureCollection, index, floors, max_height, gap_height = 0.5) {
       if (
         !featureCollection.features ||
         !Array.isArray(featureCollection.features)
       ) {
         throw new Error("Invalid GeoJSON feature collection format");
+      }
+
+      // Validasi index
+      if (index < 0 || index >= featureCollection.features.length) {
+        throw new Error(`Invalid index: ${index}. Index must be between 0 and ${featureCollection.features.length - 1}`);
       }
 
       const originalPolygon = featureCollection.features[index];
@@ -71,8 +71,8 @@ export function useConfig() {
       const heightIncrement = max_height / floors;
 
       for (let i = 0; i < floors; i++) {
-        const base_height = i * heightIncrement;
-        const height = (i + 1) * heightIncrement;
+        const base_height = i * (heightIncrement + gap_height);
+        const height = base_height + heightIncrement;
 
         const duplicatedPolygon = {
           type: "Feature",
@@ -80,11 +80,24 @@ export function useConfig() {
           properties: {
             base_height: base_height,
             height: height,
-            index: i
+            index: i,
+            color: "green"
+          }
+        };
+
+        const gapPolygon = {
+          type: "Feature",
+          geometry: originalPolygon.geometry,
+          properties: {
+            base_height: height,
+            height: height + gap_height,
+            index: i,
+            color: "black"
           }
         };
 
         duplicatedFeatureCollection.features.push(duplicatedPolygon);
+        duplicatedFeatureCollection.features.push(gapPolygon);
       }
 
       return duplicatedFeatureCollection;
@@ -113,7 +126,7 @@ export function useConfig() {
       ]
     };
 
-    const new_fc = duplicatePolygonByFloors(plane, 0, 10, 70);
+    const new_fc = duplicatePolygonByFloors(plane, 0, 10, 70, 1);
 
 
     map.current.on("load", () => {
@@ -152,17 +165,9 @@ export function useConfig() {
         type: "fill-extrusion",
         source: "plane",
         paint: {
-          "fill-extrusion-color": [
-            "match",
-            ["get", "index"],
-            1,
-            "green",
-            2,
-            "green",
-            "green"
-          ],
+          "fill-extrusion-color": ["get", "color"],
           "fill-extrusion-base": ["get", "base_height"],
-          "fill-extrusion-height": ["-", ["get", "height"], 1],
+          "fill-extrusion-height": ["get", "height"],
           "fill-extrusion-opacity": [
             "interpolate",
             ["linear"],
@@ -184,44 +189,43 @@ export function useConfig() {
           const index = feature.properties.index;
 
           if (previousHoveredIndex !== null && previousHoveredIndex !== index) {
-            // Kembalikan warna lantai sebelumnya ke warna semula
+            // Kembalikan warna lantai sebelumnya ke hijau
             map.current.setPaintProperty("extrusion", "fill-extrusion-color", [
-              "match",
-              ["get", "index"],
-              index,
-              "yellow",
-              "green"
-            ]);
-          } else if (previousHoveredIndex === null) {
-            // Ubah warna lantai yang di-hover menjadi kuning
-            map.current.setPaintProperty("extrusion", "fill-extrusion-color", [
-              "match",
-              ["get", "index"],
-              index,
-              "yellow",
-              "green"
+              "case",
+              ["==", ["get", "color"], "green"],
+              ["match", ["get", "index"], previousHoveredIndex, "green", "green"],
+              ["get", "color"]
             ]);
           }
+
+          // Ubah warna lantai yang di-hover menjadi kuning
+          map.current.setPaintProperty("extrusion", "fill-extrusion-color", [
+            "case",
+            ["==", ["get", "color"], "green"],
+            ["match", ["get", "index"], index, "yellow", "green"],
+            ["get", "color"]
+          ]);
 
           // Perbarui index lantai yang dihover
           previousHoveredIndex = index;
         }
       });
 
+      // Mengembalikan semua lantai ke warna hijau saat mouse keluar dari gedung
       map.current.on("mouseleave", "extrusion", () => {
-        // Kembalikan semua warna ke kondisi semula ketika mouse keluar dari layer
-        map.current.setPaintProperty("extrusion", "fill-extrusion-color", [
-          "match",
-          ["get", "index"],
-          1,
-          "green",
-          2,
-          "green",
-          "green"
-        ]);
-
-        previousHoveredIndex = null;
         map.current.getCanvas().style.cursor = "";
+
+        if (previousHoveredIndex !== null) {
+          // Kembalikan semua lantai ke warna hijau
+          map.current.setPaintProperty("extrusion", "fill-extrusion-color", [
+            "case",
+            ["==", ["get", "color"], "green"],
+            "green",
+            ["get", "color"]
+          ]);
+
+          previousHoveredIndex = null;
+        }
       });
 
       // Event listener untuk klik
