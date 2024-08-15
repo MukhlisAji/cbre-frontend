@@ -99,6 +99,20 @@ export default function TwoDSearch({ mapApi }) {
     setShowResults(true);
   };
 
+  const handleResetButton= () => {
+    console.log("reset")
+    setSelectedMicromarket('Select')
+    setSelectedPropUsage('Select')
+    setSelectedRegion('Select')
+    setSelectedStatus('Select')
+    setSelectedSubType('Select')
+    setSelectedZoning('Select')
+    setAvailableDate(null)
+    setBuildingNla(50)
+    setVacantSpace(50)
+    setAskingRent(50)
+  };
+
   const handleButtonClick = (button) => {
     setActiveButton(button);
   };
@@ -348,7 +362,7 @@ export default function TwoDSearch({ mapApi }) {
 
                       <div className="absolute bottom-0 left-0 w-full flex justify-center space-x-4 p-2 pl-4 pr-8 bg-neutral-200 shadow-md">
                         <button
-                          // onClick={}
+                          onClick={handleResetButton}
                           className="flex items-center font-thin w-1/2 px-4 py-2 text-blue-700 border rounded-md bg-white text-xs hover:bg-neutral-100 hover:text-neutral-700 transition-all duration-300"
                         >
                           <TbZoomReset className="mr-2 text-lg" />
