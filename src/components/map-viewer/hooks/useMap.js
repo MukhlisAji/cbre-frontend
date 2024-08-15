@@ -536,13 +536,16 @@ export function useMap(styleMap, map, zoom, triggerRadius) {
 
       // Add marker to map
       const marker = new mapboxgl.Marker(el);
+      console.log(item)
       marker.setLngLat(
         [item.LONGITUDE, item.LATITUDE]).addTo(map.current);
       const popup = new mapboxgl.Popup({ offset: 25 }).setHTML(`
       <div class="popup-container">
         <div class="info-box">
       <h3>${item.BUILDINGNAME}</h3>
-      <p><strong>Address:</strong> ${item.BUILDINGNAME}, ${item.BUILDINGADDRESS_POSTCODE}</p>
+      <p><strong>Address:</strong> ${item.BUILDINGNAME}, ${item.POSTCODE}</p>
+      <p><strong>Street No:</strong> ${item.STREETNO}</p>
+      <p><strong>Street Name:</strong> ${item.STREETNAME}</p>
     </div>
     </div>
     `);
