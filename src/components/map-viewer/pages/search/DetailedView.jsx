@@ -11,39 +11,39 @@ export default function DetailedView({ building, onClose }) {
                     <div className="p-2 text-sm text-gray-700 space-y-2">
                         <div className="flex justify-between">
                             <span className="font-semibold">Floor:</span>
-                            <span>{building.BUILDINGID}</span>
+                            <span>01</span>
                         </div>
                         <div className="flex justify-between">
                             <span className="font-semibold">Space Name:</span>
-                            <span>{building.BUILDINGNAME}</span>
+                            <span>Entire</span>
                         </div>
                         <div className="flex justify-between">
                             <span className="font-semibold">Space Status:</span>
-                            <span>{building.BUILDINGNAME}</span>
+                            <span>For Sale</span>
                         </div>
                         <div className="flex justify-between">
                             <span className="font-semibold">Possession Status:</span>
-                            <span>{building.BUILDINGNAME}</span>
+                            <span>Vacant</span>
                         </div>
                         <div className="flex justify-between">
                             <span className="font-semibold">Space Size:</span>
-                            <span>{building.STREETNO}</span>
+                            <span>28,656 sq ft</span>
                         </div>
                         <div className="flex justify-between">
                             <span className="font-semibold">Tenant Name:</span>
-                            <span>{building.BUILDINGNAME}</span>
+                            <span>Rent</span>
                         </div>
                         <div className="flex justify-between">
                             <span className="font-semibold">Lease Type:</span>
-                            <span>{building.BUILDINGNAME}</span>
+                            <span>Negotiator</span>
                         </div>
                         <div className="flex justify-between">
                             <span className="font-semibold">Commencement:</span>
-                            <span>{building.BUILDINGNAME}</span>
+                            <span>Immediate</span>
                         </div>
                         <div className="flex justify-between">
                             <span className="font-semibold">Expiry:</span>
-                            <span>{building.BUILDINGNAME}</span>
+                            <span>Landlord</span>
                         </div>
                     </div>
                 );
@@ -52,11 +52,11 @@ export default function DetailedView({ building, onClose }) {
                     <div className="p-2 text-sm text-gray-700 space-y-2">
                         <div className="flex justify-between">
                             <span className="font-semibold">Available Spaces:</span>
-                            <span>{building.BUILDINGNAME}</span>
+                            <span>{building.SPACE_COUNT}</span>
                         </div>
                         <div className="flex justify-between">
                             <span className="font-semibold">Next Availability:</span>
-                            <span>{building.BUILDINGNAME}</span>
+                            <span>Immediate</span>
                         </div>
                     </div>
                 );
@@ -65,11 +65,11 @@ export default function DetailedView({ building, onClose }) {
                     <div className="p-2 text-sm text-gray-700 space-y-2">
                         <div className="flex justify-between">
                             <span className="font-semibold">Tenant 1:</span>
-                            <span>{building.BUILDINGNAME}</span>
+                            <span>ABC Corp</span>
                         </div>
                         <div className="flex justify-between">
                             <span className="font-semibold">Tenant 2:</span>
-                            <span>{building.BUILDINGNAME}</span>
+                            <span>XYZ Ltd</span>
                         </div>
                     </div>
                 );
@@ -105,7 +105,7 @@ export default function DetailedView({ building, onClose }) {
                     className={`p-2 text-neutral-500 text-sm ${activeTab === 'Availability' ? 'border-b-2 border-black text-neutral-700' : ''}`}
                     onClick={() => setActiveTab('Availability')}
                 >
-                    Availability ({building.BUILDINGNAME})
+                    Availability ({building.SPACE_COUNT})
                 </button>
                 <button
                     className={`p-2 text-neutral-500 text-sm ${activeTab === 'Tenant Stack' ? 'border-b-2 border-black text-neutral-700' : ''}`}
