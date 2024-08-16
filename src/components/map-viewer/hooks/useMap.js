@@ -494,16 +494,7 @@ export function useMap(styleMap, map, zoom, triggerRadius) {
     });
   };
 
-  const mapApi = async (body) => {
-    const res = await fetch(`${CONFIG_APP.MAPBOX_API}/test2`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(body),
-    });
-    // const res = await fetch(`http://103.127.134.145:3000/map-region/SG04`)
-    const responseData = await res.json();
+  const mapApi = async (responseData) => {
     removeMarkers();
     setDataMap(responseData.data);
     responseData.data.forEach((item, index) => {
