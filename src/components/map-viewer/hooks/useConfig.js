@@ -85,6 +85,7 @@ export function useConfig() {
           }
         };
 
+        //gap
         const gapPolygon = {
           type: "Feature",
           geometry: originalPolygon.geometry,
