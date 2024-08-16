@@ -18,7 +18,9 @@ import { IoAddOutline, IoSaveOutline } from "react-icons/io5";
 import { TbZoomReset } from "react-icons/tb";
 import { IoMdSearch } from "react-icons/io";
 import { DatePicker } from "@mui/x-date-pickers";
+
 import { format } from "date-fns";
+import { removeMarkers } from "../../hooks";
 
 
 export default function TwoDSearch({ mapApi }) {
@@ -111,6 +113,7 @@ export default function TwoDSearch({ mapApi }) {
     setBuildingNla(50)
     setVacantSpace(50)
     setAskingRent(50)
+    removeMarkers()
   };
 
   const handleButtonClick = (button) => {

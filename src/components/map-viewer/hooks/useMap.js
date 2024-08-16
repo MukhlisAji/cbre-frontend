@@ -410,10 +410,12 @@ export function useMap(styleMap, map, zoom, triggerRadius) {
     }
   }, [map.current, triggerRadius]);
 
-  function removeMarkers() {
-    const markers = document.querySelectorAll(".marker-map");
-    markers.forEach((marker) => marker.remove());
-  }
+  
+
+  // const removeMarkers = ()=>{
+  //   const markers = document.querySelectorAll(".marker-map");
+  //   markers.forEach((marker) => marker.remove());
+  // };
 
   const fetchApi = async (longitude, latitude, meter_radius) => {
     const res = await fetch(`${CONFIG_APP.MAPBOX_API}/map-radius-circle`, {
@@ -618,4 +620,9 @@ export function useMap(styleMap, map, zoom, triggerRadius) {
     search,
     mapApi
   };
+}
+
+export function removeMarkers() {
+  const markers = document.querySelectorAll(".marker-map");
+  markers.forEach((marker) => marker.remove());
 }

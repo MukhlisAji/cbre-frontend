@@ -63,7 +63,7 @@ function Map2D() {
 
   const [triggerRadius, setTriggerRadius] = useState(false);
   // Main map
-  const { filteringData, handleSearch, search, mapApi } = useMap(
+  const { filteringData, handleSearch, search, mapApi} = useMap(
     styleMap,
     map,
     zoom,
