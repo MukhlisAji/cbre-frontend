@@ -14,7 +14,7 @@ import {
   fetchMicromarketeOptions,
   fetchSubTypeOptions,
 } from "./SearchUtils"; // Import the hook
-import { Box, FormControlLabel, Slider, Switch } from "@mui/material";
+import { Box, createTheme, FormControlLabel, Slider, Switch, ThemeProvider } from "@mui/material";
 import { IoAddOutline, IoSaveOutline } from "react-icons/io5";
 import { TbZoomReset } from "react-icons/tb";
 import { IoMdSearch } from "react-icons/io";
@@ -104,7 +104,7 @@ export default function TwoDSearch({ mapApi }) {
     set
   };
 
-  const handleResetButton= () => {
+  const handleResetButton = () => {
     console.log("reset")
     setSelectedMicromarket('Select')
     setSelectedPropUsage('Select')
@@ -178,6 +178,46 @@ export default function TwoDSearch({ mapApi }) {
     // setShowResults(true);
   };
 
+  const darkGreen = '#5a8184';
+
+  const newTheme = (theme) =>
+    createTheme({
+      ...theme,
+      components: {
+        MuiTextField: {
+          styleOverrides: {
+            root: {
+              '& .MuiInputBase-root': {
+                fontSize: '12px',
+                padding: '2px 8px',
+
+                '& .MuiInputAdornment-root': {
+                  '& .MuiSvgIcon-root': {
+                    fontSize: '16px',
+                  },
+                },
+              },
+              '& .MuiInputBase-input': {
+                fontSize: '12px',
+                padding: '3.5px 8px',
+              },
+              '& .MuiOutlinedInput-root': {
+                '&:hover fieldset': {
+                  borderColor: darkGreen,
+                },
+                '&.Mui-focused fieldset': {
+                  borderColor: darkGreen,
+                },
+              },
+              '& .MuiInputLabel-root.Mui-focused': {
+                color: darkGreen,
+              },
+            },
+          },
+        },
+      },
+    });
+
   return (
     <div className="flex bg-neutral-150 h-full relative">
       <div className="flex relative">
@@ -210,8 +250,8 @@ export default function TwoDSearch({ mapApi }) {
                   <button
                     onClick={() => setActiveTab("buildings")}
                     className={`flex-grow p-2 rounded-md my-1 text-sm text-neutral-500 ${activeTab === "buildings"
-                        ? "bg-white text-black border-neutral-300 shadow-md"
-                        : "bg-neutral-200 text-neutral-700 border-neutral-300"
+                      ? "bg-white text-black border-neutral-300 shadow-md"
+                      : "bg-neutral-200 text-neutral-700 border-neutral-300"
                       }`}
                   >
                     Buildings
@@ -219,8 +259,8 @@ export default function TwoDSearch({ mapApi }) {
                   <button
                     onClick={() => setActiveTab("account")}
                     className={`flex-grow p-2 rounded-md my-1 text-sm text-neutral-500 ${activeTab === "account"
-                        ? "bg-white text-black border-neutral-300 shadow-md"
-                        : "bg-neutral-200 text-neutral-700 border-neutral-300"
+                      ? "bg-white text-black border-neutral-300 shadow-md"
+                      : "bg-neutral-200 text-neutral-700 border-neutral-300"
                       }`}
                   >
                     Account
@@ -233,8 +273,8 @@ export default function TwoDSearch({ mapApi }) {
                       <button
                         onClick={() => handleButtonClick("all")}
                         className={`flex-grow p-1 w-1/2 rounded-l-md shadow-md text-sm ${activeButton === "all"
-                            ? "bg-c-teal text-white"
-                            : "bg-neutral-200 text-neutral-500 hover:bg-neutral-300"
+                          ? "bg-c-teal text-white"
+                          : "bg-neutral-200 text-neutral-500 hover:bg-neutral-300"
                           }`}
                       >
                         All Buildings
@@ -242,8 +282,8 @@ export default function TwoDSearch({ mapApi }) {
                       <button
                         onClick={() => handleButtonClick("available")}
                         className={`flex-grow p-1 w-1/2 rounded-r-md shadow-md text-sm ${activeButton === "available"
-                            ? "bg-c-teal text-white"
-                            : "bg-neutral-200 text-neutral-500 hover:bg-neutral-300"
+                          ? "bg-c-teal text-white"
+                          : "bg-neutral-200 text-neutral-500 hover:bg-neutral-300"
                           }`}
                       >
                         Available Buildings
@@ -296,11 +336,18 @@ export default function TwoDSearch({ mapApi }) {
                         onSelect={setSelectedDate}
                       /> */}
 
-                      <div className="relative">
+                      <div className="w-full">
                         <label className="block mt-2 text-xs font-semibold leading-6 text-neutral-500">
                           Available Date
                         </label>
-                        <DatePicker className="rounded-md" value={availableDate} onChange={setAvailableDate} />
+                        <ThemeProvider theme={newTheme}>
+                          <DatePicker
+                            sx={{ width: 1, bgcolor: 'white' }}
+                            value={availableDate}
+                            onChange={(date) => setAvailableDate(date)}
+                            fullWidth={true}
+                          />
+                        </ThemeProvider>
                       </div>
 
                       <div className="flex items-center space-x-2 py-2 mt-2">
@@ -414,8 +461,8 @@ export default function TwoDSearch({ mapApi }) {
                       <button
                         onClick={() => handleButtonClick("all")}
                         className={`flex-grow p-1 w-1/2 rounded-l-md shadow-md text-sm ${activeButton === "all"
-                            ? "bg-c-teal text-white"
-                            : "bg-neutral-200 text-neutral-500 hover:bg-neutral-300"
+                          ? "bg-c-teal text-white"
+                          : "bg-neutral-200 text-neutral-500 hover:bg-neutral-300"
                           }`}
                       >
                         All Buildings
@@ -423,8 +470,8 @@ export default function TwoDSearch({ mapApi }) {
                       <button
                         onClick={() => handleButtonClick("available")}
                         className={`flex-grow p-1 w-1/2 rounded-r-md shadow-md text-sm ${activeButton === "available"
-                            ? "bg-c-teal text-white"
-                            : "bg-neutral-200 text-neutral-500 hover:bg-neutral-300"
+                          ? "bg-c-teal text-white"
+                          : "bg-neutral-200 text-neutral-500 hover:bg-neutral-300"
                           }`}
                       >
                         Available Buildings

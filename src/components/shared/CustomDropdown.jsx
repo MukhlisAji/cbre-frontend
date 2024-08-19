@@ -35,10 +35,10 @@ export default function CustomDropdown({ label, options, selectedOption, onSelec
                                 className="relative w-full cursor-pointer rounded-md bg-white py-1.5 pl-3 pr-10 text-left text-xs text-neutral-600 shadow-sm ring-1 ring-inset ring-gray-300 focus:outline-none focus:ring-1 focus:ring-c-teal hover:ring-1 hover:ring-c-teal"
                             >
                                 <span className="flex items-center">
-                                    <span className="ml-1 block truncate">{selectedOption}</span>
+                                    <span className="ml-1 block truncate font-normal">{selectedOption}</span>
                                 </span>
-                                <span className="pointer-events-none absolute inset-y-0 right-0 ml-1 flex items-center pr-2">
-                                    <HiChevronUpDown className="h-5 w-5 text-gray-300" aria-hidden="true" />
+                                <span className="pointer-events-none absolute inset-y-0 -right-1.5 ml-1 flex items-center pr-2">
+                                    <HiChevronUpDown className="h-5 w-5 text-gray-500" aria-hidden="true" />
                                 </span>
                             </Listbox.Button>
 
