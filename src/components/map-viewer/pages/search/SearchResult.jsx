@@ -11,11 +11,11 @@ import { Checkbox } from '@headlessui/react';
 import { useAppContext } from '../../../../AppContext';
 import AddProject from '../project/AddProject';
 
-export default function SearchResult({ onBack }) {
-    const { selectedBuildings, setSelectedBuildings } = useAppContext();
+export default function SearchResult({ onBack, buildings, setBuildings }) {
+    const {selectedBuildings, setSelectedBuildings } = useAppContext();
     const [selectedBuilding, setSelectedBuilding] = useState(null);
     const {confirmSave, setConfirmSave} = useAppContext();
-    const [buildings, setBuildings] = useState(BUILDINGDATADUMMY);
+   
     const [saveNew, setSaveNew] = useState();
     const { toggleDrawer } = useAppContext();
 
@@ -52,8 +52,8 @@ export default function SearchResult({ onBack }) {
                 <div className="flex-grow space-y-2 w-full">
                     {buildings.map((building, index) => (
                         <div
-                            key={building.id}
-                            className={`flex w-full p-2 border-b space-x-2.5 cursor-pointer bg-white ${selectedBuilding && selectedBuilding.id === building.id ? 'bg-blue-100' : 'hover:bg-gray-200'}`}
+                            key={building.BUILDINGID}
+                            className={`flex w-full p-2 border-b space-x-2.5 cursor-pointer bg-white ${selectedBuilding && selectedBuilding.id === building.BUILDINGID ? 'bg-blue-100' : 'hover:bg-gray-200'}`}
                             onClick={() => handleItemClick(building)}
                         >
                             <Checkbox

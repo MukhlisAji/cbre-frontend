@@ -12,7 +12,7 @@ function DraggableBuilding({ building }) {
     const [{ isDragging }, drag] = useDrag({
         type: ItemTypes.BUILDING,
         item: { building },
-        canDrag: () => selectedBuildings.some(b => b.id === building.id && b.enabled),
+        canDrag: () => selectedBuildings.some(b => b.id === building.BUILDINGID && b.enabled),
         end: (item, monitor) => {
             if (monitor.didDrop() && item) {
                 // Only add to droppedBuildings if not already present
@@ -32,9 +32,9 @@ function DraggableBuilding({ building }) {
 
     return (
         <div className='flex flex-col w-full p-2' ref={drag} style={{ opacity: isDragging ? 0.5 : 1 }}>
-            <span className="text-sm text-neutral-500">{building.name}</span>
-            <span className="text-sm text-neutral-500">{building.address}</span>
-            <span className="text-sm text-neutral-500">No. of Spaces: <strong>{building.space}</strong></span>
+            <span className="text-sm text-neutral-500">{building.BUILDINGNAME}</span>
+            <span className="text-sm text-neutral-500">{building.LATITUDE}</span>
+            <span className="text-sm text-neutral-500">No. of Spaces: <strong>{building.POSTCODE}</strong></span>
         </div>
     );
 }

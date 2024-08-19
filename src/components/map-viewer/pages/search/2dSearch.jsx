@@ -4,6 +4,7 @@ import CustomDropdown from "../../../shared/CustomDropdown";
 import { useAppContext } from "../../../../AppContext";
 import { useNavigate } from "react-router-dom";
 import SearchResult from "./SearchResult";
+import { CONFIG_APP } from "../../config/app";
 import {
   SearchUtils,
   fetchRegionOptions,
@@ -18,7 +19,9 @@ import { IoAddOutline, IoSaveOutline } from "react-icons/io5";
 import { TbZoomReset } from "react-icons/tb";
 import { IoMdSearch } from "react-icons/io";
 import { DatePicker } from "@mui/x-date-pickers";
+
 import { format } from "date-fns";
+import { removeMarkers } from "../../hooks";
 
 
 export default function TwoDSearch({ mapApi }) {
@@ -38,6 +41,7 @@ export default function TwoDSearch({ mapApi }) {
   const [activeButton, setActiveButton] = useState("all");
   const [isTransactionEnabled, setIsTransactionEnabled] = useState(false);
 
+  const [buildings, setBuildings] = useState([]);
   const {
     options: statusOptions,
     selectedOption: selectedStatus,
@@ -97,6 +101,7 @@ export default function TwoDSearch({ mapApi }) {
   const handleSearch = () => {
     console.log("Searching for:", searchQuery);
     setShowResults(true);
+    set
   };
 
   const handleResetButton = () => {
@@ -111,6 +116,7 @@ export default function TwoDSearch({ mapApi }) {
     setBuildingNla(50)
     setVacantSpace(50)
     setAskingRent(50)
+    removeMarkers()
   };
 
   const handleButtonClick = (button) => {
@@ -136,11 +142,8 @@ export default function TwoDSearch({ mapApi }) {
     setShowResults(false);
   };
 
-  const handleSearchButton = () => {
-    console.log("Searching for:", searchQuery);
-    // console.log({
-    //   sub_type: ,});
-    mapApi({
+  const handleSearchButton = async () => {
+    const body = {
       sub_type: selectedSubType === "Select" ? null : selectedSubType,
       region: selectedRegion === "Select" ? null : selectedRegion,
       micromarket:
@@ -152,7 +155,26 @@ export default function TwoDSearch({ mapApi }) {
       vacant_space: vacantSpace,
       asking_rent: askingRent,
       available_date: availableDate ? format(availableDate, 'yyyy-MM-dd') : null,
+    }
+
+    console.log("Searching for:", searchQuery);
+    const res = await fetch(`${CONFIG_APP.MAPBOX_API}/test2`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(body),
     });
+    // const res = await fetch(`http://103.127.134.145:3000/map-region/SG04`)
+    const responseData = await res.json();
+    setBuildings(responseData.data)
+    setShowResults(true);
+
+    // console.log({
+    //   sub_type: ,});
+    mapApi(
+      responseData
+    );
     // setShowResults(true);
   };
 
@@ -476,7 +498,7 @@ export default function TwoDSearch({ mapApi }) {
                 )}
               </>
             ) : (
-              <SearchResult onBack={handleBackToSearch} />
+              <SearchResult onBack={handleBackToSearch} buildings={buildings} setBuildings={setBuildings} />
             )}
           </div>
         </div>
