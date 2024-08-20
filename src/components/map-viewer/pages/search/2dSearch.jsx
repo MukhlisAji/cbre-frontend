@@ -22,6 +22,7 @@ import { DatePicker } from "@mui/x-date-pickers";
 
 import { format } from "date-fns";
 import { removeMarkers } from "../../hooks";
+import NumberInput from "../../../shared/NumberInput";
 
 
 export default function TwoDSearch({ mapApi }) {
@@ -33,15 +34,22 @@ export default function TwoDSearch({ mapApi }) {
   const [searchQuery, setSearchQuery] = useState("");
   const [sectionHeight, setSectionHeight] = useState(0);
   const [showResults, setShowResults] = useState(false);
-  const [buildingNLA, setBuildingNla] = useState(50);
-  const [vacantSpace, setVacantSpace] = useState(50);
-
-  const [askingRent, setAskingRent] = useState(50);
+  
   const [availableDate, setAvailableDate] = useState(null);
   const [activeButton, setActiveButton] = useState("all");
   const [isTransactionEnabled, setIsTransactionEnabled] = useState(false);
 
   const [buildings, setBuildings] = useState([]);
+
+
+  const [minBuildingNLA, setMinBuildingNla] = useState(null);
+  const [maxBuildingNLA, setMaxBuildingNla] = useState(null);
+
+  const [minVacantSpace, setMinVacantSpace] = useState(null);
+  const [maxVacantSpace, setMaxVacantSpace] = useState(null);
+
+  const [minAskingRent, setMinAskingRent] = useState(null);
+  const [maxAskingRent, setMaxAskingRent] = useState(null);
   const {
     options: statusOptions,
     selectedOption: selectedStatus,
@@ -143,6 +151,7 @@ export default function TwoDSearch({ mapApi }) {
   };
 
   const handleSearchButton = async () => {
+    
     const body = {
       sub_type: selectedSubType === "Select" ? null : selectedSubType,
       region: selectedRegion === "Select" ? null : selectedRegion,
@@ -150,10 +159,10 @@ export default function TwoDSearch({ mapApi }) {
         selectedMicromarket === "Select" ? null : selectedMicromarket,
       zoning: selectedZoning === "Select" ? null : selectedZoning,
       property_usage: selectedPropUsage === "Select" ? null : selectedPropUsage,
-      building_nla: buildingNLA,
+      // building_nla: buildingNLA,
       space_status: selectedStatus === "Select" ? null : selectedStatus,
-      vacant_space: vacantSpace,
-      asking_rent: askingRent,
+      // vacant_space: vacantSpace,
+      // asking_rent: askingRent,
       available_date: availableDate ? format(availableDate, 'yyyy-MM-dd') : null,
     }
 
@@ -349,6 +358,28 @@ export default function TwoDSearch({ mapApi }) {
                           />
                         </ThemeProvider>
                       </div>
+                      <NumberInput 
+                        label="Building NLA"
+                        setMaxInput= {setMaxBuildingNla}
+                        setMinInput={setMinBuildingNla}
+                        minInput={minBuildingNLA}
+                        maxInput={maxBuildingNLA}
+                        />
+                      <NumberInput 
+                        label="Vacant Space"
+                        setMaxInput= {setMaxVacantSpace}
+                        setMinInput={setMinVacantSpace}
+                        minInput={minVacantSpace}
+                        maxInput={maxVacantSpace}
+                        />
+                      <NumberInput 
+                        label="Asking Rent"
+                        setMaxInput= {setMaxAskingRent}
+                        setMinInput={setMinAskingRent}
+                        minInput={minAskingRent}
+                        maxInput={maxAskingRent}
+                      />
+                     
 
                       <div className="flex items-center space-x-2 py-2 mt-2">
                         <label className="block text-xs font-semibold leading-6 text-neutral-500">
@@ -367,7 +398,7 @@ export default function TwoDSearch({ mapApi }) {
 
                       {isTransactionEnabled && (
                         <>
-                          <div className="flex flex-col items-center w-full mt-2">
+                          {/* <div className="flex flex-col items-center w-full mt-2">
                             <label className="mr-auto text-xs font-semibold leading-6 text-neutral-500">
                               Building NLA
                             </label>
@@ -386,8 +417,8 @@ export default function TwoDSearch({ mapApi }) {
                                 ]} // Adjust marks as needed
                               />
                             </Box>
-                          </div>
-
+                          </div> */}
+{/* 
                           <div className="flex flex-col items-center w-full mt-2">
                             <label className="mr-auto text-xs font-semibold leading-6 text-neutral-500">
                               Vacant Space
@@ -424,8 +455,8 @@ export default function TwoDSearch({ mapApi }) {
                                   { value: 500, label: "500" },
                                 ]} // Adjust marks as needed
                               />
-                            </Box>
-                          </div>
+                            </Box> */}
+                          {/* </div> */}
                         </>
                       )}
 
