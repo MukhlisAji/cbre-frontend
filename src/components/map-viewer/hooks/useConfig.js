@@ -131,29 +131,76 @@ export function useConfig() {
 
 
     map.current.on("load", () => {
-      map.current.addSource("polygon", {
-        type: "geojson",
-        data: {
-          type: "Feature",
-          geometry: {
-            type: "Polygon",
-            coordinates: [data.geometry.coordinates],
-          },
+      const layers = map.current.getStyle().layers;
+      const labelLayerId = layers.find(
+        (layer) => layer.type === 'symbol' && layer.layout['text-field']
+      ).id;
+      map.current.addLayer(
+        {
+          'id': 'add-3d-buildings',
+          'source': 'composite',
+          'source-layer': 'building',
+          'filter': ['==', 'extrude', 'true'],
+          'type': 'fill-extrusion',
+          'minzoom': 15,
+          'paint': {
+            'fill-extrusion-color': ['rgb', 80, 80, 80],
+
+            // Use an 'interpolate' expression to
+            // add a smooth transition effect to
+            // the buildings as the user zooms in.
+            'fill-extrusion-height': [
+              'interpolate',
+              ['linear'],
+              ['zoom'],
+              15,
+              0,
+              15.05,
+              ['get', 'height']
+            ],
+            'fill-extrusion-base': [
+              'interpolate',
+              ['linear'],
+              ['zoom'],
+              15,
+              0,
+              15.05,
+              ['get', 'min_height']
+            ],
+            'fill-extrusion-opacity': [
+              'interpolate',
+              ['linear'],
+              ['zoom'],
+              16, 1,
+              16.5, 0
+            ]
+          }
         },
-      });
-      map.current.addLayer({
-        id: "line-layer",
-        type: "line",
-        source: "polygon",
-        layout: {
-          "line-join": "round",
-          "line-cap": "round",
-        },
-        paint: {
-          "line-color": "#cc234a",
-          "line-width": 2,
-        },
-      });
+        labelLayerId
+      );
+      // map.current.addSource("polygon", {
+      //   type: "geojson",
+      //   data: {
+      //     type: "Feature",
+      //     geometry: {
+      //       type: "Polygon",
+      //       coordinates: [data.geometry.coordinates],
+      //     },
+      //   },
+      // });
+      // map.current.addLayer({
+      //   id: "line-layer",
+      //   type: "line",
+      //   source: "polygon",
+      //   layout: {
+      //     "line-join": "round",
+      //     "line-cap": "round",
+      //   },
+      //   paint: {
+      //     "line-color": "#cc234a",
+      //     "line-width": 2,
+      //   },
+      // });
 
       // Add Building
       map.current.addSource("plane", {
