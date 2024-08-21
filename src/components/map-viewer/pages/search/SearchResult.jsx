@@ -1,20 +1,14 @@
 import React, { useState } from "react";
+import { useDrag, useDrop } from "react-dnd";
 import {
   IoAddOutline,
   IoArrowBackOutline,
   IoSaveOutline,
 } from "react-icons/io5";
-import DetailedView from "./DetailedView";
-import { BUILDINGDATADUMMY } from "../../../lib/const/DummyData";
-import { RiCloseLine } from "react-icons/ri";
-import TextField from "@mui/material/TextField";
-import { Box } from "@mui/material";
-import DraggableBuilding from "../project/DraggableBuilding";
-import { BsCheckLg } from "react-icons/bs";
-import { Checkbox } from "@headlessui/react";
 import { useAppContext } from "../../../../AppContext";
 import AddProject from "../project/AddProject";
-import { useDrag, useDrop } from "react-dnd";
+import DraggableBuilding from "../project/DraggableBuilding";
+import DetailedView from "./DetailedView";
 
 export default function SearchResult({ onBack, buildings, setBuildings, map }) {
   const { selectedBuildings, setSelectedBuildings } = useAppContext();
@@ -64,6 +58,7 @@ export default function SearchResult({ onBack, buildings, setBuildings, map }) {
   };
 
   const DraggableItem = ({ building, index }) => {
+    const [checked, setChecked] = useState(false);
     const [{ isDragging }, drag] = useDrag({
       type: "BUILDING",
       item: { index },
@@ -81,29 +76,29 @@ export default function SearchResult({ onBack, buildings, setBuildings, map }) {
         }
       },
     });
-
     return (
       <div
         ref={(node) => drag(drop(node))}
         key={building.BUILDINGID}
-        className={`flex w-full p-2 border-b space-x-2.5 cursor-pointer bg-white ${
-          selectedBuilding && selectedBuilding.id === building.BUILDINGID
-            ? "bg-blue-100"
-            : "hover:bg-gray-200"
-        }`}
+        className={`flex w-full p-2 border-b space-x-2.5 cursor-pointer bg-white ${selectedBuilding && selectedBuilding.id === building.BUILDINGID
+          ? "bg-blue-100"
+          : "hover:bg-gray-200"
+          }`}
         onClick={() => handleItemClick(building)}
         style={{ opacity: isDragging ? 0.5 : 1 }}
       >
-        <Checkbox
-          checked={building.enabled}
+        {/* <Checkbox
+          checked={checked}
           onChange={() => handleBuildingChange(index)}
-          className={`form-checkbox h-5 w-5 text-c-teal mt-2.5 rounded-md ${
-            building.enabled ? "bg-c-teal" : "bg-neutral-300"
-          }`}
+          className={`form-checkbox h-5 w-5 text-c-teal mt-2.5 rounded-md ${checked ? "bg-c-teal" : "bg-neutral-300"
+            }`}
         >
-          {building.enabled && <BsCheckLg className="text-white text-lg" />}
-        </Checkbox>
-        <DraggableBuilding building={building} index={index} />
+          {checked && <BsCheckLg className="text-white text-lg" />}
+        </Checkbox> */}
+        <DraggableBuilding onClick={() => {
+          setChecked(prev => !prev)
+          console.log(checked)
+        }} building={building} index={index} />
       </div>
     );
   };

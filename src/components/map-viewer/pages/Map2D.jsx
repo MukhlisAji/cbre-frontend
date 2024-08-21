@@ -1,4 +1,5 @@
 import "@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css";
+import { useAtom } from "jotai";
 import "mapbox-gl/dist/mapbox-gl.css";
 import React, { useEffect, useState } from "react";
 import "../../../App.css";
@@ -10,6 +11,7 @@ import { useConfig, useMap, useRegion } from "../hooks";
 import { useMicromarket } from "../hooks/useMicromarket";
 import { useZoning } from "../hooks/useZoning";
 import { AllRegion, NortWest, SouthEast, StyleSatelliteStreet } from "../utils";
+import { buildAtom } from "./project/store/build";
 import TwoDSearch from "./search/2dSearch";
 
 function Map2D() {
@@ -27,6 +29,8 @@ function Map2D() {
   } = useConfig();
 
   const { isSidebarOpen, isCollapsed2dSearchOpen } = useAppContext();
+  const [build] = useAtom(buildAtom)
+  console.log({ build })
 
   useEffect(() => {
     if (!map.current || !mapContainer.current) return;
@@ -63,7 +67,7 @@ function Map2D() {
 
   const [triggerRadius, setTriggerRadius] = useState(false);
   // Main map
-  const { filteringData, handleSearch, search, mapApi} = useMap(
+  const { filteringData, handleSearch, search, mapApi } = useMap(
     styleMap,
     map,
     zoom,
@@ -155,11 +159,10 @@ function Map2D() {
         <div className="filtering absolute top-2 left-4 z-40 flex items-center space-x-2 bg-white bg-opacity-75 p-2 rounded-lg shadow-md">
           <button
             onClick={() => setTriggerRadius((prev) => !prev)}
-            className={`px-2 py-1.5 shadow-md text-sm rounded-lg font-bold flex justify-center items-center border ${
-              triggerRadius
+            className={`px-2 py-1.5 shadow-md text-sm rounded-lg font-bold flex justify-center items-center border ${triggerRadius
                 ? "bg-c-teal text-white border-c-teal"
                 : "bg-white text-neutral-600 hover:bg-c-teal hover:text-white hover:border-c-teal"
-            }`}
+              }`}
           >
             Radius
           </button>
@@ -170,9 +173,9 @@ function Map2D() {
             Search
           </button>
         </div>
-  
+
         <FilterLine subMenu={subMenu} expandedMenu={expandedMenu} />
-  
+
         {/* Map Container */}
         <div
           ref={mapContainer}
@@ -181,7 +184,7 @@ function Map2D() {
       </div>
     </>
   );
-  
+
 }
 
 export default Map2D;

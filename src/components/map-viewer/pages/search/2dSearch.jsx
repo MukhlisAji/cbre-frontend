@@ -1,29 +1,30 @@
-import React, { useState, useEffect } from "react";
-import { BiSearch, BiChevronLeft, BiChevronRight } from "react-icons/bi";
-import CustomDropdown from "../../../shared/CustomDropdown";
-import { useAppContext } from "../../../../AppContext";
+import { FormControlLabel, Switch, ThemeProvider, createTheme } from "@mui/material";
+import { DatePicker } from "@mui/x-date-pickers";
+import React, { useEffect, useState } from "react";
+import { BiChevronLeft, BiChevronRight, BiSearch } from "react-icons/bi";
+import { IoMdSearch } from "react-icons/io";
+import { TbZoomReset } from "react-icons/tb";
 import { useNavigate } from "react-router-dom";
-import SearchResult from "./SearchResult";
+import { useAppContext } from "../../../../AppContext";
+import CustomDropdown from "../../../shared/CustomDropdown";
 import { CONFIG_APP } from "../../config/app";
+import SearchResult from "./SearchResult";
 import {
   SearchUtils,
+  fetchMicromarketeOptions,
+  fetchPropertyUsageOptions,
   fetchRegionOptions,
   fetchStatusOptions,
-  fetchZoningOptions,
-  fetchPropertyUsageOptions,
-  fetchMicromarketeOptions,
   fetchSubTypeOptions,
+  fetchZoningOptions,
 } from "./SearchUtils"; // Import the hook
-import { Box, createTheme, FormControlLabel, Slider, Switch, ThemeProvider } from "@mui/material";
-import { IoAddOutline, IoSaveOutline } from "react-icons/io5";
-import { TbZoomReset } from "react-icons/tb";
-import { IoMdSearch } from "react-icons/io";
-import { DatePicker } from "@mui/x-date-pickers";
 
 import { format } from "date-fns";
-import { removeMarkers } from "../../hooks";
+import { useAtom } from "jotai";
 import NumberInput from "../../../shared/NumberInput";
 import NumberRange from "../../../shared/NumberRange";
+import { removeMarkers } from "../../hooks";
+import { buildAtom } from "../project/store/build";
 
 
 export default function TwoDSearch({ mapApi, map }) {
@@ -35,13 +36,14 @@ export default function TwoDSearch({ mapApi, map }) {
   const [searchQuery, setSearchQuery] = useState("");
   const [sectionHeight, setSectionHeight] = useState(0);
   const [showResults, setShowResults] = useState(false);
-  
+
   const [availableDate, setAvailableDate] = useState(null);
   const [activeButton, setActiveButton] = useState("all");
   const [isTransactionEnabled, setIsTransactionEnabled] = useState(false);
 
   const [buildings, setBuildings] = useState([]);
-
+  const [dts, setDts] = useState([])
+  const [build] = useAtom(buildAtom)
 
   const [minBuildingNLA, setMinBuildingNla] = useState(null);
   const [maxBuildingNLA, setMaxBuildingNla] = useState(null);
@@ -180,6 +182,7 @@ export default function TwoDSearch({ mapApi, map }) {
     const responseData = await res.json();
     setBuildings(responseData.data)
     setShowResults(true);
+    setDts(responseData)
 
     // console.log({
     //   sub_type: ,});
@@ -188,6 +191,10 @@ export default function TwoDSearch({ mapApi, map }) {
     );
     // setShowResults(true);
   };
+
+  useEffect(() => {
+    mapApi(dts)
+  }, [build])
 
   const darkGreen = '#5a8184';
 
@@ -360,27 +367,27 @@ export default function TwoDSearch({ mapApi, map }) {
                           />
                         </ThemeProvider>
                       </div>
-                      <NumberRange 
+                      <NumberRange
                         label="Building NLA"
-                        setMaxInput= {setMaxBuildingNla}
+                        setMaxInput={setMaxBuildingNla}
                         setMinInput={setMinBuildingNla}
                         minInput={minBuildingNLA}
                         maxInput={maxBuildingNLA}
-                        />
-                      <NumberRange 
+                      />
+                      <NumberRange
                         label="Vacant Space"
-                        setMaxInput= {setMaxVacantSpace}
+                        setMaxInput={setMaxVacantSpace}
                         setMinInput={setMinVacantSpace}
                         minInput={minVacantSpace}
                         maxInput={maxVacantSpace}
-                        />
+                      />
                       <label className="block mt-2 text-xs font-semibold leading-6 text-neutral-500">Asking Rent</label>
                       <NumberInput
                         category="full"
                         input={askingRent}
                         setInput={setAskingRent}
                       />
-                     
+
 
                       <div className="flex items-center space-x-2 py-2 mt-2">
                         <label className="block text-xs font-semibold leading-6 text-neutral-500">
@@ -419,7 +426,7 @@ export default function TwoDSearch({ mapApi, map }) {
                               />
                             </Box>
                           </div> */}
-{/* 
+                          {/* 
                           <div className="flex flex-col items-center w-full mt-2">
                             <label className="mr-auto text-xs font-semibold leading-6 text-neutral-500">
                               Vacant Space

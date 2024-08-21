@@ -8,10 +8,11 @@ import mapboxgl from "mapbox-gl";
 //   SimpleSelectMode,
 // } from "mapbox-gl-draw-circle";
 import * as turf from "@turf/turf";
-import axios from "axios";
+import { useAtom } from "jotai";
 import { useEffect, useRef, useState } from "react";
 import { CONFIG_APP } from "../config/app";
-import './mapboxGeocoder.css';
+import { buildAtom } from "../pages/project/store/build";
+import "./mapboxGeocoder.css";
 
 export function useMap(styleMap, map, zoom, triggerRadius) {
   const [dataMap, setDataMap] = useState();
@@ -22,6 +23,7 @@ export function useMap(styleMap, map, zoom, triggerRadius) {
   const handleMouseDown = useRef(null);
   const handleMouseUp = useRef(null);
   const handleMouseLeave = useRef(null);
+  const [build] = useAtom(buildAtom);
 
   const handleSearch = (searchValue) => {
     setSearch(searchValue);
@@ -166,49 +168,50 @@ export function useMap(styleMap, map, zoom, triggerRadius) {
       });
     }
 
-    if (!document.querySelector('.mapboxgl-ctrl-geocoder')) {
+    if (!document.querySelector(".mapboxgl-ctrl-geocoder")) {
       const geocoder = new MapboxGeocoder({
         accessToken: mapboxgl.accessToken,
         mapboxgl: mapboxgl,
-        marker: false
+        marker: false,
       });
 
       map.current.addControl(geocoder);
 
-      geocoder.on('result', (e) => {
+      geocoder.on("result", (e) => {
         const center = e.result.center;
         map.current.flyTo({
           center: center,
-          zoom: 14
+          zoom: 14,
         });
       });
 
-      const filteringDiv = document.querySelector('.filtering');
-      const mapboxglCtrlGeocoder = document.querySelector('.mapboxgl-ctrl-geocoder.mapboxgl-ctrl');
+      const filteringDiv = document.querySelector(".filtering");
+      const mapboxglCtrlGeocoder = document.querySelector(
+        ".mapboxgl-ctrl-geocoder.mapboxgl-ctrl"
+      );
 
       // Apply styles to geocoder container
       Object.assign(mapboxglCtrlGeocoder.style, {
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        width: '100%', 
-        margin: '0 auto', 
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        width: "100%",
+        margin: "0 auto",
       });
 
       // Apply styles to geocoder input
-      const geocoderInput = mapboxglCtrlGeocoder.querySelector('input');
+      const geocoderInput = mapboxglCtrlGeocoder.querySelector("input");
       if (geocoderInput) {
         Object.assign(geocoderInput.style, {
-          height: '2rem', 
-          padding: '0.5rem', 
-          borderRadius: '4px', 
-          width: '100%', 
+          height: "2rem",
+          padding: "0.5rem",
+          borderRadius: "4px",
+          width: "100%",
         });
       }
 
       filteringDiv.insertBefore(mapboxglCtrlGeocoder, filteringDiv.firstChild);
     }
-
 
     const addCircleEvents = () => {
       let circleFeature = null;
@@ -410,8 +413,6 @@ export function useMap(styleMap, map, zoom, triggerRadius) {
     }
   }, [map.current, triggerRadius]);
 
-  
-
   // const removeMarkers = ()=>{
   //   const markers = document.querySelectorAll(".marker-map");
   //   markers.forEach((marker) => marker.remove());
@@ -433,12 +434,11 @@ export function useMap(styleMap, map, zoom, triggerRadius) {
     // console.log(responseData);
     removeMarkers();
     setDataMap(responseData.geojson.features);
-
+    console.log({ tes: responseData.geojson.features });
     responseData.geojson.features.forEach((location, index) => {
       // Create HTML element for the marker
       const el = document.createElement("div");
       el.className = "label-marker-map";
-
       // Create SVG element
       const svg = `
       <div class="marker-map">
@@ -497,12 +497,25 @@ export function useMap(styleMap, map, zoom, triggerRadius) {
   const mapApi = async (responseData) => {
     removeMarkers();
     setDataMap(responseData.data);
+    console.log({ data: responseData });
     responseData.data.forEach((item, index) => {
       // Create HTML element for the marker
       const el = document.createElement("div");
       el.className = "label-marker-map";
-
       // Create SVG element
+      const isSame =
+        build &&
+        item.LATITUDE === build.LATITUDE &&
+        item.LONGITUDE === build.LONGITUDE;
+      if (build) {
+        console.log(
+          isSame,
+          item.LATITUDE,
+          build.LATITUDE,
+          item.LONGITUDE,
+          build.LONGITUDE
+        );
+      }
       const svg = `
       <div class="marker-map">
       <div class="label-name-map">${item.BUILDINGNAME}</div>
@@ -515,7 +528,9 @@ export function useMap(styleMap, map, zoom, triggerRadius) {
                   </radialGradient>
               </defs>
               <ellipse cx="13.5" cy="34.8" rx="10.5" ry="5.25" fill="url(#shadowGradient)"></ellipse>
-              <path fill="#1b72e5" d="M27,13.5C27,19.07 20.25,27 14.75,34.5C14.02,35.5 12.98,35.5 12.25,34.5C6.75,27 0,19.22 0,13.5C0,6.04 6.04,0 13.5,0C20.96,0 27,6.04 27,13.5Z"></path>
+              <path fill="${
+                isSame ? "#e6051b" : "#1b72e5"
+              }" d="M27,13.5C27,19.07 20.25,27 14.75,34.5C14.02,35.5 12.98,35.5 12.25,34.5C6.75,27 0,19.22 0,13.5C0,6.04 6.04,0 13.5,0C20.96,0 27,6.04 27,13.5Z"></path>
               <path opacity="0.25" d="M13.5,0C6.04,0 0,6.04 0,13.5C0,19.22 6.75,27 12.25,34.5C13,35.52 14.02,35.5 14.75,34.5C20.25,27 27,19.07 27,13.5C27,6.04 20.96,0 13.5,0ZM13.5,1C20.42,1 26,6.58 26,13.5C26,15.9 24.5,19.18 22.22,22.74C19.95,26.3 16.71,30.14 13.94,33.91C13.74,34.18 13.61,34.32 13.5,34.44C13.39,34.32 13.26,34.18 13.06,33.91C10.28,30.13 7.41,26.31 5.02,22.77C2.62,19.23 1,15.95 1,13.5C1,6.58 6.58,1 13.5,1Z"></path>
           </svg>
           <div class="label-address-map">${index + 1}</div>
@@ -528,9 +543,8 @@ export function useMap(styleMap, map, zoom, triggerRadius) {
 
       // Add marker to map
       const marker = new mapboxgl.Marker(el);
-      console.log(item)
-      marker.setLngLat(
-        [item.LONGITUDE, item.LATITUDE]).addTo(map.current);
+      console.log(item);
+      marker.setLngLat([item.LONGITUDE, item.LATITUDE]).addTo(map.current);
       const popup = new mapboxgl.Popup({ offset: 25 }).setHTML(`
       <div class="popup-container">
         <div class="info-box">
@@ -609,7 +623,7 @@ export function useMap(styleMap, map, zoom, triggerRadius) {
     setFilteringData,
     handleSearch,
     search,
-    mapApi
+    mapApi,
   };
 }
 
