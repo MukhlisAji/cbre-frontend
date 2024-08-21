@@ -149,7 +149,7 @@ function Map2D() {
   return (
     <>
       <div className="relative top-0 z-30">
-        <TwoDSearch mapApi={mapApi} />
+        <TwoDSearch mapApi={mapApi} map={map} />
       </div>
       <div className="relative w-full min-h-full overflow-hidden">
         <div className="filtering absolute top-2 left-4 z-40 flex items-center space-x-2 bg-white bg-opacity-75 p-2 rounded-lg shadow-md">

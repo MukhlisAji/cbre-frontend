@@ -26,7 +26,7 @@ import NumberInput from "../../../shared/NumberInput";
 import NumberRange from "../../../shared/NumberRange";
 
 
-export default function TwoDSearch({ mapApi }) {
+export default function TwoDSearch({ mapApi, map }) {
   const { isCollapsed2dSearchOpen, setIsCollapsed2dSearchOpen } =
     useAppContext();
   const navigate = useNavigate();
@@ -530,7 +530,7 @@ export default function TwoDSearch({ mapApi }) {
                 )}
               </>
             ) : (
-              <SearchResult onBack={handleBackToSearch} buildings={buildings} setBuildings={setBuildings} />
+              <SearchResult onBack={handleBackToSearch} buildings={buildings} setBuildings={setBuildings} map={map} />
             )}
           </div>
         </div>

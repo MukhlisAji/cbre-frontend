@@ -6,7 +6,7 @@ const ItemTypes = {
     BUILDING: 'building',
 };
 
-function DraggableBuilding({ building }) {
+function DraggableBuilding({ building, index }) {
     const { selectedBuildings, setDroppedBuildings } = useAppContext();
 
     const [{ isDragging }, drag] = useDrag({
@@ -32,7 +32,7 @@ function DraggableBuilding({ building }) {
 
     return (
         <div className='flex flex-col w-full p-2' ref={drag} style={{ opacity: isDragging ? 0.5 : 1 }}>
-            <span className="text-sm text-neutral-500">{building.BUILDINGNAME}</span>
+            <span className="text-sm text-neutral-500">{index+1}. {building.BUILDINGNAME}</span>
             <span className="text-sm text-neutral-500">{building.LATITUDE}</span>
             <span className="text-sm text-neutral-500">No. of Spaces: <strong>{building.POSTCODE}</strong></span>
         </div>
