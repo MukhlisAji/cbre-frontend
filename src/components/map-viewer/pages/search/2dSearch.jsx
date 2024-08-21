@@ -23,6 +23,7 @@ import { DatePicker } from "@mui/x-date-pickers";
 import { format } from "date-fns";
 import { removeMarkers } from "../../hooks";
 import NumberInput from "../../../shared/NumberInput";
+import NumberRange from "../../../shared/NumberRange";
 
 
 export default function TwoDSearch({ mapApi }) {
@@ -48,8 +49,7 @@ export default function TwoDSearch({ mapApi }) {
   const [minVacantSpace, setMinVacantSpace] = useState(null);
   const [maxVacantSpace, setMaxVacantSpace] = useState(null);
 
-  const [minAskingRent, setMinAskingRent] = useState(null);
-  const [maxAskingRent, setMaxAskingRent] = useState(null);
+  const [askingRent, setAskingRent] = useState(null);
   const {
     options: statusOptions,
     selectedOption: selectedStatus,
@@ -151,7 +151,9 @@ export default function TwoDSearch({ mapApi }) {
   };
 
   const handleSearchButton = async () => {
-    
+    console.log(minBuildingNLA)
+    console.log(minVacantSpace)
+    console.log(askingRent)
     const body = {
       sub_type: selectedSubType === "Select" ? null : selectedSubType,
       region: selectedRegion === "Select" ? null : selectedRegion,
@@ -159,10 +161,10 @@ export default function TwoDSearch({ mapApi }) {
         selectedMicromarket === "Select" ? null : selectedMicromarket,
       zoning: selectedZoning === "Select" ? null : selectedZoning,
       property_usage: selectedPropUsage === "Select" ? null : selectedPropUsage,
-      // building_nla: buildingNLA,
+      building_nla: minBuildingNLA,
       space_status: selectedStatus === "Select" ? null : selectedStatus,
-      // vacant_space: vacantSpace,
-      // asking_rent: askingRent,
+      vacant_space: minVacantSpace,
+      asking_rent: askingRent,
       available_date: availableDate ? format(availableDate, 'yyyy-MM-dd') : null,
     }
 
@@ -358,26 +360,25 @@ export default function TwoDSearch({ mapApi }) {
                           />
                         </ThemeProvider>
                       </div>
-                      <NumberInput 
+                      <NumberRange 
                         label="Building NLA"
                         setMaxInput= {setMaxBuildingNla}
                         setMinInput={setMinBuildingNla}
                         minInput={minBuildingNLA}
                         maxInput={maxBuildingNLA}
                         />
-                      <NumberInput 
+                      <NumberRange 
                         label="Vacant Space"
                         setMaxInput= {setMaxVacantSpace}
                         setMinInput={setMinVacantSpace}
                         minInput={minVacantSpace}
                         maxInput={maxVacantSpace}
                         />
-                      <NumberInput 
-                        label="Asking Rent"
-                        setMaxInput= {setMaxAskingRent}
-                        setMinInput={setMinAskingRent}
-                        minInput={minAskingRent}
-                        maxInput={maxAskingRent}
+                      <label className="block mt-2 text-xs font-semibold leading-6 text-neutral-500">Asking Rent</label>
+                      <NumberInput
+                        category="full"
+                        input={askingRent}
+                        setInput={setAskingRent}
                       />
                      
 
