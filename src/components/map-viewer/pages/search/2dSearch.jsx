@@ -26,7 +26,7 @@ import NumberRange from "../../../shared/NumberRange";
 import { removeMarkers } from "../../hooks";
 import { buildAtom } from "../project/store/build";
 
-
+// search
 export default function TwoDSearch({ mapApi, map }) {
   const { isCollapsed2dSearchOpen, setIsCollapsed2dSearchOpen } =
     useAppContext();
