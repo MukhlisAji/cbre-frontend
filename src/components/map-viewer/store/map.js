@@ -1,5 +1,5 @@
 import { atom } from "jotai";
-
+// input
 export const mapAtom = atom({
   sub_type: "",
   region: "",

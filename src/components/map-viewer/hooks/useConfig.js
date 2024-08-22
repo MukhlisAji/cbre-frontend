@@ -131,29 +131,63 @@ export function useConfig() {
 
 
     map.current.on("load", () => {
-      map.current.addSource("polygon", {
-        type: "geojson",
-        data: {
-          type: "Feature",
-          geometry: {
-            type: "Polygon",
-            coordinates: [data.geometry.coordinates],
-          },
-        },
-      });
+      const layers = map.current.getStyle().layers;
+      const labelLayerId = layers.find(
+        (layer) => layer.type === 'symbol' && layer.layout['text-field']
+      ).id;
       map.current.addLayer({
-        id: "line-layer",
-        type: "line",
-        source: "polygon",
-        layout: {
-          "line-join": "round",
-          "line-cap": "round",
-        },
-        paint: {
-          "line-color": "#cc234a",
-          "line-width": 2,
-        },
-      });
+        'id': '3d-buildings',
+        'source': 'composite',
+        'source-layer': 'building',
+        'filter': ['==', 'extrude', 'true'],
+        'type': 'fill-extrusion',
+        'minzoom': 15,
+        'paint': {
+          'fill-extrusion-color': '#fff',
+          'fill-extrusion-height': [
+            'interpolate',
+            ['linear'],
+            ['zoom'],
+            15,
+            0,
+            15.05,
+            ['get', 'height']
+          ],
+          'fill-extrusion-base': [
+            'interpolate',
+            ['linear'],
+            ['zoom'],
+            15,
+            0,
+            15.05,
+            ['get', 'min_height']
+          ],
+          'fill-extrusion-opacity': 0.8
+        }
+      }, labelLayerId);
+      // map.current.addSource("polygon", {
+      //   type: "geojson",
+      //   data: {
+      //     type: "Feature",
+      //     geometry: {
+      //       type: "Polygon",
+      //       coordinates: [data.geometry.coordinates],
+      //     },
+      //   },
+      // });
+      // map.current.addLayer({
+      //   id: "line-layer",
+      //   type: "line",
+      //   source: "polygon",
+      //   layout: {
+      //     "line-join": "round",
+      //     "line-cap": "round",
+      //   },
+      //   paint: {
+      //     "line-color": "#cc234a",
+      //     "line-width": 2,
+      //   },
+      // });
 
       // Add Building
       map.current.addSource("plane", {
