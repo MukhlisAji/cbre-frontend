@@ -37,7 +37,7 @@ export default function SearchResult({ onBack, buildings, setBuildings, map }) {
 
   const handleItemClick = (building) => {
     setSelectedBuilding(building);
-
+    building.enabled = true
     if (map.current) {
       map.current.flyTo({
         center: [parseFloat(building.LONGITUDE), parseFloat(building.LATITUDE)],
