@@ -123,9 +123,11 @@ export default function TwoDSearch({ mapApi, map }) {
     setSelectedSubType('Select')
     setSelectedZoning('Select')
     setAvailableDate(null)
-    setBuildingNla(50)
-    setVacantSpace(50)
-    setAskingRent(50)
+    setMinBuildingNla(null)
+    setMaxBuildingNla(null)
+    setMinVacantSpace(null)
+    setMaxVacantSpace(null)
+    setAskingRent(null)
     removeMarkers()
   };
 

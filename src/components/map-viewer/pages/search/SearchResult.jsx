@@ -13,6 +13,7 @@ import DetailedView from "./DetailedView";
 export default function SearchResult({ onBack, buildings, setBuildings, map }) {
   const { selectedBuildings, setSelectedBuildings } = useAppContext();
   const [selectedBuilding, setSelectedBuilding] = useState(null);
+  
   const { confirmSave, setConfirmSave } = useAppContext();
 
   const [saveNew, setSaveNew] = useState();

@@ -28,6 +28,7 @@ function Map2D() {
     handleChangeStyleMap,
   } = useConfig();
 
+  const[isSearch, setIsSearch]= useState(null)
   const { isSidebarOpen, isCollapsed2dSearchOpen } = useAppContext();
   const [build] = useAtom(buildAtom)
   console.log({ build })
@@ -181,6 +182,10 @@ function Map2D() {
           ref={mapContainer}
           className="w-full h-full transition-all duration-300 ease-in-out overflow-hidden"
         />
+
+        <div>
+          {isSearch != null ? <p className="px-2 py-1.7 ">Condition is true!</p> : null}
+        </div>
       </div>
     </>
   );

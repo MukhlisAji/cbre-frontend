@@ -494,10 +494,9 @@ export function useMap(styleMap, map, zoom, triggerRadius) {
     });
   };
 
-  const mapApi = async (responseData) => {
+const mapApi = async (responseData) => {
     removeMarkers();
     setDataMap(responseData.data);
-    console.log({ data: responseData });
     responseData.data.forEach((item, index) => {
       // Create HTML element for the marker
       const el = document.createElement("div");
@@ -570,6 +569,7 @@ export function useMap(styleMap, map, zoom, triggerRadius) {
       }
     });
   };
+
 
   // useEffect(() => {
   //   mapApi({
