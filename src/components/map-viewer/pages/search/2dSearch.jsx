@@ -539,7 +539,7 @@ export default function TwoDSearch({ mapApi, map }) {
                 )}
               </>
             ) : (
-              <SearchResult onBack={handleBackToSearch} buildings={buildings} setBuildings={setBuildings} map={map} />
+              <SearchResult mapApi={mapApi} onBack={handleBackToSearch} buildings={buildings} setBuildings={setBuildings} map={map} />
             )}
           </div>
         </div>

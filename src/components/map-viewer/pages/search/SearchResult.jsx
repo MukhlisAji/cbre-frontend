@@ -9,8 +9,9 @@ import { useAppContext } from "../../../../AppContext";
 import AddProject from "../project/AddProject";
 import DraggableBuilding from "../project/DraggableBuilding";
 import DetailedView from "./DetailedView";
+import { data } from "autoprefixer";
 
-export default function SearchResult({ onBack, buildings, setBuildings, map }) {
+export default function SearchResult({ onBack, buildings, setBuildings, map, mapApi }) {
   const { selectedBuildings, setSelectedBuildings } = useAppContext();
   const [selectedBuilding, setSelectedBuilding] = useState(null);
   
@@ -56,6 +57,10 @@ export default function SearchResult({ onBack, buildings, setBuildings, map }) {
     newBuildings.splice(dragIndex, 1);
     newBuildings.splice(hoverIndex, 0, dragBuilding);
     setBuildings(newBuildings);
+    const dataMap = {
+      data: newBuildings,
+    }
+    mapApi(dataMap);
   };
 
   const DraggableItem = ({ building, index }) => {
