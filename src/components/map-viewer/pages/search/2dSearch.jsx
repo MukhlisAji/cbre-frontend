@@ -25,6 +25,7 @@ import NumberInput from "../../../shared/NumberInput";
 import NumberRange from "../../../shared/NumberRange";
 import { removeMarkers } from "../../hooks";
 import { buildAtom } from "../project/store/build";
+import { data } from "autoprefixer";
 
 // search
 export default function TwoDSearch({ mapApi, map }) {
@@ -42,7 +43,7 @@ export default function TwoDSearch({ mapApi, map }) {
   const [isTransactionEnabled, setIsTransactionEnabled] = useState(false);
 
   const [buildings, setBuildings] = useState([]);
-  const [dts, setDts] = useState([])
+  // const [dts, setDts] = useState([])
   const [build] = useAtom(buildAtom)
 
   const [minBuildingNLA, setMinBuildingNla] = useState(null);
@@ -184,7 +185,7 @@ export default function TwoDSearch({ mapApi, map }) {
     const responseData = await res.json();
     setBuildings(responseData.data)
     setShowResults(true);
-    setDts(responseData)
+    // setDts(responseData)
 
     // console.log({
     //   sub_type: ,});
@@ -195,7 +196,10 @@ export default function TwoDSearch({ mapApi, map }) {
   };
 
   useEffect(() => {
-    mapApi(dts)
+    const dataMap = {
+      data: buildings
+    }
+    mapApi(dataMap)
   }, [build])
 
   const darkGreen = '#5a8184';

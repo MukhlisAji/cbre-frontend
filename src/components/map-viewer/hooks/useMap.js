@@ -506,15 +506,15 @@ const mapApi = async (responseData) => {
         build &&
         item.LATITUDE === build.LATITUDE &&
         item.LONGITUDE === build.LONGITUDE;
-      if (build) {
-        console.log(
-          isSame,
-          item.LATITUDE,
-          build.LATITUDE,
-          item.LONGITUDE,
-          build.LONGITUDE
-        );
-      }
+      // if (build) {
+      //   console.log(
+      //     isSame,
+      //     item.LATITUDE,
+      //     build.LATITUDE,
+      //     item.LONGITUDE,
+      //     build.LONGITUDE
+      //   );
+      // }
       const svg = `
       <div class="marker-map">
       <div class="label-name-map">${item.BUILDINGNAME}</div>
@@ -542,7 +542,7 @@ const mapApi = async (responseData) => {
 
       // Add marker to map
       const marker = new mapboxgl.Marker(el);
-      console.log(item);
+      // console.log(item);
       marker.setLngLat([item.LONGITUDE, item.LATITUDE]).addTo(map.current);
       const popup = new mapboxgl.Popup({ offset: 25 }).setHTML(`
       <div class="popup-container">

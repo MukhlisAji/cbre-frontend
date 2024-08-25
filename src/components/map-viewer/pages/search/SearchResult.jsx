@@ -57,6 +57,8 @@ export default function SearchResult({ onBack, buildings, setBuildings, map, map
     newBuildings.splice(dragIndex, 1);
     newBuildings.splice(hoverIndex, 0, dragBuilding);
     setBuildings(newBuildings);
+    console.log(newBuildings);
+    
     const dataMap = {
       data: newBuildings,
     }
