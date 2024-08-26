@@ -81,7 +81,7 @@ export function useConfig() {
             base_height: base_height,
             height: height,
             index: i,
-            color: "green"
+            color: "#99d188"
           }
         };
 
@@ -93,7 +93,7 @@ export function useConfig() {
             base_height: height,
             height: height + gap_height,
             index: i,
-            color: "black"
+            color: "white"
           }
         };
 
