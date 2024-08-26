@@ -43,6 +43,7 @@ import ContactDetails from "./components/property/ContactDetails";
 import GlobalSearchResult from "./components/shared/global-search/GlobalSearchResult";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
+import Properties from "./components/property/Properties";
 
 Modal.setAppElement("#root");
 
@@ -62,10 +63,13 @@ function App() {
               />
               <Route path="property" element={<PropertyLayout />}>
                 <Route path="accounts" element={<Account />} />
-                <Route path="accounts/details" element={<AccountDetails />} />
+                <Route path="accounts/details/:id" element={<AccountDetails />} />
 
                 <Route path="contacts" element={<Contact />} />
-                <Route path="contacts/details" element={<ContactDetails />} />
+                <Route path="contacts/details/:id" element={<ContactDetails />} />
+
+                <Route path="properties" element={<Properties />} />
+
               </Route>
               <Route path="map" element={<MapViewer />} />
               <Route path="search/result" element={<GlobalSearchResult />} />

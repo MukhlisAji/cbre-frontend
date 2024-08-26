@@ -5,14 +5,7 @@ import "./index.css";
 import App from "./rooot";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
-  <React.StrictMode>
-    {/* <RouterProvider router={createBrowserRouter([{ path: "/", element: <App /> }])} /> */}
-
-    {/* <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<App />} />
-      </Routes>
-    </BrowserRouter> */}
+  // <React.StrictMode>
     <App />
-  </React.StrictMode>
+  // </React.StrictMode>
 );

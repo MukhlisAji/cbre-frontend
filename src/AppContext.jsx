@@ -13,7 +13,7 @@ export const AppProvider = ({ children }) => {
     const [drawerContent, setDrawerContent] = useState('default');
     const [openProject, setOpenProject] = useState(false);
     const [confirmSave, setConfirmSave] = useState(false);
-
+    const [token, setToken] = useState("");
 
 
     const toggleDrawer = (content = 'default') => {
@@ -38,9 +38,11 @@ export const AppProvider = ({ children }) => {
             selectedBuildings, setSelectedBuildings,
             droppedBuildings, setDroppedBuildings,
             openProject, toggleDrawer, drawerContent,
-            confirmSave, setConfirmSave
+            confirmSave, setConfirmSave,
+            token, setToken
         }}>
             {children}
         </AppContext.Provider>
     );
+    
 };

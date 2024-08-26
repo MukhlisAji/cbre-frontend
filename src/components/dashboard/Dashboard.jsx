@@ -1,11 +1,26 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import ProjectList from './ProjectList';
 import RecentSearch from './RecentSearch';
 import LeaseExpiries from './LeaseExpiries';
 import ListingAnalytics from './ListingAnalytics';
 import NotificationHistory from './NotificationHistory';
+import { useUtils } from '../lib/api/Authorization';
 
 const Dashboard = () => {
+  const { generateAndSetToken } = useUtils();
+
+  useEffect(() => {
+    const fetchToken = async () => {
+      const success = await generateAndSetToken();
+      if (success) {
+        console.log('Token generated and set successfully');
+      } else {
+        console.error('Failed to generate and set token');
+      }
+    };
+
+    fetchToken();
+  }, []); 
   return (
     <div className="px-4 pb-4 pt-2 h-full bg-neutral-100">
       <h1 className="text-lg font-bold mb-2 text-neutral-500">Welcome Back, <span className='text-neutral-700'>James</span> </h1>

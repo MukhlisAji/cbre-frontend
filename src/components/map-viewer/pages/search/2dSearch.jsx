@@ -37,22 +37,19 @@ export default function TwoDSearch({ mapApi, map }) {
   const [searchQuery, setSearchQuery] = useState("");
   const [sectionHeight, setSectionHeight] = useState(0);
   const [showResults, setShowResults] = useState(false);
-
   const [availableDate, setAvailableDate] = useState(null);
   const [activeButton, setActiveButton] = useState("all");
   const [isTransactionEnabled, setIsTransactionEnabled] = useState(false);
-
   const [buildings, setBuildings] = useState([]);
   // const [dts, setDts] = useState([])
   const [build] = useAtom(buildAtom)
-
   const [minBuildingNLA, setMinBuildingNla] = useState(null);
   const [maxBuildingNLA, setMaxBuildingNla] = useState(null);
-
   const [minVacantSpace, setMinVacantSpace] = useState(null);
   const [maxVacantSpace, setMaxVacantSpace] = useState(null);
-
   const [askingRent, setAskingRent] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+
   const {
     options: statusOptions,
     selectedOption: selectedStatus,
@@ -156,43 +153,50 @@ export default function TwoDSearch({ mapApi, map }) {
   };
 
   const handleSearchButton = async () => {
-    console.log(minBuildingNLA)
-    console.log(minVacantSpace)
-    console.log(askingRent)
-    const body = {
-      sub_type: selectedSubType === "Select" ? null : selectedSubType,
-      region: selectedRegion === "Select" ? null : selectedRegion,
-      micromarket:
-        selectedMicromarket === "Select" ? null : selectedMicromarket,
-      zoning: selectedZoning === "Select" ? null : selectedZoning,
-      property_usage: selectedPropUsage === "Select" ? null : selectedPropUsage,
-      building_nla: minBuildingNLA,
-      space_status: selectedStatus === "Select" ? null : selectedStatus,
-      vacant_space: minVacantSpace,
-      asking_rent: askingRent,
-      available_date: availableDate ? format(availableDate, 'yyyy-MM-dd') : null,
+    setIsLoading(true);
+    try {
+      console.log(minBuildingNLA);
+      console.log(minVacantSpace);
+      console.log(askingRent);
+      const body = {
+        sub_type: selectedSubType === "Select" ? null : selectedSubType,
+        region: selectedRegion === "Select" ? null : selectedRegion,
+        micromarket:
+          selectedMicromarket === "Select" ? null : selectedMicromarket,
+        zoning: selectedZoning === "Select" ? null : selectedZoning,
+        property_usage: selectedPropUsage === "Select" ? null : selectedPropUsage,
+        building_nla: minBuildingNLA,
+        space_status: selectedStatus === "Select" ? null : selectedStatus,
+        vacant_space: minVacantSpace,
+        asking_rent: askingRent,
+        available_date: availableDate ? format(availableDate, 'yyyy-MM-dd') : null,
+      };
+
+      console.log("Searching for:", searchQuery);
+      const res = await fetch(`${CONFIG_APP.MAPBOX_API}/test2`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(body),
+      });
+
+      if (!res.ok) {
+        throw new Error(`HTTP error! status: ${res.status}`);
+      }
+
+      const responseData = await res.json();
+      setBuildings(responseData.data);
+      setShowResults(true);
+
+      mapApi(responseData);
+    } catch (error) {
+      console.error("Error during search:", error);
+      // Optionally, you can set an error state here to display to the user
+      // setError(error.message);
+    } finally {
+      setIsLoading(false);
     }
-
-    console.log("Searching for:", searchQuery);
-    const res = await fetch(`${CONFIG_APP.MAPBOX_API}/test2`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(body),
-    });
-    // const res = await fetch(`http://103.127.134.145:3000/map-region/SG04`)
-    const responseData = await res.json();
-    setBuildings(responseData.data)
-    setShowResults(true);
-    // setDts(responseData)
-
-    // console.log({
-    //   sub_type: ,});
-    mapApi(
-      responseData
-    );
-    // setShowResults(true);
   };
 
   useEffect(() => {
@@ -253,6 +257,11 @@ export default function TwoDSearch({ mapApi, map }) {
             className={`flex flex-col p-4 transition-opacity duration-300 ease-in-out ${isCollapsed2dSearchOpen ? "opacity-0" : "opacity-100"
               }`}
           >
+            {isLoading && (
+              <div className="absolute inset-0 bg-white bg-opacity-70 flex justify-center items-center z-50">
+                <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-c-teal"></div>
+              </div>
+            )}
             {!showResults ? (
               <>
                 <div className="relative mb-4 w-full h-full">

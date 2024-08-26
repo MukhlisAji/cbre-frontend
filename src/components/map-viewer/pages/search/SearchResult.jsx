@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useDrag, useDrop } from "react-dnd";
 import {
   IoAddOutline,
@@ -14,7 +14,7 @@ import { data } from "autoprefixer";
 export default function SearchResult({ onBack, buildings, setBuildings, map, mapApi }) {
   const { selectedBuildings, setSelectedBuildings } = useAppContext();
   const [selectedBuilding, setSelectedBuilding] = useState(null);
-  
+  const [sectionHeight, setSectionHeight] = useState(0);
   const { confirmSave, setConfirmSave } = useAppContext();
 
   const [saveNew, setSaveNew] = useState();
@@ -58,7 +58,7 @@ export default function SearchResult({ onBack, buildings, setBuildings, map, map
     newBuildings.splice(hoverIndex, 0, dragBuilding);
     setBuildings(newBuildings);
     console.log(newBuildings);
-    
+
     const dataMap = {
       data: newBuildings,
     }
@@ -111,64 +111,84 @@ export default function SearchResult({ onBack, buildings, setBuildings, map, map
     );
   };
 
-  return (
-    <div className="flex w-full h-full">
-      <div className="flex flex-col w-full">
-        <div className="flex items-center gap-2 mb-4">
-          <div className="p-1.5 rounded-full hover:bg-neutral-200 cursor-pointer">
-            <IoArrowBackOutline onClick={onBack} className="text-md" />
+  useEffect(() => {
+    const handleResize = () => {
+      const screenHeight = window.innerHeight;
+      const newHeight = screenHeight - 100;
+      setSectionHeight(newHeight);
+    };
+
+    handleResize();
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
+
+    return (
+      <div className="flex w-full h-full">
+        <div className="flex flex-col w-full">
+          <div className="flex items-center gap-2 mb-4">
+            <div className="p-1.5 rounded-full hover:bg-neutral-200 cursor-pointer">
+              <IoArrowBackOutline onClick={onBack} className="text-md" />
+            </div>
+            <span className="text-md text-neutral-700">Search Results</span>
           </div>
-          <span className="text-md text-neutral-700">Search Results</span>
+          <div
+            style={{ height: `${sectionHeight}px` }}
+            className="overflow-y-auto pr-3"
+          >
+            <div className="flex-grow space-y-2 w-full">
+              {buildings.map((building, index) => (
+                <DraggableItem
+                  key={building.BUILDINGID}
+                  building={building}
+                  index={index}
+                />
+              ))}
+            </div>
+          </div>
         </div>
-        <div className="flex-grow space-y-2 w-full">
-          {buildings.map((building, index) => (
-            <DraggableItem
-              key={building.BUILDINGID}
-              building={building}
-              index={index}
-            />
-          ))}
-        </div>
-      </div>
 
-      {selectedBuilding && (
-        <DetailedView
-          building={selectedBuilding}
-          onClose={handleCloseDetailView}
-        />
-      )}
-
-      <div className="absolute bottom-0 left-0 w-full flex justify-center space-x-4 p-2 bg-neutral-200 shadow-md">
-        <button
-          onClick={() => {
-            toggleDrawer("saveProject");
-          }}
-          className="flex items-center font-thin px-4 py-2 text-blue-700 border rounded-md bg-white text-xs hover:bg-neutral-100 hover:text-neutral-700 transition-all duration-300"
-        >
-          <IoSaveOutline className="mr-2 text-lg" />
-          Save Project
-        </button>
-        <button
-          onClick={() => {
-            setConfirmSave(true);
-          }}
-          className="flex items-center font-thin px-4 py-2 text-white rounded-md bg-c-teal text-xs hover:bg-c-weldon-blue transition-all duration-300"
-        >
-          <IoAddOutline className="mr-2 text-lg" />
-          New
-        </button>
-      </div>
-
-      {confirmSave && (
-        <div>
-          <div className="fixed inset-0 bg-black bg-opacity-50 z-50" />
-          <AddProject
-            onClose={() => {
-              setConfirmSave(false);
-            }}
+        {selectedBuilding && (
+          <DetailedView
+            building={selectedBuilding}
+            onClose={handleCloseDetailView}
           />
+        )}
+
+        <div className="absolute bottom-0 left-0 w-full flex justify-center space-x-4 p-2 bg-neutral-200 shadow-md">
+          <button
+            onClick={() => {
+              toggleDrawer("saveProject");
+            }}
+            className="flex items-center font-thin px-4 py-2 text-blue-700 border rounded-md bg-white text-xs hover:bg-neutral-100 hover:text-neutral-700 transition-all duration-300"
+          >
+            <IoSaveOutline className="mr-2 text-lg" />
+            Save Project
+          </button>
+          <button
+            onClick={() => {
+              setConfirmSave(true);
+            }}
+            className="flex items-center font-thin px-4 py-2 text-white rounded-md bg-c-teal text-xs hover:bg-c-weldon-blue transition-all duration-300"
+          >
+            <IoAddOutline className="mr-2 text-lg" />
+            New
+          </button>
         </div>
-      )}
-    </div>
-  );
-}
+
+        {confirmSave && (
+          <div>
+            <div className="fixed inset-0 bg-black bg-opacity-50 z-50" />
+            <AddProject
+              onClose={() => {
+                setConfirmSave(false);
+              }}
+            />
+          </div>
+        )}
+      </div>
+    );
+  }

@@ -23,13 +23,21 @@ const CONTACTCOLUMNDUMMY = [
 ]
 
 const ACCOUNTCOLUMNDUMMY = [
-  { "label": "Account Name", "accessor": "accountName" },
-  { "label": "Account Status With Site", "accessor": "accountStatusWithSite" },
-  { "label": "Local Account Name", "accessor": "localAccountName" },
-  { "label": "Number of Active Opportunities", "accessor": "ofActiveOpportunity" },
-  { "label": "SPOC", "accessor": "spoc" },
-  { "label": "Billing City", "accessor": "billingCity" },
-  { "label": "Billing State/Province", "accessor": "billingStateProvince" }
+  { "label": "Account Name", "accessor": "accountName", "isClickable": true , "url": "details" },
+  { "label": "Phone", "accessor": "phone", "isClickable": false },
+  { "label": "website", "accessor": "website", "isClickable": false },
+  { "label": "Status", "accessor": "status", "isClickable": false },
+  { "label": "Billing Post Code", "accessor": "billingPostCode", "isClickable": false },
+  { "label": "Billing City", "accessor": "billingCity", "isClickable": false },
+  { "label": "Billing Street", "accessor": "billingStreet", "isClickable": false },
+  { "label": "Status", "accessor": "status", "isClickable": false },
+  { "label": "Inactivation Date", "accessor": "inactivationDate", "isClickable": false },
+  { "label": "Created By", "accessor": "createdBy", "isClickable": false },
+  { "label": "Source System", "accessor": "sourceSystem", "isClickable": false },
+  { "label": "Created Date", "accessor": "createdDate", "isClickable": false },
+  { "label": "Modified By", "accessor": "modifiedBy", "isClickable": false },
+  { "label": "Modified Date", "accessor": "modifiedDate", "isClickable": false },
+  { "label": "Billing Country", "accessor": "billingCountry", "isClickable": false }
 ]
 
 const ACCOUNTDATADUMMY = [

@@ -21,12 +21,31 @@ export default {
         "c-dark-grayish": "#485558",
         "c-light-grayish": "#7A8A98",
       },
+      keyframes: {
+        'fade-in-out': {
+          '0%, 100%': { opacity: 0 },
+          '10%, 90%': { opacity: 1 },
+        },
+        'fade-in': {
+          '0%': { opacity: 0 },
+          '100%': { opacity: 1 }
+        },
+        'fade-out': {
+          '0%': { opacity: 1 },
+          '100%': { opacity: 0 }
+        }
+      },
+      animation: {
+        'fade-in-out': 'fade-in-out 5s ease-in-out',
+        'fade-in': 'fade-in 0.5s ease-out forwards',
+        'fade-out': 'fade-out 0.5s ease-in forwards'
+      },
       height: {
         'row-height': '19px',
       },
     },
   },
   plugins: [
-    import('flowbite/plugin') 
+    import('flowbite/plugin')
   ],
 };
