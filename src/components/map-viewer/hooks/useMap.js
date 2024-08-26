@@ -162,7 +162,7 @@ export function useMap(styleMap, map, zoom, triggerRadius) {
     if (!map.current) {
       map.current = new mapboxgl.Map({
         container: mapContainerRef.current,
-        style: "mapbox://styles/mapbox/streets-v11",
+        style: "mapbox://styles/mapbox/streets-v12",
         center: [-74.5, 40],
         zoom: 9,
       });
