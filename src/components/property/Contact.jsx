@@ -8,6 +8,7 @@ import ContactNew from './ContactNew';
 const Contact = () => {
     const location = useLocation();
     const [isModalOpen, setIsModalOpen] = useState(false); // State for modal visibility
+    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
         // Check if the state indicates that the modal should be open
@@ -25,6 +26,11 @@ const Contact = () => {
     const closeModal = () => {
         setIsModalOpen(false);
     };
+
+    const handleEdit = (contact) => {
+        console.log('Editing contact:', contact);
+        // Logic for editing an account
+      };
 
     return (
         <div className="h-screen flex flex-col flex-grow mb-4">
@@ -51,7 +57,7 @@ const Contact = () => {
                         </button>
                     </div> */}
                 </div>
-                <DataTable column={CONTACTCOLUMNDUMMY} dataTable={CONTACTDATADUMMY} openModal={openModal} tableHeight={300} isHeader={true}/>
+                <DataTable column={CONTACTCOLUMNDUMMY} dataTable={CONTACTDATADUMMY} openModal={openModal} tableHeight={300} isHeader={true} loading={loading} onEdit={handleEdit}/>
                 {isModalOpen && <ContactNew onClose={closeModal} />}
             </div>
         </div>

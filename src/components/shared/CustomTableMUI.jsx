@@ -9,14 +9,17 @@ import {
 import { useTheme } from '@table-library/react-table-library/theme';
 import { Virtualized } from "@table-library/react-table-library/virtualized";
 import { FaList } from 'react-icons/fa';
-import { IoIosSearch } from 'react-icons/io';
-
+import { IoIosSearch, IoMdArrowDropdown } from 'react-icons/io';
+import { TiArrowSortedDown } from "react-icons/ti";
 import UnfoldMoreOutlinedIcon from "@mui/icons-material/UnfoldMoreOutlined";
 import KeyboardArrowUpOutlinedIcon from "@mui/icons-material/KeyboardArrowUpOutlined";
 import KeyboardArrowDownOutlinedIcon from "@mui/icons-material/KeyboardArrowDownOutlined";
 import { createTheme as createMaterialTheme } from "@mui/material/styles";
 import { ThemeProvider as MaterialThemeProvider } from "@mui/material/styles";
 import Button from "@mui/material/Button";
+import { useNavigate } from 'react-router-dom';
+import { SelectClickTypes } from '@table-library/react-table-library/types';
+
 
 const ROW_HEIGHT = 40;
 
@@ -39,7 +42,7 @@ const setRecentlyViewed = (item) => {
 };
 
 
-const CustomTableMUI = ({ dataTable, column, openModal, isHeader, tableHeight }) => {
+const CustomTableMUI = ({ dataTable, column, openModal, isHeader, tableHeight, loading, onEdit }) => {
     const [search, setSearch] = useState("");
     const [visibleColumns, setVisibleColumns] = useState(column.slice(0, 7));
     const [editing, setEditing] = useState(null);
@@ -50,6 +53,13 @@ const CustomTableMUI = ({ dataTable, column, openModal, isHeader, tableHeight })
     const [activeButton, setActiveButton] = useState('all');
     const [recentlyViewed, setRecentlyViewedState] = useState(getRecentlyViewed());
     const [showRecentlyViewed, setShowRecentlyViewed] = useState(false);
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        console.log("Updated data: ", dataTable);
+        setData(dataTable);
+    }, [dataTable]);
+
 
     const handleButtonClick = (button) => {
         setActiveButton(button);
@@ -59,7 +69,6 @@ const CustomTableMUI = ({ dataTable, column, openModal, isHeader, tableHeight })
             setShowRecentlyViewed(false);
         }
     };
-
 
 
     const handleClickOutside = (event) => {
@@ -98,10 +107,23 @@ const CustomTableMUI = ({ dataTable, column, openModal, isHeader, tableHeight })
         });
     };
 
-    const handleCellClick = (item, accessor) => {
-        setEditing({ id: item.id, accessor, value: item[accessor] });
-        setRecentlyViewed(item);
-        setRecentlyViewedState(getRecentlyViewed());
+    // const handleCellClick = (item, accessor) => {
+    //     setEditing({ id: item.id, accessor, value: item[accessor] });
+    //     setRecentlyViewed(item);
+    //     setRecentlyViewedState(getRecentlyViewed());
+    // };
+
+    const handleCellClick = (item, accessor, isClickable, url) => {
+        if (isClickable) {
+            navigate(`${url}/${item.id}`)
+            console.log(`Clicked on ${accessor} for item ${item.id}`);
+            setRecentlyViewed(item);
+            setRecentlyViewedState(getRecentlyViewed());
+        } else {
+            setEditing({ id: item.id, accessor, value: item[accessor] });
+            setRecentlyViewed(item);
+            setRecentlyViewedState(getRecentlyViewed());
+        }
     };
 
 
@@ -139,7 +161,7 @@ const CustomTableMUI = ({ dataTable, column, openModal, isHeader, tableHeight })
 
     const theme = useTheme({
         Table: `
-            --data-table-library_grid-template-columns: 30px repeat(${visibleColumns.length}, minmax(0, 1fr));
+            --data-table-library_grid-template-columns: 30px repeat(${visibleColumns.length}, minmax(0, 1fr)) 40px;
             font-family: "Salesforce Sans", Arial, sans-serif; /* Font similar to Salesforce */
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow for elevation */
         `,
@@ -149,7 +171,7 @@ const CustomTableMUI = ({ dataTable, column, openModal, isHeader, tableHeight })
         `,
         Cell: `
             padding: 4px 8px; /* Padding inside cells */
-            color: #333; /* Dark text color */
+            // color: #333; /* Dark text color */
             display: flex;
             align-items: center; /* Center align text vertically */
             font-size: 13px
@@ -174,7 +196,11 @@ const CustomTableMUI = ({ dataTable, column, openModal, isHeader, tableHeight })
     // Initialize row selection
     const select = useRowSelect({ nodes: filteredData }, {
         onChange: onSelectChange,
-    });
+    },
+        {
+            clickType: SelectClickTypes.ButtonClick,
+        }
+    );
 
     function onSelectChange(action, state) {
         console.log(action, state);
@@ -238,6 +264,14 @@ const CustomTableMUI = ({ dataTable, column, openModal, isHeader, tableHeight })
     }, []);
 
     const resize = { resizerHighlight: "#3b82f6", resizerWidth: 3 };
+
+
+    // action dropdown
+    const [edit, setEdit] = useState(null);  // Store the ID or index of the clicked item
+
+    const toggleDropdown = (itemId) => {
+        setEdit((prevEdit) => (prevEdit === itemId ? null : itemId));  // Toggle the dropdown for the clicked item
+    };
 
     return (
         <div className="space-y-4">
@@ -347,74 +381,108 @@ const CustomTableMUI = ({ dataTable, column, openModal, isHeader, tableHeight })
 
             <div style={{ height: `${sectionHeight}px` }} className="bg-white overflow-auto">
                 <MaterialThemeProvider theme={createMaterialTheme({})}>
-                    <Table
-                        data={{ nodes: showRecentlyViewed ? recentlyViewed : filteredData }}
-                        theme={theme}
-                        layout={{ isDiv: true, fixedHeader: true, custom: true }}
-                        select={select}
-                        sort={sort}
-                    >
-                        {(tableList) => (
-                            <Virtualized
-                                tableList={tableList}
-                                rowHeight={ROW_HEIGHT}
-                                header={() => (
-                                    <HeaderRow className="header-cel">
-                                        <HeaderCellSelect
-                                            style={{
-                                                margin: '0 auto',
-                                                backgroundColor: '#f4f6f9',
-                                                borderTop: '2px solid #d9dde6',
-                                                padding: '8px',
-                                            }}
-                                        />
-                                        {visibleColumns.map((col) => (
-                                            <HeaderCell resize={resize} key={col.accessor} className="header-cell">
-                                                <Button
-                                                    fullWidth
-                                                    className="header-title"
-                                                    style={{ justifyContent: "flex-start" }}
-                                                    endIcon={getIcon(col.accessor)}
-                                                    onClick={() =>
-                                                        sort.fns.onToggleSort({
-                                                            sortKey: col.accessor,
-                                                        })
-                                                    }
+                    {loading ? (
+                        <div className="flex items-center h-full align-center bg-white bg-opacity-70 flex justify-center items-center z-50">
+                            <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-c-teal"></div>
+                        </div>
+                    ) : (
+                        <Table
+                            data={{ nodes: showRecentlyViewed ? recentlyViewed : filteredData }}
+                            theme={theme}
+                            layout={{ isDiv: true, fixedHeader: true, custom: true }}
+                            select={select}
+                            sort={sort}
+                        >
+                            {(tableList) => (
+                                <Virtualized
+                                    tableList={tableList}
+                                    rowHeight={ROW_HEIGHT}
+                                    header={() => (
+                                        <HeaderRow className="header-cel">
+                                            <HeaderCellSelect
+                                                style={{
+                                                    margin: '0 auto',
+                                                    backgroundColor: '#f4f6f9',
+                                                    borderTop: '2px solid #d9dde6',
+                                                    padding: '8px',
+                                                }}
+                                            />
+                                            {visibleColumns.map((col) => (
+                                                <HeaderCell resize={resize} key={col.accessor} className="header-cell">
+                                                    <Button
+                                                        fullWidth
+                                                        className="header-title"
+                                                        style={{ justifyContent: "flex-start" }}
+                                                        endIcon={getIcon(col.accessor)}
+                                                        onClick={() =>
+                                                            sort.fns.onToggleSort({
+                                                                sortKey: col.accessor,
+                                                            })
+                                                        }
+                                                    >
+                                                        {col.label}
+                                                    </Button>
+                                                </HeaderCell>
+
+                                            ))
+                                            }
+
+                                            <HeaderCell className='header-cell'><span></span></HeaderCell>
+
+                                        </HeaderRow>
+                                    )}
+                                    body={(item, index) => (
+                                        <Row key={index} item={item} className="hover:bg-blue-50">
+                                            <CellSelect item={item} />
+                                            {visibleColumns.map((col) => (
+                                                <Cell
+                                                    key={col.accessor}
+                                                    onClick={() => handleCellClick(item, col.accessor, col.isClickable, col.url)}
+                                                    className={col.isClickable ? 'cursor-pointer text-blue-700 hover:text-blue-700 hover:font-semibold' : ''}
+
                                                 >
-                                                    {col.label}
-                                                </Button>
-                                            </HeaderCell>
-                                        ))}
-                                    </HeaderRow>
-                                )}
-                                body={(item, index) => (
-                                    <Row key={index} item={item} className="hover:bg-blue-50">
-                                        <CellSelect item={item} />
-                                        {visibleColumns.map((col) => (
-                                            <Cell
-                                                key={col.accessor}
-                                                onClick={() => handleCellClick(item, col.accessor)}
-                                            >
-                                                {editing && editing.id === item.id && editing.accessor === col.accessor ? (
-                                                    <input
-                                                        className='p-2 w-full border border-c-teal rounded-md'
-                                                        type="text"
-                                                        value={editing.value}
-                                                        onChange={handleChange}
-                                                        onBlur={handleBlur}
-                                                        onKeyPress={handleKeyPress}
-                                                        autoFocus
-                                                    />
-                                                ) : ( 
-                                                    item[col.accessor]
+                                                    {/* {editing && editing.id === item.id && editing.accessor === col.accessor ? (
+                                                        <input
+                                                            className='p-1.5 w-full border focus:border-c-teal rounded-md'
+                                                            type="text"
+                                                            value={editing.value}
+                                                            onChange={handleChange}
+                                                            onBlur={handleBlur}
+                                                            onKeyPress={handleKeyPress}
+                                                            autoFocus
+                                                        />
+                                                    ) : ( */}
+                                                    {item[col.accessor]}
+                                                    {/* )} */}
+                                                </Cell>
+                                            ))}
+                                            <Cell className='action-cell'>
+
+                                                <div onClick={() => toggleDropdown(item.id)}
+                                                    className='border mx-0.5 border-neutral-400 hover:border-c-teal py-0.5 rounded-sm flex items-center justify-center bg-white cursor-pointer'>
+                                                    <IoMdArrowDropdown className='text-neutral-500 hover:text-neutral-600' />
+                                                </div>
+                                                {edit === item.id && (
+                                                    <div className='absolute z-20 right-0 mt-1 py-1 w-16 bg-white border border-neutral-400 rounded-md shadow-lg'>
+                                                        <div
+                                                            onClick={() => {
+                                                                onEdit(item);
+                                                                setEdit(null);  // Close the dropdown after editing
+                                                            }}
+                                                            className='px-2 py-1 rounded-md hover:bg-gray-100 cursor-pointer'
+                                                        >
+                                                            Edit
+                                                        </div>
+                                                        {/* Add more options here if needed */}
+                                                    </div>
                                                 )}
                                             </Cell>
-                                        ))}
-                                    </Row>
-                                )}
-                            />
-                        )}
-                    </Table>
+                                        </Row>
+                                    )}
+                                />
+                            )}
+                        </Table>
+                    )}
                 </MaterialThemeProvider>
             </div>
         </div>

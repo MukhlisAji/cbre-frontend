@@ -1,14 +1,49 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import DataTable from '../shared/CustomTableMUI';
 import { ACCOUNTCOLUMNDUMMY, ACCOUNTDATADUMMY } from '../lib/const/DummyData';
 import AccountNew from './AccountNew';
 import { MdAccountBox } from 'react-icons/md';
+import { generateTransactionId } from '../lib/api/Authorization';
 
 
 
 const Account = () => {
     const [isModalOpen, setIsModalOpen] = useState(false); // State for modal visibility
     const [activeButton, setActiveButton] = useState('all');
+    const [resultSet, setResultSet] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [isEditing, setIsEditing] = useState(false);
+    const [currentAccount, setCurrentAccount] = useState(null);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            const transactionId = generateTransactionId();
+            try {
+                const response = await fetch('http://localhost:8080/cbre/account?page=1', {
+                    method: 'GET',
+                    headers: {
+                        'transactionId': transactionId
+                    }
+                });
+                const data = await response.json();
+                console.log("data result data : ", data.resultSet);
+
+                setResultSet(data.resultSet);
+                setLoading(false);
+
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        };
+
+        fetchData();
+    }, []);
+
+    // This effect runs whenever resultSet is updated
+    // useEffect(() => {
+    //     console.log("Updated resultSet: ", resultSet);
+    // }, [resultSet]);
+
 
     const handleButtonClick = (button) => {
         setActiveButton(button);
@@ -21,8 +56,28 @@ const Account = () => {
     };
 
     // Function to close the modal
+    const handleNewAccount = () => {
+        setIsEditing(false);
+        setCurrentAccount(null);
+        setIsModalOpen(true);
+    };
+
+    const handleEditAccount = (account) => {
+        console.log('Editing account:', account);
+        setIsEditing(true);
+        setCurrentAccount(account);
+        setIsModalOpen(true);
+    };
+
     const closeModal = () => {
         setIsModalOpen(false);
+        setIsEditing(false);
+        setCurrentAccount(null);
+    };
+
+    const handleEdit = (account) => {
+        console.log('Editing account:', account);
+        <AccountNew onClose={closeModal} isEditing={false} initialData={account} />
     };
     return (
         <div className="h-screen flex flex-col flex-grow mb-4">
@@ -60,10 +115,14 @@ const Account = () => {
                     </div> */}
 
                 </div>
-                <DataTable column={ACCOUNTCOLUMNDUMMY} dataTable={ACCOUNTDATADUMMY} openModal={openModal} isHeader={true} tableHeight={300}/>
-                {isModalOpen &&
-                    <AccountNew onClose={closeModal} />
-                }
+                <DataTable column={ACCOUNTCOLUMNDUMMY} dataTable={resultSet} openModal={handleNewAccount} isHeader={true} tableHeight={300} loading={loading} onEdit={handleEditAccount} />
+                {isModalOpen && (
+                    <AccountNew
+                        onClose={closeModal}
+                        isEditing={isEditing}
+                        initialData={currentAccount}
+                    />
+                )}
             </div>
         </div>
     );
