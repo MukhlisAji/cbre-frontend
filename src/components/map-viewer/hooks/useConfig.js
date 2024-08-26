@@ -227,8 +227,8 @@ export function useConfig() {
             // Kembalikan warna lantai sebelumnya ke hijau
             map.current.setPaintProperty("extrusion", "fill-extrusion-color", [
               "case",
-              ["==", ["get", "color"], "green"],
-              ["match", ["get", "index"], previousHoveredIndex, "green", "green"],
+              ["==", ["get", "color"], "#99d188"],
+              ["match", ["get", "index"], previousHoveredIndex, "#99d188", "#99d188"],
               ["get", "color"]
             ]);
           }
@@ -236,8 +236,8 @@ export function useConfig() {
           // Ubah warna lantai yang di-hover menjadi kuning
           map.current.setPaintProperty("extrusion", "fill-extrusion-color", [
             "case",
-            ["==", ["get", "color"], "green"],
-            ["match", ["get", "index"], index, "yellow", "green"],
+            ["==", ["get", "color"], "#99d188"],
+            ["match", ["get", "index"], index, "yellow", "#99d188"],
             ["get", "color"]
           ]);
 
@@ -254,8 +254,8 @@ export function useConfig() {
           // Kembalikan semua lantai ke warna hijau
           map.current.setPaintProperty("extrusion", "fill-extrusion-color", [
             "case",
-            ["==", ["get", "color"], "green"],
-            "green",
+            ["==", ["get", "color"], "#99d188"],
+            "#99d188",
             ["get", "color"]
           ]);
 
