@@ -290,6 +290,7 @@ export function useMap(styleMap, map, zoom, triggerRadius) {
           map.current.removeLayer("circle");
           map.current.removeLayer("circle-outline");
           map.current.removeSource("circle");
+          removeMarkers()
           circleFeature = null;
           document.getElementById("search-buttonradius").style.display = "none";
           return;
@@ -429,7 +430,6 @@ export function useMap(styleMap, map, zoom, triggerRadius) {
     </div>
 
     `
-
     spinnerDiv.innerHTML=spinner
 
     const res = await fetch(`${CONFIG_APP.MAPBOX_API}/map-radius-circle`, {
@@ -556,6 +556,8 @@ const mapApi = async (responseData) => {
 
       // Append SVG and custom circle to marker element
       el.innerHTML = svg;
+
+
 
       // Add marker to map
       const marker = new mapboxgl.Marker(el);
