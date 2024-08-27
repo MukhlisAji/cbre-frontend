@@ -24,7 +24,7 @@ export function useMap(styleMap, map, zoom, triggerRadius) {
   const handleMouseUp = useRef(null);
   const handleMouseLeave = useRef(null);
   const [build] = useAtom(buildAtom);
-  const [isRadiusLoading, setIsRadiusLoading] = useState(false)
+
 
   const handleSearch = (searchValue) => {
     setSearch(searchValue);
@@ -387,7 +387,6 @@ export function useMap(styleMap, map, zoom, triggerRadius) {
       document
         .getElementById("search-buttonradius")
         .addEventListener("click", function () {
-          setIsRadiusLoading(true)
           removeMarkers();
           fetchApi(centerPoint[0], centerPoint[1], radius);
         });
