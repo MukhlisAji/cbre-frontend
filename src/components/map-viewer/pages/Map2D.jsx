@@ -175,6 +175,12 @@ function Map2D() {
           >
             Search
           </button>
+          <button
+            className="px-2 py-1.5 bg-white hover:bg-c-teal text-neutral-600 hover:text-white border hover:border-c-teal shadow-md text-sm rounded-lg font-bold flex justify-center items-center"
+            id="clear-buttonradius"
+          >
+            Clear
+          </button>
         </div>
 
         <FilterLine subMenu={subMenu} expandedMenu={expandedMenu} />

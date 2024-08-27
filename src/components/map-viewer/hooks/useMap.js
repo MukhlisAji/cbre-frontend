@@ -268,6 +268,7 @@ export function useMap(styleMap, map, zoom, triggerRadius) {
 
         removeMarkers();
         document.getElementById("search-buttonradius").style.display = "block";
+        document.getElementById("clear-buttonradius").style.display = "block";
       };
 
       handleClick.current = function (e) {
@@ -281,18 +282,18 @@ export function useMap(styleMap, map, zoom, triggerRadius) {
         }
 
         if (circleFeature && !isDragging) {
-          const coordinates =
-            map.current.getSource("circle")._data.geometry.coordinates[0];
-          const point = [e.lngLat.lng, e.lngLat.lat];
-          if (turf.booleanPointInPolygon(point, turf.polygon([coordinates]))) {
-            return;
-          }
-          map.current.removeLayer("circle");
-          map.current.removeLayer("circle-outline");
-          map.current.removeSource("circle");
-          removeMarkers()
-          circleFeature = null;
-          document.getElementById("search-buttonradius").style.display = "none";
+          // const coordinates =
+          //   map.current.getSource("circle")._data.geometry.coordinates[0];
+          // const point = [e.lngLat.lng, e.lngLat.lat];
+          // if (turf.booleanPointInPolygon(point, turf.polygon([coordinates]))) {
+          //   return;
+          // }
+          // map.current.removeLayer("circle");
+          // map.current.removeLayer("circle-outline");
+          // map.current.removeSource("circle");
+          // removeMarkers()
+          // circleFeature = null;
+          // document.getElementById("search-buttonradius").style.display = "none";
           return;
         }
 
@@ -391,6 +392,17 @@ export function useMap(styleMap, map, zoom, triggerRadius) {
           removeMarkers();
           fetchApi(centerPoint[0], centerPoint[1], radius);
         });
+
+        document
+        .getElementById("clear-buttonradius")
+        .addEventListener("click", function () {
+          removeMarkers();
+          map.current.removeLayer("circle");
+          map.current.removeLayer("circle-outline");
+          map.current.removeSource("circle");
+          document.getElementById("search-buttonradius").style.display = "none";
+          document.getElementById("clear-buttonradius").style.display = "none";
+        });
     };
 
     const removeCircleEvents = () => {
@@ -412,6 +424,7 @@ export function useMap(styleMap, map, zoom, triggerRadius) {
         map.current.removeSource("circle");
       }
       document.getElementById("search-buttonradius").style.display = "none";
+      document.getElementById("clear-buttonradius").style.display = "none";
     }
   }, [map.current, triggerRadius]);
 
