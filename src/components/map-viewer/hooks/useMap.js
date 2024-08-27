@@ -24,6 +24,7 @@ export function useMap(styleMap, map, zoom, triggerRadius) {
   const handleMouseUp = useRef(null);
   const handleMouseLeave = useRef(null);
   const [build] = useAtom(buildAtom);
+  const [isRadiusLoading, setIsRadiusLoading] = useState(false)
 
   const handleSearch = (searchValue) => {
     setSearch(searchValue);
@@ -386,6 +387,7 @@ export function useMap(styleMap, map, zoom, triggerRadius) {
       document
         .getElementById("search-buttonradius")
         .addEventListener("click", function () {
+          setIsRadiusLoading(true)
           removeMarkers();
           fetchApi(centerPoint[0], centerPoint[1], radius);
         });
@@ -419,6 +421,18 @@ export function useMap(styleMap, map, zoom, triggerRadius) {
   // };
 
   const fetchApi = async (longitude, latitude, meter_radius) => {
+    const spinnerDiv = document.getElementById("spinner")
+
+    let spinner = `
+    
+    <div class="absolute inset-0 bg-white bg-opacity-70 flex justify-center items-center z-50">
+        <div class="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-c-teal"></div>
+    </div>
+
+    `
+
+    spinnerDiv.innerHTML=spinner
+
     const res = await fetch(`${CONFIG_APP.MAPBOX_API}/map-radius-circle`, {
       method: "POST",
       headers: {
@@ -430,7 +444,11 @@ export function useMap(styleMap, map, zoom, triggerRadius) {
         meter_radius,
       }),
     });
+    
+
     const responseData = await res.json();
+    spinnerDiv.innerHTML=``
+
     // console.log(responseData);
     removeMarkers();
     setDataMap(responseData.geojson.features);

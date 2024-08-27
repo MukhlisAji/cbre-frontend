@@ -31,6 +31,7 @@ function Map2D() {
   const[isSearch, setIsSearch]= useState(null)
   const { isSidebarOpen, isCollapsed2dSearchOpen } = useAppContext();
   const [build] = useAtom(buildAtom)
+  
   console.log({ build })
 
   useEffect(() => {
@@ -111,6 +112,7 @@ function Map2D() {
     },
   ];
 
+  
   const expandedMenu = [
     {
       label: "Region Map",
@@ -176,16 +178,15 @@ function Map2D() {
         </div>
 
         <FilterLine subMenu={subMenu} expandedMenu={expandedMenu} />
-
+       
         {/* Map Container */}
         <div
           ref={mapContainer}
           className="w-full h-full transition-all duration-300 ease-in-out overflow-hidden"
-        />
-
-        <div>
-          {isSearch != null ? <p className="px-2 py-1.7 ">Condition is true!</p> : null}
+        >
+          <div id="spinner"></div>
         </div>
+
       </div>
     </>
   );
