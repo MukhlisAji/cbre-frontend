@@ -230,6 +230,19 @@ export function useMap(styleMap, map, zoom, triggerRadius) {
       const updateCircle = (center, radius) => {
         const updatedCircle = createCircle(center, radius);
         map.current.getSource("circle").setData(updatedCircle);
+        const extremes= findExtremes()
+        const new_extremes = {
+          type: 'FeatureCollection',
+          features: extremes.map(coord => ({
+            type: 'Feature',
+            geometry: {
+              type: 'Point',
+              coordinates: coord // Ensure `coord` is in [longitude, latitude] format
+            },
+            properties: {} // Optional: You can add properties if needed
+          }))
+        }
+        map.current.getSource("pointer").setData(new_extremes);
       };
 
       const addCircle = (center, radius) => {
@@ -238,10 +251,26 @@ export function useMap(styleMap, map, zoom, triggerRadius) {
         }
 
         circleFeature = createCircle(center, radius);
-
+       
         map.current.addSource("circle", {
           type: "geojson",
           data: circleFeature,
+        });
+
+        const coordinates = findExtremes()
+
+        map.current.addSource('pointer', {
+          type: 'geojson',
+          data: {
+              type: 'FeatureCollection',
+              features: coordinates.map(coord => ({
+                  type: 'Feature',
+                  geometry: {
+                      type: 'Point',
+                      coordinates: coord
+                  }
+              }))
+          }
         });
 
         map.current.addLayer({
@@ -266,6 +295,19 @@ export function useMap(styleMap, map, zoom, triggerRadius) {
           },
         });
 
+        map.current.addLayer({
+          id: 'pointer-layer',
+          type: 'circle',
+          source: 'pointer',
+          paint: {
+              'circle-radius': 5, // Fixed radius of 10 pixels, constant across all zoom levels
+              'circle-color': 'white', // Red color
+              'circle-opacity': 1, // 50% opacity
+              'circle-stroke-width': 2, // Border width of 2 pixels
+              'circle-stroke-color': 'black', // Border color (black)
+              'circle-stroke-opacity': 1 
+          }
+        });
         removeMarkers();
         document.getElementById("search-buttonradius").style.display = "block";
         document.getElementById("clear-buttonradius").style.display = "block";
@@ -280,8 +322,9 @@ export function useMap(styleMap, map, zoom, triggerRadius) {
           resizing = false;
           return;
         }
-
+      
         if (circleFeature && !isDragging) {
+         
           // const coordinates =
           //   map.current.getSource("circle")._data.geometry.coordinates[0];
           // const point = [e.lngLat.lng, e.lngLat.lat];
@@ -316,11 +359,10 @@ export function useMap(styleMap, map, zoom, triggerRadius) {
           return;
         }
 
-        const coordinates =
-          map.current.getSource("circle")._data.geometry.coordinates[0];
+        const coordinates = map.current.getSource("circle")._data.geometry.coordinates[0];
         const point = [e.lngLat.lng, e.lngLat.lat];
 
-        if (turf.booleanPointInPolygon(point, turf.polygon([coordinates]))) {
+        if (isPointExactMatch(point, findExtremes())) {
           map.current.getCanvas().style.cursor = "move";
           map.current.dragPan.disable();
         } else {
@@ -335,25 +377,55 @@ export function useMap(styleMap, map, zoom, triggerRadius) {
             { units: "meters" }
           );
           radius = dragRadius;
+  
           updateCircle(centerPoint, radius);
         }
       };
 
+      const findExtremes = () => {
+        const coords =  map.current.getSource("circle")._data.geometry.coordinates[0]
+        const topMost = coords[0];
+        const bottomMost = coords[Math.floor(coords.length / 4)]; // Approximate
+        const leftMost = coords[Math.floor(coords.length / 2)];
+        const rightMost = coords[Math.floor(3 * coords.length / 4)];
+    
+        return [topMost, bottomMost, leftMost, rightMost];
+      };
+      const isPointExactMatch = (pointToCheck, coordinates) => {
+        return coordinates.some(coord => 
+          parseFloat(coord[0].toFixed(2)) === parseFloat(pointToCheck[0].toFixed(2)) &&
+          parseFloat(coord[1].toFixed(2)) === parseFloat(pointToCheck[1].toFixed(2))
+        );
+      };
+    
+
       handleMouseDown.current = function (e) {
+        
         if (!triggerRadius || !circleFeature) {
           return;
         }
-
-        const coordinates =
-          map.current.getSource("circle")._data.geometry.coordinates[0];
-        const point = [e.lngLat.lng, e.lngLat.lat];
-
-        if (turf.booleanPointInPolygon(point, turf.polygon([coordinates]))) {
+        
+        const extremes = findExtremes()
+       
+        
+        if(isPointExactMatch([e.lngLat.lng, e.lngLat.lat], extremes)){
+      
           isDragging = true;
           resizing = true;
           map.current.getCanvas().style.cursor = "nwse-resize";
           map.current.dragPan.disable();
         }
+
+        // const coordinates =
+        //   map.current.getSource("circle")._data.geometry.coordinates[0];
+        // const point = [e.lngLat.lng, e.lngLat.lat];
+
+        // if (turf.booleanPointInPolygon(point, turf.polygon([coordinates]))) {
+        //   isDragging = true;
+        //   resizing = true;
+        //   map.current.getCanvas().style.cursor = "nwse-resize";
+        //   map.current.dragPan.disable();
+        // }
       };
 
       handleMouseUp.current = function () {
@@ -399,7 +471,9 @@ export function useMap(styleMap, map, zoom, triggerRadius) {
           removeMarkers();
           map.current.removeLayer("circle");
           map.current.removeLayer("circle-outline");
-          map.current.removeSource("circle");
+          map.current.removeSource("circle")
+          map.current.removeLayer("pointer-layer")
+          map.current.removeSource("pointer")
           document.getElementById("search-buttonradius").style.display = "none";
           document.getElementById("clear-buttonradius").style.display = "none";
         });
