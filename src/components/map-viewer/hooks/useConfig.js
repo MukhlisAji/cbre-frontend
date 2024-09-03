@@ -279,6 +279,47 @@ export function useConfig() {
     });
   }, [styleMap, localStorage.getItem("styleMap")]);
 
+  useEffect(()=>{
+    const customControl = {
+      onAdd() {
+        // this._map = map;
+    
+        // Create a container for the control
+        const container = document.createElement('div');
+        container.id = 'control'
+        container.className = 'mapboxgl-ctrl'; // Optional: Custom CSS class
+        const svg =`
+            <img id="2d" src="2d.svg" alt="2D" style="width:30px; height: 30px;"/>
+            <img id="3d" src="3d.svg" alt="3D" style="width:30px; height: 30px;"/>
+            <img id="mrt" src="mrt.svg" alt="MRT" style="width:30px; height: 30px;"/>
+            <img id="house" src="house.svg" alt="House" style="width:30px; height: 30px;"/>
+            `
+    
+        // // Append the button to the container
+        container.innerHTML = svg;
+    
+        return container;
+      },
+    
+      onRemove() {
+        document.getElementById("control").remove()
+      }
+    };
+    
+    // Add the custom control to the map
+    map.current.addControl(customControl, 'top-right');
+
+    document
+    .getElementById("2d")
+    .addEventListener("click", function () {
+      alert("halo")
+    });
+  },[])
+
+  function handleClick(type){
+    alert(`click ${type}`)
+  }
+
   useEffect(() => {
     if (zoom < 14) {
       const markerLabel = document.querySelectorAll(".marker-testing");

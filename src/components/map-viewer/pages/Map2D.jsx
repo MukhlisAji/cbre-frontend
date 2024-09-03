@@ -13,6 +13,7 @@ import { useZoning } from "../hooks/useZoning";
 import { AllRegion, NortWest, SouthEast, StyleSatelliteStreet } from "../utils";
 import { buildAtom } from "./project/store/build";
 import TwoDSearch from "./search/2dSearch";
+import HeaderButton from "../../shared/HeaderButton";
 
 function Map2D() {
   const {
@@ -86,13 +87,6 @@ function Map2D() {
   };
 
   const subMenu = [
-    {
-      name: "Line MRT/LRT",
-      icon: IconLine,
-      onClick: () => {
-        setShowMRT((prev) => !prev);
-      },
-    },
     {
       name: "North West",
       icon: NortWest,
@@ -182,6 +176,8 @@ function Map2D() {
           >
             Clear
           </button>
+          
+
         </div>
 
         <FilterLine subMenu={subMenu} expandedMenu={expandedMenu} />
