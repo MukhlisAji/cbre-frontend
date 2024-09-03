@@ -2,6 +2,7 @@ import mapboxgl from "mapbox-gl";
 import { useEffect, useRef, useState } from "react";
 import data from "../utils/data.json";
 import { CONFIG_APP } from "../config/app";
+import { useMRTLine } from "./useMRT";
 
 export function useConfig() {
   mapboxgl.accessToken = CONFIG_APP.MAPBOX_KEY;
@@ -10,6 +11,7 @@ export function useConfig() {
   const [lng, setLng] = useState(data.geometry.coordinates[0][0]);
   const [lat, setLat] = useState(data.geometry.coordinates[0][1]);
   const [zoom, setZoom] = useState(10);
+  const {showMRT, setShowMRT} = useMRTLine(map)
 
   const [styleMap, setStyleMap] = useState(
     "mapbox://styles/rajifmahendra/clxrims5h002k01pf1imoen80"
@@ -310,15 +312,12 @@ export function useConfig() {
     map.current.addControl(customControl, 'top-right');
 
     document
-    .getElementById("2d")
-    .addEventListener("click", function () {
-      alert("halo")
+    .getElementById("mrt")
+    .addEventListener("click", function(){
+      setShowMRT(prev=>!prev);
     });
   },[])
 
-  function handleClick(type){
-    alert(`click ${type}`)
-  }
 
   useEffect(() => {
     if (zoom < 14) {
