@@ -146,10 +146,24 @@ export function useMRTData(zoom, map) {
 export function useMRTLine(map) {
   const [showMRT, setShowMRT] = useState(false);
   const MRTLineData = async () => {
+    const spinnerDiv = document.getElementById("spinner")
+
+    let spinner = `
+    
+    <div class="absolute inset-0 bg-white bg-opacity-70 flex justify-center items-center z-50">
+        <div class="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-c-teal"></div>
+    </div>
+
+    `
+    spinnerDiv.innerHTML=spinner
+
     const res = await fetch(
       `${CONFIG_APP.MAPBOX_API}/map-transportation/line`
     );
     const responseData = await res.json();
+
+    spinnerDiv.innerHTML=``
+
     const geoJson = responseData.geojson;
     map.current.addSource("line", {
       type: "geojson",

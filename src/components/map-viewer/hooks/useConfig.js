@@ -291,10 +291,10 @@ export function useConfig() {
         container.id = 'control'
         container.className = 'mapboxgl-ctrl'; // Optional: Custom CSS class
         const svg =`
-            <img id="2d" src="2d.svg" alt="2D" style="width:30px; height: 30px;"/>
-            <img id="3d" src="3d.svg" alt="3D" style="width:30px; height: 30px;"/>
-            <img id="mrt" src="mrt.svg" alt="MRT" style="width:30px; height: 30px;"/>
-            <img id="house" src="house.svg" alt="House" style="width:30px; height: 30px;"/>
+            <img id="2d" src="2d.svg" alt="2D" style="width:30px; height: 30px;  background-color:white;" />
+            <img id="3d" src="3d.svg" alt="3D" style="width:30px; height: 30px;  background-color:white"/>
+            <img id="mrt" src="mrt.svg" alt="MRT" style="width:30px; height: 30px;  background-color:white"/>
+            <img id="house" src="house.svg" alt="House" style="width:30px; height: 30px;  background-color:white"/>
             `
     
         // // Append the button to the container
