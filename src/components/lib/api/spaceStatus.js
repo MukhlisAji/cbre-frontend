@@ -17,7 +17,7 @@ export function useTest({
   const [data, setData] = useState(null);
   useEffect(() => {
     //api master
-    axios(`${CONFIG_APP.MAPBOX_API}/test2`, {
+    axios(`${CONFIG_APP.MAPBOX_API}/master-filter`, {
       method: "POST",
       data: {
         sub_type: sub_type || "",

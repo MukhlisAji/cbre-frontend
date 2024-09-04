@@ -173,7 +173,7 @@ export default function TwoDSearch({ mapApi, map }) {
       };
 
       console.log("Searching for:", searchQuery);
-      const res = await fetch(`${CONFIG_APP.MAPBOX_API}/test2`, {
+      const res = await fetch(`${CONFIG_APP.MAPBOX_API}/master-filter`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
