@@ -11,7 +11,7 @@ export function useConfig() {
   const [lng, setLng] = useState(data.geometry.coordinates[0][0]);
   const [lat, setLat] = useState(data.geometry.coordinates[0][1]);
   const [zoom, setZoom] = useState(10);
-  const {showMRT, setShowMRT} = useMRTLine(map)
+  const { showMRT, setShowMRT } = useMRTLine(map)
 
   const [styleMap, setStyleMap] = useState(
     "mapbox://styles/rajifmahendra/clxrims5h002k01pf1imoen80"
@@ -23,90 +23,237 @@ export function useConfig() {
     window.location.reload();
   };
 
-  useEffect(() => {
-    if (map.current) return; // initialize map only once
-    map.current = new mapboxgl.Map({
-      container: mapContainer.current,
-      //style: "mapbox://styles/mapbox/streets-v12",
-      style: JSON.parse(localStorage.getItem("styleMap")),
-      center: [lng, lat],
-      zoom: zoom,
-    });
+  function toggle3D(enable3D) {
+    if (!map.current) return;
+
+    const layers = map.current.getStyle().layers;
+    const labelLayerId = layers.find(
+      (layer) => layer.type === "symbol" && layer.layout["text-field"]
+    ).id;
+
+    if (enable3D) {
+      // Jika 3D diaktifkan
+      if (!map.current.getLayer("3d-buildings")) {
+        map.current.addLayer(
+          {
+            id: "3d-buildings",
+            source: "composite",
+            "source-layer": "building",
+            filter: ["==", "extrude", "true"],
+            type: "fill-extrusion",
+            minzoom: 15,
+            paint: {
+              "fill-extrusion-color": "#fff",
+              "fill-extrusion-height": [
+                "interpolate",
+                ["linear"],
+                ["zoom"],
+                15,
+                0,
+                15.05,
+                ["get", "height"],
+              ],
+              "fill-extrusion-base": [
+                "interpolate",
+                ["linear"],
+                ["zoom"],
+                15,
+                0,
+                15.05,
+                ["get", "min_height"],
+              ],
+              "fill-extrusion-opacity": 0.8,
+            },
+          },
+          labelLayerId
+        );
+      }
+      map.current.flyTo({
+        zoom: 17,
+        pitch: 70,
+        essential: true,
+      });
+    } else {
+      // Jika 3D dinonaktifkan
+      if (map.current.getLayer("3d-buildings")) {
+        map.current.removeLayer("3d-buildings");
+      }
+      map.current.flyTo({
+        zoom: 15,
+        pitch: 0,
+        essential: true,
+      });
+    }
+  }
+
+  function addMapControls() {
     map.current.addControl(new mapboxgl.NavigationControl());
     map.current.addControl(new mapboxgl.FullscreenControl());
     map.current.addControl(
       new mapboxgl.GeolocateControl({
-        positionOptions: {
-          enableHighAccuracy: true,
-        },
+        positionOptions: { enableHighAccuracy: true },
         trackUserLocation: true,
       })
     );
-    map.current.on("click", "polygon-fill", (e) => {
-      const coordinates = e.lngLat;
-      const { title, description } = e.features[0].properties;
-      new mapboxgl.Popup()
-        .setLngLat(coordinates)
-        .setHTML(`<p>${description}</p>`)
-        .addTo(map.current);
+  }
+
+  function setupMapLayers() {
+    const plane = createPlaneFeature();
+    const new_fc = duplicatePolygonByFloors(plane, 0, 10, 70, 1);
+
+    // map.current.addSource("polygon", {
+    //   type: "geojson",
+    //   data: {
+    //     type: "Feature",
+    //     geometry: {
+    //       type: "Polygon",
+    //       coordinates: [data.geometry.coordinates],
+    //     },
+    //   },
+    // });
+    // map.current.addLayer({
+    //   id: "line-layer",
+    //   type: "line",
+    //   source: "polygon",
+    //   layout: {
+    //     "line-join": "round",
+    //     "line-cap": "round",
+    //   },
+    //   paint: {
+    //     "line-color": "#cc234a",
+    //     "line-width": 2,
+    //   },
+    // });
+
+    map.current.addSource("plane", { type: "geojson", data: new_fc });
+
+    map.current.addLayer({
+      id: "extrusion",
+      type: "fill-extrusion",
+      source: "plane",
+      paint: {
+        "fill-extrusion-color": ["get", "color"],
+        "fill-extrusion-base": ["get", "base_height"],
+        "fill-extrusion-height": ["get", "height"],
+        "fill-extrusion-opacity": [
+          "interpolate", ["linear"], ["zoom"], 15, 0.5, 16.5, 1
+        ],
+      },
     });
-    // Add Building
-    function duplicatePolygonByFloors(featureCollection, index, floors, max_height, gap_height = 0.5) {
-      if (
-        !featureCollection.features ||
-        !Array.isArray(featureCollection.features)
-      ) {
-        throw new Error("Invalid GeoJSON feature collection format");
+  }
+
+  function setupMapInteractions() {
+    let previousHoveredIndex = null;
+
+    map.current.on("mousemove", "extrusion", (e) => {
+      map.current.getCanvas().style.cursor = "pointer";
+
+      if (e.features.length > 0) {
+        const index = e.features[0].properties.index;
+        updateLayerColorOnHover(index, previousHoveredIndex);
+        previousHoveredIndex = index;
       }
+    });
 
-      // Validasi index
-      if (index < 0 || index >= featureCollection.features.length) {
-        throw new Error(`Invalid index: ${index}. Index must be between 0 and ${featureCollection.features.length - 1}`);
-      }
+    map.current.on("mouseleave", "extrusion", () => {
+      map.current.getCanvas().style.cursor = "";
+      resetLayerColors();
+    });
 
-      const originalPolygon = featureCollection.features[index];
-      const duplicatedFeatureCollection = {
-        type: "FeatureCollection",
-        features: []
-      };
+    map.current.on("click", "extrusion", (e) => {
+      const index = e.features[0].properties.index;
+      console.log(`LT ${index + 1}`);
+    });
+  }
 
-      const heightIncrement = max_height / floors;
-
-      for (let i = 0; i < floors; i++) {
-        const base_height = i * (heightIncrement + gap_height);
-        const height = base_height + heightIncrement;
-
-        const duplicatedPolygon = {
-          type: "Feature",
-          geometry: originalPolygon.geometry,
-          properties: {
-            base_height: base_height,
-            height: height,
-            index: i,
-            color: "#99d188"
-          }
-        };
-
-        //gap
-        const gapPolygon = {
-          type: "Feature",
-          geometry: originalPolygon.geometry,
-          properties: {
-            base_height: height,
-            height: height + gap_height,
-            index: i,
-            color: "white"
-          }
-        };
-
-        duplicatedFeatureCollection.features.push(duplicatedPolygon);
-        duplicatedFeatureCollection.features.push(gapPolygon);
-      }
-
-      return duplicatedFeatureCollection;
+  function updateLayerColorOnHover(index, previousIndex) {
+    if (previousIndex !== null && previousIndex !== index) {
+      map.current.setPaintProperty("extrusion", "fill-extrusion-color", [
+        "case",
+        ["==", ["get", "color"], "#99d188"],
+        ["match", ["get", "index"], previousIndex, "#99d188", "#99d188"]],
+        ["get", "color"]
+      );
     }
 
-    const plane = {
+    map.current.setPaintProperty("extrusion", "fill-extrusion-color", [
+      "case",
+      ["==", ["get", "color"], "#99d188"],
+      ["match", ["get", "index"], index, "yellow", "#99d188"]],
+      ["get", "color"]
+    );
+  }
+
+  function resetLayerColors() {
+    map.current.setPaintProperty("extrusion", "fill-extrusion-color", [
+      "case",
+      ["==", ["get", "color"], "#99d188"],
+      "#99d188",
+      ["get", "color"]
+    ]);
+  }
+
+  function updateLabelVisibility() {
+    const currentZoom = map.current.getZoom().toFixed(2);
+    const displayStyle = currentZoom < 12 ? "none" : "flex";
+    document.querySelectorAll(".tes").forEach(item => item.style.display = displayStyle);
+  }
+
+  function setupCustomControl() {
+    const customControl = {
+      onAdd() {
+        const container = document.createElement('div');
+        container.id = 'control';
+        container.className = 'mapboxgl-ctrl';
+        const svg = `
+            <div class="control-img-wrapper">
+                <img id="control-2d" src="2d.svg" alt="2D"/>
+            </div>
+            <div class="control-img-wrapper">
+                <img id="control-3d" src="3d.svg" alt="3D"/>
+            </div>
+            <div class="control-img-wrapper">
+                <img id="mrt" src="mrt.svg" alt="MRT"/>
+            </div>
+            <div class="control-img-wrapper">
+                <img id="house" src="house.svg" alt="House"/>
+            </div>
+        `;
+
+        // Append the buttons to the container
+        container.innerHTML = svg;
+        container.querySelector("#control-2d").addEventListener("click", () => toggle3D(false));
+        container.querySelector("#control-3d").addEventListener("click", () => toggle3D(true));
+        return container;
+      },
+      onRemove() {
+        document.getElementById("control").remove();
+      }
+    };
+
+    map.current.addControl(customControl, 'top-right');
+
+    document.getElementById("mrt").addEventListener("click", () => {
+      setShowMRT(prev => !prev);
+    });
+  }
+
+  function updateMarkerVisibility() {
+    document.querySelectorAll(".marker-testing").forEach(item => {
+      item.style.display = zoom < 14 ? "none" : "flex";
+    });
+
+    document.querySelectorAll(".container-marker-name-testing").forEach(item => {
+      item.style.display = zoom < 15 ? "none" : "flex";
+    });
+
+    document.querySelectorAll(".label-name-map").forEach(item => {
+      item.style.display = zoom > 14 ? "block" : "none";
+    });
+  }
+
+  function createPlaneFeature() {
+    return {
       type: "FeatureCollection",
       features: [
         {
@@ -128,237 +275,40 @@ export function useConfig() {
         }
       ]
     };
-
-    const new_fc = duplicatePolygonByFloors(plane, 0, 10, 70, 1);
-
-
-    map.current.on("load", () => {
-      const layers = map.current.getStyle().layers;
-      const labelLayerId = layers.find(
-        (layer) => layer.type === 'symbol' && layer.layout['text-field']
-      ).id;
-      map.current.addLayer({
-        'id': '3d-buildings',
-        'source': 'composite',
-        'source-layer': 'building',
-        'filter': ['==', 'extrude', 'true'],
-        'type': 'fill-extrusion',
-        'minzoom': 15,
-        'paint': {
-          'fill-extrusion-color': '#fff',
-          'fill-extrusion-height': [
-            'interpolate',
-            ['linear'],
-            ['zoom'],
-            15,
-            0,
-            15.05,
-            ['get', 'height']
-          ],
-          'fill-extrusion-base': [
-            'interpolate',
-            ['linear'],
-            ['zoom'],
-            15,
-            0,
-            15.05,
-            ['get', 'min_height']
-          ],
-          'fill-extrusion-opacity': 0.8
-        }
-      }, labelLayerId);
-      // map.current.addSource("polygon", {
-      //   type: "geojson",
-      //   data: {
-      //     type: "Feature",
-      //     geometry: {
-      //       type: "Polygon",
-      //       coordinates: [data.geometry.coordinates],
-      //     },
-      //   },
-      // });
-      // map.current.addLayer({
-      //   id: "line-layer",
-      //   type: "line",
-      //   source: "polygon",
-      //   layout: {
-      //     "line-join": "round",
-      //     "line-cap": "round",
-      //   },
-      //   paint: {
-      //     "line-color": "#cc234a",
-      //     "line-width": 2,
-      //   },
-      // });
-
-      // Add Building
-      map.current.addSource("plane", {
-        type: "geojson",
-        data: new_fc
-      });
-
-      map.current.addLayer({
-        id: "extrusion",
-        type: "fill-extrusion",
-        source: "plane",
-        paint: {
-          "fill-extrusion-color": ["get", "color"],
-          "fill-extrusion-base": ["get", "base_height"],
-          "fill-extrusion-height": ["get", "height"],
-          "fill-extrusion-opacity": [
-            "interpolate",
-            ["linear"],
-            ["zoom"],
-            15,
-            0.5,
-            16.5,
-            1
-          ]
-        }
-      });
-      let previousHoveredIndex = null;
-
-      map.current.on("mousemove", "extrusion", (e) => {
-        map.current.getCanvas().style.cursor = "pointer";
-
-        if (e.features.length > 0) {
-          const feature = e.features[0];
-          const index = feature.properties.index;
-
-          if (previousHoveredIndex !== null && previousHoveredIndex !== index) {
-            // Kembalikan warna lantai sebelumnya ke hijau
-            map.current.setPaintProperty("extrusion", "fill-extrusion-color", [
-              "case",
-              ["==", ["get", "color"], "#99d188"],
-              ["match", ["get", "index"], previousHoveredIndex, "#99d188", "#99d188"],
-              ["get", "color"]
-            ]);
-          }
-
-          // Ubah warna lantai yang di-hover menjadi kuning
-          map.current.setPaintProperty("extrusion", "fill-extrusion-color", [
-            "case",
-            ["==", ["get", "color"], "#99d188"],
-            ["match", ["get", "index"], index, "yellow", "#99d188"],
-            ["get", "color"]
-          ]);
-
-          // Perbarui index lantai yang dihover
-          previousHoveredIndex = index;
-        }
-      });
-
-      // Mengembalikan semua lantai ke warna hijau saat mouse keluar dari gedung
-      map.current.on("mouseleave", "extrusion", () => {
-        map.current.getCanvas().style.cursor = "";
-
-        if (previousHoveredIndex !== null) {
-          // Kembalikan semua lantai ke warna hijau
-          map.current.setPaintProperty("extrusion", "fill-extrusion-color", [
-            "case",
-            ["==", ["get", "color"], "#99d188"],
-            "#99d188",
-            ["get", "color"]
-          ]);
-
-          previousHoveredIndex = null;
-        }
-      });
-
-      // Event listener untuk klik
-      map.current.on("click", "extrusion", (e) => {
-        const properties = e.features[0].properties;
-        console.log(`LT ${properties.index + 1}`);
-      });
-    });
-    // label
-    map.current.on("zoom", () => {
-      const currentZoom = map.current.getZoom().toFixed(2);
-      const markerLabels = document.querySelectorAll(".tes");
-      markerLabels.forEach((item) => {
-        item.style.display = currentZoom < 12 ? "none" : "flex";
-      });
-    });
-  }, [styleMap, localStorage.getItem("styleMap")]);
-
-  useEffect(()=>{
-    const customControl = {
-      onAdd() {
-        // this._map = map;
-    
-        // Create a container for the control
-        const container = document.createElement('div');
-        container.id = 'control'
-        container.className = 'mapboxgl-ctrl'; // Optional: Custom CSS class
-        const svg =`
-            <img id="2d" src="2d.svg" alt="2D" style="width:30px; height: 30px;"/>
-            <img id="3d" src="3d.svg" alt="3D" style="width:30px; height: 30px;"/>
-            <img id="mrt" src="mrt.svg" alt="MRT" style="width:30px; height: 30px;"/>
-            <img id="house" src="house.svg" alt="House" style="width:30px; height: 30px;"/>
-            `
-    
-        // // Append the button to the container
-        container.innerHTML = svg;
-    
-        return container;
-      },
-    
-      onRemove() {
-        document.getElementById("control").remove()
-      }
-    };
-    
-    // Add the custom control to the map
-    map.current.addControl(customControl, 'top-right');
-
-    document
-    .getElementById("mrt")
-    .addEventListener("click", function(){
-      setShowMRT(prev=>!prev);
-    });
-  },[])
-
+  }
 
   useEffect(() => {
-    if (zoom < 14) {
-      const markerLabel = document.querySelectorAll(".marker-testing");
-      markerLabel.forEach((item) => {
-        item.style.display = "none";
-      });
-    } else if (zoom >= 14) {
-      const markerLabel = document.querySelectorAll(".marker-testing");
-      markerLabel.forEach((item) => {
-        item.style.display = "flex";
-      });
-    }
+    // Initialize map if not already initialized
+    if (map.current) return;
+    map.current = new mapboxgl.Map({
+      container: mapContainer.current,
+      style: JSON.parse(localStorage.getItem("styleMap")),
+      center: [lng, lat],
+      zoom: zoom,
+    });
 
-    if (zoom < 15) {
-      const markerName = document.querySelectorAll(
-        ".container-marker-name-testing"
-      );
-      markerName.forEach((item) => {
-        item.style.display = "none";
-      });
-    } else if (zoom >= 15) {
-      const markerName = document.querySelectorAll(
-        ".container-marker-name-testing"
-      );
-      markerName.forEach((item) => {
-        item.style.display = "flex";
-      });
-    }
+    // Add controls to the map
+    addMapControls();
 
-    if (zoom > 14) {
-      const markerName = document.querySelectorAll(".label-name-map");
-      markerName.forEach((item) => {
-        item.style.display = "block";
-      });
-    } else if (zoom <= 14) {
-      const markerName = document.querySelectorAll(".label-name-map");
-      markerName.forEach((item) => {
-        item.style.display = "none";
-      });
-    }
+    // Load event listener for map
+    map.current.on("load", () => {
+      setupMapLayers();
+      setupMapInteractions();
+    });
+
+    // Label visibility based on zoom level
+    map.current.on("zoom", updateLabelVisibility);
+
+  }, [styleMap, localStorage.getItem("styleMap")]);
+
+  useEffect(() => {
+    // Custom control setup
+    setupCustomControl();
+  }, []);
+
+  useEffect(() => {
+    // Marker visibility and label display based on zoom
+    updateMarkerVisibility();
   }, [zoom]);
 
   return {
@@ -373,5 +323,6 @@ export function useConfig() {
     styleMap,
     setStyleMap,
     handleChangeStyleMap,
+    toggle3D
   };
 }
