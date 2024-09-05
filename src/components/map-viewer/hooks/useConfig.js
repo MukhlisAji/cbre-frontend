@@ -12,7 +12,7 @@ export function useConfig() {
   const [lat, setLat] = useState(data.geometry.coordinates[0][1]);
   const [zoom, setZoom] = useState(10);
   const { showMRT, setShowMRT } = useMRTLine(map)
-  const  [show3d, setShow3d]= useState(true)
+  const  [show3d, setShow3d]= useState(false)
   const [styleMap, setStyleMap] = useState(
     "mapbox://styles/rajifmahendra/clxrims5h002k01pf1imoen80"
   );
@@ -204,7 +204,7 @@ export function useConfig() {
         container.className = 'mapboxgl-ctrl';
         const svg = `
             <div class="control-img-wrapper" id ="2d-3d-container">
-                <img id="control-2d" src="2d.svg" alt="2D"/>
+                <img id="control-2d" src="3d.svg" alt="2D"/>
             </div>
             <div class="control-img-wrapper">
                 <img id="mrt" src="mrt.svg" alt="MRT"/>
