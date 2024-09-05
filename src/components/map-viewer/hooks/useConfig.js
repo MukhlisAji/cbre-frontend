@@ -25,12 +25,8 @@ export function useConfig() {
 
   function toggle3D(enable3D) {
     if (!map.current) return;
-    const layers = map.current.getStyle().layers;
-    const labelLayerId = layers.find(
-      (layer) => layer.type === "symbol" && layer.layout["text-field"]
-    ).id;
+  
 
-    console.log("mskk")
     if (enable3D) {
       // Jika 3D diaktifkan
       if (!map.current.getLayer("3d-buildings")) {
@@ -65,7 +61,6 @@ export function useConfig() {
               "fill-extrusion-opacity": 0.8,
             },
           },
-          labelLayerId
         );
       }
       map.current.flyTo({
@@ -208,7 +203,7 @@ export function useConfig() {
         container.id = 'control';
         container.className = 'mapboxgl-ctrl';
         const svg = `
-            <div class="control-img-wrapper">
+            <div class="control-img-wrapper" id ="2d-3d-container">
                 <img id="control-2d" src="2d.svg" alt="2D"/>
             </div>
             <div class="control-img-wrapper">
@@ -311,13 +306,20 @@ export function useConfig() {
 
   useEffect(() => {
   
-    console.log("halpo")
     if (!map.current.isStyleLoaded()){
       return
     }
     // Marker visibility and label display based on zoom
     console.log(show3d)
     toggle3D((show3d))
+    if (!show3d){
+      const container = document.getElementById('2d-3d-container')
+      container.innerHTML = ` <img id="control-2d" src="3d.svg" alt="3D"/>`
+    }else{
+      const container = document.getElementById('2d-3d-container')
+      container.innerHTML = ` <img id="control-2d" src="2d.svg" alt="2D"/>`
+    }
+    document.querySelector("#control-2d").addEventListener("click", () => setShow3d(prev=>!prev));
   }, [show3d]);
 
   return {
