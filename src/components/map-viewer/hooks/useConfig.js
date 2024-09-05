@@ -10,6 +10,7 @@ export function useConfig() {
   const map = useRef(null);
   const [lng, setLng] = useState(data.geometry.coordinates[0][0]);
   const [lat, setLat] = useState(data.geometry.coordinates[0][1]);
+  const [isMap3D, setIsMap3D] = useState(false);
   const [zoom, setZoom] = useState(10);
   const { showMRT, setShowMRT } = useMRTLine(map)
 
@@ -23,15 +24,22 @@ export function useConfig() {
     window.location.reload();
   };
 
-  function toggle3D(enable3D) {
+  function toggle3D() {
     if (!map.current) return;
 
     const layers = map.current.getStyle().layers;
     const labelLayerId = layers.find(
       (layer) => layer.type === "symbol" && layer.layout["text-field"]
-    ).id;
+    )?.id;
+    const control = document.querySelector("#control-building-map").parentNode;
+    control.innerHTML = isMap3D ?
+      `<img id="control-building-map" src="2d.svg" alt="2D"/>`
+      :
+      `<img id="control-building-map" src="3d.svg" alt="3D"/>`;
 
-    if (enable3D) {
+    control.addEventListener("click", () => setIsMap3D(!isMap3D));
+
+    if (isMap3D) {
       // Jika 3D diaktifkan
       if (!map.current.getLayer("3d-buildings")) {
         map.current.addLayer(
@@ -199,18 +207,22 @@ export function useConfig() {
     document.querySelectorAll(".tes").forEach(item => item.style.display = displayStyle);
   }
 
-  function setupCustomControl() {
+  const addCustomControl = () => {
     const customControl = {
       onAdd() {
+        // this._map = map;
+
+        // Create a container for the control
         const container = document.createElement('div');
         container.id = 'control';
         container.className = 'mapboxgl-ctrl';
         const svg = `
             <div class="control-img-wrapper">
-                <img id="control-2d" src="2d.svg" alt="2D"/>
-            </div>
-            <div class="control-img-wrapper">
-                <img id="control-3d" src="3d.svg" alt="3D"/>
+                ${isMap3D ?
+            `<img id="control-building-map" src="2d.svg" alt="2D"/>`
+            :
+            `<img id="control-building-map" src="3d.svg" alt="3D"/>`
+          }
             </div>
             <div class="control-img-wrapper">
                 <img id="mrt" src="mrt.svg" alt="MRT"/>
@@ -222,21 +234,24 @@ export function useConfig() {
 
         // Append the buttons to the container
         container.innerHTML = svg;
-        container.querySelector("#control-2d").addEventListener("click", () => toggle3D(false));
-        container.querySelector("#control-3d").addEventListener("click", () => toggle3D(true));
+        container.querySelector("#control-building-map").parentNode.addEventListener("click", () => setIsMap3D(!isMap3D));
         return container;
       },
+
       onRemove() {
-        document.getElementById("control").remove();
+        document.getElementById("control").remove()
       }
     };
 
+    // Add the custom control to the map
     map.current.addControl(customControl, 'top-right');
 
-    document.getElementById("mrt").addEventListener("click", () => {
-      setShowMRT(prev => !prev);
-    });
-  }
+    document
+      .getElementById("mrt")
+      .addEventListener("click", function () {
+        setShowMRT(prev => !prev);
+      });
+  };
 
   function updateMarkerVisibility() {
     document.querySelectorAll(".marker-testing").forEach(item => {
@@ -278,6 +293,10 @@ export function useConfig() {
   }
 
   useEffect(() => {
+    toggle3D();
+  }, [isMap3D])
+
+  useEffect(() => {
     // Initialize map if not already initialized
     if (map.current) return;
     map.current = new mapboxgl.Map({
@@ -303,7 +322,7 @@ export function useConfig() {
 
   useEffect(() => {
     // Custom control setup
-    setupCustomControl();
+    addCustomControl();
   }, []);
 
   useEffect(() => {
