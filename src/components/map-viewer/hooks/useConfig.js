@@ -13,7 +13,7 @@ export function useConfig() {
   const [isMap3D, setIsMap3D] = useState(false);
   const [zoom, setZoom] = useState(10);
   const { showMRT, setShowMRT } = useMRTLine(map)
-
+  const  [show3d, setShow3d]= useState(false)
   const [styleMap, setStyleMap] = useState(
     "mapbox://styles/rajifmahendra/clxrims5h002k01pf1imoen80"
   );
@@ -73,7 +73,6 @@ export function useConfig() {
               "fill-extrusion-opacity": 0.8,
             },
           },
-          labelLayerId
         );
       }
       map.current.flyTo({
@@ -92,6 +91,8 @@ export function useConfig() {
         essential: true,
       });
     }
+
+    
   }
 
   function addMapControls() {
@@ -329,6 +330,24 @@ export function useConfig() {
     // Marker visibility and label display based on zoom
     updateMarkerVisibility();
   }, [zoom]);
+
+  useEffect(() => {
+  
+    if (!map.current.isStyleLoaded()){
+      return
+    }
+    // Marker visibility and label display based on zoom
+    console.log(show3d)
+    toggle3D((show3d))
+    if (!show3d){
+      const container = document.getElementById('2d-3d-container')
+      container.innerHTML = ` <img id="control-2d" src="3d.svg" alt="3D"/>`
+    }else{
+      const container = document.getElementById('2d-3d-container')
+      container.innerHTML = ` <img id="control-2d" src="2d.svg" alt="2D"/>`
+    }
+    document.querySelector("#control-2d").addEventListener("click", () => setShow3d(prev=>!prev));
+  }, [show3d]);
 
   return {
     map,

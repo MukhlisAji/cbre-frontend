@@ -1,12 +1,5 @@
-// import MapboxDraw from "@mapbox/mapbox-gl-draw";
 import MapboxGeocoder from "@mapbox/mapbox-gl-geocoder";
 import mapboxgl from "mapbox-gl";
-// import {
-//   CircleMode,
-//   DirectMode,
-//   DragCircleMode,
-//   SimpleSelectMode,
-// } from "mapbox-gl-draw-circle";
 import * as turf from "@turf/turf";
 import { useAtom } from "jotai";
 import { useEffect, useRef, useState } from "react";
@@ -43,122 +36,7 @@ export function useMap(styleMap, map, zoom, triggerRadius) {
       setFilteringData([]);
     }
   };
-  // delete
-  // // userProperties has to be enabled
-  // const draw = new MapboxDraw({
-  //   defaultMode: "draw_circle",
-  //   userProperties: true,
-  //   modes: {
-  //     ...MapboxDraw.modes,
-  //     draw_circle: CircleMode,
-  //     drag_circle: DragCircleMode,
-  //     direct_select: DirectMode,
-  //     simple_select: SimpleSelectMode,
-  //   },
-  // });
-
-  // // Add this draw object to the map when map loads
-  // // if(map.current.getControls().getArray().length === 0) {
-  // //   map.current.addControl(draw);
-  // // }
-
-  // useEffect(() => {
-  //   // Add draw control if it hasn't been added yet
-  //   if (map.current) {
-  //     map.current.addControl(draw);
-  //   }
-  // }, [map]);
-
-  // function createCircle(center, radius) {
-  //   const steps = 64;
-  //   const circleCoordinates = [];
-
-  //   for (let i = 0; i < dataMap.length; i++) {
-  //     const angle = (i * 360) / steps;
-  //     const radians = angle * (Math.PI / 180);
-  //     const dx = radius * Math.cos(radians);
-  //     const dy = radius * Math.sin(radians);
-
-  //     const deltaLat = dy / 111320;
-  //     const deltaLng = dx / (111320 * Math.cos((center[1] * Math.PI) / 180)); // Longitude
-
-  //     circleCoordinates.push([center[0] + deltaLng, center[1] + deltaLat]);
-  //   }
-  //   circleCoordinates.push(circleCoordinates[0]);
-  //   return {
-  //     type: "Feature",
-  //     geometry: {
-  //       type: "Polygon",
-  //       coordinates: [circleCoordinates],
-  //     },
-  //   };
-  // }
-  // let circleLayer = null;
-  // map.current?.on("click", function (e) {
-  //   const center = [e.lngLat.lng, e.lngLat.lat];
-  //   const radius = 2000;
-
-  //   if (circleLayer) {
-  //     map.current?.removeLayer(circleLayer);
-  //     map.current?.removeSource(circleLayer);
-  //   }
-  //   const circleFeature = createCircle(center, radius);
-
-  //   map.current?.addSource("circlesource", {
-  //     type: "geojson",
-  //     data: {
-  //       type: "FeatureCollection",
-  //       features: [circleFeature],
-  //     },
-  //   });
-
-  //   map.current?.addLayer({
-  //     id: "circle",
-  //     type: "fill",
-  //     source: "circlesource",
-  //     layout: {},
-  //     paint: {
-  //       "fill-color": "#F3C294",
-  //       "fill-opacity": 0.4,
-  //     },
-  //   });
-
-  //   circleLayer = "circle";
-  // });
-
-  // const drawRadiusGeoJSON = (center, radius) => {
-  //   //  const circleFeature = createCircle(center, radius);
-
-  //   map.current.addSource("circlesource", {
-  //     type: "geojson",
-  //     data: {
-  //       type: "FeatureCollection",
-  //       features: [
-  //         {
-  //           type: "Feature",
-  //           geometry: {
-  //             type: "Polygon",
-  //             coordinates: [106.827183, -6.175394],
-  //           },
-  //         },
-  //       ],
-  //     },
-  //   });
-
-  //   map.current.addLayer({
-  //     id: "circleid",
-  //     type: "fill",
-  //     source: "circlesource",
-  //     layout: {},
-  //     paint: {
-  //       "fill-color": "#F3C294",
-  //       "fill-opacity": 0.4,
-  //     },
-  //   });
-
-  //   console.log("Added new source and layers");
-  // };
-
+  
   useEffect(() => {
     if (!map.current) {
       map.current = new mapboxgl.Map({
