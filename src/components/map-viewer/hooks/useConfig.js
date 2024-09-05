@@ -12,7 +12,7 @@ export function useConfig() {
   const [lat, setLat] = useState(data.geometry.coordinates[0][1]);
   const [zoom, setZoom] = useState(10);
   const { showMRT, setShowMRT } = useMRTLine(map)
-
+  const  [show3d, setShow3d]= useState(true)
   const [styleMap, setStyleMap] = useState(
     "mapbox://styles/rajifmahendra/clxrims5h002k01pf1imoen80"
   );
@@ -25,12 +25,12 @@ export function useConfig() {
 
   function toggle3D(enable3D) {
     if (!map.current) return;
-
     const layers = map.current.getStyle().layers;
     const labelLayerId = layers.find(
       (layer) => layer.type === "symbol" && layer.layout["text-field"]
     ).id;
 
+    console.log("mskk")
     if (enable3D) {
       // Jika 3D diaktifkan
       if (!map.current.getLayer("3d-buildings")) {
@@ -84,6 +84,8 @@ export function useConfig() {
         essential: true,
       });
     }
+
+    
   }
 
   function addMapControls() {
@@ -210,9 +212,6 @@ export function useConfig() {
                 <img id="control-2d" src="2d.svg" alt="2D"/>
             </div>
             <div class="control-img-wrapper">
-                <img id="control-3d" src="3d.svg" alt="3D"/>
-            </div>
-            <div class="control-img-wrapper">
                 <img id="mrt" src="mrt.svg" alt="MRT"/>
             </div>
             <div class="control-img-wrapper">
@@ -222,8 +221,7 @@ export function useConfig() {
 
         // Append the buttons to the container
         container.innerHTML = svg;
-        container.querySelector("#control-2d").addEventListener("click", () => toggle3D(false));
-        container.querySelector("#control-3d").addEventListener("click", () => toggle3D(true));
+        container.querySelector("#control-2d").addEventListener("click", () => setShow3d(prev=>!prev));
         return container;
       },
       onRemove() {
@@ -310,6 +308,17 @@ export function useConfig() {
     // Marker visibility and label display based on zoom
     updateMarkerVisibility();
   }, [zoom]);
+
+  useEffect(() => {
+  
+    console.log("halpo")
+    if (!map.current.isStyleLoaded()){
+      return
+    }
+    // Marker visibility and label display based on zoom
+    console.log(show3d)
+    toggle3D((show3d))
+  }, [show3d]);
 
   return {
     map,
