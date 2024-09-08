@@ -3,12 +3,16 @@ import { HiPencil } from 'react-icons/hi2';
 import { IoMdArrowDropdown } from 'react-icons/io';
 import { IoCheckmarkCircleOutline } from 'react-icons/io5';
 import { RiContactsBook3Line } from 'react-icons/ri';
+import { CONFIG } from '../../config';
+import { useParams } from 'react-router-dom';
 
 const ContactDetails = () => {
 
     const [contactInformationVisible, setContactInformationVisible] = useState(true);
     const [addressInformationVisible, setAddressInformationVisible] = useState(true);
     const [sectionHeight, setSectionHeight] = useState(0);
+    const [contactData, setContactData] = useState(null);
+    const { id } = useParams();
 
     useEffect(() => {
         const handleResize = () => {
@@ -42,6 +46,26 @@ const ContactDetails = () => {
                 break;
         }
     };
+
+    useEffect(() => {
+        // Fetch account data based on the id parameter
+        async function fetchAccountData() {
+            try {
+                // Replace with your API call
+                const response = await fetch(`${CONFIG.CONTACT_SERVICE}/${id}`);
+                const data = await response.json();
+                setContactData(data.resultSet);
+            } catch (error) {
+                console.error('Error fetching contact data:', error);
+            }
+        }
+        fetchAccountData();
+    }, [id]);
+
+    if (!contactData) {
+        return <div>Loading...</div>;  // Show a loading state while data is fetched
+    }
+
     return (
         <div className="bg-neutral-100">
             {/* Header Section */}
@@ -53,7 +77,7 @@ const ContactDetails = () => {
                         </div>
                         <div>
                             <h1 className="text-xs font-normal">Contacts</h1>
-                            <h1 className="text-lg font-bold text-neutral-700">Mr. K singa Singamsetty</h1>
+                            <h1 className="text-lg font-bold text-neutral-700">{contactData.firstname} {contactData.lastname}</h1>
                         </div>
                     </div>
 
@@ -62,29 +86,29 @@ const ContactDetails = () => {
             <div className="flex justify-between items-center bg-white p-2 mb-4 rounded-md shadow-md">
                 <div className="flex space-x-12">
                     <div className="flex flex-col p-2 ">
-                        <span className="text-xs">Title</span>
+                        <span className="text-xs">{contactData.title}</span>
                     </div>
                     <div className="flex flex-col p-2 ">
                         <span className="text-xs">Account Name</span>
-                        <p className="text-sm cursor-pointer text-green-700 hover:text-c-teal">Xact Data Discovery</p>
+                        <p className="text-sm cursor-pointer text-green-700 hover:text-c-teal">{contactData.accountContact.accountName}</p>
                     </div>
                     <div className="flex p-2 ">
-                        <span className="material-icons text-xs">phone (2)</span>
-                        <IoMdArrowDropdown className='ml-1 cursor-pointer active:rounded-lg active:border active:border-neutral-500' />
+                        <span className="material-icons text-xs">{contactData.businessPhone}</span>
+                        {/* <IoMdArrowDropdown className='ml-1 cursor-pointer active:rounded-lg active:border active:border-neutral-500' /> */}
                     </div>
                     <div className="flex flex-col p-2 ">
                         <span className="text-xs">Email</span>
-                        <p href="mailto:k.singamsetty@xactdata.com.test" className="text-green-700 hover:text-c-teal text-sm">k.singamsetty@xactdata.com.test</p>
+                        <p href="mailto:k.singamsetty@xactdata.com.test" className="text-green-700 hover:text-c-teal text-sm">{contactData.email}</p>
                     </div>
                     <div className="flex flex-col p-2 ">
                         <span className="material-icons text-xs">linkedin</span>
-                        <p className="text-sm">LinkedIn</p>
+                        <p className="text-sm">{contactData.linkedin}</p>
                     </div>
                     <div className="flex flex-col p-2 ">
                         <span className="material-icons text-xs">Contact Status</span>
                         <div className='flex items-center'>
-                            <p className="text-sm">Active </p>
-                            <IoCheckmarkCircleOutline className='text-2xl pl-1 text-green-700'/>
+                            <p className="text-sm">{contactData.status}</p>
+                            <IoCheckmarkCircleOutline className='text-2xl pl-1 text-green-700' />
                         </div>
                     </div>
                 </div>
@@ -110,84 +134,84 @@ const ContactDetails = () => {
                                     <div className="flex justify-between border-b pb-1">
                                         <div className="flex flex-col mt-auto">
                                             <label className="text-neutral-600 text-sm mb-1">Name</label>
-                                            <input type="text" value="Mr. K singa Singamsetty" className="w-full text-sm text-neutral-700" />
+                                            <input type="text" value={`${contactData.salutation} ${contactData.firstname} ${contactData.middlename} ${contactData.lastname}`} className="w-full text-sm text-neutral-700" readOnly />
                                         </div>
                                         <HiPencil className="ml-2 cursor-pointer text-neutral-500 mt-auto" />
                                     </div>
                                     <div className="flex justify-between border-b pb-1">
                                         <div className="flex flex-col">
                                             <label className="text-neutral-600 text-sm mb-1">Account Name</label>
-                                            <a href="#" className="text-green-700 hover:text-c-teal text-sm">Xact Data Discovery</a>
+                                            <a href="#" className="text-green-700 hover:text-c-teal text-sm">{contactData.accountContact.accountName}</a>
                                         </div>
                                         <HiPencil className="ml-2 cursor-pointer text-neutral-500 mt-auto" />
                                     </div>
                                     <div className="flex justify-between border-b pb-1">
                                         <div className="flex flex-col mt-auto">
                                             <label className="text-neutral-600 text-sm mb-1">Title</label>
-                                            <input type="text" value="" className="w-full text-sm text-neutral-700" />
+                                            <input type="text" value={contactData.title} className="w-full text-sm text-neutral-700" readOnly />
                                         </div>
                                         <HiPencil className="ml-2 cursor-pointer text-neutral-500 mt-auto" />
                                     </div>
                                     <div className="flex justify-between border-b pb-1">
                                         <div className="flex flex-col mt-auto">
                                             <label className="text-neutral-600 text-sm mb-1">Email</label>
-                                            <a href="mailto:k.singamsetty@xactdata.com.test" className="text-green-700 hover:text-c-teal">k.singamsetty@xactdata.com.test</a>
+                                            <a href={`mailto:${contactData.email}`} className="text-green-700 hover:text-c-teal">{contactData.email}</a>
                                         </div>
                                         <HiPencil className="ml-2 cursor-pointer text-neutral-500 mt-auto" />
                                     </div>
                                     <div className="flex justify-between border-b pb-1">
                                         <div className="flex flex-col mt-auto">
                                             <label className="text-neutral-600 text-sm mb-1">Department</label>
-                                            <input type="text" value="" className="w-full text-sm text-neutral-700" />
+                                            <input type="text" value={contactData.department} className="w-full text-sm text-neutral-700" readOnly />
                                         </div>
                                         <HiPencil className="ml-2 cursor-pointer text-neutral-500 mt-auto" />
                                     </div>
                                     <div className="flex justify-between border-b pb-1">
                                         <div className="flex flex-col mt-auto">
                                             <label className="text-neutral-600 text-sm mb-1">Business Phone</label>
-                                            <input type="text" value="" className="w-full text-sm text-neutral-700" />
+                                            <input type="text" value={contactData.businessPhone} className="w-full text-sm text-neutral-700" readOnly />
                                         </div>
                                         <HiPencil className="ml-2 cursor-pointer text-neutral-500 mt-auto" />
                                     </div>
                                     <div className="flex justify-between border-b pb-1">
                                         <div className="flex flex-col mt-auto">
                                             <label className="text-neutral-600 text-sm mb-1">Contact Profile</label>
-                                            <input type="text" value="" className="w-full text-sm text-neutral-700" />
+                                            <input type="text" value={contactData.contactProfile.map(profile => profile.contactProfileList.name).join(', ')} className="w-full text-sm text-neutral-700" readOnly />
                                         </div>
                                         <HiPencil className="ml-2 cursor-pointer text-neutral-500 mt-auto" />
                                     </div>
                                     <div className="flex justify-between border-b pb-1">
                                         <div className="flex flex-col mt-auto">
                                             <label className="text-neutral-600 text-sm mb-1">Mobile</label>
-                                            <input type="text" value="" className="w-full text-sm text-neutral-700" />
+                                            <input type="text" value={contactData.mobilePhone} className="w-full text-sm text-neutral-700" readOnly />
                                         </div>
                                         <HiPencil className="ml-2 cursor-pointer text-neutral-500 mt-auto" />
                                     </div>
                                     <div className="flex justify-between border-b pb-1">
                                         <div className="flex flex-col mt-auto">
                                             <label className="text-neutral-600 text-sm mb-1">Contact Type</label>
-                                            <input type="text" value="" className="w-full text-sm text-neutral-700" />
+                                            <input type="text" value={contactData.accountContact.relationshipType.name} className="w-full text-sm text-neutral-700" readOnly />
                                         </div>
                                         <HiPencil className="ml-2 cursor-pointer text-neutral-500 mt-auto" />
                                     </div>
                                     <div className="flex justify-between border-b pb-1">
                                         <div className="flex flex-col mt-auto">
                                             <label className="text-neutral-600 text-sm mb-1">Main Phone</label>
-                                            <input type="text" value="" className="w-full text-sm text-neutral-700" />
+                                            <input type="text" value={contactData.businessPhone} className="w-full text-sm text-neutral-700" readOnly />
                                         </div>
                                         <HiPencil className="ml-2 cursor-pointer text-neutral-500 mt-auto" />
                                     </div>
                                     <div className="flex justify-between border-b pb-1">
                                         <div className="flex flex-col mt-auto">
                                             <label className="text-neutral-600 text-sm mb-1">Linkedin</label>
-                                            <input type="text" value="" className="w-full text-sm text-neutral-700" />
+                                            <input type="text" value={contactData.linkedin} className="w-full text-sm text-neutral-700" readOnly />
                                         </div>
                                         <HiPencil className="ml-2 cursor-pointer text-neutral-500 mt-auto" />
                                     </div>
                                     <div className="flex justify-between border-b pb-1">
                                         <div className="flex flex-col mt-auto">
                                             <label className="text-neutral-600 text-sm mb-1">Influence Level</label>
-                                            <input type="text" value="low" className="w-full text-sm text-neutral-700" />
+                                            <input type="text" value={contactData.influenceLevel} className="w-full text-sm text-neutral-700" readOnly />
                                         </div>
                                         <HiPencil className="ml-2 cursor-pointer text-neutral-500 mt-auto" />
                                     </div>
@@ -209,14 +233,19 @@ const ContactDetails = () => {
                                     <div className="flex justify-between border-b pb-1">
                                         <div className="flex flex-col mt-auto">
                                             <label className="text-neutral-600 text-sm mb-1">Source of Mailing Address</label>
-                                            <input type="text" value="account address" className="w-full text-sm text-neutral-700" />
+                                            <input type="text" value="Contact" className="w-full text-sm text-neutral-700" readOnly />
                                         </div>
                                         <HiPencil className="ml-2 cursor-pointer text-neutral-500 mt-auto" />
                                     </div>
                                     <div className="flex justify-between border-b pb-1">
                                         <div className="flex flex-col mt-auto">
                                             <label className="text-neutral-600 text-sm mb-1">Address</label>
-                                            <input type="text" value="MDC, Mumbai" className="w-full text-sm text-neutral-700" />
+                                            <input
+                                                type="text"
+                                                value={`${contactData.mailingStreet || ''}, ${contactData.mailingCity || ''}, ${contactData.mailingState || ''}, ${contactData.mailingPostCode || ''}, ${contactData.mailingCountry?.countryName || ''}`}
+                                                className="w-full text-sm text-neutral-700"
+                                                readOnly
+                                            />
                                         </div>
                                         <HiPencil className="ml-2 cursor-pointer text-neutral-500 mt-auto" />
                                     </div>
