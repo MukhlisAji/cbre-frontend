@@ -14,9 +14,8 @@ export function useConfig() {
   const [zoom, setZoom] = useState(10);
   const { showMRT, setShowMRT } = useMRTLine(map)
   const  [show3d, setShow3d]= useState(false)
-  const [styleMap, setStyleMap] = useState(
-    "mapbox://styles/rajifmahendra/clxrims5h002k01pf1imoen80"
-  );
+  const [styleMap, setStyleMap] = useState("mapbox://styles/mapbox/streets-v12");
+    
 
   const handleChangeStyleMap = (value) => {
     setStyleMap(value);
@@ -302,13 +301,11 @@ export function useConfig() {
     if (map.current) return;
     map.current = new mapboxgl.Map({
       container: mapContainer.current,
-      style: JSON.parse(localStorage.getItem("styleMap")),
+      // style: JSON.parse(localStorage.getItem("styleMap")),
+      style: localStorage.getItem("styleMap") ? JSON.parse(localStorage.getItem("styleMap")) : styleMap,
       center: [lng, lat],
       zoom: zoom,
     });
-
-    // Add controls to the map
-    addMapControls();
 
     // Load event listener for map
     map.current.on("load", () => {
@@ -322,6 +319,8 @@ export function useConfig() {
   }, [styleMap, localStorage.getItem("styleMap")]);
 
   useEffect(() => {
+    // Add controls to the map
+    addMapControls();
     // Custom control setup
     addCustomControl();
   }, []);
@@ -337,7 +336,6 @@ export function useConfig() {
       return
     }
     // Marker visibility and label display based on zoom
-    console.log(show3d)
     toggle3D((show3d))
     if (!show3d){
       const container = document.getElementById('2d-3d-container')

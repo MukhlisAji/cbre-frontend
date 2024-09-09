@@ -7,7 +7,7 @@ import { useAppContext } from "../../../AppContext";
 import IconLine from "../../../assets/jalur.png";
 import FilterLine from "../FilterLine/FilterLine";
 import { StyleList, filterdata } from "../constant";
-import { useConfig, useMap, useRegion } from "../hooks";
+import { useConfig, useMap, useMRTData, useRegion } from "../hooks";
 import { useMicromarket } from "../hooks/useMicromarket";
 import { useZoning } from "../hooks/useZoning";
 import { AllRegion, NortWest, SouthEast, StyleSatelliteStreet } from "../utils";
@@ -78,7 +78,7 @@ function Map2D() {
   );
 
   // MRT
-  // useMRTData(zoom, map);
+  useMRTData(zoom, map);
   // const { setShowMRT } = useMRTLine(map);
 
   const handleClick = (coordinate) => {

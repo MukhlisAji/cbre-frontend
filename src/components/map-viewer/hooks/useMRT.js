@@ -5,15 +5,17 @@ import { generatedColor, generatedRounded } from "../helper";
 import { CONFIG_APP } from "../config/app";
 
 export function useMRTData(zoom, map) {
+  console.log("Using MRT data hook...");
+  
   const MRTData = async () => {
     console.log("Fetching MRT data...");
     const res = await fetch(
-      `${CONFIG_APP.MAPBOX_API}/map-transportation/label`
+      `${CONFIG_APP.MAPBOX_API}/map-transportation/mrt`
     );
     const responseData = await res.json();
     responseData?.geojson?.features?.forEach((station) => {
-      if (station.properties.lines) {
-        const values = station.properties.lines.filter((value) => value);
+      if (station.properties.REF) {
+        const values = station.properties.REF.filter((value) => value);
         let linesOutput = "";
 
         linesOutput += `<div class="marker-testing">`;
@@ -32,7 +34,7 @@ export function useMRTData(zoom, map) {
         const element = document.createElement("div");
         element.innerHTML = `
     <div class="container-marker-name-testing">
-      <div class="marker-name-testing">${station?.properties?.name}</div>
+      <div class="marker-name-testing">${station?.properties?.NAME}</div>
       <div class="icon-wrapper">
        ${
          station?.properties?.network === "mrt"
@@ -73,23 +75,38 @@ export function useMRTData(zoom, map) {
         element.addEventListener("mouseenter", () => {
           hoverPopup = new mapboxgl.Popup({ offset: 25 }).setHTML(`
             <div class="popup-container">
-                <div class="popup-image">
-                    <img src="${station.properties.wikipedia_image_url}" alt="No Image" />
-                </div>
                 <div class="info-box">
-                    <h3>${station.properties.name}</h3>
+                    <h3>${station.properties.NAME}</h3>
                     <div class="other-info">
-                        <p><strong>In Hindi:</strong> ${station.properties.name_hi}</p>
-                        <p><strong>In Chinese:</strong> ${station.properties.name_zh}</p>
-                        <p><strong>Line:</strong> NS23</p>
-                        <p><strong>Network:</strong> ${station.properties.network}</p>
+                        <p><strong>Longitude:</strong> ${station.geometry.coordinates[0]}</p>
+                        <p><strong>Latitude:</strong> ${station.geometry.coordinates[1]}</p>
+                        <p><strong>Railway:</strong> ${station.properties.RAILWAY}</p>
+                        <p><strong>Member Role:</strong> ${station.properties.MEMBER_ROLE}</p>
                     </div>
-                    <p><strong>Type:</strong> ${station.properties.type}</p>
-                    <a href="${station.properties.wikipedia_url}" target="_blank">More Info</a>
                 </div>
             </div>`);
           hoverPopup.setLngLat(station.geometry.coordinates).addTo(map.current);
           element.hoverPopup = hoverPopup;
+          
+          // hoverPopup = new mapboxgl.Popup({ offset: 25 }).setHTML(`
+          //   <div class="popup-container">
+          //       <div class="popup-image">
+          //           <img src="${station.properties.wikipedia_image_url}" alt="No Image" />
+          //       </div>
+          //       <div class="info-box">
+          //           <h3>${station.properties.name}</h3>
+          //           <div class="other-info">
+          //               <p><strong>In Hindi:</strong> ${station.properties.name_hi}</p>
+          //               <p><strong>In Chinese:</strong> ${station.properties.name_zh}</p>
+          //               <p><strong>Line:</strong> NS23</p>
+          //               <p><strong>Network:</strong> ${station.properties.network}</p>
+          //           </div>
+          //           <p><strong>Type:</strong> ${station.properties.type}</p>
+          //           <a href="${station.properties.wikipedia_url}" target="_blank">More Info</a>
+          //       </div>
+          //   </div>`);
+          // hoverPopup.setLngLat(station.geometry.coordinates).addTo(map.current);
+          // element.hoverPopup = hoverPopup;
 
           hoverPopup.getElement().addEventListener("mouseleave", () => {
             hoverPopup.remove();
