@@ -4,11 +4,16 @@ import { useLocation } from 'react-router-dom';
 import { CONTACTCOLUMNDUMMY, CONTACTDATADUMMY, PROPERTYCOLUMNDUMMY, PROPERTYDATADUMMY } from '../lib/const/DummyData';
 import PropertyNew from './PropertyNew';
 import DataTable from '../shared/CustomTableMUI';
+import PropertyForm from './PropertyForm';
 
 
 export default function Properties() {
     const location = useLocation();
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [loading, setLoading] = useState(true);
+    const [isEditing, setIsEditing] = useState(false);
+    const [currentAccount, setCurrentAccount] = useState(null);
+    const [propertyId, setPropertyId] = useState(null);
 
     useEffect(() => {
         if (location.state?.openModal) {
@@ -26,6 +31,19 @@ export default function Properties() {
         setIsModalOpen(false);
     };
 
+    const handleNewProperty = () => {
+        setIsEditing(false);
+        setCurrentAccount(null);
+        setIsModalOpen(true);
+    };
+
+    const handleEditProperty = (property) => {
+        setIsModalOpen(true);
+        console.log('Editing account:', property.id);
+        setIsEditing(true);
+        setAccountId(property.id);
+        setCurrentAccount(property);
+    };
     return (
         <div className="h-screen flex flex-col flex-grow mb-4">
             <div className="bg-neutral-100 rounded flex-grow">
@@ -51,8 +69,15 @@ export default function Properties() {
                         </button>
                     </div> */}
                 </div>
-                <DataTable column={PROPERTYCOLUMNDUMMY} dataTable={PROPERTYDATADUMMY} openModal={openModal} tableHeight={300} isHeader={true} />
-                {isModalOpen && <PropertyNew onClose={closeModal} />}
+                <DataTable column={PROPERTYCOLUMNDUMMY} dataTable={PROPERTYDATADUMMY} openModal={handleNewProperty} isHeader={true} tableHeight={300} loading={loading} onEdit={handleEditProperty} dataType={"contact"} />
+                {isModalOpen && (
+                    <PropertyForm
+                        onClose={closeModal}
+                        isEditing={isEditing}
+                        initialData={currentAccount}
+                        accountId={propertyId}
+                    />
+                )}
             </div>
         </div>
     );
