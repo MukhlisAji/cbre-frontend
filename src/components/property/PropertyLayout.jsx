@@ -1,19 +1,48 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Outlet, Link } from 'react-router-dom';
-import ContactNew from './ContactNew';
 import { FaChevronDown, FaChevronUp } from 'react-icons/fa';
-import AccountNew from './AccountNew';
 import { IoIosSearch } from 'react-icons/io';
+import { useUtils } from '../lib/api/Authorization';
+import AccountForm from './AccountForm';
+import ContactForm from './ContactForm';
+import Project from '../map-viewer/pages/project/Project';
+import { DndProvider } from 'react-dnd';
+import { HTML5Backend } from 'react-dnd-html5-backend';
 
 
 export default function PropertyLayout() {
     const [activeMenu, setActiveMenu] = useState(null);
     const [openMenu, setOpenMenu] = useState(null);
-    const [isModalOpen, setIsModalOpen] = useState(false); // State for modal visibility
-
-
+    const [isModalOpen, setIsModalOpen] = useState(false);
     const accountMenuRef = useRef(null);
     const contactMenuRef = useRef(null);
+    const propertiesMenuRef = useRef(null); // Fixing the duplicate contactMenuRef
+    const { generateAndSetToken } = useUtils();
+    const [modalType, setModalType] = useState(null);
+
+    const openModal = (type) => {
+        console.log('Opening modal for:', type); // Debugging
+        setModalType(type);
+        setIsModalOpen(true);
+    };
+
+    const closeModal = () => {
+        setIsModalOpen(false);
+        setModalType(null);
+    };
+
+    useEffect(() => {
+        const fetchToken = async () => {
+            const success = await generateAndSetToken();
+            if (success) {
+                console.log('Token generated and set successfully');
+            } else {
+                console.error('Failed to generate and set token');
+            }
+        };
+
+        fetchToken();
+    }, []);
 
     const handleLabelClick = (menu) => {
         if (activeMenu !== menu) {
@@ -34,7 +63,8 @@ export default function PropertyLayout() {
     const handleClickOutside = (event) => {
         if (
             accountMenuRef.current && !accountMenuRef.current.contains(event.target) &&
-            contactMenuRef.current && !contactMenuRef.current.contains(event.target)
+            contactMenuRef.current && !contactMenuRef.current.contains(event.target) &&
+            propertiesMenuRef.current && !propertiesMenuRef.current.contains(event.target) // Adding properties menu ref
         ) {
             setOpenMenu(null);
         }
@@ -50,17 +80,8 @@ export default function PropertyLayout() {
     const isMenuActive = (menu) => activeMenu === menu;
     const isMenuOpen = (menu) => openMenu === menu;
 
-    // Function to open the modal
-    const openModal = () => {
-        setIsModalOpen(true);
-    };
-
-    // Function to close the modal
-    const closeModal = () => {
-        setIsModalOpen(false);
-    };
-
     return (
+        <DndProvider backend={HTML5Backend}>
         <div className="flex flex-col overflow-hidden">
             <div className="flex relative bg-white p-2 text-c-dark-grayish border-b border-neutral-200">
                 <div className="text-md text-c-dark-grayish font-semibold"><span>Property</span></div>
@@ -82,21 +103,18 @@ export default function PropertyLayout() {
                     {isMenuOpen('accounts') && (
                         <div className="absolute mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-20">
                             <div className="py-1" role="menu" aria-orientation="vertical" aria-labelledby="options-menu">
-                                <div onClick={openModal} className="block px-4 py-2 text-sm text-gray-700 cursor-pointer hover:bg-gray-100 hover:text-gray-900 hover:no-underline" role="menuitem">
+                                <div onClick={() => openModal('account')} className="block px-4 py-2 text-sm text-gray-700 cursor-pointer hover:bg-gray-100 hover:text-gray-900 hover:no-underline" role="menuitem">
                                     <span className="flex items-center">
                                         <span className="mr-2">+</span> New Account
                                     </span>
                                 </div>
                             </div>
-
                         </div>
                     )}
-
-
                 </div>
-                {isModalOpen &&
-                    <AccountNew onClose={closeModal} />
-                }
+                {isModalOpen && modalType === 'account' && (
+                    <AccountForm onClose={closeModal} />
+                )}
                 {/* Contact Menu */}
                 <div ref={contactMenuRef} className={`relative inline-block text-left border-b-2 ${isMenuActive('contacts') ? 'border-b-2 border-c-teal' : 'border-white'}`}>
                     <div className="flex cursor-pointer" onClick={() => handleLabelClick('contacts')}>
@@ -113,7 +131,7 @@ export default function PropertyLayout() {
                     {isMenuOpen('contacts') && (
                         <div className="absolute mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-20">
                             <div className="py-1" role="menu" aria-orientation="vertical" aria-labelledby="options-menu">
-                                <div onClick={openModal} className="block px-4 py-2 text-sm text-gray-700 cursor-pointer hover:bg-gray-100 hover:text-gray-900 hover:no-underline" role="menuitem">
+                                <div onClick={() => openModal('contact')} className="block px-4 py-2 text-sm text-gray-700 cursor-pointer hover:bg-gray-100 hover:text-gray-900 hover:no-underline" role="menuitem">
                                     <span className="flex items-center">
                                         <span className="mr-2">+</span> New Contact
                                     </span>
@@ -123,11 +141,12 @@ export default function PropertyLayout() {
                     )}
                 </div>
 
-                {isModalOpen &&
-                    <ContactNew onClose={closeModal} />
-                }
+                {isModalOpen && modalType === 'contact' && (
+                    <ContactForm onClose={closeModal} />
+                )}
 
-                <div ref={contactMenuRef} className={`relative border-b-2 inline-block text-left ${isMenuActive('properties') ? 'border-b-2 border-c-teal' : 'border-white'}`}>
+                {/* Properties Menu */}
+                <div ref={propertiesMenuRef} className={`relative border-b-2 inline-block text-left ${isMenuActive('properties') ? 'border-b-2 border-c-teal' : 'border-white'}`}>
                     <div className="flex cursor-pointer" onClick={() => handleLabelClick('properties')}>
                         <Link to="properties" className=' hover:no-underline'>
                             <span className="mr-2 flex items-center text-neutral-700 text-sm" >
@@ -142,14 +161,14 @@ export default function PropertyLayout() {
                     {isMenuOpen('properties') && (
                         <div className="absolute mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-20">
                             <div className="py-1" role="menu" aria-orientation="vertical" aria-labelledby="options-menu">
-                                <div onClick={openModal} className="block px-4 py-2 text-sm text-gray-700 cursor-pointer hover:bg-gray-100 hover:text-gray-900 hover:no-underline" role="menuitem">
+                                <div onClick={() => openModal('properties')} className="block px-4 py-2 text-sm text-gray-700 cursor-pointer hover:bg-gray-100 hover:text-gray-900 hover:no-underline" role="menuitem">
                                     <span className="flex items-center">
                                         <span className="mr-3">+</span> New Properties
                                     </span>
                                 </div>
-                                <div onClick={openModal} className="block px-4 py-2 text-sm text-gray-700 cursor-pointer hover:bg-gray-100 hover:text-gray-900 hover:no-underline" role="menuitem">
+                                <div onClick={() => openModal('searchProperties')} className="block px-4 py-2 text-sm text-gray-700 cursor-pointer hover:bg-gray-100 hover:text-gray-900 hover:no-underline" role="menuitem">
                                     <span className="flex items-center">
-                                        <span className="mr-1.5"><IoIosSearch className='font-bold text-neutral-900'/></span>Search Properties
+                                        <span className="mr-1.5"><IoIosSearch className='font-bold text-neutral-900' /></span>Search Properties
                                     </span>
                                 </div>
                             </div>
@@ -160,6 +179,11 @@ export default function PropertyLayout() {
             <div className='p-4'>
                 <Outlet />
             </div>
+            <Project />
         </div>
+        </DndProvider>
     );
 }
+
+
+

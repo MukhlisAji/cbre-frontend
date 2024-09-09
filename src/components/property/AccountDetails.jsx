@@ -15,7 +15,7 @@ function classNames(...classes) {
 
 export default function AccountDetails() {
     const [selectedIndex, setSelectedIndex] = useState(0);
-    const { id } = useParams();  // Get the path variable
+    const { id } = useParams(); 
     const [accountData, setAccountData] = useState(null);
 
 
@@ -35,7 +35,7 @@ export default function AccountDetails() {
         async function fetchAccountData() {
             try {
                 // Replace with your API call
-                const response = await fetch(`http://localhost:8080/cbre/account/${id}`);
+                const response = await fetch(`http://localhost:8085/cbre/account/${id}`);
                 const data = await response.json();
                 setAccountData(data.resultSet);
             } catch (error) {

@@ -1,0 +1,5 @@
+export const CONFIG = {
+    ACCOUNT_SERVICE: import.meta.env.VITE_ACCOUNT_SERVICE,
+    CONTACT_SERVICE: import.meta.env.VITE_CONTACT_SERVICE,
+    UTILITIES_SERVICE: import.meta.env.VITE_UTILITIES_SERVICE,
+};
