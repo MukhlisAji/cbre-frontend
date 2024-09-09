@@ -23,26 +23,7 @@ import { SelectClickTypes } from '@table-library/react-table-library/types';
 
 const ROW_HEIGHT = 40;
 
-const RECENTLY_VIEWED_KEY = 'recentlyViewedItems';
-
-const getRecentlyViewed = () => {
-    const storedItems = localStorage.getItem(RECENTLY_VIEWED_KEY);
-    return storedItems ? JSON.parse(storedItems) : [];
-};
-
-const setRecentlyViewed = (item) => {
-    const recentlyViewed = getRecentlyViewed();
-    if (!recentlyViewed.some(viewedItem => viewedItem.id === item.id)) {
-        if (recentlyViewed.length >= 5) {
-            recentlyViewed.shift(); // Remove the oldest item
-        }
-        recentlyViewed.push(item);
-        localStorage.setItem(RECENTLY_VIEWED_KEY, JSON.stringify(recentlyViewed));
-    }
-};
-
-
-const CustomTableMUI = ({ dataTable, column, openModal, isHeader, tableHeight, loading, onEdit }) => {
+const CustomTableMUI = ({ dataTable, column, openModal, isHeader, tableHeight, loading, onEdit, dataType }) => {
     const [search, setSearch] = useState("");
     const [visibleColumns, setVisibleColumns] = useState(column.slice(0, 7));
     const [editing, setEditing] = useState(null);
@@ -51,10 +32,31 @@ const CustomTableMUI = ({ dataTable, column, openModal, isHeader, tableHeight, l
     const buttonRef = useRef(null);
     const dropdownRef = useRef(null);
     const [activeButton, setActiveButton] = useState('all');
-    const [recentlyViewed, setRecentlyViewedState] = useState(getRecentlyViewed());
+    // const [recentlyViewed, setRecentlyViewedState] = useState(getRecentlyViewed());
     const [showRecentlyViewed, setShowRecentlyViewed] = useState(false);
     const navigate = useNavigate();
 
+    const RECENTLY_VIEWED_KEY = `recentlyViewed_${dataType}`;
+
+
+    const getRecentlyViewed = () => {
+        const storedItems = localStorage.getItem(RECENTLY_VIEWED_KEY);
+        return storedItems ? JSON.parse(storedItems) : [];
+    };
+
+    const [recentlyViewed, setRecentlyViewedState] = useState(getRecentlyViewed());
+
+
+    const setRecentlyViewed = (item) => {
+        const recentlyViewed = getRecentlyViewed();
+        if (!recentlyViewed.some(viewedItem => viewedItem.id === item.id)) {
+            if (recentlyViewed.length >= 5) {
+                recentlyViewed.shift(); // Remove the oldest item
+            }
+            recentlyViewed.push(item);
+            localStorage.setItem(RECENTLY_VIEWED_KEY, JSON.stringify(recentlyViewed));
+        }
+    };
     useEffect(() => {
         console.log("Updated data: ", dataTable);
         setData(dataTable);
@@ -69,7 +71,6 @@ const CustomTableMUI = ({ dataTable, column, openModal, isHeader, tableHeight, l
             setShowRecentlyViewed(false);
         }
     };
-
 
     const handleClickOutside = (event) => {
         if (
@@ -467,7 +468,9 @@ const CustomTableMUI = ({ dataTable, column, openModal, isHeader, tableHeight, l
                                                         <div
                                                             onClick={() => {
                                                                 onEdit(item);
-                                                                setEdit(null);  // Close the dropdown after editing
+                                                                setEdit(null);
+                                                                setRecentlyViewed(item);
+                                                                setRecentlyViewedState(getRecentlyViewed());
                                                             }}
                                                             className='px-2 py-1 rounded-md hover:bg-gray-100 cursor-pointer'
                                                         >
@@ -485,7 +488,7 @@ const CustomTableMUI = ({ dataTable, column, openModal, isHeader, tableHeight, l
                     )}
                 </MaterialThemeProvider>
             </div>
-        </div>
+        </div >
     );
 };
 

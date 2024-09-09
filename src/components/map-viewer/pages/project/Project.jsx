@@ -14,11 +14,11 @@ const ItemTypes = {
 const sampleData = {
     projects: [
         { id: 1, name: "Project Alpha", description: "A project focused on developing alpha features.", enabled: false },
-        { id: 2, name: "Project Beta", description: "A project focused on developing beta features.", enabled: true },
+        { id: 2, name: "Project Beta", description: "A project focused on developing beta features.", enabled: false },
     ],
     buildings: [
-        { id: 1, name: "Building One", location: "1234 Main St", enabled: false },
-        { id: 2, name: "Building Two", location: "5678 Elm St", enabled: true },
+        { id: 1, name: "Building One", location: "1234 Main St", enabled: true, projectId: 1 },
+        { id: 2, name: "Building Two", location: "5678 Elm St", enabled: true, projectId: 2 },
     ],
 };
 
@@ -28,18 +28,30 @@ export default function Project() {
     const [buildings, setBuildings] = useState(BUILDINGDATADUMMY);
     const [buildingIdList, setBuildingIdList] = useState([]);
     const { openProject, drawerContent, toggleDrawer } = useAppContext();
+    const [selectedProjectId, setSelectedProjectId] = useState(null);
 
-    const handleProjectChange = (index) => {
-        const newProjects = [...projects];
-        newProjects[index].enabled = !newProjects[index].enabled;
+
+    const handleProjectChange = (projectId) => {
+        const newProjects = projects.map((project) =>
+            project.id === projectId ? { ...project, enabled: !project.enabled } : project
+        );
         setProjects(newProjects);
     };
+
+
+    const filteredBuildings = sampleData.buildings.filter(building => building.projectId === selectedProjectId);
+
 
     const handleBuildingChange = (index) => {
         const newBuildings = [...buildings];
         newBuildings[index].enabled = !newBuildings[index].enabled;
         setBuildings(newBuildings);
     };
+
+    const handleProjectSelection = (projectId) => {
+        setSelectedProjectId(projectId === selectedProjectId ? null : projectId); // Toggle selection
+
+    }
 
     const handleCancelShare = () => {
         setConfirmationDialogVisible(false);
@@ -72,37 +84,49 @@ export default function Project() {
                                 </h2>
                             </div>
                             <div className='flex flex-col flex-grow p-2'>
-                                {projects.map((project, index) => (
-                                    <div key={project.id} className='mb-2 py-2 flex items-center'>
+                                {projects.map((project) => (
+                                    <div
+                                        onClick={() => handleProjectSelection(project.id)}
+                                        key={project.id}
+                                        className={`mb-2 py-2 pl-2 flex items-center cursor-pointer ${selectedProjectId === project.id ? 'bg-blue-100' : 'bg-white'
+                                            } hover:bg-neutral-200`}
+                                    >
                                         <Checkbox
                                             checked={project.enabled}
-                                            onChange={() => handleProjectChange(index)}
-                                            className={`form-checkbox h-5 w-5 text-c-teal rounded-md ${project.enabled ? 'bg-c-teal' : 'bg-neutral-300'}`}
+                                            onChange={() => handleProjectChange(project.id)}
+                                            className={`form-checkbox h-5 w-5 text-c-teal rounded-md ${project.enabled ? 'bg-c-teal' : 'bg-neutral-300'
+                                                }`}
                                         >
                                             {project.enabled && <BsCheckLg className="text-white text-lg" />}
                                         </Checkbox>
+
                                         <span className="ml-2 text-sm text-neutral-700">{project.name}</span>
                                     </div>
                                 ))}
                             </div>
+
+
                         </div>
                         <div className='flex flex-col h-3/6 mb-2'>
                             <div className='flex items-center justify-center bg-neutral-200'>
                                 <h2 className="text-sm py-3 w-full text-center items-center font-semibold text-neutral-700">Building List</h2>
                             </div>
                             <div ref={drop} className={`flex flex-col flex-grow p-2 h-full ${isOver ? 'border border-green-500' : ''}`}>
-                                {buildings.filter((building) => buildingIdList.includes(building.id)).map((building, index) => (
-                                    <div key={building.id} className='mb-2 py-2 flex items-center'>
-                                        <Checkbox
-                                            checked={building.enabled}
-                                            onChange={() => handleBuildingChange(index)}
-                                            className={`form-checkbox h-5 w-5 text-c-teal rounded-md ${building.enabled ? 'bg-c-teal' : 'bg-neutral-300'}`}
-                                        >
-                                            {building.enabled && <BsCheckLg className="text-white text-lg" />}
-                                        </Checkbox>
-                                        <span className="ml-2 text-sm text-neutral-700">{building.name}</span>
+                                {selectedProjectId && (
+                                    <div className='flex flex-col flex-grow p-2'>
+                                        {filteredBuildings.length > 0 ? (
+                                            filteredBuildings.map((building) => (
+                                                <div key={building.id} className='mb-2 py-2 flex items-center'>
+                                                    <span className="ml-2">{building.name} - {building.location}</span>
+                                                </div>
+                                            ))
+                                        ) : (
+                                            <div className='text-center text-neutral-500'>
+                                                No buildings available for this project.
+                                            </div>
+                                        )}
                                     </div>
-                                ))}
+                                )}
                             </div>
                         </div>
                         <div className='flex flex-col justify-bottom flex-grow px-2 h-1/6'>
@@ -126,22 +150,53 @@ export default function Project() {
                         <div className='flex flex-col h-3/6 border-b'>
                             <div className='flex items-center justify-center bg-neutral-200'>
                                 <h2 className="text-sm py-3 w-full text-center items-center font-semibold text-neutral-700">
-                                    James's Project List
+                                    My Project List
                                 </h2>
                             </div>
                             <div className='flex flex-col flex-grow p-2'>
-                                {projects.map((project, index) => (
-                                    <div key={project.id} className='mb-2 py-2 flex items-center'>
+                                {projects.map((project) => (
+                                    <div
+                                        onClick={() => handleProjectSelection(project.id)}
+                                        key={project.id}
+                                        className={`mb-2 py-2 pl-2 flex items-center cursor-pointer ${selectedProjectId === project.id ? 'bg-blue-100' : 'bg-white'
+                                            } hover:bg-neutral-200`}
+                                    >
                                         <Checkbox
                                             checked={project.enabled}
-                                            onChange={() => handleProjectChange(index)}
-                                            className={`form-checkbox h-5 w-5 text-c-teal rounded-md ${project.enabled ? 'bg-c-teal' : 'bg-neutral-300'}`}
+                                            onChange={() => handleProjectChange(project.id)}
+                                            className={`form-checkbox h-5 w-5 text-c-teal rounded-md ${project.enabled ? 'bg-c-teal' : 'bg-neutral-300'
+                                                }`}
                                         >
                                             {project.enabled && <BsCheckLg className="text-white text-lg" />}
                                         </Checkbox>
+
                                         <span className="ml-2 text-sm text-neutral-700">{project.name}</span>
                                     </div>
                                 ))}
+                            </div>
+
+
+                        </div>
+                        <div className='flex flex-col h-3/6 mb-2'>
+                            <div className='flex items-center justify-center bg-neutral-200'>
+                                <h2 className="text-sm py-3 w-full text-center items-center font-semibold text-neutral-700">Building List</h2>
+                            </div>
+                            <div ref={drop} className={`flex flex-col flex-grow p-2 h-full ${isOver ? 'border border-green-500' : ''}`}>
+                                {selectedProjectId && (
+                                    <div className='flex flex-col flex-grow p-2'>
+                                        {filteredBuildings.length > 0 ? (
+                                            filteredBuildings.map((building) => (
+                                                <div key={building.id} className='mb-2 py-2 flex items-center'>
+                                                    <span className="ml-2">{building.name} - {building.location}</span>
+                                                </div>
+                                            ))
+                                        ) : (
+                                            <div className='text-center text-neutral-500'>
+                                                No buildings available for this project.
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
                             </div>
                         </div>
                         <div className='flex flex-col justify-bottom flex-grow px-2 h-1/6'>

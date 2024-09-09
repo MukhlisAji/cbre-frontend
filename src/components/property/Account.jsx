@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import DataTable from '../shared/CustomTableMUI';
 import { ACCOUNTCOLUMNDUMMY, ACCOUNTDATADUMMY } from '../lib/const/DummyData';
-import AccountNew from './AccountNew';
 import { MdAccountBox } from 'react-icons/md';
 import { generateTransactionId } from '../lib/api/Authorization';
+import { ACCOUNTCOLUMN } from '../lib/const/AppContant';
+import AccountForm from './AccountForm';
 
 
 
@@ -14,12 +15,13 @@ const Account = () => {
     const [loading, setLoading] = useState(true);
     const [isEditing, setIsEditing] = useState(false);
     const [currentAccount, setCurrentAccount] = useState(null);
+    const [accountId, setAccountId] = useState(null);
 
     useEffect(() => {
         const fetchData = async () => {
             const transactionId = generateTransactionId();
             try {
-                const response = await fetch('http://localhost:8080/cbre/account?page=1', {
+                const response = await fetch('http://localhost:8085/cbre/account?page=1', {
                     method: 'GET',
                     headers: {
                         'transactionId': transactionId
@@ -63,10 +65,11 @@ const Account = () => {
     };
 
     const handleEditAccount = (account) => {
-        console.log('Editing account:', account);
-        setIsEditing(true);
-        setCurrentAccount(account);
         setIsModalOpen(true);
+        console.log('Editing account:', account.id);
+        setIsEditing(true);
+        setAccountId(account.id);
+        setCurrentAccount(account);
     };
 
     const closeModal = () => {
@@ -75,10 +78,6 @@ const Account = () => {
         setCurrentAccount(null);
     };
 
-    const handleEdit = (account) => {
-        console.log('Editing account:', account);
-        <AccountNew onClose={closeModal} isEditing={false} initialData={account} />
-    };
     return (
         <div className="h-screen flex flex-col flex-grow mb-4">
             <div className="bg-neutral-100 rounded flex-grow">
@@ -115,12 +114,13 @@ const Account = () => {
                     </div> */}
 
                 </div>
-                <DataTable column={ACCOUNTCOLUMNDUMMY} dataTable={resultSet} openModal={handleNewAccount} isHeader={true} tableHeight={300} loading={loading} onEdit={handleEditAccount} />
+                <DataTable column={ACCOUNTCOLUMN} dataTable={resultSet} openModal={handleNewAccount} isHeader={true} tableHeight={300} loading={loading} onEdit={handleEditAccount} dataType={"contact"} />
                 {isModalOpen && (
-                    <AccountNew
+                    <AccountForm
                         onClose={closeModal}
                         isEditing={isEditing}
                         initialData={currentAccount}
+                        accountId={accountId}
                     />
                 )}
             </div>
