@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { RiContactsBook3Line } from 'react-icons/ri';
 import { useLocation } from 'react-router-dom';
-import { CONTACTCOLUMNDUMMY, CONTACTDATADUMMY } from '../lib/const/DummyData';
+import { CONTACTCOLUMNDUMMY, CONTACTDATADUMMY, PROPERTYCOLUMNDUMMY, PROPERTYDATADUMMY } from '../lib/const/DummyData';
 import PropertyNew from './PropertyNew';
 import DataTable from '../shared/CustomTableMUI';
 
@@ -51,7 +51,7 @@ export default function Properties() {
                         </button>
                     </div> */}
                 </div>
-                <DataTable column={CONTACTCOLUMNDUMMY} dataTable={CONTACTDATADUMMY} openModal={openModal} tableHeight={300} isHeader={true} />
+                <DataTable column={PROPERTYCOLUMNDUMMY} dataTable={PROPERTYDATADUMMY} openModal={openModal} tableHeight={300} isHeader={true} />
                 {isModalOpen && <PropertyNew onClose={closeModal} />}
             </div>
         </div>

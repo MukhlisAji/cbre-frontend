@@ -124,4 +124,21 @@ const BUILDINGDATADUMMY = [{
 }
 ]
 
-export { CONTACTDATADUMMY, ACCOUNTDATADUMMY, ACCOUNTCOLUMNDUMMY, BUILDINGDATADUMMY, CONTACTCOLUMNDUMMY };
+const PROPERTYCOLUMNDUMMY = [
+  { "label": "Property Name", "accessor": "propertyName" },
+  { "label": "Address", "accessor": "address" },
+  { "label": "Total NLA", "accessor": "totalNLA" },
+  { "label": "Floor", "accessor": "floor" }
+];
+
+
+const PROPERTYDATADUMMY = [
+  { "id": 1, "propertyName": "Sunset Tower", "address": "101 Sunset Blvd, Los Angeles, CA", "totalNLA": "50,000 sq ft", "floor": 10, "column": "A" },
+  { "id": 2, "propertyName": "Riverfront Plaza", "address": "202 River Rd, New York, NY", "totalNLA": "75,000 sq ft", "floor": 20, "column": "B" },
+  { "id": 3, "propertyName": "Lakeside Offices", "address": "303 Lakeview Dr, Chicago, IL", "totalNLA": "60,000 sq ft", "floor": 15, "column": "C" },
+  { "id": 4, "propertyName": "City Center Tower", "address": "404 Central Ave, San Francisco, CA", "totalNLA": "100,000 sq ft", "floor": 25, "column": "D" },
+  { "id": 5, "propertyName": "Downtown Hub", "address": "505 Main St, Seattle, WA", "totalNLA": "45,000 sq ft", "floor": 8, "column": "E" }
+];
+
+
+export { CONTACTDATADUMMY, ACCOUNTDATADUMMY, ACCOUNTCOLUMNDUMMY, BUILDINGDATADUMMY, CONTACTCOLUMNDUMMY, PROPERTYCOLUMNDUMMY, PROPERTYDATADUMMY};

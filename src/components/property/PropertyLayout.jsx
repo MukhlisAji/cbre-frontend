@@ -5,6 +5,10 @@ import { IoIosSearch } from 'react-icons/io';
 import { useUtils } from '../lib/api/Authorization';
 import AccountForm from './AccountForm';
 import ContactForm from './ContactForm';
+import Project from '../map-viewer/pages/project/Project';
+import { DndProvider } from 'react-dnd';
+import { HTML5Backend } from 'react-dnd-html5-backend';
+
 
 export default function PropertyLayout() {
     const [activeMenu, setActiveMenu] = useState(null);
@@ -77,6 +81,7 @@ export default function PropertyLayout() {
     const isMenuOpen = (menu) => openMenu === menu;
 
     return (
+        <DndProvider backend={HTML5Backend}>
         <div className="flex flex-col overflow-hidden">
             <div className="flex relative bg-white p-2 text-c-dark-grayish border-b border-neutral-200">
                 <div className="text-md text-c-dark-grayish font-semibold"><span>Property</span></div>
@@ -174,7 +179,9 @@ export default function PropertyLayout() {
             <div className='p-4'>
                 <Outlet />
             </div>
+            <Project />
         </div>
+        </DndProvider>
     );
 }
 
