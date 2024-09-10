@@ -13,6 +13,7 @@ export function useConfig() {
   const [isMap3D, setIsMap3D] = useState(false);
   const [zoom, setZoom] = useState(10);
   const { showMRT, setShowMRT } = useMRTLine(map)
+
   const [styleMap, setStyleMap] = useState("mapbox://styles/mapbox/streets-v12");
     
 
@@ -29,7 +30,14 @@ export function useConfig() {
     const labelLayerId = layers.find(
       (layer) => layer.type === "symbol" && layer.layout["text-field"]
     )?.id;
-    
+    // const control = document.querySelector("#control-building-map").parentNode;
+    // control.innerHTML = isMap3D ?
+    //   `<img id="control-building-map" src="2d.svg" alt="2D"/>`
+    //   :
+    //   `<img id="control-building-map" src="3d.svg" alt="3D"/>`;
+
+    // control.addEventListener("click", () => setIsMap3D(!isMap3D));
+
     if (isMap3D) {
       // Jika 3D diaktifkan
       if (!map.current.getLayer("3d-buildings")) {
@@ -208,8 +216,15 @@ export function useConfig() {
         const container = document.createElement('div');
         container.id = 'control';
         container.className = 'mapboxgl-ctrl';
+  //       <div class="control-img-wrapper">
+  //       ${isMap3D ?
+  //   `<img id="control-building-map" src="2d.svg" alt="2D"/>`
+  //   :
+  //   `<img id="control-building-map" src="3d.svg" alt="3D"/>`
+  // }
+  //   </div>
         const svg = `
-            </div>
+           
             <div class="control-img-wrapper">
                 <img id="mrt" src="mrt.svg" alt="MRT"/>
             </div>
@@ -220,6 +235,7 @@ export function useConfig() {
 
         // Append the buttons to the container
         container.innerHTML = svg;
+        // container.querySelector("#control-building-map").parentNode.addEventListener("click", () => setIsMap3D(!isMap3D));
         return container;
       },
 
@@ -314,6 +330,7 @@ export function useConfig() {
     // Marker visibility and label display based on zoom
     updateMarkerVisibility();
   }, [zoom]);
+
 
   return {
     map,
