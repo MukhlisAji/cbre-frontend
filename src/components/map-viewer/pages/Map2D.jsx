@@ -13,8 +13,8 @@ import { useZoning } from "../hooks/useZoning";
 import { AllRegion, NortWest, SouthEast, StyleSatelliteStreet } from "../utils";
 import { buildAtom } from "./project/store/build";
 import TwoDSearch from "./search/2dSearch";
-import HeaderButton from "../../shared/HeaderButton";
-
+import { FormControlLabel, Switch, ThemeProvider, createTheme } from "@mui/material";
+import ReactDOM from 'react-dom';
 function Map2D() {
   const {
     lat,
@@ -27,6 +27,8 @@ function Map2D() {
     setZoom,
     styleMap,
     handleChangeStyleMap,
+    isMap3D,
+    setIsMap3D
   } = useConfig();
 
   const[isSearch, setIsSearch]= useState(null)
@@ -108,23 +110,23 @@ function Map2D() {
 
   
   const expandedMenu = [
-    {
-      label: "Region Map",
-      items: [
-        ...filterdata.map((data) => ({
-          name: data.REGIONNAME,
-          icon: data.ICON,
-          onClick: () => {
-            showRegion(data.REGIONCODE);
-          },
-        })),
-        {
-          name: "All Region",
-          icon: AllRegion,
-          onClick: showAllRegion,
-        },
-      ],
-    },
+    // {
+    //   label: "Region Map",
+    //   items: [
+    //     ...filterdata.map((data) => ({
+    //       name: data.REGIONNAME,
+    //       icon: data.ICON,
+    //       onClick: () => {
+    //         showRegion(data.REGIONCODE);
+    //       },
+    //     })),
+    //     {
+    //       name: "All Region",
+    //       icon: AllRegion,
+    //       onClick: showAllRegion,
+    //     },
+    //   ],
+    // },
     {
       label: "Type Map",
       items: [
@@ -145,8 +147,37 @@ function Map2D() {
       setLat(map.current.getCenter().lat.toFixed(4));
       setZoom(map.current.getZoom().toFixed(2));
     });
+    addCustomControl()
   }, []);
+  
+  const addCustomControl = () => {
+    const customControl = {
+      onAdd() {
+         // Create a container for the control
+        const container = document.createElement('div');
+        container.id = 'control-layer';
+        container.className = 'mapboxgl-ctrl';
 
+        // Render the React component into the container
+        ReactDOM.render(
+            <FilterLine subMenu={subMenu} expandedMenu={expandedMenu} />, 
+            container
+        );
+
+    return container;
+      },
+
+      onRemove() {
+        document.getElementById("control-layer").remove()
+      }
+    };
+
+    // Add the custom control to the map
+    map.current.addControl(customControl, 'top-right');
+  }
+  const handleToggleChange = (event) => {
+    setIsMap3D(event.target.checked);
+  };
   return (
     <>
       <div className="relative top-0 z-30">
@@ -180,7 +211,6 @@ function Map2D() {
 
         </div>
 
-        <FilterLine subMenu={subMenu} expandedMenu={expandedMenu} />
        
         {/* Map Container */}
         <div
@@ -188,6 +218,19 @@ function Map2D() {
           className="w-full h-full transition-all duration-300 ease-in-out overflow-hidden"
         >
           <div id="spinner"></div>
+        </div>
+        <div className="absolute top-2 right-7 z-40 flex items-center gap-1.5">
+        <img id="control-building-map" src="3d.svg" alt="3D" className="w-[30px] h-[30px]"/>
+          <FormControlLabel
+            control={
+              <Switch
+                size="medium"
+                checked={isMap3D}
+                onChange={handleToggleChange}
+              />
+            }
+          />
+         
         </div>
 
       </div>

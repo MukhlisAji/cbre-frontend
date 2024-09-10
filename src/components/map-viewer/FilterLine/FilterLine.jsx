@@ -50,7 +50,7 @@ const FilterLine = ({ expandedMenu, subMenu }) => {
   return (
     <>
       <div
-        className="absolute bottom-10 left-4 z-40 flex bg-white p-0.5 w-[90px] h-[90px] rounded-lg shadow-md text-center transition-all duration-200 delay-300 ease-in-out"
+        className=" relative justify-center gap-2.5 items-center  z-100 flex  w-[30px] h-[30px] shadow-md text-center transition-all duration-200 delay-300 ease-in-out"
         onMouseEnter={() => {
           setTimeout(() => {
             setIsHover(true);
@@ -66,18 +66,15 @@ const FilterLine = ({ expandedMenu, subMenu }) => {
               src={StyleStreet}
               draggable="false"
               alt="line"
-              className="object-cover w-[80px] h-[80px] rounded-lg transition-transform duration-300 ease-in-out hover:scale-90"
+              className="object-cover w-[30px] h-[30px]  transition-transform duration-300 ease-in-out hover:scale-90"
             />
-            <p className="absolute bottom-0 w-full text-white text-md font-semibold z-10">
-              Layer
-            </p>
-            <div className="absolute top-0 left-0 w-full h-full bg-black/30 rounded-lg"></div>
+            <div className="absolute top-0 left-0 w-full h-full bg-black/30"></div>
           </div>
 
         </div>
         {isHover && (
           <div
-            className="absolute left-[110%] top-0 bg-white rounded-md shadow-md p-2 z-10 flex flex-row gap-4 items-start"
+            className="absolute right-[120%] top-0 bg-white rounded-md shadow-md p-2 z-100 flex flex-row gap-4 items-start"
             onMouseEnter={clearHoverTimeout}
             onMouseLeave={handleOutHover}
             ref={subMenuRef}
@@ -122,7 +119,7 @@ const FilterLine = ({ expandedMenu, subMenu }) => {
             ) : (
               <>
                 <div
-                  className={`absolute -bottom-[75px] left-0 w-[450px] bg-white rounded-md shadow-md p-2 z-10 flex flex-col gap-5 ${expandedMenu ? "block" : "hidden"
+                  className={`absolute -bottom-[80px] right-0 w-[450px] bg-white rounded-md shadow-md p-2 z-10 flex flex-col gap-5 ${expandedMenu ? "block" : "hidden"
                     }`}
                 >
                   <button
