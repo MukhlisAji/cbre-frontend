@@ -12,6 +12,8 @@ export function useMRTData(zoom, map) {
     const res = await fetch(
       `${CONFIG_APP.MAPBOX_API}/map-transportation/mrt`
     );
+
+    console.log(res)
     const responseData = await res.json();
     responseData?.geojson?.features?.forEach((station) => {
       if (station.properties.REF) {
@@ -22,7 +24,14 @@ export function useMRTData(zoom, map) {
         values.forEach((value, index, array) => {
           const prefix = value.match(/^[A-Z]+/)[0];
           const separated = value.replace(/([A-Z]+)(\d+)/, "$1 $2");
-          const color = colorMap[prefix] || "gray";
+          
+          let color;
+          if(station.properties.STATUS){
+            color = colorMap[prefix] || "gray";
+          }else{
+            color ="#696969";
+          }
+         
           if (color) {
             linesOutput += `<span class="${color}" style="padding: 0.3em 10px; display: inline-block; line-height: 1; background-color: ${color}; font-size: 15px; color: ${generatedColor(
               color
@@ -73,10 +82,14 @@ export function useMRTData(zoom, map) {
         let hoverPopup;
 
         element.addEventListener("mouseenter", () => {
+          const backgroundColor = station.properties.STATUS ? 'green' : 'red';
           hoverPopup = new mapboxgl.Popup({ offset: 25 }).setHTML(`
             <div class="popup-container">
                 <div class="info-box">
-                    <h3>${station.properties.NAME}</h3>
+                    <div class="info-container">
+                      <h3>${station.properties.NAME}</h3>
+                      <p class="status" style="background-color: ${backgroundColor};"> ${station.properties.STATUS ? 'active' : 'inactive'}</p>
+                    </div>
                     <div class="other-info">
                         <p><strong>Longitude:</strong> ${station.geometry.coordinates[0]}</p>
                         <p><strong>Latitude:</strong> ${station.geometry.coordinates[1]}</p>
@@ -86,7 +99,10 @@ export function useMRTData(zoom, map) {
                 </div>
             </div>`);
           hoverPopup.setLngLat(station.geometry.coordinates).addTo(map.current);
+         
+
           element.hoverPopup = hoverPopup;
+        
           
           // hoverPopup = new mapboxgl.Popup({ offset: 25 }).setHTML(`
           //   <div class="popup-container">
