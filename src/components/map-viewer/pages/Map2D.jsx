@@ -10,11 +10,13 @@ import { StyleList, filterdata } from "../constant";
 import { useConfig, useMap, useMRTData, useRegion } from "../hooks";
 import { useMicromarket } from "../hooks/useMicromarket";
 import { useZoning } from "../hooks/useZoning";
-import { AllRegion, NortWest, SouthEast, StyleSatelliteStreet } from "../utils";
+import { AllRegion, NortWest, SouthEast, StyleSatelliteStreet, StyleStreet } from "../utils";
 import { buildAtom } from "./project/store/build";
 import TwoDSearch from "./search/2dSearch";
 import { FormControlLabel, Switch, ThemeProvider, createTheme } from "@mui/material";
 import ReactDOM from 'react-dom';
+
+
 function Map2D() {
   const {
     lat,
@@ -89,16 +91,24 @@ function Map2D() {
   };
 
   const subMenu = [
-    {
-      name: "North West",
-      icon: NortWest,
-      onClick: () => showRegion("SG03"),
+    // {
+    //   name: "North West",
+    //   icon: NortWest,
+    //   onClick: () => showRegion("SG03"),
+    // },
+    // {
+    //   name: "South East",
+    //   icon: SouthEast,
+    //   onClick: () => showRegion("SG04"),
+    // },
+  {
+
+    name: "Style Street",
+    icon: StyleStreet,
+    onClick: () => {
+      handleChangeStyleMap("mapbox://styles/mapbox/streets-v12");
     },
-    {
-      name: "South East",
-      icon: SouthEast,
-      onClick: () => showRegion("SG04"),
-    },
+  },
     {
       name: "Style Satellite Street",
       icon: StyleSatelliteStreet,
