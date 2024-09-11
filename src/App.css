@@ -233,6 +233,22 @@ button {
   margin: 5px 0;
   font-size: 14px;
 }
+.info-container {
+  display: flex;
+  align-items: center;
+  gap: 7px; 
+}
+
+.info-container p {
+  margin: 0; 
+}
+
+.status {
+  color: white;
+  font-size: 10px; 
+  padding: 2px 2px;
+  border-radius: 10px; 
+}
 
 .info-box strong {
   color: #555;
