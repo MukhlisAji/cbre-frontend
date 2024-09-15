@@ -1,16 +1,16 @@
 import React, { useEffect, useState } from 'react'
 import { RiContactsBook3Line } from 'react-icons/ri';
 import { useLocation } from 'react-router-dom';
-import { CONTACTCOLUMNDUMMY, CONTACTDATADUMMY, PROPERTYCOLUMNDUMMY, PROPERTYDATADUMMY } from '../lib/const/DummyData';
+import { CONTACTCOLUMNDUMMY, CONTACTDATADUMMY, PROPERTYCOLUMNDUMMY, PROPERTYDATADUMMY } from '../../lib/const/DummyData';
 import PropertyNew from './PropertyNew';
-import DataTable from '../shared/CustomTableMUI';
+import DataTable from '../../shared/CustomTableMUI';
 import PropertyForm from './PropertyForm';
 
 
 export default function Properties() {
     const location = useLocation();
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
     const [currentAccount, setCurrentAccount] = useState(null);
     const [propertyId, setPropertyId] = useState(null);
@@ -69,7 +69,7 @@ export default function Properties() {
                         </button>
                     </div> */}
                 </div>
-                <DataTable column={PROPERTYCOLUMNDUMMY} dataTable={PROPERTYDATADUMMY} openModal={handleNewProperty} isHeader={true} tableHeight={300} loading={loading} onEdit={handleEditProperty} dataType={"contact"} />
+                <DataTable column={PROPERTYCOLUMNDUMMY} dataTable={PROPERTYDATADUMMY} openModal={handleNewProperty} isHeader={true} tableHeight={300} loading={loading} onEdit={handleEditProperty} dataType={"properties"} />
                 {isModalOpen && (
                     <PropertyForm
                         onClose={closeModal}

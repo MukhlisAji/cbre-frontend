@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Tab } from '@headlessui/react';
 import { FaRegCheckCircle } from "react-icons/fa";
 import { useParams } from 'react-router-dom';
-import { CONFIG_APP } from '../map-viewer/config/app';
+import { CONFIG_APP } from '../../map-viewer/config/app';
 import { FaBuildingUser } from "react-icons/fa6";
 import { PiWarningCircleLight } from 'react-icons/pi';
 import { RiContactsBook3Line, RiErrorWarningFill } from 'react-icons/ri';

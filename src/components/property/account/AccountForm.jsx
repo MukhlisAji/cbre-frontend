@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAppContext } from '../../AppContext';
+import { useAppContext } from '../../../AppContext';
 import AccountFormSection from './AccountFormSection';
 import { BsQuestionCircle } from 'react-icons/bs';
-import { generateTransactionId, useUtils } from '../lib/api/Authorization';
-import ContactFormSection from './ContactFormSection';
-import { CONFIG } from '../../config';
+import { generateTransactionId, useUtils } from '../../lib/api/Authorization';
+import { CONFIG } from '../../../config';
 
 const generateSystemValues = () => {
     const currentUser = "System User"; // Replace with actual user info if available
@@ -17,7 +16,7 @@ const generateSystemValues = () => {
     };
 };
 
-export default function ContactForm({ onClose, isEditing, contactId }) {
+export default function AccountForm({ onClose, isEditing, accountId }) {
     const { token } = useAppContext();
     const [isLoading, setIsLoading] = useState(false);
     const [notification, setNotification] = useState(null);
@@ -26,102 +25,89 @@ export default function ContactForm({ onClose, isEditing, contactId }) {
     const { generateAndSetToken } = useUtils();
     const navigate = useNavigate();
 
-
     const [sectionVisibility, setSectionVisibility] = useState({
         accountInformationVisible: true,
         addressInformationVisible: true,
         additionalInformationVisible: true,
         segmentInformationVisible: true,
         systemInformationVisible: true,
-        contactInformationVisible: true,
-        communicationPreferencesVisible: true,
+        associateInformationVisible: true,
     });
-
-    const toggleVisibility = (section) => {
-        setSectionVisibility((prev) => ({
-            ...prev,
-            [section]: !prev[section],
-        }));
-    };
 
     const [initialData, setInitialData] = useState(null);
     const [formData, setFormData] = useState({
-        contactInformation: {
-            salutation: '',
-            firstName: '',
-            middleName: '',
-            lastName: '',
-            title: '',
-            department: '',
-            email: '',
-            businessPhone: '',
-            mobilePhone: '',
-            mainPhone: '',
+        accountDetails: {
+            accountId: '',
+            accountName: '',
+            parentAccount: '',
+            localAccountName: '',
+            clientType: [],
+            phone: '',
             fax: '',
-            linkedin: '',
-            accountName: {
-                accountId: null,
-                salesforceAccountId: '',
-                relationshipTypeId: null,
-                relationshipType: '',
-                isPrimary: 'No'
-            },
-            contactProfile: [],
-            influenceLevel: ''
+            website: '',
         },
         addressInformation: {
-            mailingCountryCode: '',
-            mailingCountry: '',
-            mailingState: '',
-            mailingCity: '',
-            mailingStreet: '',
-            mailingPostCode: ''
+            billingCountryCode: '',
+            billingCountry: '',
+            billingState: '',
+            billingCity: '',
+            billingStreet: '',
+            billingPostCode: '',
+            shippingCountryCode: '',
+            shippingCountry: '',
+            shippingState: '',
+            shippingCity: '',
+            shippingStreet: '',
+            shippingPostCode: '',
         },
-        communicationPreference: {
-            communicationMethod: '',
-            emailOptions: '',
-            mailOptions: '',
-            callOptions: '',
-            smsOptions: '',
-            excludeReason: '',
-            excludeOn: '',
-            excludeBy: {
-                excludeById: null,
-                excludeBySalesforceId: ''
-            }
+        segmentation: {
+            industrialType: '',
+            subIndustrialId: '',
+            subIndustrial: '',
+            headquarterCountryId: '',
+            headquarterCountry: '',
+            commercialNumber: '',
         },
         additionalInformation: {
-            nickName: '',
-            assistantName: '',
-            assistantPhone: '',
-            assistantEmail: '',
-            reportsTo: {
-                reportsToId: null,
-                reportsToSalesforceId: ''
-            },
+            taxType: '',
+            taxId: '',
             description: '',
-            cbreEmployee: false
         },
         systemInformation: {
-            contactOwner: [],
-            // createdBy: generateSystemValues().createdBy,
-            // createdDate: generateSystemValues().createdDate,
-            status: '',
+            accountOwner: [],
+            createdBy: generateSystemValues.createdBy,
+            createdDate: generateSystemValues.createdDate,
+            // lastModifiedBy: '',
+            // lastModifiedDate: '',
+            status: 'Active',
             inactivationDate: '',
             reasonForInactivating: '',
+            userId: '',
             saveToSFDC: true,
-            userId: ''
-        }
+            // salesforceId: '',
+        },
+        // associateInformation: {
+        //     accountSource: 'One App',
+        //     accountId: '',
+        //     parentAccountSource: '',
+        //     parentAccountId: '',
+        //     topParentAccountSource: '',
+        //     topParentAccountId: '',
+        // },
     });
-
-    const url = `${CONFIG.CONTACT_SERVICE}/${contactId}`;
+    const url = `${CONFIG.ACCOUNT_SERVICE}/${accountId}`;
+    // const headers = {
+    //     'transactionId': ,
+    //     'Cookie': 'CookieConsentPolicy=0:1; LSKey-c$CookieConsentPolicy=0:1'
+    // };
 
     useEffect(() => {
         if (isEditing) {
-            console.log("url is ", url);
+
             const fetchAccountData = async () => {
                 try {
                     const transactionId = generateTransactionId();
+
                     const response = await fetch(url, {
                         method: 'GET',
                         headers: {
@@ -136,91 +122,69 @@ export default function ContactForm({ onClose, isEditing, contactId }) {
 
                     const data = await response.json();
                     setInitialData(data.resultSet);
-                    console.log('Fetched contact data:', data);
+                    console.log('Fetched account data:', data);
                 } catch (error) {
-                    console.error('Error fetching contact data:', error);
+                    console.error('Error fetching account data:', error);
                 }
             };
             fetchAccountData();
         }
-    }, [isEditing, url]);
+    }, []);
+
     useEffect(() => {
         if (initialData) {
             setFormData({
-                contactInformation: {
-                    contactId: initialData.id || '',
-                    salutation: initialData.salutation || '',
-                    firstName: initialData.firstname || '',
-                    middleName: initialData.middlename || '',
-                    lastName: initialData.lastname || '',
-                    title: initialData.title || '',
-                    department: initialData.department || '',
-                    email: initialData.email || '',
-                    businessPhone: initialData.businessPhone || '',
-                    mobilePhone: initialData.mobilePhone || '',
-                    mainPhone: initialData.mainPhone || '',
-                    fax: initialData.fax || '',
-                    linkedin: initialData.linkedin || '',
-                    accountName: initialData.accountContact ? {
-                        accountId: initialData.accountContact.accountId || '',
-                        salesforceAccountId: initialData.accountContact.accountSalesforceId || '',
-                        relationshipTypeId: initialData.accountContact.relationshipType.id || '',
-                        relationshipType: initialData.accountContact.relationshipType.name || '',
-                        isPrimary: 'Yes' // Assuming it's primary if it's the only one provided
-                    } : {},
-                    contactProfile: initialData.contactProfile.map(profile => ({
-                        contactProfileId: profile.contactProfileList.id,
-                        contactProfileName: profile.contactProfileList.name
+                accountDetails: {
+                    accountId: initialData.id || '',
+                    accountName: initialData.accountName || '',
+                    parentAccount: initialData.parentAccount.id || '',
+                    localAccountName: initialData.localAccountName || '',
+                    clientType: initialData.clientType.map(type => ({
+                        clientTypeId: type.id,
+                        clientTypeName: type.name
                     })) || [],
-                    influenceLevel: initialData.influenceLevel || '',
+                    phone: initialData.phone || '',
+                    fax: initialData.fax || '',
+                    website: initialData.website || '',
                 },
                 addressInformation: {
-                    mailingCountry: initialData.mailingCountry ? initialData.mailingCountry.countryName : '',
-                    mailingCountryCode: initialData.mailingCountry ? initialData.mailingCountry.countryCode : '',
-                    mailingState: initialData.mailingState || '',
-                    mailingCity: initialData.mailingCity || '',
-                    mailingStreet: initialData.mailingStreet || '',
-                    mailingPostCode: initialData.mailingPostCode || '',
+                    billingCountryCode: initialData.billingCountry.countryCode || '',
+                    billingCountry: initialData.billingCountry.countryName || '',
+                    billingState: initialData.billingState || '',
+                    billingCity: initialData.billingCity || '',
+                    billingStreet: initialData.billingStreet || '',
+                    billingPostCode: initialData.billingPostCode || '',
+                    shippingCountryCode: initialData.shippingCountry.countryCode || '',
+                    shippingCountry: initialData.shippingCountry.countryName || '',
+                    shippingState: initialData.shippingState || '',
+                    shippingCity: initialData.shippingCity || '',
+                    shippingStreet: initialData.shippingStreet || '',
+                    shippingPostCode: initialData.shippingPostCode || '',
                 },
-                communicationPreference: {
-                    communicationMethod: initialData.communicationMethod || '',
-                    emailOptions: initialData.emailOptions || '',
-                    mailOptions: initialData.mailOptions || '',
-                    callOptions: initialData.callOptions || '',
-                    smsOptions: initialData.smsOptions || '',
-                    excludeReason: initialData.excludeReason || '',
-                    excludeOn: initialData.excludeOn || '',
-                    excludeBy: initialData.excludeBy ? {
-                        excludeById: initialData.excludeBy.id,
-                        excludeBySalesforceId: initialData.excludeBy.salesforceId || '',
-                    } : {},
+                segmentation: {
+                    industrialType: initialData.industrialType.name || '',
+                    subIndustrialId: initialData.subIndustrial.id || '',
+                    subIndustrial: initialData.subIndustrial.name || '',
+                    headquarterCountry: initialData.headQuarter.countryName || '',
+                    commercialNumber: initialData.commercialNumber || '',
                 },
                 additionalInformation: {
-                    nickName: initialData.nickName || '',
-                    assistantName: initialData.assistantName || '',
-                    assistantPhone: initialData.assistantPhone || '',
-                    assistantEmail: initialData.assistantEmail || '',
-                    reportsTo: initialData.reportsTo ? {
-                        reportsToId: initialData.reportsTo.id,
-                        reportsToSalesforceId: initialData.reportsTo.salesforceId || '',
-                    } : {},
+                    taxType: initialData.taxType || '',
+                    taxId: initialData.taxId || '',
                     description: initialData.description || '',
-                    cbreEmployee: initialData.cbreEmployee || false,
                 },
                 systemInformation: {
-                    contactOwner: initialData.contactOwner.map(owner =>
-                        owner.employee.employeeId,
+                    accountOwner: initialData.accountOwner.map(owner =>
+                        owner.employee.id,
                     ) || [],
                     status: initialData.status || '',
-                    inactivationDate: initialData.inactiveDate || '',
+                    inactivationDate: initialData.inactivationDate || '',
                     reasonForInactivating: initialData.reasonForInactivating || '',
                     userId: '',
                 },
             });
         }
-        console.log("this is the data : ", formData);
     }, [initialData, isEditing]);
-
 
     useEffect(() => {
         toggleBodyOverflow(true);
@@ -229,19 +193,19 @@ export default function ContactForm({ onClose, isEditing, contactId }) {
         };
     }, []);
 
-    // useEffect(() => {
-    //     if (formData) {
-    //         console.log("this is the data : ", formData);
-    //     }
-    // })
-
     const handleAccountAction = async (event, { isNew = false, navigateTo = null, showDialog = false }) => {
         event.preventDefault();
         setIsLoading(true);
         console.log("formData : ", formData);
-        console.log('Processing data');
-        // console.log('Set to invalid session');
 
+        if (showDialog) {
+            setConfirmationDialogVisible(true);
+            setIsLoading(false);
+            return;
+        }
+
+        setConfirmationDialogVisible(false);
+        console.log('Processing data');
 
         try {
             let result;
@@ -265,20 +229,23 @@ export default function ContactForm({ onClose, isEditing, contactId }) {
 
             if (result.statusCode === "00") {
                 if (isEditing) {
-                    showNotification("Contact updated successfully!", 'success');
+                    showNotification("Account updated successfully!", 'success');
                     if (navigateTo) {
                         navigate(navigateTo);
+                    } else {
+                        // Optionally navigate to a details page or stay on the same page
+                        // navigate(`details/${accountId}`);
                     }
                 } else {
-                    if (result.resultSet && result.resultSet.contactId) {
-                        const contactId = result.resultSet.contactId;
-                        showNotification("Contact created successfully!", 'success');
+                    if (result.resultSet && result.resultSet.accountId) {
+                        const accountId = result.resultSet.accountId;
+                        showNotification("Account created successfully!", 'success');
                         if (isNew) {
                             resetData();
                         } else if (navigateTo) {
                             navigate(navigateTo, { state: { openModal: true } });
                         } else {
-                            navigate(`details/${contactId}`);
+                            navigate(`details/${accountId}`);
                         }
                     } else {
                         console.error('Unexpected response format for new account:', result);
@@ -296,10 +263,11 @@ export default function ContactForm({ onClose, isEditing, contactId }) {
             setIsLoading(false);
         }
     };
-
-    const handleSave = (event) => handleAccountAction(event, { navigateTo: isEditing ? `details/${contactId}` : null });
+    // Usage examples:
+    const handleSave = (event) => handleAccountAction(event, { showDialog: !isEditing, navigateTo: isEditing ? `details/${accountId}` : null });
     const handleSaveNew = (event) => handleAccountAction(event, { isNew: true });
-    // const handleConfirmSave = (event) => handleAccountAction(event, { navigateTo: '/property/contacts' });
+    const handleConfirmSave = (event) => handleAccountAction(event, { navigateTo: '/property/contacts' });
+
     const handleCancelSave = () => {
         setConfirmationDialogVisible(false);
         setIsLoading(false);
@@ -310,7 +278,7 @@ export default function ContactForm({ onClose, isEditing, contactId }) {
         event.preventDefault();
 
         try {
-            const response = await fetch(`${CONFIG.CONTACT_SERVICE}/`, {
+            const response = await fetch(`${CONFIG.ACCOUNT_SERVICE}/`, {
                 method: 'POST',
                 headers: {
                     'SFDC-token': token,
@@ -326,19 +294,19 @@ export default function ContactForm({ onClose, isEditing, contactId }) {
 
             const result = await response.json();
             console.log('Success:', result);
-            return result;
+            return result; // Return the result
         } catch (error) {
             console.error('Error:', error);
-            throw error;
+            throw error; // Re-throw the error so it can be caught in handleAccountAction
         }
-    };
+    }
 
     const handleEdit = async (event) => {
         const transactionId = generateTransactionId();
         event.preventDefault();
 
         try {
-            const response = await fetch(`${CONFIG.CONTACT_SERVICE}/`, {
+            const response = await fetch(`${CONFIG.ACCOUNT_SERVICE}/`, {
                 method: 'PUT',
                 headers: {
                     'SFDC-token': token,
@@ -354,12 +322,13 @@ export default function ContactForm({ onClose, isEditing, contactId }) {
 
             const result = await response.json();
             console.log('Success:', result);
-            return result;
+            return result; // Return the result
         } catch (error) {
             console.error('Error:', error);
-            throw error;
+            throw error; // Re-throw the error so it can be caught in handleAccountAction
         }
     };
+
 
     const showNotification = (message, type = 'success') => {
         setNotification(message);
@@ -370,76 +339,89 @@ export default function ContactForm({ onClose, isEditing, contactId }) {
         }, 5000);
     };
 
+
     const resetData = () => {
         setFormData({
-            contactInformation: {
-                salutation: '',
-                firstName: '',
-                middleName: '',
-                lastName: '',
-                title: '',
-                department: '',
-                email: '',
-                businessPhone: '',
-                mobilePhone: '',
-                mainPhone: '',
-                fax: '',
-                linkedin: '',
+            accountDetails: {
+                accountId: '',
                 accountName: '',
-                relationshipType: '',
-                contactProfile: [],
-                influenceLevel: '',
+                parentAccount: '',
+                localAccountName: '',
+                clientType: [
+                    {
+                        clientTypeId: '',
+                        clientTypeName: ''
+                    }
+                ],
+                phone: '',
+                fax: '',
+                website: '',
             },
             addressInformation: {
-                mailingCountryCode: '',
-                mailingCountry: '',
-                mailingbillingState: '',
-                mailingbillingCity: '',
-                mailingbillingStreet: '',
-                mailingbillingPostCode: '',
+                billingCountry: '',
+                billingState: '',
+                billingCity: '',
+                billingStreet: '',
+                billingPostCode: '',
+                shippingCountry: '',
+                shippingState: '',
+                shippingCity: '',
+                shippingStreet: '',
+                shippingPostCode: '',
             },
-            communicationPreferences: {
-                communicationmethod: '',
-                emailOptions: '',
-                mailOptions: '',
-                callOptions: '',
-                smsOptions: '',
-                excludeReason: '',
-                excludeOn: '',
-                excludeBy: '',
+            segmentation: {
+                industryType: '',
+                subIndustry: '',
+                headquarterCountry: '',
+                commercialNumber: '',
             },
             additionalInformation: {
-                nickName: '',
-                assistantName: '',
-                assistantPhone: '',
-                assistantEmail: '',
-                reportsTo: '',
+                taxType: '',
+                taxId: '',
                 description: '',
-                cbreEmployee: false,
             },
             systemInformation: {
-                contactOwner: [],
-                // createdBy: generateSystemValues().createdBy,
-                // createdDate: generateSystemValues().createdDate,
-                status: 'Active',
+                accountOwner: [],
+                createdBy: systemValues.createdBy,
+                createdDate: systemValues.createdDate,
+                lastModifiedBy: '',
+                lastModifiedDate: '',
+                status: '',
                 inactivationDate: '',
                 reasonForInactivating: '',
+                userId: '',
                 saveToSFDC: true,
+                salesforceId: '',
             },
+            // associateInformation: {
+            //     accountSource: 'One App',
+            //     accountId: '',
+            //     parentAccountSource: '',
+            //     parentAccountId: '',
+            //     topParentAccountSource: '',
+            //     topParentAccountId: '',
+            // },
         });
     };
 
     const copyBillingToShipping = () => {
-        setFormData((prevData) => ({
-            ...prevData,
+        setFormData({
+            ...formData,
             addressInformation: {
-                ...prevData.addressInformation,
-                shippingCountry: prevData.addressInformation.mailingCountry,
-                shippingPostalCode: prevData.addressInformation.mailingPostCode,
-                shippingCity: prevData.addressInformation.mailingCity,
-                shippingState: prevData.addressInformation.mailingState,
-                shippingStreet: prevData.addressInformation.mailingStreet,
+                ...formData.addressInformation,
+                shippingCountry: formData.addressInformation.billingCountry,
+                shippingPostCode: formData.addressInformation.billingPostCode,
+                shippingCity: formData.addressInformation.billingCity,
+                shippingState: formData.addressInformation.billingState,
+                shippingStreet: formData.addressInformation.billingStreet,
             },
+        });
+    };
+
+    const toggleVisibility = (section) => {
+        setSectionVisibility((prev) => ({
+            ...prev,
+            [section]: !prev[section],
         }));
     };
 
@@ -455,6 +437,34 @@ export default function ContactForm({ onClose, isEditing, contactId }) {
         return <p>Loading...</p>;
     }
 
+    const [isFormValid, setIsFormValid] = useState(true);
+
+    const validateAccountDetails = () => {
+        // Check if each field in accountDetails is filled
+        const isAccountNameFilled = formData.accountDetails.accountName.trim() !== '';
+        const isParentAccountFilled = formData.accountDetails.parentAccount.trim() !== '';
+        const isLocalAccountNameFilled = formData.accountDetails.localAccountName.trim() !== '';
+        const isPhoneFilled = formData.accountDetails.phone.trim() !== '';
+        const isFaxFilled = formData.accountDetails.fax.trim() !== '';
+        const isWebsiteFilled = formData.accountDetails.website.trim() !== '';
+        
+        // Check if clientType array is valid (e.g., at least one item with non-empty fields)
+        // const isClientTypeValid = formData.accountDetails.clientType.some(clientType =>
+        //     clientType.clientTypeId.trim() !== '' && clientType.clientTypeName.trim() !== ''
+        // );
+    
+        // Combine all checks
+        const allFieldsFilled = isAccountNameFilled &&
+                                isParentAccountFilled && isLocalAccountNameFilled &&
+                                isPhoneFilled && isFaxFilled && isWebsiteFilled;
+    
+        setIsFormValid(allFieldsFilled);
+    };
+    
+    useEffect(() => {
+        validateAccountDetails();
+    }, [formData]);
+
     return (
         <div className={`fixed inset-0 flex items-center justify-center z-50 ${onClose ? 'animate-fade-in' : 'animate-fade-out'}`}>
             <div className="absolute inset-0 bg-black opacity-50"></div>
@@ -465,9 +475,10 @@ export default function ContactForm({ onClose, isEditing, contactId }) {
                     </div>
                 )}
                 {notification && (
-                    <div className={`absolute top-5 right-5 text-white px-4 py-2 rounded shadow-lg z-50 animate-fade-in-out
+                    <div className={`absolute top-5 right-5 text-white px-4 py-2 rounded shadow-lg z-50 animate-fade-in-out 
                         ${notificationType === 'success' ? 'bg-green-500' : 'bg-red-500'}
-                    `}>
+                    text-white
+                `}>
                         {notification}
                     </div>
                 )}
@@ -478,18 +489,18 @@ export default function ContactForm({ onClose, isEditing, contactId }) {
                     >
                         &times;
                     </button>
-                    <h2 className="text-lg font-bold text-c-dark-grayish text-align-center">NEW CONTACT</h2>
+                    <h2 className="text-lg font-bold text-c-dark-grayish text-align-center">NEW ACCOUNT</h2>
                 </header>
 
                 <main className="flex-1 overflow-y-auto">
                     <div className="bg-white relative p-4">
-                        <ContactFormSection
+                        <AccountFormSection
                             formData={formData}
                             setFormData={setFormData}
                             toggleVisibility={toggleVisibility}
                             sectionVisibility={sectionVisibility}
                             copyBillingToShipping={copyBillingToShipping}
-                            initialData={initialData}
+                            isEditing={isEditing}
                         />
                     </div>
                 </main>
@@ -503,19 +514,22 @@ export default function ContactForm({ onClose, isEditing, contactId }) {
                     </button>
                     <button
                         onClick={handleSaveNew}
+                        disabled={!isFormValid}
                         type="submit"
                         className="px-4 py-2 rounded-lg bg-white text-blue-600 border border-neutral-500 text-xs hover:text-neutral-700 hover:bg-neutral-100"
                     >
-                        Save & New
+                        {isEditing ? 'Update & New' : 'Save & New'}
                     </button>
                     <button
                         onClick={handleSave}
+                        disabled={!isFormValid}
                         className="px-4 py-2 text-white rounded-lg bg-c-teal text-xs text-white hover:text-white hover:bg-c-weldon-blue"
                     >
                         {isEditing ? 'Update' : 'Save'}
                     </button>
                 </footer>
 
+                {/* Confirmation Dialog */}
                 {confirmationDialogVisible && (
                     <div className="fixed inset-0 flex items-center justify-center z-50">
                         <div className="absolute inset-0 bg-black opacity-50"></div>
@@ -523,7 +537,7 @@ export default function ContactForm({ onClose, isEditing, contactId }) {
                             <div className="flex flex-col items-center">
                                 <BsQuestionCircle className="text-yellow-500 text-4xl mb-4" />
                                 <h3 className="text-lg font-bold text-center">Confirm Save</h3>
-                                <p className="mt-2 text-center">Do you want to proceed to create new contact with this set of data?</p>
+                                <p className="mt-2 text-center">Do you want to proceed to create new contact with this set of Account data?</p>
                                 <div className="flex gap-4 mt-4">
                                     <button
                                         onClick={handleCancelSave}
@@ -546,6 +560,3 @@ export default function ContactForm({ onClose, isEditing, contactId }) {
         </div>
     );
 }
-
-
-

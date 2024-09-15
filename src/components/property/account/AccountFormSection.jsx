@@ -1,10 +1,8 @@
 import { debounce } from 'lodash';
 import React, { useEffect, useRef, useState } from 'react';
 import { MdClear } from 'react-icons/md';
-import { CONFIG } from '../../config';
+import { CONFIG } from '../../../config';
 
-
-// Reusable Input Field Component
 
 const InputField = ({
     label,
@@ -401,26 +399,26 @@ const AutocompleteField = ({
     );
 };
 
-
-// Main ContactFormSection Component
-export default function ContactFormSection({
+export default function AccountFormSection({
     formData,
     setFormData,
     toggleVisibility,
     sectionVisibility,
     copyBillingToShipping,
+    isEditing,
 }) {
     const [resourceData, setResourceData] = useState(null);
-
+    const [searchTerm, setSearchTerm] = useState('');
+    const [accountOwnerOptions, setAccountOwnerOptions] = useState([]);
 
     useEffect(() => {
         const fetchResourceData = async () => {
-            const cachedData = localStorage.getItem('resourceDataContact');
+            const cachedData = localStorage.getItem('resourceData');
             if (cachedData) {
                 setResourceData(JSON.parse(cachedData));
             } else {
                 try {
-                    const response = await fetch(`${CONFIG.CONTACT_SERVICE}/resources?category=Contact`, {
+                    const response = await fetch('http://localhost:8085/cbre/account/resources', {
                         method: 'GET',
                         headers: {
                             'transactionId': '46467657665',
@@ -430,7 +428,7 @@ export default function ContactFormSection({
                     if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
                     const data = await response.json();
                     setResourceData(data.resultSet);
-                    localStorage.setItem('resourceDataContact', JSON.stringify(data.resultSet));
+                    localStorage.setItem('resourceData', JSON.stringify(data.resultSet));
                 } catch (error) {
                     console.error('Error fetching resource data:', error);
                 }
@@ -438,7 +436,6 @@ export default function ContactFormSection({
         };
         fetchResourceData();
     }, []);
-
 
     const handleInputChange = (field, subField = null) => (e) => {
         const newValue = e.target.value;
@@ -450,11 +447,9 @@ export default function ContactFormSection({
         }));
     };
 
-
     const handleCountryChange = (field, countryField, stateField, countryCodeField) => (e) => {
         const selectedCountry = resourceData.country.find(c => c.countryName === e.target.value);
         const countryCode = selectedCountry ? selectedCountry.countryCode : '';
-
 
         setFormData((prevData) => ({
             ...prevData,
@@ -467,41 +462,32 @@ export default function ContactFormSection({
         }));
     };
 
+    // const fetchAccountOwnerOptions = debounce(async (name) => {
+    //     try {
+    //         const response = await fetch(`http://localhost:8084/cbre/utilities/find-employee?name=${name}`, {
+    //             method: 'GET',
+    //             headers: {
+    //                 'Cookie': 'CookieConsentPolicy=0:1; LSKey-c$CookieConsentPolicy=0:1',
+    //             },
+    //         });
+    //         if (response.ok) {
+    //             const data = await response.json();
+    //             setAccountOwnerOptions(data.resultSet.map(emp => ({ id: emp.id, label: `${emp.givenName} ${emp.surname}` })));
+    //         } else {
+    //             console.error('Failed to fetch account owner options');
+    //         }
+    //     } catch (error) {
+    //         console.error('Error fetching account owner options:', error);
+    //     }
+    // }, 500); // 500ms delay
 
-    const searchAccountName = async (searchTerm) => {
-        const response = await fetch(`${CONFIG.ACCOUNT_SERVICE}/find-account?name=${searchTerm}`, {
-            method: 'GET',
-            headers: {
-                'Cookie': 'CookieConsentPolicy=0:1; LSKey-c$CookieConsentPolicy=0:1',
-            },
-        });
-        const data = await response.json();
-        return data.resultSet.map((account) => ({
-            id: account.id,
-            label: `${account.accountName}`,
-            salesforceId: account.salesforceId,
-        }));
-    };
+    // const handleSearchChange = (e) => {
+    //     setSearchTerm(e.target.value);
+    //     fetchAccountOwnerOptions(e.target.value);
+    // };
 
-
-    const searchContactName = async (searchTerm) => {
-        const response = await fetch(`${CONFIG.CONTACT_SERVICE}/find-contact?name=${searchTerm}`, {
-            method: 'GET',
-            headers: {
-                'Cookie': 'CookieConsentPolicy=0:1; LSKey-c$CookieConsentPolicy=0:1',
-            },
-        });
-        const data = await response.json();
-        return data.resultSet.map((contact) => ({
-            id: contact.id,
-            label: `${contact.firstName} ${contact.middleName} ${contact.lastName}`,
-            salesforceId: `${contact.salesforceId}`,
-        }));
-    };
-
-
-    const searchEmployee = async (searchTerm) => {
-        const response = await fetch(`${CONFIG.UTILITIES_SERVICE}/find-employee?name=${searchTerm}`, {
+    const searchAccountOwners = async (searchTerm) => {
+        const response = await fetch(`http://localhost:8084/cbre/utilities/find-employee?name=${searchTerm}`, {
             method: 'GET',
             headers: {
                 'Cookie': 'CookieConsentPolicy=0:1; LSKey-c$CookieConsentPolicy=0:1',
@@ -511,208 +497,100 @@ export default function ContactFormSection({
         return data.resultSet.map((employee) => ({
             id: employee.id,
             label: `${employee.givenName} ${employee.surname}`,
-            salesforceId: `${employee.salesforceId}`,
         }));
     };
 
-
     const sections = [
         {
-            title: 'Contact Information',
-            visibilityKey: 'contactInformationVisible',
+            title: 'Account Information',
+            visibilityKey: 'accountInformationVisible',
             fields: [
-                { label: 'Salutation', value: formData.contactInformation.salutation, initialSearchTerm: formData.contactInformation.salutation, onChange: handleInputChange('contactInformation', 'salutation'), options: resourceData?.salutation.map(reason => ({ id: reason, label: reason })) || [], valueField: 'id', labelField: 'label' },
-                { label: 'First Name', type: 'text', value: formData.contactInformation.firstName, onChange: handleInputChange('contactInformation', 'firstName') },
-                { label: 'Middle Name', type: 'text', value: formData.contactInformation.middleName, onChange: handleInputChange('contactInformation', 'middleName') },
-                { label: 'Last Name*', type: 'text', value: formData.contactInformation.lastName, onChange: handleInputChange('contactInformation', 'lastName'), required: true },
-                { label: 'Title', type: 'text', value: formData.contactInformation.title, onChange: handleInputChange('contactInformation', 'title') },
-                { label: 'Department', type: 'text', value: formData.contactInformation.department, onChange: handleInputChange('contactInformation', 'department') },
-                { label: 'Email', type: 'text', value: formData.contactInformation.email, onChange: handleInputChange('contactInformation', 'email') },
-                { label: 'Business Phone', type: 'text', value: formData.contactInformation.businessPhone, onChange: handleInputChange('contactInformation', 'businessPhone') },
-                { label: 'Mobile Phone', type: 'text', value: formData.contactInformation.mobilePhone, onChange: handleInputChange('contactInformation', 'mobilePhone') },
-                { label: 'Main Phone', type: 'text', value: formData.contactInformation.mainPhone, onChange: handleInputChange('contactInformation', 'mainPhone') },
-                { label: 'Fax', type: 'text', value: formData.contactInformation.fax, onChange: handleInputChange('contactInformation', 'fax') },
-                { label: 'LinkedIn', type: 'text', value: formData.contactInformation.linkedin, onChange: handleInputChange('contactInformation', 'linkedin') },
+                { label: 'Account Name', type: 'text', value: formData.accountDetails.accountName, onChange: handleInputChange('accountDetails', 'accountName'), required: true },
+                { label: 'Parent Account', type: 'text', value: formData.accountDetails.parentAccount, onChange: handleInputChange('accountDetails', 'parentAccount') },
+                { label: 'Local Account Name', type: 'text', value: formData.accountDetails.localAccountName, onChange: handleInputChange('accountDetails', 'localAccountName') },
                 {
-                    label: 'Account Name',
-                    value: formData.contactInformation.accountName.accountId,
-                    onChange: (event) => {
-                        const value = event.target ? event.target.value : event;
-                        const accountId = value.id || null;
-                        const salesforceAccountId = (value.salesforceId && value.salesforceId !== 'null') ? value.salesforceId : null;
-                        console.log("value ", value);
-
-
+                    label: 'Client Type',
+                    value: formData.accountDetails.clientType.map(client => client.clientTypeId),
+                    // initialSearchTerm: formData.accountDetails.clientType.length > 0 ? formData.accountDetails.clientType[0].clientTypeName : '',
+                    onChange: (e) => {
+                        const selectedIds = e.target.value;
                         setFormData(prevData => ({
                             ...prevData,
-                            contactInformation: {
-                                ...prevData.contactInformation,
-                                accountName: {
-                                    ...prevData.contactInformation.accountName,
-                                    accountId: accountId,
-                                    salesforceAccountId: salesforceAccountId,
-                                },
+                            accountDetails: {
+                                ...prevData.accountDetails,
+                                clientType: selectedIds.map(id => ({
+                                    clientTypeId: id,
+                                    clientTypeName: resourceData?.clientType.find(client => client.id === id)?.clientTypeName || '',
+                                }))
                             },
                         }));
                     },
-                    searchApi: searchAccountName,
-                    required: true,
-                },
-                {
-                    label: 'Relationship Type*',
-                    value: formData.contactInformation.accountName.relationshipTypeId,
-                    onChange: (event) => {
-                        const value = event.target ? event.target.value : event;
-                        const selectedId = parseInt(value, 10);
-                        const selectedType = resourceData?.relationshipType.find(item => item.id === selectedId);
+                    options: resourceData?.clientType.map(client => ({ id: client.id, label: client.clientTypeName })) || [],
+                    valueField: 'id', labelField: 'label', multiple: true,
 
-
-                        setFormData(prevData => ({
-                            ...prevData,
-                            contactInformation: {
-                                ...prevData.contactInformation,
-                                accountName: {
-                                    ...prevData.contactInformation.accountName,
-                                    relationshipTypeId: selectedId,
-                                    relationshipType: selectedType ? selectedType.name : '',
-                                },
-                            },
-                        }));
-                    },
-                    options: resourceData?.relationshipType.map(reason => ({ id: reason.id, label: reason.name })) || [],
-                    valueField: 'id',
-                    labelField: 'label',
                 },
-                {
-                    label: 'Contact Profile',
-                    value: formData.contactInformation.contactProfile.map(profile => profile.contactProfileId),
-                    onChange: (event) => {
-                        const selectedIds = event.target.value;
-                        setFormData(prevData => ({
-                            ...prevData,
-                            contactInformation: {
-                                ...prevData.contactInformation,
-                                contactProfile: selectedIds.map(id => ({
-                                    contactProfileId: id,
-                                    contactProfileName: resourceData?.contactProfile.find(profile => profile.id === id)?.name || '',
-                                })),
-                            },
-                        }));
-                    },
-                    options: resourceData?.contactProfile.map(profile => ({ id: profile.id, label: profile.name })) || [],
-                    valueField: 'id',
-                    labelField: 'label',
-                    multiple: true,
-                },
-
-                { label: 'Influence Level', value: formData.contactInformation.influenceLevel, onChange: handleInputChange('contactInformation', 'influenceLevel'), options: resourceData?.influenceLevel.map(reason => ({ id: reason, label: reason })) || [], valueField: 'id', labelField: 'label' },
+                { label: 'Phone', type: 'number', value: formData.accountDetails.phone, onChange: handleInputChange('accountDetails', 'phone') },
+                { label: 'Fax', type: 'text', value: formData.accountDetails.fax, onChange: handleInputChange('accountDetails', 'fax') },
+                { label: 'Website', type: 'text', value: formData.accountDetails.website, onChange: handleInputChange('accountDetails', 'website') },
             ],
         },
         {
             title: 'Address Information',
             visibilityKey: 'addressInformationVisible',
             fields: [
-                { label: 'Mailing Country*', value: formData.addressInformation.mailingCountry, onChange: handleCountryChange('addressInformation', 'mailingCountry', 'mailingState', 'mailingCountryCode'), options: resourceData?.country || [], valueField: 'countryName', labelField: 'countryName', required: true },
-                { label: 'Mailing State/Province*', value: formData.addressInformation.mailingState, onChange: handleInputChange('addressInformation', 'mailingState'), options: resourceData?.country.find(c => c.countryCode === formData.addressInformation.mailingCountryCode)?.state || [], valueField: 'stateName', labelField: 'stateName', required: true, disabled: !formData.addressInformation.mailingCountryCode },
-                { label: 'Mailing City*', type: 'text', value: formData.addressInformation.mailingCity, onChange: handleInputChange('addressInformation', 'mailingCity'), required: true },
-                { label: 'Mailing Street*', type: 'text', value: formData.addressInformation.mailingStreet, onChange: handleInputChange('addressInformation', 'mailingStreet'), required: true },
-                { label: 'Mailing Zip/Postal Code', value: formData.addressInformation.mailingPostCode, onChange: handleInputChange('addressInformation', 'mailingPostCode') },
+                { label: 'Billing Country', value: formData.addressInformation.billingCountry, initialSearchTerm: formData.addressInformation.billingCountry, onChange: handleCountryChange('addressInformation', 'billingCountry', 'billingState', 'billingCountryCode'), options: resourceData?.country || [], valueField: 'countryName', labelField: 'countryName', required: true },
+                { label: 'Shipping Country', value: formData.addressInformation.shippingCountry, initialSearchTerm: formData.addressInformation.shippingCountry, onChange: handleCountryChange('addressInformation', 'shippingCountry', 'shippingState', 'shippingCountryCode'), options: resourceData?.country || [], valueField: 'countryName', labelField: 'countryName' },
+                { label: 'Billing State/Province', value: formData.addressInformation.billingState, initialSearchTerm: formData.addressInformation.shippingCountry, onChange: handleInputChange('addressInformation', 'billingState'), options: resourceData?.country.find(c => c.countryCode === formData.addressInformation.billingCountryCode)?.state || [], valueField: 'stateName', labelField: 'stateName', disabled: !formData.addressInformation.billingCountryCode },
+                { label: 'Shipping State/Province', value: formData.addressInformation.shippingState, initialSearchTerm: formData.addressInformation.shippingCountry, onChange: handleInputChange('addressInformation', 'shippingState'), options: resourceData?.country.find(c => c.countryCode === formData.addressInformation.shippingCountryCode)?.state || [], valueField: 'stateName', labelField: 'stateName', required: true, disabled: !formData.addressInformation.shippingCountryCode },
+                { label: 'Billing City', type: 'text', value: formData.addressInformation.billingCity, onChange: handleInputChange('addressInformation', 'billingCity'), required: true },
+                { label: 'Shipping City', type: 'text', value: formData.addressInformation.shippingCity, onChange: handleInputChange('addressInformation', 'shippingCity') },
+                { label: 'Billing Street', type: 'text', value: formData.addressInformation.billingStreet, onChange: handleInputChange('addressInformation', 'billingStreet'), required: true },
+                { label: 'Shipping Street', type: 'text', value: formData.addressInformation.shippingStreet, onChange: handleInputChange('addressInformation', 'shippingStreet') },
+                { label: 'Billing Zip/Postal Code', value: formData.addressInformation.billingPostCode, onChange: handleInputChange('addressInformation', 'billingPostCode') },
+                { label: 'Shipping Zip/Postal Code', value: formData.addressInformation.shippingPostCode, onChange: handleInputChange('addressInformation', 'shippingPostCode') },
             ],
         },
         {
-            title: 'Communication Preferences',
-            visibilityKey: 'communicationPreferencesVisible',
+            title: 'Segmentation',
+            visibilityKey: 'segmentInformationVisible',
             fields: [
-                { label: 'Preferred Communication Method', value: formData.communicationPreference.communicationMethod, onChange: handleInputChange('communicationPreference', 'communicationMethod'), options: resourceData?.communicationMethod.map(reason => ({ id: reason, label: reason })) || [], valueField: 'id', labelField: 'label' },
-                { label: 'Email Options', value: formData.communicationPreference.emailOptions, onChange: handleInputChange('communicationPreference', 'emailOptions'), options: resourceData?.emailOption.map(reason => ({ id: reason, label: reason })) || [], valueField: 'id', labelField: 'label' },
-                { label: 'Mail Options', value: formData.communicationPreference.mailOptions, onChange: handleInputChange('communicationPreference', 'mailOptions'), options: resourceData?.mailOption.map(reason => ({ id: reason, label: reason })) || [], valueField: 'id', labelField: 'label' },
-                { label: 'Call Options', value: formData.communicationPreference.callOptions, onChange: handleInputChange('communicationPreference', 'callOptions'), options: resourceData?.callOption.map(reason => ({ id: reason, label: reason })) || [], valueField: 'id', labelField: 'label' },
-                { label: 'SMS Options', value: formData.communicationPreference.smsOptions, onChange: handleInputChange('communicationPreference', 'smsOptions'), options: resourceData?.smsOption.map(reason => ({ id: reason, label: reason })) || [], valueField: 'id', labelField: 'label' },
-                { label: 'Exclude Reason', value: formData.communicationPreference.excludeReason, onChange: handleInputChange('communicationPreference', 'excludeReason'), options: resourceData?.excludeReason.map(reason => ({ id: reason, label: reason })) || [], valueField: 'id', labelField: 'label' },
-                { label: 'Exclude On', type: 'date', value: formData.communicationPreference.excludeOn, onChange: handleInputChange('communicationPreference', 'excludeOn') },
                 {
-                    label: 'Exclude By',
-                    value: formData.communicationPreference.excludeBy.excludeById,
-                    onChange: (event) => {
-                        const value = event.target ? event.target.value : event;
-                        const excludeById = value.id || null;
-                        const salesforceAccountId = value.salesforceId || '';
-                        setFormData(prevData => ({
-                            ...prevData,
-                            communicationPreference: {
-                                ...prevData.communicationPreference,
-                                excludeBy: {
-                                    ...prevData.contactInformation.excludeBy,
-                                    excludeById: excludeById,
-                                    excludeBySalesforceId: salesforceAccountId,
-                                },
+                    label: 'Industrial Type', value: formData.segmentation.industrialType, initialSearchTerm: formData.segmentation.industrialType, onChange: (e) => {
+                        setFormData({
+                            ...formData,
+                            segmentation: {
+                                ...formData.segmentation,
+                                industrialType: e.target.value,
+                                subIndustrial: '',
                             },
-                        }));
-                    },
-                    searchApi: searchEmployee,
-                    required: true,
+                        });
+                    }, options: resourceData?.industrialType || [], valueField: 'industryTypeName', labelField: 'industryTypeName'
                 },
+                {
+                    label: 'Sub Industry', value: formData.segmentation.subIndustrial, initialSearchTerm: formData.segmentation.subIndustrial, onChange: (e) => {
+                        const selectedIndustryType = resourceData.industrialType.find(c => c.industryTypeName === formData.segmentation.industrialType);
+                        const selectedSubIndustry = selectedIndustryType?.subIndustry.find(s => s.subIndustryName === e.target.value);
+
+                        setFormData({
+                            ...formData,
+                            segmentation: {
+                                ...formData.segmentation,
+                                subIndustrial: e.target.value,
+                                subIndustrialId: selectedSubIndustry ? selectedSubIndustry.id : '',
+                            },
+                        });
+                    }, options: resourceData?.industrialType.find(c => c.industryTypeName === formData.segmentation.industrialType)?.subIndustry || [], valueField: 'subIndustryName', labelField: 'subIndustryName', disabled: !formData.segmentation.industrialType
+                },
+                { label: 'Headquarter Country', value: formData.segmentation.headquarterCountry, initialSearchTerm: formData.segmentation.headquarterCountry, onChange: handleInputChange('segmentation', 'headquarterCountry'), options: resourceData?.country || [], valueField: 'countryName', labelField: 'countryName' },
+                { label: 'Commercial Number', type: 'number', value: formData.segmentation.commercialNumber, onChange: handleInputChange('segmentation', 'commercialNumber') },
             ],
         },
         {
             title: 'Additional Information',
             visibilityKey: 'additionalInformationVisible',
             fields: [
-                { label: 'Nick Name', type: 'text', value: formData.additionalInformation.nickName, onChange: handleInputChange('additionalInformation', 'nickName') },
-                { label: 'Assistant Name', type: 'text', value: formData.additionalInformation.assistantName, onChange: handleInputChange('additionalInformation', 'assistantName') },
-                { label: 'Assistant Phone', type: 'text', value: formData.additionalInformation.assistantPhone, onChange: handleInputChange('additionalInformation', 'assistantPhone') },
-                { label: 'Assistant Email', type: 'text', value: formData.additionalInformation.assistantEmail, onChange: handleInputChange('additionalInformation', 'assistantEmail') },
-                {
-                    label: 'Reports To',
-                    value: formData.additionalInformation.reportsTo.reportsToId,
-                    onChange: (event) => {
-                        const value = event.target ? event.target.value : event;
-                        const accountId = value.id || null;
-                        const salesforceAccountId = value.salesforceId || '';
-
-
-                        setFormData(prevData => ({
-                            ...prevData,
-                            additionalInformation: {
-                                ...prevData.additionalInformation,
-                                reportsTo: {
-                                    ...prevData.additionalInformation.reportsTo,
-                                    reportsToId: accountId,
-                                    reportsToSalesforceId: salesforceAccountId,
-                                },
-                            },
-                        }));
-                    },
-                    searchApi: searchContactName,
-                    required: true,
-                },
-                {
-                    label: 'CBRE Employee',
-                    type: 'checkbox',
-                    value: formData.additionalInformation.cbreEmployee,
-                    onChange: (e) => {
-                        setFormData(prevData => ({
-                            ...prevData,
-                            additionalInformation: {
-                                ...prevData.additionalInformation,
-                                cbreEmployee: e.target.checked,
-                            }
-                        }));
-                    },
-                    customRender: ({ label, value, onChange }) => (
-                        <div className="flex items-center">
-                            <input
-                                type="checkbox"
-                                checked={value}
-                                onChange={onChange}
-                                className="mr-2"
-                            />
-                            <label className="block text-sm font-medium text-gray-700">
-                                {label}
-                            </label>
-                        </div>
-                    ),
-                },
+                { label: 'Tax Type', value: formData.additionalInformation.taxType, initialSearchTerm: formData.additionalInformation.taxType, onChange: handleInputChange('additionalInformation', 'taxType'), options: resourceData?.taxType.map(type => ({ id: type, label: type })) || [], valueField: 'id', labelField: 'label' },
+                { label: 'Tax ID', type: 'text', value: formData.additionalInformation.taxId, onChange: handleInputChange('additionalInformation', 'taxId') },
                 {
                     label: 'Description', type: 'textarea', value: formData.additionalInformation.description, onChange: handleInputChange('additionalInformation', 'description'),
                     customRender: ({ label, value, onChange }) => (
@@ -736,25 +614,28 @@ export default function ContactFormSection({
             visibilityKey: 'systemInformationVisible',
             fields: [
                 {
-                    label: 'Contact Owner',
-                    value: formData.systemInformation.contactOwner,
-                    onChange: (selectedIds) => {
+                    label: 'Account Owner',
+                    value: formData.systemInformation.accountOwner,
+                    onChange: (value) => {
                         setFormData(prevData => ({
                             ...prevData,
                             systemInformation: {
                                 ...prevData.systemInformation,
-                                contactOwner: selectedIds
+                                accountOwner: value,
                             },
                         }));
                     },
-                    searchApi: searchEmployee,
-                    required: true,
-                    multiple: true, // Enable multiple selections
+                    searchApi: searchAccountOwners,
+                    required: true, multiple: true,
                 },
-                { label: 'Status', value: formData.systemInformation.status, onChange: handleInputChange('systemInformation', 'status'), options: [{ id: 'Active', label: 'Active' }, { id: 'Inactive', label: 'Inactive' }], valueField: 'id', labelField: 'label' },
+                // isEditing && { label: 'Modified By', type: 'text', value: formData.systemInformation.createdBy, onChange: handleInputChange('systemInformation', 'modifiedBy'), disabled: true },
+                // isEditing && { label: 'Modified Date', type: 'text', value: formData.systemInformation.createdDate, onChange: handleInputChange('systemInformation', 'modifiedDate'), disabled: true },
+                // isEditing && { label: 'Created By', type: 'text', value: formData.systemInformation.createdBy, onChange: handleInputChange('systemInformation', 'createdBy'), disabled: true },
+                // isEditing && { label: 'Created Date', type: 'text', value: formData.systemInformation.createdDate, onChange: handleInputChange('systemInformation', 'createdDate'), disabled: true },
+                { label: 'Status', value: formData.systemInformation.status, initialSearchTerm: formData.systemInformation.status, onChange: handleInputChange('systemInformation', 'status'), options: [{ id: 'Active', label: 'Active' }, { id: 'Inactive', label: 'Inactive' }], valueField: 'id', labelField: 'label' },
                 { label: 'Inactivation Date', type: 'date', value: formData.systemInformation.inactivationDate, onChange: handleInputChange('systemInformation', 'inactivationDate') },
-                { label: 'Reason for Inactivating', value: formData.systemInformation.reasonForInactivating, onChange: handleInputChange('systemInformation', 'reasonForInactivating'), options: resourceData?.inactiveReason.map(reason => ({ id: reason, label: reason })) || [], valueField: 'id', labelField: 'label' },
-                {
+                { label: 'Reason for Inactivating', value: formData.systemInformation.reasonForInactivating, initialSearchTerm: formData.systemInformation.reasonForInactivating, onChange: handleInputChange('systemInformation', 'reasonForInactivating'), options: resourceData?.inactiveReason.map(reason => ({ id: reason, label: reason })) || [], valueField: 'id', labelField: 'label' },
+                !isEditing && {
                     label: 'Save to SFDC',
                     type: 'checkbox',
                     value: formData.systemInformation.saveToSFDC,
@@ -781,10 +662,10 @@ export default function ContactFormSection({
                         </div>
                     ),
                 },
-            ],
+                // { label: 'User ID', type: 'text', value: formData.systemInformation.userId, onChange: handleInputChange('systemInformation', 'userId') },
+            ].filter(Boolean),  // Filter out false values
         },
     ];
-
 
     return (
         <>
@@ -822,9 +703,10 @@ export default function ContactFormSection({
             ))}
         </>
     );
+
+
+
 }
-
-
 
 
 

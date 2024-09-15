@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import DataTable from '../shared/CustomTableMUI';
-import { ACCOUNTCOLUMNDUMMY, ACCOUNTDATADUMMY } from '../lib/const/DummyData';
+import DataTable from '../../shared/CustomTableMUI';
+import { ACCOUNTCOLUMNDUMMY, ACCOUNTDATADUMMY } from '../../lib/const/DummyData';
 import { MdAccountBox } from 'react-icons/md';
-import { generateTransactionId } from '../lib/api/Authorization';
-import { ACCOUNTCOLUMN } from '../lib/const/AppContant';
+import { generateTransactionId } from '../../lib/api/Authorization';
+import { ACCOUNTCOLUMN } from '../../lib/const/AppContant';
 import AccountForm from './AccountForm';
 
 

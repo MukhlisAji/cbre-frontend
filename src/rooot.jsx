@@ -36,14 +36,16 @@ import DataEntryLayout from "./components/shared/DataEntryLayout";
 import Layout from "./components/shared/Layout";
 import MapViewer from "./components/map-viewer/pages/MapViewer";
 import PropertyLayout from "./components/property/PropertyLayout";
-import Account from "./components/property/Account";
-import Contact from "./components/property/Contact";
-import AccountDetails from "./components/property/AccountDetails";
-import ContactDetails from "./components/property/ContactDetails";
+import Account from "./components/property/account/Account";
+import Contact from "./components/property/contact/Contact";
+import AccountDetails from "./components/property/account/AccountDetails";
+import ContactDetails from "./components/property/contact/ContactDetails";
 import GlobalSearchResult from "./components/shared/global-search/GlobalSearchResult";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
-import Properties from "./components/property/Properties";
+import Properties from "./components/property/properties/Properties";
+import PropertySearchForm from "./components/property/properties/PropertySearchForm";
+import PropertyDetails from "./components/property/properties/PropertyDetails";
 
 Modal.setAppElement("#root");
 
@@ -69,6 +71,9 @@ function App() {
                 <Route path="contacts/details/:id" element={<ContactDetails />} />
 
                 <Route path="properties" element={<Properties />} />
+                <Route path="properties/search" element={<PropertySearchForm />} />
+                <Route path="properties/details/:id" element={<PropertyDetails />} />
+
 
               </Route>
               <Route path="map" element={<MapViewer />} />

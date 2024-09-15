@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import DataTable from '../shared/CustomTableMUI';
+import DataTable from '../../shared/CustomTableMUI';
 import { RiContactsBook3Line } from "react-icons/ri";
-import { generateTransactionId } from '../lib/api/Authorization';
-import { CONTACTCOLUMN } from '../lib/const/AppContant';
+import { generateTransactionId } from '../../lib/api/Authorization';
+import { CONTACTCOLUMN } from '../../lib/const/AppContant';
 import ContactForm from './ContactForm';
 
 
