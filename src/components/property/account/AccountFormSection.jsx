@@ -418,7 +418,7 @@ export default function AccountFormSection({
                 setResourceData(JSON.parse(cachedData));
             } else {
                 try {
-                    const response = await fetch('http://localhost:8085/cbre/account/resources', {
+                    const response = await fetch(`${CONFIG.ACCOUNT_SERVICE}/resources`, {
                         method: 'GET',
                         headers: {
                             'transactionId': '46467657665',
@@ -487,7 +487,7 @@ export default function AccountFormSection({
     // };
 
     const searchAccountOwners = async (searchTerm) => {
-        const response = await fetch(`http://localhost:8084/cbre/utilities/find-employee?name=${searchTerm}`, {
+        const response = await fetch(`${CONFIG.UTILITIES_SERVICE}/find-employee?name=${searchTerm}`, {
             method: 'GET',
             headers: {
                 'Cookie': 'CookieConsentPolicy=0:1; LSKey-c$CookieConsentPolicy=0:1',

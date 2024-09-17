@@ -4,6 +4,7 @@ import { RiContactsBook3Line } from "react-icons/ri";
 import { generateTransactionId } from '../../lib/api/Authorization';
 import { CONTACTCOLUMN } from '../../lib/const/AppContant';
 import ContactForm from './ContactForm';
+import { CONFIG } from '../../../config';
 
 
 
@@ -20,7 +21,7 @@ const Contact = () => {
         const fetchData = async () => {
             const transactionId = generateTransactionId();
             try {
-                const response = await fetch('http://localhost:8080/cbre/contact?page=1', {
+                const response = await fetch(`${CONFIG.CONTACT_SERVICE}?page=1`, {
                     method: 'GET',
                     headers: {
                         'transactionId': transactionId

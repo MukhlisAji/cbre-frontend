@@ -75,8 +75,8 @@ export default function AccountForm({ onClose, isEditing, accountId }) {
         },
         systemInformation: {
             accountOwner: [],
-            createdBy: generateSystemValues.createdBy,
-            createdDate: generateSystemValues.createdDate,
+            // createdBy: generateSystemValues.createdBy,
+            // createdDate: generateSystemValues.createdDate,
             // lastModifiedBy: '',
             // lastModifiedDate: '',
             status: 'Active',
@@ -135,54 +135,53 @@ export default function AccountForm({ onClose, isEditing, accountId }) {
         if (initialData) {
             setFormData({
                 accountDetails: {
-                    accountId: initialData.id || '',
-                    accountName: initialData.accountName || '',
-                    parentAccount: initialData.parentAccount.id || '',
-                    localAccountName: initialData.localAccountName || '',
-                    clientType: initialData.clientType.map(type => ({
-                        clientTypeId: type.id,
-                        clientTypeName: type.name
+                    accountId: initialData?.id?.toString() || '',
+                    accountName: initialData?.accountName?.toString() || '',
+                    parentAccount: initialData?.parentAccount?.id?.toString() || '',
+                    localAccountName: initialData?.localAccountName?.toString() || '',
+                    clientType: initialData?.clientType?.map(type => ({
+                        clientTypeId: type?.id?.toString() || '',
+                        clientTypeName: type?.name?.toString() || '',
                     })) || [],
-                    phone: initialData.phone || '',
-                    fax: initialData.fax || '',
-                    website: initialData.website || '',
+                    phone: initialData?.phone?.toString() || '',
+                    fax: initialData?.fax?.toString() || '',
+                    website: initialData?.website?.toString() || '',
                 },
                 addressInformation: {
-                    billingCountryCode: initialData.billingCountry.countryCode || '',
-                    billingCountry: initialData.billingCountry.countryName || '',
-                    billingState: initialData.billingState || '',
-                    billingCity: initialData.billingCity || '',
-                    billingStreet: initialData.billingStreet || '',
-                    billingPostCode: initialData.billingPostCode || '',
-                    shippingCountryCode: initialData.shippingCountry.countryCode || '',
-                    shippingCountry: initialData.shippingCountry.countryName || '',
-                    shippingState: initialData.shippingState || '',
-                    shippingCity: initialData.shippingCity || '',
-                    shippingStreet: initialData.shippingStreet || '',
-                    shippingPostCode: initialData.shippingPostCode || '',
+                    billingCountryCode: initialData?.billingCountry?.countryCode?.toString() || '',
+                    billingCountry: initialData?.billingCountry?.countryName?.toString() || '',
+                    billingState: initialData?.billingState?.toString() || '',
+                    billingCity: initialData?.billingCity?.toString() || '',
+                    billingStreet: initialData?.billingStreet?.toString() || '',
+                    billingPostCode: initialData?.billingPostCode?.toString() || '',
+                    shippingCountryCode: initialData?.shippingCountry?.countryCode?.toString() || '',
+                    shippingCountry: initialData?.shippingCountry?.countryName?.toString() || '',
+                    shippingState: initialData?.shippingState?.toString() || '',
+                    shippingCity: initialData?.shippingCity?.toString() || '',
+                    shippingStreet: initialData?.shippingStreet?.toString() || '',
+                    shippingPostCode: initialData?.shippingPostCode?.toString() || '',
                 },
                 segmentation: {
-                    industrialType: initialData.industrialType.name || '',
-                    subIndustrialId: initialData.subIndustrial.id || '',
-                    subIndustrial: initialData.subIndustrial.name || '',
-                    headquarterCountry: initialData.headQuarter.countryName || '',
-                    commercialNumber: initialData.commercialNumber || '',
+                    industrialType: initialData?.industrialType?.name?.toString() || '',
+                    subIndustrialId: initialData?.subIndustrial?.id?.toString() || '',
+                    subIndustrial: initialData?.subIndustrial?.name?.toString() || '',
+                    headquarterCountry: initialData?.headQuarter?.countryName?.toString() || '',
+                    commercialNumber: initialData?.commercialNumber?.toString() || '',
                 },
                 additionalInformation: {
-                    taxType: initialData.taxType || '',
-                    taxId: initialData.taxId || '',
-                    description: initialData.description || '',
+                    taxType: initialData?.taxType?.toString() || '',
+                    taxId: initialData?.taxId?.toString() || '',
+                    description: initialData?.description?.toString() || '',
                 },
                 systemInformation: {
-                    accountOwner: initialData.accountOwner.map(owner =>
-                        owner.employee.id,
-                    ) || [],
-                    status: initialData.status || '',
-                    inactivationDate: initialData.inactivationDate || '',
-                    reasonForInactivating: initialData.reasonForInactivating || '',
-                    userId: '',
+                    accountOwner: initialData?.accountOwner?.map(owner => owner?.employee?.id?.toString()) || [],
+                    status: initialData?.status?.toString() || '',
+                    inactivationDate: initialData?.inactivationDate?.toString() || '',
+                    reasonForInactivating: initialData?.reasonForInactivating?.toString() || '',
+                    userId: '', // Assuming this is set elsewhere, keeping it empty
                 },
             });
+            
         }
     }, [initialData, isEditing]);
 
@@ -433,9 +432,9 @@ export default function AccountForm({ onClose, isEditing, accountId }) {
         }
     };
 
-    if (!initialData && isEditing) {
-        return <p>Loading...</p>;
-    }
+    // if (!initialData && isEditing) {
+    //     return <p>Loading...</p>;
+    // }
 
     const [isFormValid, setIsFormValid] = useState(true);
 
@@ -469,7 +468,7 @@ export default function AccountForm({ onClose, isEditing, accountId }) {
         <div className={`fixed inset-0 flex items-center justify-center z-50 ${onClose ? 'animate-fade-in' : 'animate-fade-out'}`}>
             <div className="absolute inset-0 bg-black opacity-50"></div>
             <div className="relative flex flex-col w-1/2 h-3/4 bg-white shadow-lg rounded-lg">
-                {isLoading && (
+                {(isLoading || !initialData) && (
                     <div className="absolute inset-0 bg-white bg-opacity-70 flex justify-center items-center z-50">
                         <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-c-teal"></div>
                     </div>

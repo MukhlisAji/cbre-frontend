@@ -101,20 +101,20 @@ export const SelectField = ({
         } else if (!multiple && value) {
             const selectedOption = options.find(option => option[valueField] === value);
             const newSearchTerm = selectedOption ? selectedOption[labelField] : '';
-            
+
             // Only set search term if it actually needs to change
             if (searchTerm !== newSearchTerm) {
                 setSearchTerm(newSearchTerm);
             }
-    
+
             // Only update selected values if needed
-            if (selectedValues[0] !== value) {
+            if (selectedValues && selectedValues[0] !== value) {
                 setSelectedValues([value]);
             }
         }
     }, [value, options, multiple, valueField, labelField, selectedValues, searchTerm]);
 
-    
+
     const handleInputChange = (e) => {
         setSearchTerm(e.target.value);
         setShowDropdown(true);

@@ -5,6 +5,7 @@ import { MdAccountBox } from 'react-icons/md';
 import { generateTransactionId } from '../../lib/api/Authorization';
 import { ACCOUNTCOLUMN } from '../../lib/const/AppContant';
 import AccountForm from './AccountForm';
+import { CONFIG } from '../../../config';
 
 
 
@@ -21,7 +22,7 @@ const Account = () => {
         const fetchData = async () => {
             const transactionId = generateTransactionId();
             try {
-                const response = await fetch('http://localhost:8085/cbre/account?page=1', {
+                const response = await fetch(`${CONFIG.ACCOUNT_SERVICE}?page=1`, {
                     method: 'GET',
                     headers: {
                         'transactionId': transactionId

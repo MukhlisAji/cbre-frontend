@@ -147,75 +147,76 @@ export default function ContactForm({ onClose, isEditing, contactId }) {
         if (initialData) {
             setFormData({
                 contactInformation: {
-                    contactId: initialData.id || '',
-                    salutation: initialData.salutation || '',
-                    firstName: initialData.firstname || '',
-                    middleName: initialData.middlename || '',
-                    lastName: initialData.lastname || '',
-                    title: initialData.title || '',
-                    department: initialData.department || '',
-                    email: initialData.email || '',
-                    businessPhone: initialData.businessPhone || '',
-                    mobilePhone: initialData.mobilePhone || '',
-                    mainPhone: initialData.mainPhone || '',
-                    fax: initialData.fax || '',
-                    linkedin: initialData.linkedin || '',
-                    accountName: initialData.accountContact ? {
-                        accountId: initialData.accountContact.accountId || '',
-                        salesforceAccountId: initialData.accountContact.accountSalesforceId || '',
-                        relationshipTypeId: initialData.accountContact.relationshipType.id || '',
-                        relationshipType: initialData.accountContact.relationshipType.name || '',
+                    contactId: initialData?.id?.toString() || '',
+                    salutation: initialData?.salutation?.toString() || '',
+                    firstName: initialData?.firstname?.toString() || '',
+                    middleName: initialData?.middlename?.toString() || '',
+                    lastName: initialData?.lastname?.toString() || '',
+                    title: initialData?.title?.toString() || '',
+                    department: initialData?.department?.toString() || '',
+                    email: initialData?.email?.toString() || '',
+                    businessPhone: initialData?.businessPhone?.toString() || '',
+                    mobilePhone: initialData?.mobilePhone?.toString() || '',
+                    mainPhone: initialData?.mainPhone?.toString() || '',
+                    fax: initialData?.fax?.toString() || '',
+                    linkedin: initialData?.linkedin?.toString() || '',
+                    accountName: initialData?.accountContact ? {
+                        accountId: initialData?.accountContact?.accountId?.toString() || '',
+                        salesforceAccountId: initialData?.accountContact?.accountSalesforceId?.toString() || '',
+                        relationshipTypeId: initialData?.accountContact?.relationshipType?.id?.toString() || '',
+                        relationshipType: initialData?.accountContact?.relationshipType?.name?.toString() || '',
                         isPrimary: 'Yes' // Assuming it's primary if it's the only one provided
                     } : {},
-                    contactProfile: initialData.contactProfile.map(profile => ({
-                        contactProfileId: profile.contactProfileList.id,
-                        contactProfileName: profile.contactProfileList.name
+                    contactProfile: initialData?.contactProfile?.map(profile => ({
+                        contactProfileId: profile?.contactProfileList?.id?.toString() || '',
+                        contactProfileName: profile?.contactProfileList?.name?.toString() || '',
                     })) || [],
-                    influenceLevel: initialData.influenceLevel || '',
+                    influenceLevel: initialData?.influenceLevel?.toString() || '',
                 },
                 addressInformation: {
-                    mailingCountry: initialData.mailingCountry ? initialData.mailingCountry.countryName : '',
-                    mailingCountryCode: initialData.mailingCountry ? initialData.mailingCountry.countryCode : '',
-                    mailingState: initialData.mailingState || '',
-                    mailingCity: initialData.mailingCity || '',
-                    mailingStreet: initialData.mailingStreet || '',
-                    mailingPostCode: initialData.mailingPostCode || '',
+                    mailingCountry: initialData?.mailingCountry?.countryName?.toString() || '',
+                    mailingCountryCode: initialData?.mailingCountry?.countryCode?.toString() || '',
+                    mailingState: initialData?.mailingState?.toString() || '',
+                    mailingCity: initialData?.mailingCity?.toString() || '',
+                    mailingStreet: initialData?.mailingStreet?.toString() || '',
+                    mailingPostCode: initialData?.mailingPostCode?.toString() || '',
                 },
                 communicationPreference: {
-                    communicationMethod: initialData.communicationMethod || '',
-                    emailOptions: initialData.emailOptions || '',
-                    mailOptions: initialData.mailOptions || '',
-                    callOptions: initialData.callOptions || '',
-                    smsOptions: initialData.smsOptions || '',
-                    excludeReason: initialData.excludeReason || '',
-                    excludeOn: initialData.excludeOn || '',
-                    excludeBy: initialData.excludeBy ? {
-                        excludeById: initialData.excludeBy.id,
-                        excludeBySalesforceId: initialData.excludeBy.salesforceId || '',
+                    communicationMethod: initialData?.communicationMethod?.toString() || '',
+                    emailOptions: initialData?.emailOptions?.toString() || '',
+                    mailOptions: initialData?.mailOptions?.toString() || '',
+                    callOptions: initialData?.callOptions?.toString() || '',
+                    smsOptions: initialData?.smsOptions?.toString() || '',
+                    excludeReason: initialData?.excludeReason?.toString() || '',
+                    excludeOn: initialData?.excludeOn?.toString() || '',
+                    excludeBy: initialData?.excludeBy ? {
+                        excludeById: initialData?.excludeBy?.id?.toString() || '',
+                        excludeBySalesforceId: initialData?.excludeBy?.salesforceId?.toString() || '',
                     } : {},
                 },
                 additionalInformation: {
-                    nickName: initialData.nickName || '',
-                    assistantName: initialData.assistantName || '',
-                    assistantPhone: initialData.assistantPhone || '',
-                    assistantEmail: initialData.assistantEmail || '',
-                    reportsTo: initialData.reportsTo ? {
-                        reportsToId: initialData.reportsTo.id,
-                        reportsToSalesforceId: initialData.reportsTo.salesforceId || '',
+                    nickName: initialData?.nickName?.toString() || '',
+                    assistantName: initialData?.assistantName?.toString() || '',
+                    assistantPhone: initialData?.assistantPhone?.toString() || '',
+                    assistantEmail: initialData?.assistantEmail?.toString() || '',
+                    reportsTo: initialData?.reportsTo ? {
+                        reportsToId: initialData?.reportsTo?.id?.toString() || '',
+                        reportsToSalesforceId: initialData?.reportsTo?.salesforceId?.toString() || '',
                     } : {},
-                    description: initialData.description || '',
-                    cbreEmployee: initialData.cbreEmployee || false,
+                    description: initialData?.description?.toString() || '',
+                    cbreEmployee: initialData?.cbreEmployee || false,
                 },
                 systemInformation: {
-                    contactOwner: initialData.contactOwner.map(owner =>
-                        owner.employee.employeeId,
+                    contactOwner: initialData?.contactOwner?.map(owner =>
+                        owner?.employee?.employeeId?.toString() || '',
                     ) || [],
-                    status: initialData.status || '',
-                    inactivationDate: initialData.inactiveDate || '',
-                    reasonForInactivating: initialData.reasonForInactivating || '',
-                    userId: '',
+                    status: initialData?.status?.toString() || '',
+                    inactivationDate: initialData?.inactiveDate?.toString() || '',
+                    reasonForInactivating: initialData?.reasonForInactivating?.toString() || '',
+                    userId: '', // Assuming userId is set elsewhere
                 },
             });
+            
         }
         console.log("this is the data : ", formData);
     }, [initialData, isEditing]);
@@ -450,15 +451,15 @@ export default function ContactForm({ onClose, isEditing, contactId }) {
         }
     };
 
-    if (!initialData && isEditing) {
-        return <p>Loading...</p>;
-    }
+    // if (!initialData && isEditing) {
+    //     return <p>Loading...</p>;
+    // }
 
     return (
         <div className={`fixed inset-0 flex items-center justify-center z-50 ${onClose ? 'animate-fade-in' : 'animate-fade-out'}`}>
             <div className="absolute inset-0 bg-black opacity-50"></div>
             <div className="relative flex flex-col w-1/2 h-3/4 bg-white shadow-lg rounded-lg">
-                {isLoading && (
+                {(isLoading || !initialData) && (
                     <div className="absolute inset-0 bg-white bg-opacity-70 flex justify-center items-center z-50">
                         <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-c-teal"></div>
                     </div>
