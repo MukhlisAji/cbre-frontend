@@ -6,6 +6,7 @@ import { useDrop } from 'react-dnd';
 import { BUILDINGDATADUMMY } from '../../../lib/const/DummyData';
 import ProjectShare from './ProjectShare';
 import { useAppContext } from '../../../../AppContext';
+import NewProject from './NewProject';
 
 const ItemTypes = {
     BUILDING: 'building',
@@ -30,7 +31,11 @@ export default function Project() {
     const { openProject, drawerContent, toggleDrawer } = useAppContext();
     const [selectedProjectId, setSelectedProjectId] = useState(null);
     const [showConfirmation, setShowConfirmation] = useState(null);
+    const [newProjectDialogVisible, setNewProjectDialogVisible] = useState(false);
     const confirmationRef = useRef(null);
+    const [newProjectName, setNewProjectName] = useState('');
+    const [newAccount, setNewAccount] = useState('');
+    const [newContact, setNewContact] = useState('');
 
 
     const confirmDeletion = (itemType, itemId) => {
@@ -99,6 +104,10 @@ export default function Project() {
         setConfirmationDialogVisible(false);
     };
 
+    const handleCancelSaveNew = () => {
+        setNewProjectDialogVisible(false);
+    }
+
     const [{ isOver }, drop] = useDrop({
         accept: ItemTypes.BUILDING,
         drop: (item) => addBuildingToProject(item.building),
@@ -110,6 +119,18 @@ export default function Project() {
     const addBuildingToProject = (building) => {
         setBuildingIdList((prev) => [...prev, building.id]);
     };
+
+    const handleSaveNewProject = () => {
+        const newProject = {
+            id: projects.length + 1, // Simple id generation, update based on your logic
+            name: newProjectName,
+            description: "New project", // You can update this to be more descriptive
+            enabled: false,
+        };
+        setProjects([...projects, newProject]);
+        setNewProjectDialogVisible(false);
+    };
+
 
     return (
         <div className="relative">
@@ -124,6 +145,12 @@ export default function Project() {
                                 <h2 className="text-sm py-3 w-full text-center items-center font-semibold text-neutral-700">
                                     My Project List
                                 </h2>
+                                <button
+                                    className="flex items-center font-normal text-sm space-x-2 px-4 py-0.5 hover:bg-neutral-100 hover:text-neutral-700 border border-neutral-500 bg-white text-blue-700 rounded rounded-md transition duration-150 ease-in-out mx-2"
+                                    onClick={() => setNewProjectDialogVisible(true)}
+                                >
+                                    New
+                                </button>
                             </div>
                             <div className='flex flex-col flex-grow p-2'>
                                 {projects.map((project) => (
@@ -414,6 +441,10 @@ export default function Project() {
                     <ProjectShare onClose={handleCancelShare} />
                 )}
             </div>
+            {newProjectDialogVisible && (
+                <NewProject onClose={handleCancelSaveNew} />
+            )}
+
         </div>
     );
 }
