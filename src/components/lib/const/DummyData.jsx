@@ -125,7 +125,7 @@ const BUILDINGDATADUMMY = [{
 ]
 
 const PROPERTYCOLUMNDUMMY = [
-  { "label": "Property Name", "accessor": "propertyName" },
+  { "label": "Property Name", "accessor": "propertyName", "isClickable": true, "url": "details" },
   { "label": "Address", "accessor": "address" },
   { "label": "Total NLA", "accessor": "totalNLA" },
   { "label": "Floor", "accessor": "floor" }

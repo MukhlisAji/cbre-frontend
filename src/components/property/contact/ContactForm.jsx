@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAppContext } from '../../AppContext';
-import AccountFormSection from './AccountFormSection';
+import { useAppContext } from '../../../AppContext';
 import { BsQuestionCircle } from 'react-icons/bs';
-import { generateTransactionId, useUtils } from '../lib/api/Authorization';
-import { CONFIG } from '../../config';
+import { generateTransactionId, useUtils } from '../../lib/api/Authorization';
+import ContactFormSection from './ContactFormSection';
+import { CONFIG } from '../../../config';
 
 const generateSystemValues = () => {
     const currentUser = "System User"; // Replace with actual user info if available
@@ -16,7 +16,7 @@ const generateSystemValues = () => {
     };
 };
 
-export default function AccountForm({ onClose, isEditing, accountId }) {
+export default function ContactForm({ onClose, isEditing, contactId }) {
     const { token } = useAppContext();
     const [isLoading, setIsLoading] = useState(false);
     const [notification, setNotification] = useState(null);
@@ -25,89 +25,102 @@ export default function AccountForm({ onClose, isEditing, accountId }) {
     const { generateAndSetToken } = useUtils();
     const navigate = useNavigate();
 
+
     const [sectionVisibility, setSectionVisibility] = useState({
         accountInformationVisible: true,
         addressInformationVisible: true,
         additionalInformationVisible: true,
         segmentInformationVisible: true,
         systemInformationVisible: true,
-        associateInformationVisible: true,
+        contactInformationVisible: true,
+        communicationPreferencesVisible: true,
     });
+
+    const toggleVisibility = (section) => {
+        setSectionVisibility((prev) => ({
+            ...prev,
+            [section]: !prev[section],
+        }));
+    };
 
     const [initialData, setInitialData] = useState(null);
     const [formData, setFormData] = useState({
-        accountDetails: {
-            accountId: '',
-            accountName: '',
-            parentAccount: '',
-            localAccountName: '',
-            clientType: [],
-            phone: '',
+        contactInformation: {
+            salutation: '',
+            firstName: '',
+            middleName: '',
+            lastName: '',
+            title: '',
+            department: '',
+            email: '',
+            businessPhone: '',
+            mobilePhone: '',
+            mainPhone: '',
             fax: '',
-            website: '',
+            linkedin: '',
+            accountName: {
+                accountId: null,
+                salesforceAccountId: '',
+                relationshipTypeId: null,
+                relationshipType: '',
+                isPrimary: 'No'
+            },
+            contactProfile: [],
+            influenceLevel: ''
         },
         addressInformation: {
-            billingCountryCode: '',
-            billingCountry: '',
-            billingState: '',
-            billingCity: '',
-            billingStreet: '',
-            billingPostCode: '',
-            shippingCountryCode: '',
-            shippingCountry: '',
-            shippingState: '',
-            shippingCity: '',
-            shippingStreet: '',
-            shippingPostCode: '',
+            mailingCountryCode: '',
+            mailingCountry: '',
+            mailingState: '',
+            mailingCity: '',
+            mailingStreet: '',
+            mailingPostCode: ''
         },
-        segmentation: {
-            industrialType: '',
-            subIndustrialId: '',
-            subIndustrial: '',
-            headquarterCountryId: '',
-            headquarterCountry: '',
-            commercialNumber: '',
+        communicationPreference: {
+            communicationMethod: '',
+            emailOptions: '',
+            mailOptions: '',
+            callOptions: '',
+            smsOptions: '',
+            excludeReason: '',
+            excludeOn: '',
+            excludeBy: {
+                excludeById: null,
+                excludeBySalesforceId: ''
+            }
         },
         additionalInformation: {
-            taxType: '',
-            taxId: '',
+            nickName: '',
+            assistantName: '',
+            assistantPhone: '',
+            assistantEmail: '',
+            reportsTo: {
+                reportsToId: null,
+                reportsToSalesforceId: ''
+            },
             description: '',
+            cbreEmployee: false
         },
         systemInformation: {
-            accountOwner: [],
-            createdBy: generateSystemValues.createdBy,
-            createdDate: generateSystemValues.createdDate,
-            // lastModifiedBy: '',
-            // lastModifiedDate: '',
-            status: 'Active',
+            contactOwner: [],
+            // createdBy: generateSystemValues().createdBy,
+            // createdDate: generateSystemValues().createdDate,
+            status: '',
             inactivationDate: '',
             reasonForInactivating: '',
-            userId: '',
             saveToSFDC: true,
-            // salesforceId: '',
-        },
-        // associateInformation: {
-        //     accountSource: 'One App',
-        //     accountId: '',
-        //     parentAccountSource: '',
-        //     parentAccountId: '',
-        //     topParentAccountSource: '',
-        //     topParentAccountId: '',
-        // },
+            userId: ''
+        }
     });
-    const url = `${CONFIG.ACCOUNT_SERVICE}/${accountId}`;
-    // const headers = {
-    //     'transactionId': ,
-    //     'Cookie': 'CookieConsentPolicy=0:1; LSKey-c$CookieConsentPolicy=0:1'
-    // };
+
+    const url = `${CONFIG.CONTACT_SERVICE}/${contactId}`;
 
     useEffect(() => {
         if (isEditing) {
-
+            console.log("url is ", url);
             const fetchAccountData = async () => {
                 try {
                     const transactionId = generateTransactionId();
-
                     const response = await fetch(url, {
                         method: 'GET',
                         headers: {
@@ -122,69 +135,92 @@ export default function AccountForm({ onClose, isEditing, accountId }) {
 
                     const data = await response.json();
                     setInitialData(data.resultSet);
-                    console.log('Fetched account data:', data);
+                    console.log('Fetched contact data:', data);
                 } catch (error) {
-                    console.error('Error fetching account data:', error);
+                    console.error('Error fetching contact data:', error);
                 }
             };
             fetchAccountData();
         }
-    }, []);
-
+    }, [isEditing, url]);
     useEffect(() => {
         if (initialData) {
             setFormData({
-                accountDetails: {
-                    accountId: initialData.id || '',
-                    accountName: initialData.accountName || '',
-                    parentAccount: initialData.parentAccount.id || '',
-                    localAccountName: initialData.localAccountName || '',
-                    clientType: initialData.clientType.map(type => ({
-                        clientTypeId: type.id,
-                        clientTypeName: type.name
+                contactInformation: {
+                    contactId: initialData?.id?.toString() || '',
+                    salutation: initialData?.salutation?.toString() || '',
+                    firstName: initialData?.firstname?.toString() || '',
+                    middleName: initialData?.middlename?.toString() || '',
+                    lastName: initialData?.lastname?.toString() || '',
+                    title: initialData?.title?.toString() || '',
+                    department: initialData?.department?.toString() || '',
+                    email: initialData?.email?.toString() || '',
+                    businessPhone: initialData?.businessPhone?.toString() || '',
+                    mobilePhone: initialData?.mobilePhone?.toString() || '',
+                    mainPhone: initialData?.mainPhone?.toString() || '',
+                    fax: initialData?.fax?.toString() || '',
+                    linkedin: initialData?.linkedin?.toString() || '',
+                    accountName: initialData?.accountContact ? {
+                        accountId: initialData?.accountContact?.accountId?.toString() || '',
+                        salesforceAccountId: initialData?.accountContact?.accountSalesforceId?.toString() || '',
+                        relationshipTypeId: initialData?.accountContact?.relationshipType?.id?.toString() || '',
+                        relationshipType: initialData?.accountContact?.relationshipType?.name?.toString() || '',
+                        isPrimary: 'Yes' // Assuming it's primary if it's the only one provided
+                    } : {},
+                    contactProfile: initialData?.contactProfile?.map(profile => ({
+                        contactProfileId: profile?.contactProfileList?.id?.toString() || '',
+                        contactProfileName: profile?.contactProfileList?.name?.toString() || '',
                     })) || [],
-                    phone: initialData.phone || '',
-                    fax: initialData.fax || '',
-                    website: initialData.website || '',
+                    influenceLevel: initialData?.influenceLevel?.toString() || '',
                 },
                 addressInformation: {
-                    billingCountryCode: initialData.billingCountry.countryCode || '',
-                    billingCountry: initialData.billingCountry.countryName || '',
-                    billingState: initialData.billingState || '',
-                    billingCity: initialData.billingCity || '',
-                    billingStreet: initialData.billingStreet || '',
-                    billingPostCode: initialData.billingPostCode || '',
-                    shippingCountryCode: initialData.shippingCountry.countryCode || '',
-                    shippingCountry: initialData.shippingCountry.countryName || '',
-                    shippingState: initialData.shippingState || '',
-                    shippingCity: initialData.shippingCity || '',
-                    shippingStreet: initialData.shippingStreet || '',
-                    shippingPostCode: initialData.shippingPostCode || '',
+                    mailingCountry: initialData?.mailingCountry?.countryName?.toString() || '',
+                    mailingCountryCode: initialData?.mailingCountry?.countryCode?.toString() || '',
+                    mailingState: initialData?.mailingState?.toString() || '',
+                    mailingCity: initialData?.mailingCity?.toString() || '',
+                    mailingStreet: initialData?.mailingStreet?.toString() || '',
+                    mailingPostCode: initialData?.mailingPostCode?.toString() || '',
                 },
-                segmentation: {
-                    industrialType: initialData.industrialType.name || '',
-                    subIndustrialId: initialData.subIndustrial.id || '',
-                    subIndustrial: initialData.subIndustrial.name || '',
-                    headquarterCountry: initialData.headQuarter.countryName || '',
-                    commercialNumber: initialData.commercialNumber || '',
+                communicationPreference: {
+                    communicationMethod: initialData?.communicationMethod?.toString() || '',
+                    emailOptions: initialData?.emailOptions?.toString() || '',
+                    mailOptions: initialData?.mailOptions?.toString() || '',
+                    callOptions: initialData?.callOptions?.toString() || '',
+                    smsOptions: initialData?.smsOptions?.toString() || '',
+                    excludeReason: initialData?.excludeReason?.toString() || '',
+                    excludeOn: initialData?.excludeOn?.toString() || '',
+                    excludeBy: initialData?.excludeBy ? {
+                        excludeById: initialData?.excludeBy?.id?.toString() || '',
+                        excludeBySalesforceId: initialData?.excludeBy?.salesforceId?.toString() || '',
+                    } : {},
                 },
                 additionalInformation: {
-                    taxType: initialData.taxType || '',
-                    taxId: initialData.taxId || '',
-                    description: initialData.description || '',
+                    nickName: initialData?.nickName?.toString() || '',
+                    assistantName: initialData?.assistantName?.toString() || '',
+                    assistantPhone: initialData?.assistantPhone?.toString() || '',
+                    assistantEmail: initialData?.assistantEmail?.toString() || '',
+                    reportsTo: initialData?.reportsTo ? {
+                        reportsToId: initialData?.reportsTo?.id?.toString() || '',
+                        reportsToSalesforceId: initialData?.reportsTo?.salesforceId?.toString() || '',
+                    } : {},
+                    description: initialData?.description?.toString() || '',
+                    cbreEmployee: initialData?.cbreEmployee || false,
                 },
                 systemInformation: {
-                    accountOwner: initialData.accountOwner.map(owner =>
-                        owner.employee.id,
+                    contactOwner: initialData?.contactOwner?.map(owner =>
+                        owner?.employee?.employeeId?.toString() || '',
                     ) || [],
-                    status: initialData.status || '',
-                    inactivationDate: initialData.inactivationDate || '',
-                    reasonForInactivating: initialData.reasonForInactivating || '',
-                    userId: '',
+                    status: initialData?.status?.toString() || '',
+                    inactivationDate: initialData?.inactiveDate?.toString() || '',
+                    reasonForInactivating: initialData?.reasonForInactivating?.toString() || '',
+                    userId: '', // Assuming userId is set elsewhere
                 },
             });
+            
         }
+        console.log("this is the data : ", formData);
     }, [initialData, isEditing]);
+
 
     useEffect(() => {
         toggleBodyOverflow(true);
@@ -193,19 +229,19 @@ export default function AccountForm({ onClose, isEditing, accountId }) {
         };
     }, []);
 
+    // useEffect(() => {
+    //     if (formData) {
+    //         console.log("this is the data : ", formData);
+    //     }
+    // })
+
     const handleAccountAction = async (event, { isNew = false, navigateTo = null, showDialog = false }) => {
         event.preventDefault();
         setIsLoading(true);
         console.log("formData : ", formData);
-
-        if (showDialog) {
-            setConfirmationDialogVisible(true);
-            setIsLoading(false);
-            return;
-        }
-
-        setConfirmationDialogVisible(false);
         console.log('Processing data');
+        // console.log('Set to invalid session');
+
 
         try {
             let result;
@@ -229,23 +265,20 @@ export default function AccountForm({ onClose, isEditing, accountId }) {
 
             if (result.statusCode === "00") {
                 if (isEditing) {
-                    showNotification("Account updated successfully!", 'success');
+                    showNotification("Contact updated successfully!", 'success');
                     if (navigateTo) {
                         navigate(navigateTo);
-                    } else {
-                        // Optionally navigate to a details page or stay on the same page
-                        // navigate(`details/${accountId}`);
                     }
                 } else {
-                    if (result.resultSet && result.resultSet.accountId) {
-                        const accountId = result.resultSet.accountId;
-                        showNotification("Account created successfully!", 'success');
+                    if (result.resultSet && result.resultSet.contactId) {
+                        const contactId = result.resultSet.contactId;
+                        showNotification("Contact created successfully!", 'success');
                         if (isNew) {
                             resetData();
                         } else if (navigateTo) {
                             navigate(navigateTo, { state: { openModal: true } });
                         } else {
-                            navigate(`details/${accountId}`);
+                            navigate(`details/${contactId}`);
                         }
                     } else {
                         console.error('Unexpected response format for new account:', result);
@@ -263,11 +296,10 @@ export default function AccountForm({ onClose, isEditing, accountId }) {
             setIsLoading(false);
         }
     };
-    // Usage examples:
-    const handleSave = (event) => handleAccountAction(event, { showDialog: !isEditing, navigateTo: isEditing ? `details/${accountId}` : null });
-    const handleSaveNew = (event) => handleAccountAction(event, { isNew: true });
-    const handleConfirmSave = (event) => handleAccountAction(event, { navigateTo: '/property/contacts' });
 
+    const handleSave = (event) => handleAccountAction(event, { navigateTo: isEditing ? `details/${contactId}` : null });
+    const handleSaveNew = (event) => handleAccountAction(event, { isNew: true });
+    // const handleConfirmSave = (event) => handleAccountAction(event, { navigateTo: '/property/contacts' });
     const handleCancelSave = () => {
         setConfirmationDialogVisible(false);
         setIsLoading(false);
@@ -278,7 +310,7 @@ export default function AccountForm({ onClose, isEditing, accountId }) {
         event.preventDefault();
 
         try {
-            const response = await fetch(`${CONFIG.ACCOUNT_SERVICE}/`, {
+            const response = await fetch(`${CONFIG.CONTACT_SERVICE}/`, {
                 method: 'POST',
                 headers: {
                     'SFDC-token': token,
@@ -294,19 +326,19 @@ export default function AccountForm({ onClose, isEditing, accountId }) {
 
             const result = await response.json();
             console.log('Success:', result);
-            return result; // Return the result
+            return result;
         } catch (error) {
             console.error('Error:', error);
-            throw error; // Re-throw the error so it can be caught in handleAccountAction
+            throw error;
         }
-    }
+    };
 
     const handleEdit = async (event) => {
         const transactionId = generateTransactionId();
         event.preventDefault();
 
         try {
-            const response = await fetch(`${CONFIG.ACCOUNT_SERVICE}/`, {
+            const response = await fetch(`${CONFIG.CONTACT_SERVICE}/`, {
                 method: 'PUT',
                 headers: {
                     'SFDC-token': token,
@@ -322,13 +354,12 @@ export default function AccountForm({ onClose, isEditing, accountId }) {
 
             const result = await response.json();
             console.log('Success:', result);
-            return result; // Return the result
+            return result;
         } catch (error) {
             console.error('Error:', error);
-            throw error; // Re-throw the error so it can be caught in handleAccountAction
+            throw error;
         }
     };
-
 
     const showNotification = (message, type = 'success') => {
         setNotification(message);
@@ -339,89 +370,76 @@ export default function AccountForm({ onClose, isEditing, accountId }) {
         }, 5000);
     };
 
-
     const resetData = () => {
         setFormData({
-            accountDetails: {
-                accountId: '',
-                accountName: '',
-                parentAccount: '',
-                localAccountName: '',
-                clientType: [
-                    {
-                        clientTypeId: '',
-                        clientTypeName: ''
-                    }
-                ],
-                phone: '',
+            contactInformation: {
+                salutation: '',
+                firstName: '',
+                middleName: '',
+                lastName: '',
+                title: '',
+                department: '',
+                email: '',
+                businessPhone: '',
+                mobilePhone: '',
+                mainPhone: '',
                 fax: '',
-                website: '',
+                linkedin: '',
+                accountName: '',
+                relationshipType: '',
+                contactProfile: [],
+                influenceLevel: '',
             },
             addressInformation: {
-                billingCountry: '',
-                billingState: '',
-                billingCity: '',
-                billingStreet: '',
-                billingPostCode: '',
-                shippingCountry: '',
-                shippingState: '',
-                shippingCity: '',
-                shippingStreet: '',
-                shippingPostCode: '',
+                mailingCountryCode: '',
+                mailingCountry: '',
+                mailingbillingState: '',
+                mailingbillingCity: '',
+                mailingbillingStreet: '',
+                mailingbillingPostCode: '',
             },
-            segmentation: {
-                industryType: '',
-                subIndustry: '',
-                headquarterCountry: '',
-                commercialNumber: '',
+            communicationPreferences: {
+                communicationmethod: '',
+                emailOptions: '',
+                mailOptions: '',
+                callOptions: '',
+                smsOptions: '',
+                excludeReason: '',
+                excludeOn: '',
+                excludeBy: '',
             },
             additionalInformation: {
-                taxType: '',
-                taxId: '',
+                nickName: '',
+                assistantName: '',
+                assistantPhone: '',
+                assistantEmail: '',
+                reportsTo: '',
                 description: '',
+                cbreEmployee: false,
             },
             systemInformation: {
-                accountOwner: [],
-                createdBy: systemValues.createdBy,
-                createdDate: systemValues.createdDate,
-                lastModifiedBy: '',
-                lastModifiedDate: '',
-                status: '',
+                contactOwner: [],
+                // createdBy: generateSystemValues().createdBy,
+                // createdDate: generateSystemValues().createdDate,
+                status: 'Active',
                 inactivationDate: '',
                 reasonForInactivating: '',
-                userId: '',
                 saveToSFDC: true,
-                salesforceId: '',
             },
-            // associateInformation: {
-            //     accountSource: 'One App',
-            //     accountId: '',
-            //     parentAccountSource: '',
-            //     parentAccountId: '',
-            //     topParentAccountSource: '',
-            //     topParentAccountId: '',
-            // },
         });
     };
 
     const copyBillingToShipping = () => {
-        setFormData({
-            ...formData,
+        setFormData((prevData) => ({
+            ...prevData,
             addressInformation: {
-                ...formData.addressInformation,
-                shippingCountry: formData.addressInformation.billingCountry,
-                shippingPostCode: formData.addressInformation.billingPostCode,
-                shippingCity: formData.addressInformation.billingCity,
-                shippingState: formData.addressInformation.billingState,
-                shippingStreet: formData.addressInformation.billingStreet,
+                ...prevData.addressInformation,
+                shippingCountry: prevData.addressInformation.mailingCountry,
+                shippingPostalCode: prevData.addressInformation.mailingPostCode,
+                shippingCity: prevData.addressInformation.mailingCity,
+                shippingState: prevData.addressInformation.mailingState,
+                shippingStreet: prevData.addressInformation.mailingStreet,
             },
-        });
-    };
-
-    const toggleVisibility = (section) => {
-        setSectionVisibility((prev) => ({
-            ...prev,
-            [section]: !prev[section],
         }));
     };
 
@@ -433,24 +451,23 @@ export default function AccountForm({ onClose, isEditing, accountId }) {
         }
     };
 
-    if (!initialData && isEditing) {
-        return <p>Loading...</p>;
-    }
+    // if (!initialData && isEditing) {
+    //     return <p>Loading...</p>;
+    // }
 
     return (
         <div className={`fixed inset-0 flex items-center justify-center z-50 ${onClose ? 'animate-fade-in' : 'animate-fade-out'}`}>
             <div className="absolute inset-0 bg-black opacity-50"></div>
             <div className="relative flex flex-col w-1/2 h-3/4 bg-white shadow-lg rounded-lg">
-                {isLoading && (
+                {(isLoading || !initialData) && (
                     <div className="absolute inset-0 bg-white bg-opacity-70 flex justify-center items-center z-50">
                         <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-c-teal"></div>
                     </div>
                 )}
                 {notification && (
-                    <div className={`absolute top-5 right-5 text-white px-4 py-2 rounded shadow-lg z-50 animate-fade-in-out 
+                    <div className={`absolute top-5 right-5 text-white px-4 py-2 rounded shadow-lg z-50 animate-fade-in-out
                         ${notificationType === 'success' ? 'bg-green-500' : 'bg-red-500'}
-                    text-white
-                `}>
+                    `}>
                         {notification}
                     </div>
                 )}
@@ -461,18 +478,18 @@ export default function AccountForm({ onClose, isEditing, accountId }) {
                     >
                         &times;
                     </button>
-                    <h2 className="text-lg font-bold text-c-dark-grayish text-align-center">NEW ACCOUNT</h2>
+                    <h2 className="text-lg font-bold text-c-dark-grayish text-align-center">NEW CONTACT</h2>
                 </header>
 
                 <main className="flex-1 overflow-y-auto">
                     <div className="bg-white relative p-4">
-                        <AccountFormSection
+                        <ContactFormSection
                             formData={formData}
                             setFormData={setFormData}
                             toggleVisibility={toggleVisibility}
                             sectionVisibility={sectionVisibility}
                             copyBillingToShipping={copyBillingToShipping}
-                            isEditing={isEditing}
+                            initialData={initialData}
                         />
                     </div>
                 </main>
@@ -489,7 +506,7 @@ export default function AccountForm({ onClose, isEditing, accountId }) {
                         type="submit"
                         className="px-4 py-2 rounded-lg bg-white text-blue-600 border border-neutral-500 text-xs hover:text-neutral-700 hover:bg-neutral-100"
                     >
-                        {isEditing ? 'Update & New' : 'Save & New'}
+                        Save & New
                     </button>
                     <button
                         onClick={handleSave}
@@ -499,7 +516,6 @@ export default function AccountForm({ onClose, isEditing, accountId }) {
                     </button>
                 </footer>
 
-                {/* Confirmation Dialog */}
                 {confirmationDialogVisible && (
                     <div className="fixed inset-0 flex items-center justify-center z-50">
                         <div className="absolute inset-0 bg-black opacity-50"></div>
@@ -507,7 +523,7 @@ export default function AccountForm({ onClose, isEditing, accountId }) {
                             <div className="flex flex-col items-center">
                                 <BsQuestionCircle className="text-yellow-500 text-4xl mb-4" />
                                 <h3 className="text-lg font-bold text-center">Confirm Save</h3>
-                                <p className="mt-2 text-center">Do you want to proceed to create new contact with this set of Account data?</p>
+                                <p className="mt-2 text-center">Do you want to proceed to create new contact with this set of data?</p>
                                 <div className="flex gap-4 mt-4">
                                     <button
                                         onClick={handleCancelSave}
@@ -530,3 +546,6 @@ export default function AccountForm({ onClose, isEditing, accountId }) {
         </div>
     );
 }
+
+
+

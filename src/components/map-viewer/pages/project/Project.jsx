@@ -1,11 +1,12 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Checkbox } from '@headlessui/react';
-import { BsCheckLg } from 'react-icons/bs';
+import { BsCheckLg, BsTrash } from 'react-icons/bs';
 import { IoIosArrowDown, IoIosArrowUp } from 'react-icons/io';
 import { useDrop } from 'react-dnd';
 import { BUILDINGDATADUMMY } from '../../../lib/const/DummyData';
 import ProjectShare from './ProjectShare';
 import { useAppContext } from '../../../../AppContext';
+import NewProject from './NewProject';
 
 const ItemTypes = {
     BUILDING: 'building',
@@ -29,6 +30,52 @@ export default function Project() {
     const [buildingIdList, setBuildingIdList] = useState([]);
     const { openProject, drawerContent, toggleDrawer } = useAppContext();
     const [selectedProjectId, setSelectedProjectId] = useState(null);
+    const [showConfirmation, setShowConfirmation] = useState(null);
+    const [newProjectDialogVisible, setNewProjectDialogVisible] = useState(false);
+    const confirmationRef = useRef(null);
+    const [newProjectName, setNewProjectName] = useState('');
+    const [newAccount, setNewAccount] = useState('');
+    const [newContact, setNewContact] = useState('');
+
+
+    const confirmDeletion = (itemType, itemId) => {
+        setShowConfirmation({ itemType, itemId }); // Show the confirmation dialog
+    };
+
+    const handleConfirmDelete = (itemType, itemId) => {
+        if (itemType === 'project') {
+            handleDeleteProject(itemId);
+        } else if (itemType === 'building') {
+            handleDeleteBuilding(itemId);
+        }
+        setShowConfirmation(null); // Hide the confirmation dialog
+    };
+
+
+    const handleCancelDelete = () => {
+        setShowConfirmation(null); // Hide the confirmation dialog
+    };
+
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            // Check if the click was outside of the confirmation dialog and the trash icon
+            if (
+                confirmationRef.current &&
+                !confirmationRef.current.contains(event.target) &&
+                !event.target.closest('.trash-icon')
+            ) {
+                setShowConfirmation(null); // Close the confirmation dialog
+            }
+        };
+
+        // Add event listener to detect clicks outside
+        document.addEventListener('mousedown', handleClickOutside);
+
+        // Cleanup event listener on unmount
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, []);
 
 
     const handleProjectChange = (projectId) => {
@@ -57,6 +104,10 @@ export default function Project() {
         setConfirmationDialogVisible(false);
     };
 
+    const handleCancelSaveNew = () => {
+        setNewProjectDialogVisible(false);
+    }
+
     const [{ isOver }, drop] = useDrop({
         accept: ItemTypes.BUILDING,
         drop: (item) => addBuildingToProject(item.building),
@@ -68,6 +119,18 @@ export default function Project() {
     const addBuildingToProject = (building) => {
         setBuildingIdList((prev) => [...prev, building.id]);
     };
+
+    const handleSaveNewProject = () => {
+        const newProject = {
+            id: projects.length + 1, // Simple id generation, update based on your logic
+            name: newProjectName,
+            description: "New project", // You can update this to be more descriptive
+            enabled: false,
+        };
+        setProjects([...projects, newProject]);
+        setNewProjectDialogVisible(false);
+    };
+
 
     return (
         <div className="relative">
@@ -82,14 +145,24 @@ export default function Project() {
                                 <h2 className="text-sm py-3 w-full text-center items-center font-semibold text-neutral-700">
                                     My Project List
                                 </h2>
+                                <button
+                                    className="flex items-center font-normal text-sm space-x-2 px-4 py-0.5 hover:bg-neutral-100 hover:text-neutral-700 border border-neutral-500 bg-white text-blue-700 rounded rounded-md transition duration-150 ease-in-out mx-2"
+                                    onClick={() => setNewProjectDialogVisible(true)}
+                                >
+                                    New
+                                </button>
                             </div>
                             <div className='flex flex-col flex-grow p-2'>
                                 {projects.map((project) => (
                                     <div
-                                        onClick={() => handleProjectSelection(project.id)}
                                         key={project.id}
-                                        className={`mb-2 py-2 pl-2 flex items-center cursor-pointer ${selectedProjectId === project.id ? 'bg-blue-100' : 'bg-white'
+                                        className={`relative mb-2 py-2 pl-2 pr-8 flex items-center cursor-pointer group ${selectedProjectId === project.id ? 'bg-blue-100' : 'bg-white'
                                             } hover:bg-neutral-200`}
+                                        onClick={(e) => {
+                                            if (!e.target.closest('.trash-icon')) {
+                                                handleProjectSelection(project.id);
+                                            }
+                                        }}
                                     >
                                         <Checkbox
                                             checked={project.enabled}
@@ -99,8 +172,38 @@ export default function Project() {
                                         >
                                             {project.enabled && <BsCheckLg className="text-white text-lg" />}
                                         </Checkbox>
-
                                         <span className="ml-2 text-sm text-neutral-700">{project.name}</span>
+
+                                        <BsTrash
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                confirmDeletion('project', project.id);
+                                            }}
+                                            className="trash-icon absolute right-2 h-5 w-5 text-red-500 cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                                        />
+
+                                        {showConfirmation?.itemType === 'project' && showConfirmation?.itemId === project.id && (
+                                            <div
+                                                ref={confirmationRef}
+                                                className="absolute right-10 top-2 z-20 bg-white border border-gray-300 shadow-lg p-2 rounded-md"
+                                            >
+                                                <p className="text-sm text-gray-700">Are you sure?</p>
+                                                <div className="flex justify-end space-x-2 mt-2">
+                                                    <button
+                                                        onClick={() => handleConfirmDelete('project', project.id)}
+                                                        className="bg-red-500 text-white text-xs px-2 py-1 rounded-md"
+                                                    >
+                                                        Delete
+                                                    </button>
+                                                    <button
+                                                        onClick={handleCancelDelete}
+                                                        className="bg-gray-300 text-black text-xs px-2 py-1 rounded-md"
+                                                    >
+                                                        Cancel
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        )}
                                     </div>
                                 ))}
                             </div>
@@ -116,12 +219,45 @@ export default function Project() {
                                     <div className='flex flex-col flex-grow p-2'>
                                         {filteredBuildings.length > 0 ? (
                                             filteredBuildings.map((building) => (
-                                                <div key={building.id} className='mb-2 py-2 flex items-center'>
+                                                <div key={building.id} className="relative mb-2 py-2 pl-2 pr-8 flex items-center group hover:bg-neutral-200">
                                                     <span className="ml-2">{building.name} - {building.location}</span>
+
+                                                    {/* Trash icon for buildings */}
+                                                    <BsTrash
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            confirmDeletion('building', building.id);
+                                                        }}
+                                                        className="trash-icon absolute right-2 h-5 w-5 text-red-500 cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                                                    />
+
+                                                    {/* Confirmation dialog for buildings */}
+                                                    {showConfirmation?.itemType === 'building' && showConfirmation?.itemId === building.id && (
+                                                        <div
+                                                            ref={confirmationRef}
+                                                            className="absolute right-10 top-2 z-20 bg-white border border-gray-300 shadow-lg p-2 rounded-md"
+                                                        >
+                                                            <p className="text-sm text-gray-700">Are you sure?</p>
+                                                            <div className="flex justify-end space-x-2 mt-2">
+                                                                <button
+                                                                    onClick={() => handleConfirmDelete('building', building.id)}
+                                                                    className="bg-red-500 text-white text-xs px-2 py-1 rounded-md"
+                                                                >
+                                                                    Delete
+                                                                </button>
+                                                                <button
+                                                                    onClick={handleCancelDelete}
+                                                                    className="bg-gray-300 text-black text-xs px-2 py-1 rounded-md"
+                                                                >
+                                                                    Cancel
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    )}
                                                 </div>
                                             ))
                                         ) : (
-                                            <div className='text-center text-neutral-500'>
+                                            <div className="text-center text-neutral-500">
                                                 No buildings available for this project.
                                             </div>
                                         )}
@@ -156,10 +292,14 @@ export default function Project() {
                             <div className='flex flex-col flex-grow p-2'>
                                 {projects.map((project) => (
                                     <div
-                                        onClick={() => handleProjectSelection(project.id)}
                                         key={project.id}
-                                        className={`mb-2 py-2 pl-2 flex items-center cursor-pointer ${selectedProjectId === project.id ? 'bg-blue-100' : 'bg-white'
+                                        className={`relative mb-2 py-2 pl-2 pr-8 flex items-center cursor-pointer group ${selectedProjectId === project.id ? 'bg-blue-100' : 'bg-white'
                                             } hover:bg-neutral-200`}
+                                        onClick={(e) => {
+                                            if (!e.target.closest('.trash-icon')) {
+                                                handleProjectSelection(project.id);
+                                            }
+                                        }}
                                     >
                                         <Checkbox
                                             checked={project.enabled}
@@ -169,8 +309,38 @@ export default function Project() {
                                         >
                                             {project.enabled && <BsCheckLg className="text-white text-lg" />}
                                         </Checkbox>
-
                                         <span className="ml-2 text-sm text-neutral-700">{project.name}</span>
+
+                                        <BsTrash
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                confirmDeletion('project', project.id);
+                                            }}
+                                            className="trash-icon absolute right-2 h-5 w-5 text-red-500 cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                                        />
+
+                                        {showConfirmation?.itemType === 'project' && showConfirmation?.itemId === project.id && (
+                                            <div
+                                                ref={confirmationRef}
+                                                className="absolute right-10 top-2 z-20 bg-white border border-gray-300 shadow-lg p-2 rounded-md"
+                                            >
+                                                <p className="text-sm text-gray-700">Are you sure?</p>
+                                                <div className="flex justify-end space-x-2 mt-2">
+                                                    <button
+                                                        onClick={() => handleConfirmDelete('project', project.id)}
+                                                        className="bg-red-500 text-white text-xs px-2 py-1 rounded-md"
+                                                    >
+                                                        Delete
+                                                    </button>
+                                                    <button
+                                                        onClick={handleCancelDelete}
+                                                        className="bg-gray-300 text-black text-xs px-2 py-1 rounded-md"
+                                                    >
+                                                        Cancel
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        )}
                                     </div>
                                 ))}
                             </div>
@@ -186,12 +356,45 @@ export default function Project() {
                                     <div className='flex flex-col flex-grow p-2'>
                                         {filteredBuildings.length > 0 ? (
                                             filteredBuildings.map((building) => (
-                                                <div key={building.id} className='mb-2 py-2 flex items-center'>
+                                                <div key={building.id} className="relative mb-2 py-2 pl-2 pr-8 flex items-center group hover:bg-neutral-200">
                                                     <span className="ml-2">{building.name} - {building.location}</span>
+
+                                                    {/* Trash icon for buildings */}
+                                                    <BsTrash
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            confirmDeletion('building', building.id);
+                                                        }}
+                                                        className="trash-icon absolute right-2 h-5 w-5 text-red-500 cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                                                    />
+
+                                                    {/* Confirmation dialog for buildings */}
+                                                    {showConfirmation?.itemType === 'building' && showConfirmation?.itemId === building.id && (
+                                                        <div
+                                                            ref={confirmationRef}
+                                                            className="absolute right-10 top-2 z-20 bg-white border border-gray-300 shadow-lg p-2 rounded-md"
+                                                        >
+                                                            <p className="text-sm text-gray-700">Are you sure?</p>
+                                                            <div className="flex justify-end space-x-2 mt-2">
+                                                                <button
+                                                                    onClick={() => handleConfirmDelete('building', building.id)}
+                                                                    className="bg-red-500 text-white text-xs px-2 py-1 rounded-md"
+                                                                >
+                                                                    Delete
+                                                                </button>
+                                                                <button
+                                                                    onClick={handleCancelDelete}
+                                                                    className="bg-gray-300 text-black text-xs px-2 py-1 rounded-md"
+                                                                >
+                                                                    Cancel
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    )}
                                                 </div>
                                             ))
                                         ) : (
-                                            <div className='text-center text-neutral-500'>
+                                            <div className="text-center text-neutral-500">
                                                 No buildings available for this project.
                                             </div>
                                         )}
@@ -238,6 +441,10 @@ export default function Project() {
                     <ProjectShare onClose={handleCancelShare} />
                 )}
             </div>
+            {newProjectDialogVisible && (
+                <NewProject onClose={handleCancelSaveNew} />
+            )}
+
         </div>
     );
 }

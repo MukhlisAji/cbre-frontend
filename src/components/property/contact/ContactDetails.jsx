@@ -3,7 +3,7 @@ import { HiPencil } from 'react-icons/hi2';
 import { IoMdArrowDropdown } from 'react-icons/io';
 import { IoCheckmarkCircleOutline } from 'react-icons/io5';
 import { RiContactsBook3Line } from 'react-icons/ri';
-import { CONFIG } from '../../config';
+import { CONFIG } from '../../../config';
 import { useParams } from 'react-router-dom';
 
 const ContactDetails = () => {
