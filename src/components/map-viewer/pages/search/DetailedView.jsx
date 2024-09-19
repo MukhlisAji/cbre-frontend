@@ -1,8 +1,12 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { RiCloseLine } from 'react-icons/ri';
+import Amenities from '../../../shared/Amenities';
 
 export default function DetailedView({ building, onClose }) {
+
+    
     const [activeTab, setActiveTab] = useState('Details');
+    const [currentAmenities, setCurrentAmenities] = useState('MRts')
 
     const renderTabContent = () => {
         switch (activeTab) {
@@ -73,6 +77,44 @@ export default function DetailedView({ building, onClose }) {
                         </div>
                     </div>
                 );
+            case 'Amenities':
+                return(
+                <div className=" text-sm text-gray-700 space-y-2">
+                    <div className='border-b-2 border-black flex flex-wrap'>
+                        <Amenities label={"Mrts"} currentAmenities={currentAmenities}/>
+                        <Amenities label={"Mrts"} currentAmenities={currentAmenities}/>
+                        <Amenities label={"Mrts"} currentAmenities={currentAmenities}/>
+                        <Amenities label={"Mrts"} currentAmenities={currentAmenities}/>
+                        <Amenities label={"Mrts"} currentAmenities={currentAmenities}/>
+                        <Amenities label={"Mrts"} currentAmenities={currentAmenities}/>
+                        <Amenities label={"Mrts"} currentAmenities={currentAmenities}/>
+                        <Amenities label={"Mrts"} currentAmenities={currentAmenities}/>
+                        <Amenities label={"Mrts"} currentAmenities={currentAmenities}/>
+                       
+                    </div>
+                    <div
+                        style={{ height: '30px' }}
+                        className="overflow-y-auto pr-3 flex-grow"
+                    >
+                        <div className="flex-grow space-y-2 w-full">
+                            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+                            </p>
+                            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+                            </p>
+                            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+                            </p>
+                            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+                            </p>
+                            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+                            </p>
+                            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+                            </p>
+                            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                )
             default:
                 return null;
         }
@@ -96,22 +138,28 @@ export default function DetailedView({ building, onClose }) {
             />
             <div className="flex justify-around border-b">
                 <button
-                    className={`p-2 text-neutral-500 text-sm ${activeTab === 'Details' ? 'border-b-2 border-black text-neutral-700' : ''}`}
+                    className={`p-2 w-1/4 text-neutral-500 text-sm ${activeTab === 'Details' ? 'border-b-2 border-black text-neutral-700' : ''}`}
                     onClick={() => setActiveTab('Details')}
                 >
                     Details
                 </button>
                 <button
-                    className={`p-2 text-neutral-500 text-sm ${activeTab === 'Availability' ? 'border-b-2 border-black text-neutral-700' : ''}`}
+                    className={`p-2 w-1/4text-neutral-500 text-sm ${activeTab === 'Availability' ? 'border-b-2 border-black text-neutral-700' : ''}`}
                     onClick={() => setActiveTab('Availability')}
                 >
                     Availability ({building.SPACE_COUNT})
                 </button>
                 <button
-                    className={`p-2 text-neutral-500 text-sm ${activeTab === 'Tenant Stack' ? 'border-b-2 border-black text-neutral-700' : ''}`}
+                    className={`p-2 w-1/4 text-neutral-500 text-sm ${activeTab === 'Tenant Stack' ? 'border-b-2 border-black text-neutral-700' : ''}`}
                     onClick={() => setActiveTab('Tenant Stack')}
                 >
                     Tenant Stack
+                </button>
+                <button
+                    className={`p-2 w-1/4 text-neutral-500 text-sm ${activeTab === 'Amenities' ? 'border-b-2 border-black text-neutral-700' : ''}`}
+                    onClick={() => setActiveTab('Amenities')}
+                >
+                    Amenities
                 </button>
             </div>
             <div className="bg-gray-100 px-4 rounded-md h-full">

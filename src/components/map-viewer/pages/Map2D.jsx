@@ -229,7 +229,7 @@ function Map2D() {
         >
           <div id="spinner"></div>
         </div>
-        <div className="absolute top-2 right-7 z-40 flex items-center gap-1.5">
+        <div className="absolute top-2 right-7  flex items-center gap-1.5">
         <img id="control-building-map" src="3d.svg" alt="3D" className="w-[30px] h-[30px]"/>
           <FormControlLabel
             control={

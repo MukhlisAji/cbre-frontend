@@ -33,6 +33,8 @@ export default function TwoDSearch({ mapApi, map }) {
     useAppContext();
   const navigate = useNavigate();
 
+
+
   const [activeTab, setActiveTab] = useState("buildings");
   const [searchQuery, setSearchQuery] = useState("");
   const [sectionHeight, setSectionHeight] = useState(0);
@@ -50,6 +52,7 @@ export default function TwoDSearch({ mapApi, map }) {
   const [askingRent, setAskingRent] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
 
+ 
   const {
     options: statusOptions,
     selectedOption: selectedStatus,
@@ -552,7 +555,9 @@ export default function TwoDSearch({ mapApi, map }) {
                 )}
               </>
             ) : (
+            
               <SearchResult mapApi={mapApi} onBack={handleBackToSearch} buildings={buildings} setBuildings={setBuildings} map={map} />
+ 
             )}
           </div>
         </div>
