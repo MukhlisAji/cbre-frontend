@@ -10,12 +10,15 @@ import AddProject from "../project/AddProject";
 import DraggableBuilding from "../project/DraggableBuilding";
 import DetailedView from "./DetailedView";
 import { data } from "autoprefixer";
+import { CONFIG_APP } from "../../config/app";
 
 export default function SearchResult({ onBack, buildings, setBuildings, map, mapApi }) {
   const { selectedBuildings, setSelectedBuildings } = useAppContext();
   const [selectedBuilding, setSelectedBuilding] = useState(null);
   const [sectionHeight, setSectionHeight] = useState(0);
   const { confirmSave, setConfirmSave } = useAppContext();
+  const[nearByMrt, setNearByMrt] = useState(null)
+  const[nearByOthers, setNearByOthers] = useState(null)
 
   const [saveNew, setSaveNew] = useState();
   const { toggleDrawer } = useAppContext();
@@ -30,6 +33,32 @@ export default function SearchResult({ onBack, buildings, setBuildings, map, map
     );
     setSelectedBuildings(updatedSelectedBuildings);
   };
+
+  useEffect(() => {
+    const fetchMrt = async ()=>{
+        const res = await fetch(`${CONFIG_APP.MAPBOX_API}/near-by-mrt`, {
+            method: "GET",
+        });
+        const mrt = await res.json();
+
+        setNearByMrt(mrt.data)
+       
+    }
+
+    const fetchOther = async()=>{
+        const res = await fetch(`${CONFIG_APP.MAPBOX_API}/near-by-others`, {
+            method: "GET",
+        });
+        const others = await res.json();
+
+        setNearByOthers(others.data)
+    }
+    // fetchMrt()
+    fetchOther()
+    console.log(nearByOthers)
+    console.log("inii")
+  }, [selectedBuilding]);
+   
 
   const handleItemClick = (building) => {
     setSelectedBuilding(building);
@@ -155,6 +184,8 @@ export default function SearchResult({ onBack, buildings, setBuildings, map, map
           <DetailedView
             building={selectedBuilding}
             onClose={handleCloseDetailView}
+            nearByMrt= {nearByMrt}
+            nearByOthers = {nearByOthers}
           />
         )}
 

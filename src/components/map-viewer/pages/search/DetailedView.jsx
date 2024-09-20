@@ -1,12 +1,42 @@
 import React, { useEffect, useState } from 'react';
 import { RiCloseLine } from 'react-icons/ri';
-import Amenities from '../../../shared/Amenities';
+import AmenitiesButton from '../../../shared/AmenitiesButton';
 
-export default function DetailedView({ building, onClose }) {
+import { useRef } from 'react';
+import { Spinner } from 'flowbite-react';
+export default function DetailedView({ building, onClose, nearByMrt, nearByOthers }) {
 
-    
     const [activeTab, setActiveTab] = useState('Details');
     const [currentAmenities, setCurrentAmenities] = useState('MRts')
+    const[height, setHeight]= useState(0)
+    const targetRef = useRef(null);
+
+    useEffect(() => {
+        const handleResize = () => {
+          const screenHeight = window.innerHeight;
+          const newHeight = screenHeight - 400;
+          setHeight(newHeight);
+        };
+    
+        handleResize();
+        window.addEventListener("resize", handleResize);
+
+        return () => {
+          window.removeEventListener("resize", handleResize);
+        };
+        
+      }, []);
+
+      useEffect(() => {
+      targetRef.current = document.getElementById(currentAmenities)
+      if (targetRef.current) {
+          targetRef.current.scrollIntoView({ behavior: 'auto' });
+          targetRef.current.focus(); 
+        }
+    
+      }, [currentAmenities]);
+
+      
 
     const renderTabContent = () => {
         switch (activeTab) {
@@ -81,36 +111,71 @@ export default function DetailedView({ building, onClose }) {
                 return(
                 <div className=" text-sm text-gray-700 space-y-2">
                     <div className='border-b-2 border-black flex flex-wrap'>
-                        <Amenities label={"Mrts"} currentAmenities={currentAmenities}/>
-                        <Amenities label={"Mrts"} currentAmenities={currentAmenities}/>
-                        <Amenities label={"Mrts"} currentAmenities={currentAmenities}/>
-                        <Amenities label={"Mrts"} currentAmenities={currentAmenities}/>
-                        <Amenities label={"Mrts"} currentAmenities={currentAmenities}/>
-                        <Amenities label={"Mrts"} currentAmenities={currentAmenities}/>
-                        <Amenities label={"Mrts"} currentAmenities={currentAmenities}/>
-                        <Amenities label={"Mrts"} currentAmenities={currentAmenities}/>
-                        <Amenities label={"Mrts"} currentAmenities={currentAmenities}/>
-                       
+                        <AmenitiesButton label={"Bus Stops"} currentAmenities={currentAmenities} setCurrentAmenities={setCurrentAmenities} category={"Bus Stop"} targetRef={targetRef}/>
+                        <AmenitiesButton label={"MRT"} currentAmenities={currentAmenities} setCurrentAmenities={setCurrentAmenities} category={"MRT"} targetRef={targetRef}/>
+                        <AmenitiesButton label={"Food"} currentAmenities={currentAmenities} setCurrentAmenities={setCurrentAmenities} category={"Food"} targetRef={targetRef}/>
+                        <AmenitiesButton label={"Shopping Malls"} currentAmenities={currentAmenities} setCurrentAmenities={setCurrentAmenities} category={"Shopping Malls"} targetRef={targetRef}/>
+                        <AmenitiesButton label={"Gyms"} currentAmenities={currentAmenities} setCurrentAmenities={setCurrentAmenities} category={"Gyms"} targetRef={targetRef}/>
+                        <AmenitiesButton label={"Hotels"} currentAmenities={currentAmenities} setCurrentAmenities={setCurrentAmenities} category={"Hotels"} targetRef={targetRef}/>
+                        <AmenitiesButton label={"Hospital /Clinics"} currentAmenities={currentAmenities} setCurrentAmenities={setCurrentAmenities} category={"Hospitals"} targetRef={targetRef}/>
+                        <AmenitiesButton label={"Schools"} currentAmenities={currentAmenities} setCurrentAmenities={setCurrentAmenities} category={"Schools"} targetRef={targetRef}/>
+                        <AmenitiesButton label={"Airports"} currentAmenities={currentAmenities} setCurrentAmenities={setCurrentAmenities} category={"Airport"}/>
+                        <AmenitiesButton label={"Land Checkpoints"} currentAmenities={currentAmenities} setCurrentAmenities={setCurrentAmenities} category={"Checkpoints"} targetRef={targetRef}/>
+                        <AmenitiesButton label={"Ports"} currentAmenities={currentAmenities} setCurrentAmenities={setCurrentAmenities} category={"Ports"} targetRef={targetRef}/>
+                        
                     </div>
                     <div
-                        style={{ height: '30px' }}
+                        style={{ height: `${height}px` }}
                         className="overflow-y-auto pr-3 flex-grow"
                     >
                         <div className="flex-grow space-y-2 w-full">
-                            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-                            </p>
-                            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-                            </p>
-                            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-                            </p>
-                            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-                            </p>
-                            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-                            </p>
-                            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-                            </p>
-                            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-                            </p>
+                            {/* <div id = "MRT" className='text-sm text-gray-700'>
+                                MRT
+                            </div>
+                            {nearByMrt[0].distance_duration.map((mrt, index)=>{
+                                <>
+                                    <div className='text-sm text-gray-500'>
+                                        {mrt.Destination}
+                                    </div>
+                                    <div className='text-sm text-gray-500'>
+                                    Walking{mrt.Destination}
+                                    </div>
+                                    <div className='text-sm text-gray-500'>
+                                    {mrt.Destination}
+                                    </div>
+                                </>
+                            })} */}
+                           
+                       
+                           {!nearByOthers ? (
+                                <div class="absolute inset-0 bg-white bg-opacity-70 flex justify-center items-center z-50">
+                                    <div class="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-c-teal"></div>
+                                </div>
+                            
+                            ) : (
+                                nearByOthers.map((obj, objIndex) => (
+                                    <div key={objIndex} className='space-y-2'>
+                                        <div id={obj.category} className='text-sm text-neutral-900 font-bold'>
+                                            {obj.category}
+                                        </div>
+                                        {obj.places_result.map((building, buildingIndex) => (
+                                            <div key={buildingIndex}>
+                                                <div className='text-sm text-neutral-700'>
+                                                    {building.name}
+                                                </div>
+                                                <div className='text-sm text-neutral-500'>
+                                                    Walking: {building.distance_duration.walking.duration} ({building.distance_duration.walking.distance})
+                                                </div>
+                                                <div className='text-sm text-neutral-500'>
+                                                    Driving: {building.distance_duration.driving.duration} ({building.distance_duration.driving.distance})
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                ))
+                            )}
+                      
+  
                         </div>
                     </div>
                 </div>

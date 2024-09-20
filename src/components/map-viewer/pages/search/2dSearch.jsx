@@ -202,12 +202,7 @@ export default function TwoDSearch({ mapApi, map }) {
     }
   };
 
-  useEffect(() => {
-    const dataMap = {
-      data: buildings
-    }
-    mapApi(dataMap)
-  }, [build])
+
 
   const darkGreen = '#5a8184';
 
