@@ -17,16 +17,16 @@ spec:
         version: "1.0"
     spec:
       securityContext:
-        runAsNonRoot: true
-        runAsUser: 1000
-        runAsGroup: 1000
-        fsGroup: 1000
       containers:
       - name: one-app-container
         image: mukhlisaji/one-app:latest
         ports:
         - containerPort: 80
         securityContext:
+          runAsNonRoot: true
+          runAsUser: 1000
+          runAsGroup: 1000
+          fsGroup: 1000
           allowPrivilegeEscalation: false
       imagePullSecrets:
-      - name: dockerhub
+      - name: jfrogreg
