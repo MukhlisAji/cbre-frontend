@@ -28,5 +28,12 @@ spec:
           runAsGroup: 1000
           fsGroup: 1000
           allowPrivilegeEscalation: false
+        resources:
+          limits:
+            cpu: 1
+            memory: 1536Mi
+          requests:
+            cpu: 500m
+            memory: 1024Mi
       imagePullSecrets:
       - name: jfrogreg
