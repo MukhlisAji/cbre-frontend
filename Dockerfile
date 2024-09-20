@@ -32,11 +32,11 @@ COPY --from=builder /app/dist /usr/share/nginx/html
 RUN chown -R appuser:appuser /var/cache/nginx /var/log/nginx /etc/nginx/conf.d
 RUN touch /var/run/nginx.pid && chown -R appuser:appuser /var/run/nginx.pid
 
-# Expose port 80
-EXPOSE 80
-
 # Switch to non-root user
 USER appuser
+
+# Expose port 80
+EXPOSE 80
 
 # Start Nginx server
 CMD ["nginx", "-g", "daemon off;"]

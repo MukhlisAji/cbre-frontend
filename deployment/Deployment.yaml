@@ -1,18 +1,8 @@
-apiVersion: v1
-kind: Service
-metadata:
-  name: one-app-service
-spec:
-  ports:
-  - port: 80
-    targetPort: 80
-  selector:
-    app: one-app
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: one-app-deployment
+  namespace: oneapp-nonprod-ns
 spec:
   selector:
     matchLabels:
@@ -26,20 +16,17 @@ spec:
         app: one-app
         version: "1.0"
     spec:
-      # Add this line to enable User Namespaces
-      hostUsers: false
       securityContext:
-        # This ensures the container runs as a non-root user
         runAsNonRoot: true
-        # You can specify a specific user ID if needed
-        # runAsUser: 1000
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
       containers:
       - name: one-app-container
-        image: mukhlisaji/one-app:latest  # Replace with your Docker Hub image
+        image: mukhlisaji/one-app:latest
         ports:
         - containerPort: 80
         securityContext:
-          # Ensure the container doesn't try to run as root
           allowPrivilegeEscalation: false
       imagePullSecrets:
-      - name: dockerhub  # This should match the name of the secret you created
+      - name: dockerhub
