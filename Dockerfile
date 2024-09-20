@@ -17,10 +17,10 @@ COPY . .
 RUN npm run build
 
 # Stage 2: Serve with Nginx
-FROM nginx:1.27.0-alpine
+FROM nginxinc/nginx-unprivileged:latest
 
 # Create a non-root user
-RUN adduser -D -u 1000 appuser
+# RUN adduser -D -u 1000 appuser
 
 # Copy your Nginx configuration file
 COPY nginx/default.conf /etc/nginx/conf.d/default.conf
@@ -29,14 +29,14 @@ COPY nginx/default.conf /etc/nginx/conf.d/default.conf
 COPY --from=builder /app/dist /usr/share/nginx/html
 
 # Change ownership of the nginx directories
-RUN chown -R appuser:appuser /var/cache/nginx /var/log/nginx /etc/nginx/conf.d
-RUN touch /var/run/nginx.pid && chown -R appuser:appuser /var/run/nginx.pid
+# RUN chown -R appuser:appuser /var/cache/nginx /var/log/nginx /etc/nginx/conf.d
+# RUN touch /var/run/nginx.pid && chown -R appuser:appuser /var/run/nginx.pid
 
 # Switch to non-root user
-USER appuser
+# USER appuser
 
 # Expose port 80
-EXPOSE 80
+# EXPOSE 80
 
 # Start Nginx server
 CMD ["nginx", "-g", "daemon off;"]
