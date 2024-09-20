@@ -19,7 +19,7 @@ spec:
       securityContext:
       containers:
       - name: one-app-container
-        image: mukhlisaji/one-app:latest
+        image: oneapp-docker-nonprod.us.artifactory.gcso.cbre.com/frontend:0.1
         ports:
         - containerPort: 80
         securityContext:
