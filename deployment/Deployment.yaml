@@ -26,10 +26,20 @@ spec:
         app: one-app
         version: "1.0"
     spec:
+      # Add this line to enable User Namespaces
+      hostUsers: false
+      securityContext:
+        # This ensures the container runs as a non-root user
+        runAsNonRoot: true
+        # You can specify a specific user ID if needed
+        # runAsUser: 1000
       containers:
       - name: one-app-container
         image: mukhlisaji/one-app:latest  # Replace with your Docker Hub image
         ports:
         - containerPort: 80
+        securityContext:
+          # Ensure the container doesn't try to run as root
+          allowPrivilegeEscalation: false
       imagePullSecrets:
       - name: dockerhub  # This should match the name of the secret you created
