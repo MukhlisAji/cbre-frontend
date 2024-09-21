@@ -21,7 +21,7 @@ spec:
       - name: one-app-container
         image: oneapp-docker-nonprod.us.artifactory.gcso.cbre.com/frontend:0.2
         ports:
-        - containerPort: 80
+        - containerPort: 8080
         securityContext:
           runAsNonRoot: true
           runAsUser: 1000
