@@ -147,34 +147,6 @@ const handleFormChange = (updatedForm) => {
   setFormAddress(updatedForm);
 };
 
-
-  const handleSubmitAddress = async (event) => {
-    const transactionId = generateTransactionId();
-    event.preventDefault();
-
-    try {
-        const response = await fetch(`${CONFIG.PROPERTY_SERVICE}/`, {
-            method: 'POST',
-            headers: {
-                'transactionId': transactionId,
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(formAddress),
-        });
-
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
-        }
-
-        const result = await response.json();
-        console.log('Success:', result);
-        return result;
-    } catch (error) {
-        console.error('Error:', error);
-        throw error;
-    }
-};
-
   return (
     <div className='h-screen p-4'>
       {/* carousel */}
