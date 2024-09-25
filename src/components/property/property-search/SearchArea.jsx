@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { ImageSlider } from './ImageSlider';
+// import { ImageSlider } from './ImageSlider';
 import { LuSettings2 } from "react-icons/lu";
 import { IoSearch } from 'react-icons/io5';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -151,7 +151,7 @@ const handleFormChange = (updatedForm) => {
     <div className='h-screen p-4'>
       {/* carousel */}
       <div className="relative flex justify-center items-center h-80 w-4/5 mx-auto">
-        <ImageSlider />
+        {/* <ImageSlider /> */}
       </div>
       {/* search area */}
       <div className="flex flex-col relative left-1/2 transform -translate-x-1/2 -mt-20 pt-2 z-50 flex justify-center items-center px-24">
