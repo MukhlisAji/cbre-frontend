@@ -133,7 +133,7 @@ export default function Project() {
 
 
     return (
-        <div className="relative">
+        <div style={{ zIndex: 99 }} className="relative">
             <div
                 className={`fixed w-1/5 inset-y-0 right-0 z-20 flex flex-col transition-transform duration-300 ease-in-out bg-neutral-100 shadow-lg ${openProject ? 'transform translate-y-12' : 'transform translate-y-full pointer-events-none'}`}
             >

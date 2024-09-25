@@ -1,4 +1,7 @@
 /** @type {import('tailwindcss').Config} */
+const withMT = require("@material-tailwind/react/utils/withMT");
+
+
 export default {
   content: [
     "./index.html",
@@ -20,6 +23,7 @@ export default {
         "c-dark-teal": "#0a2b2a",
         "c-dark-grayish": "#485558",
         "c-light-grayish": "#7A8A98",
+        // "bg-neutral-100": "#7A8A98",
       },
       keyframes: {
         'fade-in-out': {

@@ -44,8 +44,10 @@ import GlobalSearchResult from "./components/shared/global-search/GlobalSearchRe
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import Properties from "./components/property/properties/Properties";
-import PropertySearchForm from "./components/property/properties/PropertySearchForm";
+import PropertySearchForm from "./components/property/property-search/PropertySearchForm";
 import PropertyDetails from "./components/property/properties/PropertyDetails";
+import SearchArea from "./components/property/property-search/SearchArea";
+import PropertyResult from "./components/property/property-search/PropertyResult";
 
 Modal.setAppElement("#root");
 
@@ -63,7 +65,11 @@ function App() {
                 path="data-entry-portal/property-database"
                 element={<PropertyDatabase />}
               />
+              <Route path="property" element={<Navigate to="search" replace />} />
               <Route path="property" element={<PropertyLayout />}>
+                <Route path="search" element={<SearchArea />} />
+                <Route path="search/result" element={<PropertyResult />} />
+
                 <Route path="accounts" element={<Account />} />
                 <Route path="accounts/details/:id" element={<AccountDetails />} />
 

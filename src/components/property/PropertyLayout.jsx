@@ -181,7 +181,7 @@ export default function PropertyLayout() {
                     <PropertyForm onClose={closeModal} />
                 )}
             </div>
-            <div className='p-4'>
+            <div c>
                 <Outlet />
             </div>
             <Project />
