@@ -43,7 +43,7 @@ const SearchArea = () => {
     streetNumber: '',
     streetName: '',
     postalCode: ''
-});
+  });
 
   useEffect(() => {
     const interval = setInterval(changePlaceholder, 3000);
@@ -143,16 +143,21 @@ const SearchArea = () => {
 
 
 
-const handleFormChange = (updatedForm) => {
-  setFormAddress(updatedForm);
-};
+  const handleFormChange = (updatedForm) => {
+    setFormAddress(updatedForm);
+  };
 
   return (
     <div className='h-screen p-4'>
       {/* carousel */}
-      <div className="relative flex justify-center items-center h-80 w-4/5 mx-auto">
-        {/* <ImageSlider /> */}
-      </div>
+      {/* <div className="relative flex justify-center items-center h-80 w-4/5 mx-auto"> */}
+      <img
+        className="relative flex justify-center items-center h-80 w-4/5 mx-auto rounded-xl"
+        src="https://images.unsplash.com/photo-1494526585095-c41746248156?q=80&w=3270&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+        alt="Beautiful scenery"
+      />
+      {/* </div> */}
+
       {/* search area */}
       <div className="flex flex-col relative left-1/2 transform -translate-x-1/2 -mt-20 pt-2 z-50 flex justify-center items-center px-24">
 
