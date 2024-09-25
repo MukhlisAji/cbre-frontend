@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 
-export default function ModalSearch({ isVisible, onClose, category, form, onFormChange, setQ }) {
+export default function ModalSearch({ isVisible, onClose, category, form, onFormChange, setQuery }) {
   if (!isVisible) return null;
 
   const handleInputChange = (e) => {
