@@ -20,6 +20,8 @@ export default function SearchResult({ onBack, buildings, setBuildings, map, map
   const[nearByMrt, setNearByMrt] = useState(null)
   const[nearByOthers, setNearByOthers] = useState(null)
 
+  const[isLoading, setIsLoading]= useState(false)
+
   const [saveNew, setSaveNew] = useState();
   const { toggleDrawer } = useAppContext();
 
@@ -53,8 +55,20 @@ export default function SearchResult({ onBack, buildings, setBuildings, map, map
 
         setNearByOthers(others.data)
     }
-    // fetchMrt()
-    fetchOther()
+
+    const fetchBoth = async()=>{
+      fetchMrt()
+      fetchOther()
+    }
+    const setLoading = async()=>{
+      console.log("trueee")
+      setIsLoading(true)
+      await fetchBoth()
+      setIsLoading(false)
+      console.log("falsee")
+    }
+
+    setLoading()
     console.log(nearByOthers)
     console.log("inii")
   }, [selectedBuilding]);
@@ -186,6 +200,7 @@ export default function SearchResult({ onBack, buildings, setBuildings, map, map
             onClose={handleCloseDetailView}
             nearByMrt= {nearByMrt}
             nearByOthers = {nearByOthers}
+            isLoading= {isLoading}
           />
         )}
 
