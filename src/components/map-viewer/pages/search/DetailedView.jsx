@@ -4,7 +4,7 @@ import AmenitiesButton from '../../../shared/AmenitiesButton';
 
 import { useRef } from 'react';
 import { Spinner } from 'flowbite-react';
-export default function DetailedView({ building, onClose, nearByMrt, nearByOthers }) {
+export default function DetailedView({ building, onClose, nearByMrt, nearByOthers, isLoading }) {
 
     const [activeTab, setActiveTab] = useState('Details');
     const [currentAmenities, setCurrentAmenities] = useState('MRts')
@@ -147,33 +147,56 @@ export default function DetailedView({ building, onClose, nearByMrt, nearByOther
                             })} */}
                            
                        
-                           {!nearByOthers ? (
-                                <div class="absolute inset-0 bg-white bg-opacity-70 flex justify-center items-center z-50">
-                                    <div class="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-c-teal"></div>
+                           {isLoading ? (
+                                <div className="absolute inset-0 bg-white bg-opacity-70 flex justify-center items-center z-50">
+                                    <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-c-teal"></div>
                                 </div>
-                            
                             ) : (
-                                nearByOthers.map((obj, objIndex) => (
-                                    <div key={objIndex} className='space-y-2'>
-                                        <div id={obj.category} className='text-sm text-neutral-900 font-bold'>
-                                            {obj.category}
+                                <>
+                            
+                                    <div  className="space-y-2">
+                                        <div id="MRT" className="text-sm text-neutral-900 font-bold">
+                                            MRT
                                         </div>
-                                        {obj.places_result.map((building, buildingIndex) => (
-                                            <div key={buildingIndex}>
-                                                <div className='text-sm text-neutral-700'>
-                                                    {building.name}
+                                        {nearByMrt.map((mrt, index) => (
+                                            <div key={index}>
+                                                <div className="text-sm text-neutral-700">
+                                                    {mrt.nearby_station}
                                                 </div>
-                                                <div className='text-sm text-neutral-500'>
-                                                    Walking: {building.distance_duration.walking.duration} ({building.distance_duration.walking.distance})
+                                                <div className="text-sm text-neutral-500">
+                                                    Walking: {mrt.walking_duration} ({mrt.walking_distance})
                                                 </div>
-                                                <div className='text-sm text-neutral-500'>
-                                                    Driving: {building.distance_duration.driving.duration} ({building.distance_duration.driving.distance})
+                                                <div className="text-sm text-neutral-500">
+                                                    Driving: {mrt.driving_duration} ({mrt.driving_distance})
                                                 </div>
                                             </div>
                                         ))}
                                     </div>
-                                ))
+
+                                
+                                    {nearByOthers.map((obj, objIndex) => (
+                                        <div key={`category-${objIndex}`} className="space-y-2">
+                                            <div id={obj.category} className="text-sm text-neutral-900 font-bold">
+                                                {obj.category}
+                                            </div>
+                                            {obj.places_result.map((building, buildingIndex) => (
+                                                <div key={`building-${buildingIndex}`}>
+                                                    <div className="text-sm text-neutral-700">
+                                                        {building.name}
+                                                    </div>
+                                                    <div className="text-sm text-neutral-500">
+                                                        Walking: {building.distance_duration.walking.duration} ({building.distance_duration.walking.distance})
+                                                    </div>
+                                                    <div className="text-sm text-neutral-500">
+                                                        Driving: {building.distance_duration.driving.duration} ({building.distance_duration.driving.distance})
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    ))}
+                                </>
                             )}
+
                       
   
                         </div>
