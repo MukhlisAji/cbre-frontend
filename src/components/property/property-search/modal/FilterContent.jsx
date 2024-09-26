@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 const FilterContent = () => {
     const [activeTab, setActiveTab] = useState('Buy');
     const [location, setLocation] = useState('');
-    const [propertyType, setPropertyType] = useState('');
+    const [propertyType, setPropertyType] = useState('All');
     const [minPrice, setMinPrice] = useState('');
     const [maxPrice, setMaxPrice] = useState('');
     const [bedroom, setBedroom] = useState(false);
@@ -61,13 +61,13 @@ const FilterContent = () => {
                     <label className="block text-sm font-medium text-gray-700">Property Type</label>
                     <div className="mt-2 flex space-x-2">
                         {['All', 'Condo', 'Landed', 'HDB'].map((type) => (
-                            <button
+                            <span
                                 key={type}
                                 onClick={() => setPropertyType(type)}
-                                className={`py-1 px-3 rounded-md border ${propertyType === type ? 'bg-red-500 text-white' : 'bg-gray-100 text-gray-600'}`}
+                                className={`py-1 px-3 rounded-md border cursor-pointer ${propertyType === type ? 'bg-red-500 text-white' : 'bg-gray-100 text-gray-600'}`}
                             >
                                 {type}
-                            </button>
+                            </span>
                         ))}
                     </div>
                 </div>
@@ -103,12 +103,7 @@ const FilterContent = () => {
                         <span>Entire Unit</span>
                     </label>
                 </div>
-                <button
-                    onClick={handleClearAll}
-                    className="text-red-500 text-sm underline"
-                >
-                    Clear All
-                </button>
+                
             </div>
         </>
     );

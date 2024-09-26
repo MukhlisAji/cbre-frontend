@@ -25,7 +25,7 @@ export default function ModalSearch({ isVisible, onClose, category, form, onForm
   switch (category) {
     case 'Address':
       content = (
-        <div className="max-w-md mx-auto p-4 bg-gray-100">
+        <div className="max-w-md mx-auto p-2">
           <div className="mb-4">
             <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="buildingName">
               Building Name
@@ -40,19 +40,7 @@ export default function ModalSearch({ isVisible, onClose, category, form, onForm
             />
           </div>
 
-          <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="streetNumber">
-              Street No
-            </label>
-            <input
-              type="text"
-              id="streetNumber"
-              value={form.streetNumber}
-              onChange={handleInputChange}
-              placeholder="Enter Street No"
-              className="w-full px-3 py-2 border rounded-md text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400"
-            />
-          </div>
+
 
           <div className="mb-4">
             <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="streetName">
@@ -68,19 +56,37 @@ export default function ModalSearch({ isVisible, onClose, category, form, onForm
             />
           </div>
 
-          <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="postalCode">
-              Postal Code
-            </label>
-            <input
-              type="text"
-              id="postalCode"
-              value={form.postalCode}
-              onChange={handleInputChange}
-              placeholder="Enter Postal Code"
-              className="w-full px-3 py-2 border rounded-md text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400"
-            />
+          <div className="grid grid-cols-2 gap-4">
+            <div className="mb-4">
+              <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="streetNumber">
+                Street No
+              </label>
+              <input
+                type="text"
+                id="streetNumber"
+                value={form.streetNumber}
+                onChange={handleInputChange}
+                placeholder="Enter Street No"
+                className="w-full px-3 py-2 border rounded-md text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400"
+              />
+            </div>
+
+            <div className="mb-4">
+              <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="postalCode">
+                Postal Code
+              </label>
+              <input
+                type="text"
+                id="postalCode"
+                value={form.postalCode}
+                onChange={handleInputChange}
+                placeholder="Enter Postal Code"
+                className="w-full px-3 py-2 border rounded-md text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400"
+              />
+            </div>
           </div>
+
+
         </div>
       );
       break;
@@ -118,7 +124,7 @@ export default function ModalSearch({ isVisible, onClose, category, form, onForm
         </div>
 
         {/* Modal Content */}
-        <div className="p-4 bg-gray-100">
+        <div className="p-4 ">
           {content}
         </div>
 

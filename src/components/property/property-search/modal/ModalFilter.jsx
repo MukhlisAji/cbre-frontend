@@ -55,36 +55,43 @@ export default function ModalFilter({ isVisible, onClose, filter }) {
 
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-            <div className="bg-white rounded-lg shadow-lg w-full max-w-md">
-                {/* Header */}
-                <div className="flex justify-between items-center p-4 border-b">
-                    <span className="text-lg font-semibold">Filter</span>
-                    <span onClick={onClose} className="cursor-pointer text-gray-500 hover:text-gray-700">
-                        &times;
-                    </span>
-                </div>
-
-                {/* Modal Content */}
-                <div className="p-4">
-                    {content}
-                </div>
-
-                {/* Footer */}
-                <div className="p-4 border-t flex justify-end space-x-4">
-                    <button
-                        onClick={onClose}
-                        className="py-2 px-4 bg-gray-200 rounded-md hover:bg-gray-300"
-                    >
-                        Clear All
-                    </button>
-                    <button
-                        className="py-2 px-4 bg-red-500 text-white rounded-md hover:bg-red-600"
-                    >
-                        Apply Filter
-                    </button>
-                </div>
-            </div>
+      <div className="bg-white rounded-lg shadow-lg w-full max-w-md">
+        {/* Header */}
+        <div className="flex bg-c-teal justify-between items-center p-4 border-b rounded-t-lg">
+          <span className="text-lg text-white font-semibold">Filter by {filter}</span>
+          <span onClick={onClose} className="cursor-pointer text-white text-lg hover:text-white/80">
+            &times;
+          </span>
         </div>
+
+        {/* Modal Content */}
+        <div className="p-4 ">
+          {content}
+        </div>
+
+        {/* Footer */}
+        <div className="p-4 border-t flex justify-between space-x-4">
+          <button
+            // onClick={handleClearAll}
+            className="text-red-600 text-sm underline"
+          >
+            Clear All
+          </button>
+          <button
+            // onClick={() => {
+            //   const queryString = `${form.buildingName},${form.streetNumber},${form.streetName},${form.postalCode}`;
+            //   setQuery(queryString);  // Update the query in the parent component
+            //   onClose();  // Close the modal
+            // }}
+            className="py-1 text-sm bg-c-teal text-white rounded-md hover:bg-c-teal/80"
+          >
+            Apply
+          </button>
+
+
+        </div>
+      </div>
+    </div>
 
     );
 };
