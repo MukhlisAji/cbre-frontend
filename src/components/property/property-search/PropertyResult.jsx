@@ -320,43 +320,6 @@ const PropertyResult = () => {
                             </div>
                         </div>
                     </div>
-
-                    <div className="relative inline-flex bg-gray-100 gap-2 rounded-full shadow-lg mt-3">
-                        {/* Active Background Slider */}
-                        <div
-                            className="absolute top-0 left-0 h-full bg-c-teal rounded-full transition-all duration-300 ease-in-out"
-                            style={{
-                                width: `${sliderStyle.width}px`,
-                                left: `${sliderStyle.left}px`,
-                            }}
-                        ></div>
-
-                        {/* Button Items */}
-                        <span
-                            ref={buttonRefs.Buy}
-                            onClick={() => handleButtonClick('Buy')}
-                            className={`relative z-10 py-1 px-4 rounded-full cursor-pointer text-sm font-bold transition-colors duration-100 ease-in-out 
-          ${activeButton === 'Buy' ? 'text-white' : 'text-gray-700 hover:bg-gray-200'}`}
-                        >
-                            Buy
-                        </span>
-                        <span
-                            ref={buttonRefs.Rent}
-                            onClick={() => handleButtonClick('Rent')}
-                            className={`relative z-10 py-1 px-4 rounded-full cursor-pointer text-sm font-bold transition-colors duration-100 ease-in-out 
-          ${activeButton === 'Rent' ? 'text-white' : 'text-gray-700 hover:bg-gray-200'}`}
-                        >
-                            Rent
-                        </span>
-                        <span
-                            ref={buttonRefs.FindAgent}
-                            onClick={() => handleButtonClick('FindAgent')}
-                            className={`relative z-10 py-1 px-4 rounded-full cursor-pointer text-sm font-bold transition-colors duration-100 ease-in-out 
-          ${activeButton === 'FindAgent' ? 'text-white' : 'text-gray-700 hover:bg-gray-200'}`}
-                        >
-                            Find Agent
-                        </span>
-                    </div>
                 </div>
             </div>
 

@@ -117,7 +117,7 @@ export default function ModalSearch({ isVisible, onClose, category, form, onForm
       <div className="bg-white rounded-lg shadow-lg w-full max-w-md">
         {/* Header */}
         <div className="flex bg-c-teal justify-between items-center p-4 border-b rounded-t-lg">
-          <span className="text-lg text-white font-semibold">Filter by {category}</span>
+          <span className="text-lg text-white font-semibold">Search by {category}</span>
           <span onClick={onClose} className="cursor-pointer text-white text-lg hover:text-white/80">
             &times;
           </span>
@@ -144,7 +144,7 @@ export default function ModalSearch({ isVisible, onClose, category, form, onForm
             }}
             className="py-1 text-sm bg-c-teal text-white rounded-md hover:bg-c-teal/80"
           >
-            Apply
+            Search
           </button>
 
 

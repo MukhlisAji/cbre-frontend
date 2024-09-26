@@ -249,13 +249,13 @@ const SearchArea = () => {
               <div className='flex gap-2'>
                 <span
                   onClick={() => handleFiltersClick('filter')}
-                  className='flex items-center text-gray-600 gap-2 py-2 px-3 bg-white text-sm font-semibold rounded-lg shadow-lg'>
+                  className='flex items-center text-gray-600 gap-2 py-2 px-3 bg-white text-xs font-semibold rounded-lg shadow-lg'>
                   <LuSettings2 className='text-md' />
                   Filter
                 </span>
                 <span
                   onClick={() => handleFiltersClick('propertyType')}
-                  className='flex items-center text-gray-600 gap-2 py-2 px-3 bg-white text-sm font-semibold rounded-lg shadow-lg'>
+                  className='flex items-center text-gray-600 gap-2 py-2 px-3 bg-white text-xs font-semibold rounded-lg shadow-lg'>
                   <span>Property Type</span>
                   <svg className="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
@@ -263,15 +263,15 @@ const SearchArea = () => {
                 </span>
                 <span
                   onClick={() => handleFiltersClick('price')}
-                  className='flex items-center text-gray-600 gap-2 py-2 px-3 bg-white text-sm font-semibold rounded-lg shadow-lg'>
-                  <span>Price</span>
+                  className='flex items-center text-gray-600 gap-2 py-2 px-3 bg-white text-xs font-semibold rounded-lg shadow-lg'>
+                  <span>Rent/Transacted</span>
                   <svg className="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
                   </svg>
                 </span>
                 <span
                   onClick={() => handleFiltersClick('size')}
-                  className='flex items-center text-gray-600 gap-2 py-2 px-3 bg-white text-sm font-semibold rounded-lg shadow-lg'>
+                  className='flex items-center text-gray-600 gap-2 py-2 px-3 bg-white text-xs font-semibold rounded-lg shadow-lg'>
                   <span>Size</span>
                   <svg className="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
@@ -306,7 +306,7 @@ const SearchArea = () => {
               className={`relative z-10 py-1 px-4 rounded-full cursor-pointer text-sm font-bold transition-colors duration-100 ease-in-out 
           ${activeButton === 'Buy' ? 'text-white' : 'text-gray-700 hover:bg-gray-200'}`}
             >
-              Buy
+              All
             </span>
             <span
               ref={buttonRefs.Rent}
@@ -314,7 +314,7 @@ const SearchArea = () => {
               className={`relative z-10 py-1 px-4 rounded-full cursor-pointer text-sm font-bold transition-colors duration-100 ease-in-out 
           ${activeButton === 'Rent' ? 'text-white' : 'text-gray-700 hover:bg-gray-200'}`}
             >
-              Rent
+              For Lease
             </span>
             <span
               ref={buttonRefs.FindAgent}
@@ -322,7 +322,7 @@ const SearchArea = () => {
               className={`relative z-10 py-1 px-4 rounded-full cursor-pointer text-sm font-bold transition-colors duration-100 ease-in-out 
           ${activeButton === 'FindAgent' ? 'text-white' : 'text-gray-700 hover:bg-gray-200'}`}
             >
-              Find Agent
+              For Sale
             </span>
           </div>
         </div>
