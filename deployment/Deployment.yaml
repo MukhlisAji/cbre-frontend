@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: one-app-deployment
+  namespace: oneapp-nonprod-ns
+spec:
+  selector:
+    matchLabels:
+      app: one-app
+  strategy:
+    type: Recreate
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: one-app
+        version: "1.0"
+    spec:
+      securityContext:
+      containers:
+      - name: one-app-container
+        image: oneapp-docker-nonprod.us.artifactory.gcso.cbre.com/frontend:0.3
+        ports:
+        - containerPort: 8080
+        securityContext:
+          runAsNonRoot: true
+          runAsUser: 1000
+          runAsGroup: 1000
+          fsGroup: 1000
+          allowPrivilegeEscalation: false
+        resources:
+          limits:
+            cpu: 1
+            memory: 1536Mi
+          requests:
+            cpu: 500m
+            memory: 1024Mi
+      imagePullSecrets:
+      - name: jfrogreg
