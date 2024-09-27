@@ -56,13 +56,30 @@ const PropertyResult = () => {
         streetNumber: '',
         streetName: '',
         postalCode: ''
-      });
+    });
 
     useEffect(() => {
         const interval = setInterval(changePlaceholder, 3000);
         return () => clearInterval(interval); // Cleanup interval on unmount
     }, [index]);
 
+    useEffect(() => {
+        const interval = setInterval(() => {
+          triggerPlaceholderChange();
+        }, 3000);
+    
+        return () => clearInterval(interval);
+      }, [index]);
+    
+      // Trigger placeholder change with animation
+      const triggerPlaceholderChange = () => {
+        setIsAnimating(true); // Start animation
+        setTimeout(() => {
+          setIndex((prevIndex) => (prevIndex + 1) % placeholders.length);
+          setIsAnimating(false); // End animation after the transition
+        }, 500); // Match the duration of the CSS animation
+      };
+      
     const changePlaceholder = () => {
         setIndex((prevIndex) => (prevIndex + 1) % placeholders.length);
     };
@@ -205,7 +222,7 @@ const PropertyResult = () => {
 
     const handleFormChange = (updatedForm) => {
         setFormAddress(updatedForm);
-      };
+    };
 
     return (
         <div className='h-screen'>

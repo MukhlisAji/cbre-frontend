@@ -29,7 +29,7 @@ const SearchArea = () => {
     "by Address",
     "by Account/Contact",
     "by District",
-    "by Region/Micromarket",
+    "by Micromarket",
     "by MRT"
   ];
   const navigate = useNavigate();
@@ -40,7 +40,7 @@ const SearchArea = () => {
     { key: 'Address', label: 'Search by Address' },
     { key: 'Account/Contacts', label: 'Search by Account/Contacts' },
     { key: 'District', label: 'Search by District' },
-    { key: 'Region/Micromarket', label: 'Search by Region/Micromarket' },
+    { key: 'Micromarket', label: 'Search by Micromarket' },
     { key: 'MRT', label: 'Search by MRT' },
 
   ];
@@ -144,12 +144,12 @@ const SearchArea = () => {
   const currentPlaceholder = placeholders[index];
   const previousPlaceholder = placeholders[(index - 1 + placeholders.length) % placeholders.length];
 
-  const [activeButton, setActiveButton] = useState('Buy'); // Default active button
+  const [activeButton, setActiveButton] = useState('All'); // Default active button
   const [sliderStyle, setSliderStyle] = useState({ width: 0, left: 0 }); // To control the slider's width and position
   const buttonRefs = {
-    Buy: useRef(null),
-    Rent: useRef(null),
-    FindAgent: useRef(null),
+    All: useRef(null),
+    Lease: useRef(null),
+    Sale: useRef(null),
   };
 
   useEffect(() => {
@@ -307,39 +307,39 @@ const SearchArea = () => {
           </div>
 
           <div className='flex justify-between items-center'>
-            <div className="relative inline-flex bg-gray-100 gap-2 rounded-full shadow-lg mt-6">
+            <div className="relative inline-flex gap-2 rounded-full mt-6">
               {/* Active Background Slider */}
-              <div
+              {/* <div
                 className="absolute top-0 left-0 h-full bg-c-teal rounded-full transition-all duration-300 ease-in-out"
                 style={{
                   width: `${sliderStyle.width}px`,
                   left: `${sliderStyle.left}px`,
                 }}
-              ></div>
+              ></div> */}
 
               {/* Button Items */}
               <span
-                ref={buttonRefs.Buy}
-                onClick={() => handleButtonClick('Buy')}
-                className={`relative z-10 py-1 px-4 rounded-full cursor-pointer text-sm font-bold transition-colors duration-100 ease-in-out 
-          ${activeButton === 'Buy' ? 'text-white' : 'text-gray-700 hover:bg-gray-200'}`}
-              >
+                ref={buttonRefs.All}
+                onClick={() => handleButtonClick('All')}
+                className={`relative z-10 py-1 px-4 rounded-full cursor-pointer text-sm font-bold transition-colors duration-100 ease-in-out
+                ${activeButton === 'All' ? 'bg-c-teal text-white' : ' text-gray-600 bg-gray-300 hover:bg-gray-400'}`}
+                >
                 All
               </span>
               <span
-                ref={buttonRefs.Rent}
-                onClick={() => handleButtonClick('Rent')}
-                className={`relative z-10 py-1 px-4 rounded-full cursor-pointer text-sm font-bold transition-colors duration-100 ease-in-out 
-          ${activeButton === 'Rent' ? 'text-white' : 'text-gray-700 hover:bg-gray-200'}`}
-              >
+                ref={buttonRefs.Lease}
+                onClick={() => handleButtonClick('Lease')}
+                className={`relative z-10 py-1 px-4 rounded-full cursor-pointer text-sm font-bold transition-colors duration-100 ease-in-out
+                ${activeButton === 'Lease' ? 'bg-c-teal text-white' : ' text-gray-600 bg-gray-300 hover:bg-gray-200'}`}
+                >
                 For Lease
               </span>
               <span
-                ref={buttonRefs.FindAgent}
-                onClick={() => handleButtonClick('FindAgent')}
-                className={`relative z-10 py-1 px-4 rounded-full cursor-pointer text-sm font-bold transition-colors duration-100 ease-in-out 
-          ${activeButton === 'FindAgent' ? 'text-white' : 'text-gray-700 hover:bg-gray-200'}`}
-              >
+                ref={buttonRefs.Sale}
+                onClick={() => handleButtonClick('Sale')}
+                className={`relative z-10 py-1 px-4 rounded-full cursor-pointer text-sm font-bold transition-colors duration-100 ease-in-out
+                ${activeButton === 'Sale' ? 'bg-c-teal text-white' : ' text-gray-600 bg-gray-300 hover:bg-gray-200'}`}
+                >
                 For Sale
               </span>
             </div>

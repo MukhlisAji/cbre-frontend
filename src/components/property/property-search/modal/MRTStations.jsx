@@ -28,12 +28,13 @@ const MRTStations = () => {
 
 
   return (
-    <div className="p-5 mx-auto">
-      <div className="flex items-center justify-between mb-4">
+    <div className="px-5 mx-auto">
+      <div className="flex text-sm items-center justify-between mb-4">
         <span>Select Line or Train Station
         </span>
-        <label className="ml-2 flex text-md items-center">
+        <label className="ml-2 flex text-sm items-center">
           <Checkbox {...label}
+          size="small"
           />
           Future Lines
         </label>
@@ -47,17 +48,17 @@ const MRTStations = () => {
       />
 
       {lines.map((line) => (
-        <div key={line.code} className="border-b py-2 flex items-center justify-between">
+        <div key={line.code} className="border-b py-1.5 flex items-center justify-between">
           <div className="flex items-center cursor-pointer">
-            <Checkbox {...label} checked={selectedLines.includes(line.code)}
+            <Checkbox {...label} size="small" checked={selectedLines.includes(line.code)}
               onChange={() => handleLineSelect(line.code)}
             />
             <div
-              className={`h-7 w-7 flex items-center justify-center text-white font-bold text-sm mr-2 rounded-md ${line.color}`}
+              className={`h-6 w-6 flex items-center justify-center text-white font-bold text-xs mr-2 rounded-md ${line.color}`}
             >
               {line.code}
             </div>
-            <span className="font-medium text-gray-600">{line.name}</span>
+            <span className="font-medium text-sm text-gray-600">{line.name}</span>
           </div>
           <FaChevronDown className="text-gray-500 cursor-pointer" />
         </div>

@@ -238,33 +238,48 @@ export default function ModalSearch({ isVisible, onClose, category, form, onForm
               />
             </div>
 
-            <Stack spacing={2} width={'100%'}>
+
+            <span>Account/Contact Search</span>
+            <div className="flex items-center space-x-2">
+              <Stack width="100%">
+                <Autocomplete
+                  id="size-small-standard"
+                  size="small"
+                  options={CONTACTDATADUMMY}
+                  getOptionLabel={(option) => option.name}
+                  onChange={(event, newValue) => {
+                    if (newValue) {
+                      setEmail(newValue.email);
+                      setContactName(newValue.name);
+                    } else {
+                      setEmail('');
+                      setContactName('');
+                    }
+                  }}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      label="Account/Contact Search"
+                      margin="dense"
+                      sx={cusInput}
+                    />
+                  )}
+                />
+              </Stack>
+
+              {/* Action Buttons */}
+              <div className="flex gap-2">
+                <span className="flex items-center cursor-pointer justify-center border text-gray-600 gap-2 py-2 px-2 bg-gray-100 hover:bg-gray-200/80 text-xs rounded-sm">
+                  <span>Select</span>
+                </span>
+                <span className="flex items-center cursor-pointer justify-center border text-gray-600 gap-2 py-2 px-2 bg-gray-100 hover:bg-gray-200/80 text-xs rounded-sm">
+                  <span>Clear</span>
+                </span>
+              </div>
+            </div>
 
 
-              <Autocomplete
-                id="size-small-standard"
-                size="small"
-                options={CONTACTDATADUMMY}
-                getOptionLabel={(option) => option.name}
-                onChange={(event, newValue) => {
-                  if (newValue) {
-                    setEmail(newValue.email);
-                    setContactName(newValue.name);
-                  } else {
-                    setEmail('');
-                    setContactName('');
-                  }
-                }}
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    label="Account/Contact Search"
-                    margin="dense"
-                    sx={cusInput}
-                  />
-                )}
-              />
-            </Stack>
+
             <div className="flex gap-2 items-center">
               <Checkbox {...label} size="small"
               />
@@ -363,7 +378,7 @@ export default function ModalSearch({ isVisible, onClose, category, form, onForm
         </div>
       );
       break;
-    case 'Region/Micromarket':
+    case 'Micromarket':
       content = (
         <div className="w-full p-4">
 
@@ -458,10 +473,23 @@ export default function ModalSearch({ isVisible, onClose, category, form, onForm
       content = <p>No content available.</p>;
   }
 
+  const handleApplyClick = () => {
+    const queryString = `${form.buildingName},${form.streetNumber},${form.streetName},${form.postalCode}`;
+    setQuery(queryString); // Update the query with address details
+    onClose(); // Close the modal
+  };
+
+  const handleSearchClick = () => {
+    // Default search logic
+    // navigate('result');
+    onClick();
+    onClose();
+  };
+
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
       <div
-        className={`bg-white rounded-lg shadow-lg w-full ${category === 'Region/Micromarket' || category === 'District' ? 'max-w-4xl' : 'max-w-md'
+        className={`bg-white rounded-lg shadow-lg w-full ${category === 'Micromarket' || category === 'District' ? 'max-w-4xl' : 'max-w-md'
           }`}
       >        {/* Header */}
         <div className="flex bg-c-teal justify-between items-center p-4 border-b rounded-t-lg">
@@ -484,18 +512,22 @@ export default function ModalSearch({ isVisible, onClose, category, form, onForm
           >
             Clear All
           </button>
-          <button
-            onClick={() => {
-              const queryString = `${form.buildingName},${form.streetNumber},${form.streetName},${form.postalCode}`;
-              setQuery(queryString); // Update the query in the parent component
-              onClose(); // Close the modal
-              onClick();
-            }}
-            className="py-1 text-sm bg-c-teal text-white rounded-md hover:bg-c-teal/80"
-          >
-            Search
-          </button>
-
+          {/* {category === 'District' ? : } */}
+          {category === 'District' ? (
+            <button
+              onClick={handleApplyClick}
+              className="py-1 text-sm bg-c-teal text-white rounded-md hover:bg-c-teal/80"
+            >
+              Apply
+            </button>
+          ) : (
+            <button
+              onClick={handleSearchClick}
+              className="py-1 text-sm bg-c-teal text-white rounded-md hover:bg-c-teal/80"
+            >
+              Search
+            </button>
+          )}
 
         </div>
       </div>
