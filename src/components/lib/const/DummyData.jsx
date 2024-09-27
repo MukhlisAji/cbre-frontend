@@ -140,5 +140,35 @@ const PROPERTYDATADUMMY = [
   { "id": 5, "propertyName": "Downtown Hub", "address": "505 Main St, Seattle, WA", "totalNLA": "45,000 sq ft", "floor": 8, "column": "E" }
 ];
 
+const DISTRICTDATA = [
+  { id: "D01", name: "Boat Quay / Raffles Place / Marina", checked: false },
+  { id: "D02", name: "Chinatown / Tanjong Pagar", checked: false },
+  { id: "D03", name: "Alexandra / Commonwealth", checked: false },
+  { id: "D04", name: "Harbourfront / Telok Blangah", checked: false },
+  { id: "D05", name: "Buona Vista / West Coast / Clementi New Town", checked: false },
+  { id: "D06", name: "City Hall / Clarke Quay", checked: false },
+  { id: "D07", name: "Beach Road / Bugis / Rochor", checked: false },
+  { id: "D08", name: "Farrer Park / Serangoon Rd", checked: false },
+  { id: "D09", name: "Orchard / River Valley", checked: false },
+  { id: "D10", name: "Tanglin / Holland / Bukit Timah", checked: false },
+  { id: "D11", name: "Newton / Novena", checked: false },
+  { id: "D12", name: "Balestier / Toa Payoh", checked: false },
+  { id: "D13", name: "Macpherson / Potong Pasir", checked: false },
+  { id: "D14", name: "Eunos / Geylang / Paya Lebar", checked: false },
+  { id: "D15", name: "East Coast / Marine Parade", checked: false },
+  { id: "D16", name: "Bedok / Upper East Coast", checked: false },
+  { id: "D17", name: "Changi Airport / Changi Village", checked: false },
+  { id: "D18", name: "Pasir Ris / Tampines", checked: false },
+  { id: "D19", name: "Hougang / Punggol / Sengkang", checked: false },
+  { id: "D20", name: "Ang Mo Kio / Bishan / Thomson", checked: false },
+  { id: "D21", name: "Clementi Park / Upper Bukit Timah", checked: false },
+  { id: "D22", name: "Boon Lay / Jurong / Tuas", checked: false },
+  { id: "D23", name: "Dairy Farm / Bukit Panjang / Choa Chu Kang", checked: false },
+  { id: "D24", name: "Lim Chu Kang / Tengah", checked: false },
+  { id: "D25", name: "Admiralty / Woodlands", checked: false },
+  { id: "D26", name: "Mandai / Upper Thomson", checked: false },
+  { id: "D27", name: "Sembawang / Yishun", checked: false },
+  { id: "D28", name: "Seletar / Yio Chu Kang", checked: false },
+];
 
-export { CONTACTDATADUMMY, ACCOUNTDATADUMMY, ACCOUNTCOLUMNDUMMY, BUILDINGDATADUMMY, CONTACTCOLUMNDUMMY, PROPERTYCOLUMNDUMMY, PROPERTYDATADUMMY};
+export { CONTACTDATADUMMY, ACCOUNTDATADUMMY, ACCOUNTCOLUMNDUMMY, BUILDINGDATADUMMY, CONTACTCOLUMNDUMMY, PROPERTYCOLUMNDUMMY, PROPERTYDATADUMMY, DISTRICTDATA};

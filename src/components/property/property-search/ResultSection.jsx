@@ -9,7 +9,7 @@ export default function ResultSection({resultData}) {
 
     return (
         <div className="w-full flex flex-col items-center space-x-5">
-            <div className="flex justify-between w-4/6 items-center py-4">
+            <div className="flex justify-between w-4/6 items-center py-4 px-2">
                 {/* Left Side: Homes Count and Save Search */}
                 <div className="flex flex-col justify-start space-y-5">
                     <span className="text-sm text-gray-500">33,928 Homes for Rent in Singapore</span>
@@ -21,7 +21,7 @@ export default function ResultSection({resultData}) {
 
                 {/* Right Side: Show Map Toggle and Recommended Dropdown */}
                 <div className="flex flex-col justify-start items-center space-y-5 ml-10">
-                    <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-4 text-sm text-gray-600">
 
                         <Switcher />
                         Show map
