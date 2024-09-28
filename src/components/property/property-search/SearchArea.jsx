@@ -1,11 +1,13 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { ImageSlider } from './ImageSlider';
+// import { ImageSlider } from './ImageSlider';
 import { LuSettings2 } from "react-icons/lu";
 import { IoSearch } from 'react-icons/io5';
 import { useLocation, useNavigate } from 'react-router-dom';
 import ModalSearch from './modal/ModalSearch';
 import ModalFilter from './modal/ModalFilter';
 import { generateTransactionId } from '../../lib/api/Authorization';
+import './SearchArea.css';
+
 
 const SearchArea = () => {
 
@@ -21,11 +23,14 @@ const SearchArea = () => {
   const [isFocused, setIsFocused] = useState(false);
   const [inputValue, setInputValue] = useState('');
   const [placeholderText, setPlaceholderText] = useState('Search');
+  const [isAnimating, setIsAnimating] = useState(false); // For managing animation state
+  const [showPlaceholder, setShowPlaceholder] = useState(true);
   const placeholders = [
-    "Search HDB Estates like Ang Mo Kio",
-    "Find your dream home",
-    "Explore properties near you",
-    "Discover the best neighborhoods"
+    "by Address",
+    "by Account/Contact",
+    "by District",
+    "by Micromarket",
+    "by MRT"
   ];
   const navigate = useNavigate();
   const location = useLocation();
@@ -34,7 +39,10 @@ const SearchArea = () => {
   const categories = [
     { key: 'Address', label: 'Search by Address' },
     { key: 'Account/Contacts', label: 'Search by Account/Contacts' },
-    { key: 'Region/Micromarket', label: 'Search by Region/Micromarket' }
+    { key: 'District', label: 'Search by District' },
+    { key: 'Micromarket', label: 'Search by Micromarket' },
+    { key: 'MRT', label: 'Search by MRT' },
+
   ];
   const results = ['test search'];
 
@@ -43,26 +51,45 @@ const SearchArea = () => {
     streetNumber: '',
     streetName: '',
     postalCode: ''
-});
+  });
+
+  // useEffect(() => {
+  //   const interval = setInterval(changePlaceholder, 3000);
+  //   return () => clearInterval(interval); // Cleanup interval on unmount
+  // }, [index]);
+
+  // const changePlaceholder = () => {
+  //   setIndex((prevIndex) => (prevIndex + 1) % placeholders.length);
+  // };
 
   useEffect(() => {
-    const interval = setInterval(changePlaceholder, 3000);
-    return () => clearInterval(interval); // Cleanup interval on unmount
+    const interval = setInterval(() => {
+      triggerPlaceholderChange();
+    }, 3000);
+
+    return () => clearInterval(interval);
   }, [index]);
 
-  const changePlaceholder = () => {
-    setIndex((prevIndex) => (prevIndex + 1) % placeholders.length);
+  // Trigger placeholder change with animation
+  const triggerPlaceholderChange = () => {
+    setIsAnimating(true); // Start animation
+    setTimeout(() => {
+      setIndex((prevIndex) => (prevIndex + 1) % placeholders.length);
+      setIsAnimating(false); // End animation after the transition
+    }, 500); // Match the duration of the CSS animation
   };
 
   const handleFocus = () => {
     setIsFocused(true);
     setPlaceholderText('');
+    setShowPlaceholder(false);
     setIsExpanded(true);
   };
 
   const handleBlur = () => {
     setIsFocused(false);
     setPlaceholderText(inputValue ? '' : 'Search');
+    setShowPlaceholder(query ? false : true);
   };
 
   const handleSearchChange = (e) => {
@@ -113,16 +140,16 @@ const SearchArea = () => {
     setInputValue(event.target.value);
   };
 
-  const showPlaceholder = !isFocused && !query;
+  // const showPlaceholder = !query;
   const currentPlaceholder = placeholders[index];
   const previousPlaceholder = placeholders[(index - 1 + placeholders.length) % placeholders.length];
 
-  const [activeButton, setActiveButton] = useState('Buy'); // Default active button
+  const [activeButton, setActiveButton] = useState('All'); // Default active button
   const [sliderStyle, setSliderStyle] = useState({ width: 0, left: 0 }); // To control the slider's width and position
   const buttonRefs = {
-    Buy: useRef(null),
-    Rent: useRef(null),
-    FindAgent: useRef(null),
+    All: useRef(null),
+    Lease: useRef(null),
+    Sale: useRef(null),
   };
 
   useEffect(() => {
@@ -143,48 +170,25 @@ const SearchArea = () => {
 
 
 
-const handleFormChange = (updatedForm) => {
-  setFormAddress(updatedForm);
-};
-
-
-  const handleSubmitAddress = async (event) => {
-    const transactionId = generateTransactionId();
-    event.preventDefault();
-
-    try {
-        const response = await fetch(`${CONFIG.PROPERTY_SERVICE}/`, {
-            method: 'POST',
-            headers: {
-                'transactionId': transactionId,
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(formAddress),
-        });
-
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
-        }
-
-        const result = await response.json();
-        console.log('Success:', result);
-        return result;
-    } catch (error) {
-        console.error('Error:', error);
-        throw error;
-    }
-};
+  const handleFormChange = (updatedForm) => {
+    setFormAddress(updatedForm);
+  };
 
   return (
     <div className='h-screen p-4'>
       {/* carousel */}
-      <div className="relative flex justify-center items-center h-80 w-4/5 mx-auto">
-        <ImageSlider />
-      </div>
-      {/* search area */}
-      <div className="flex flex-col relative left-1/2 transform -translate-x-1/2 -mt-20 pt-2 z-50 flex justify-center items-center px-24">
+      {/* <div className="relative flex justify-center items-center h-80 w-4/5 mx-auto"> */}
+      <img
+        className="relative flex justify-center items-center h-80 w-5/6 w-[1200px] mx-auto rounded-xl"
+        src="https://images.unsplash.com/photo-1494526585095-c41746248156?q=80&w=3270&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+        alt="Beautiful scenery"
+      />
+      {/* </div> */}
 
-        <div className="w-5/6 bg-black bg-opacity-60 p-5 backdrop-blur-xs rounded-xl shadow-lg">
+      {/* search area */}
+      <div className="relative flex flex-col left-1/2 transform -translate-x-1/2 -mt-20 pt-2 z-50 flex justify-center items-center px-24">
+
+        <div className="bg-black bg-opacity-60 p-5 backdrop-blur-xs rounded-xl shadow-lg">
 
           <div className="flex flex-col ">
             <div className="w-full flex justify-between items-center">
@@ -192,27 +196,17 @@ const handleFormChange = (updatedForm) => {
                 <div ref={containerRef}
                   className="relative w-80 flex items-center bg-white rounded-lg shadow-lg">
                   <div
-                    className={`absolute ml-16 inset-0 flex items-center transition-all duration-500 ease-in-out transform ${showPlaceholder ? '' : 'pointer-events-none'}`}
-                    style={{ pointerEvents: showPlaceholder ? 'auto' : 'none' }}
-                    onClick={() => inputRef.current.focus()}
+                    className={`absolute ml-16 inset-0 flex items-center pointer-events-none transition-all duration-500 ease-in-out ${
+                      isAnimating ? 'slide-out' : 'slide-in'
+                    }`}
                   >
                     {showPlaceholder && (
-                      <>
-                        <span
-
-                          className={`absolute w-auto transition-transform duration-500 text-gray-400 ${index === 0 ? 'translate-y-0' : '-translate-y-5 opacity-0'}`}
-                        >
-                          {previousPlaceholder}
-                        </span>
-                        <span
-
-                          className={`absolute w-auto transition-transform duration-500 text-gray-400 ${index > 0 ? 'translate-y-0 opacity-100' : 'translate-y-5 opacity-0'}`}
-                        >
-                          {currentPlaceholder}
-                        </span>
-                      </>
+                      <span className="text-gray-400">
+                        {currentPlaceholder}
+                      </span>
                     )}
                   </div>
+
                   <input
                     type="text"
                     className="form-input w-full py-2 px-2 rounded-l-lg focus:outline-none text-gray-600"
@@ -269,32 +263,32 @@ const handleFormChange = (updatedForm) => {
                 </span>
               </div>
 
-              <div className='flex gap-2'>
+              <div className='flex gap-2 ml-2'>
                 <span
                   onClick={() => handleFiltersClick('filter')}
-                  className='flex items-center text-gray-600 gap-2 py-2 px-3 bg-white text-sm font-semibold rounded-lg shadow-lg'>
+                  className='flex items-center text-gray-600 gap-2 py-2 px-3 bg-white text-xs font-semibold rounded-lg shadow-lg'>
                   <LuSettings2 className='text-md' />
                   Filter
                 </span>
                 <span
                   onClick={() => handleFiltersClick('propertyType')}
-                  className='flex items-center text-gray-600 gap-2 py-2 px-3 bg-white text-sm font-semibold rounded-lg shadow-lg'>
-                  <span>Property Type</span>
+                  className='flex items-center text-gray-600 gap-2 py-2 px-3 bg-white text-xs font-semibold rounded-lg shadow-lg'>
+                  <span className='whitespace-nowrap overflow-hidden text-ellipsis'>Property Type</span>
                   <svg className="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
                   </svg>
                 </span>
                 <span
                   onClick={() => handleFiltersClick('price')}
-                  className='flex items-center text-gray-600 gap-2 py-2 px-3 bg-white text-sm font-semibold rounded-lg shadow-lg'>
-                  <span>Price</span>
+                  className='flex items-center text-gray-600 gap-2 py-2 px-3 bg-white text-xs font-semibold rounded-lg shadow-lg'>
+                  <span>Rent/Transacted</span>
                   <svg className="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
                   </svg>
                 </span>
                 <span
                   onClick={() => handleFiltersClick('size')}
-                  className='flex items-center text-gray-600 gap-2 py-2 px-3 bg-white text-sm font-semibold rounded-lg shadow-lg'>
+                  className='flex items-center text-gray-600 gap-2 py-2 px-3 bg-white text-xs font-semibold rounded-lg shadow-lg'>
                   <span>Size</span>
                   <svg className="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
@@ -312,49 +306,53 @@ const handleFormChange = (updatedForm) => {
             </div>
           </div>
 
-          <div className="relative inline-flex bg-gray-100 gap-2 rounded-full shadow-lg mt-6">
-            {/* Active Background Slider */}
-            <div
-              className="absolute top-0 left-0 h-full bg-c-teal rounded-full transition-all duration-300 ease-in-out"
-              style={{
-                width: `${sliderStyle.width}px`,
-                left: `${sliderStyle.left}px`,
-              }}
-            ></div>
+          <div className='flex justify-between items-center'>
+            <div className="relative inline-flex gap-2 rounded-full mt-6">
+              {/* Active Background Slider */}
+              {/* <div
+                className="absolute top-0 left-0 h-full bg-c-teal rounded-full transition-all duration-300 ease-in-out"
+                style={{
+                  width: `${sliderStyle.width}px`,
+                  left: `${sliderStyle.left}px`,
+                }}
+              ></div> */}
 
-            {/* Button Items */}
-            <span
-              ref={buttonRefs.Buy}
-              onClick={() => handleButtonClick('Buy')}
-              className={`relative z-10 py-1 px-4 rounded-full cursor-pointer text-sm font-bold transition-colors duration-100 ease-in-out 
-          ${activeButton === 'Buy' ? 'text-white' : 'text-gray-700 hover:bg-gray-200'}`}
-            >
-              Buy
-            </span>
-            <span
-              ref={buttonRefs.Rent}
-              onClick={() => handleButtonClick('Rent')}
-              className={`relative z-10 py-1 px-4 rounded-full cursor-pointer text-sm font-bold transition-colors duration-100 ease-in-out 
-          ${activeButton === 'Rent' ? 'text-white' : 'text-gray-700 hover:bg-gray-200'}`}
-            >
-              Rent
-            </span>
-            <span
-              ref={buttonRefs.FindAgent}
-              onClick={() => handleButtonClick('FindAgent')}
-              className={`relative z-10 py-1 px-4 rounded-full cursor-pointer text-sm font-bold transition-colors duration-100 ease-in-out 
-          ${activeButton === 'FindAgent' ? 'text-white' : 'text-gray-700 hover:bg-gray-200'}`}
-            >
-              Find Agent
-            </span>
+              {/* Button Items */}
+              <span
+                ref={buttonRefs.All}
+                onClick={() => handleButtonClick('All')}
+                className={`relative z-10 py-1 px-4 rounded-full cursor-pointer text-sm font-semibold transition-colors duration-100 ease-in-out
+                ${activeButton === 'All' ? 'bg-c-teal text-white' : ' text-gray-300 bg-black/10 hover:bg-black/20'}`}
+                >
+                All
+              </span>
+              <span
+                ref={buttonRefs.Lease}
+                onClick={() => handleButtonClick('Lease')}
+                className={`relative z-10 py-1 px-4 rounded-full cursor-pointer text-sm font-semibold transition-colors duration-100 ease-in-out
+                ${activeButton === 'Lease' ? 'bg-c-teal text-white' : 'text-gray-300 bg-black/10 hover:bg-black/20'}`}
+                >
+                For Lease
+              </span>
+              <span
+                ref={buttonRefs.Sale}
+                onClick={() => handleButtonClick('Sale')}
+                className={`relative z-10 py-1 px-4 rounded-full cursor-pointer text-sm font-semibold transition-colors duration-100 ease-in-out
+                ${activeButton === 'Sale' ? 'bg-c-teal text-white' : ' text-gray-300 bg-black/10 hover:bg-black/20'}`}
+                >
+                For Sale
+              </span>
+            </div>
+            <div className="pt-6 px-1 text-right flex items-center">
+              <span className='text-gray-300 text-xs hover:texr.gray-300/80 cursor-pointer'>Classic View</span>
+            </div>
           </div>
+
         </div>
-        <div className="w-5/6 p-4 text-right">
-          <span className='text-c-dark-grayish/80 text-sm cursor-pointer'>Classic View</span>
-        </div>
+
       </div>
 
-      <ModalSearch isVisible={isModalVisible} onClose={() => setIsModalVisible(false)} category={category} form={formAddress} onFormChange={handleFormChange} setQuery={setQuery} />
+      <ModalSearch isVisible={isModalVisible} onClose={() => setIsModalVisible(false)} category={category} form={formAddress} onFormChange={handleFormChange} setQuery={setQuery} onClick={handleSearchClick}/>
       <ModalFilter isVisible={isModalFilterVisible} onClose={() => setIsModalFilterVisible(false)} filter={filter} />
 
     </div>

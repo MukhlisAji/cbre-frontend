@@ -8,6 +8,8 @@ import ModalFilter from './modal/ModalFilter';
 import ResultSection from './ResultSection';
 import { generateTransactionId } from '../../lib/api/Authorization';
 import { CONFIG } from '../../../config';
+import './SearchArea.css';
+
 
 const PropertyResult = () => {
 
@@ -27,11 +29,14 @@ const PropertyResult = () => {
     const location = useLocation();
     const [isLoading, setIsLoading] = useState(false);
     const formData = location.state?.formAddress;
+    const [isAnimating, setIsAnimating] = useState(false); // For managing animation state
+    const [showPlaceholder, setShowPlaceholder] = useState(true);
     const placeholders = [
-        "Search HDB Estates like Ang Mo Kio",
-        "Find your dream home",
-        "Explore properties near you",
-        "Discover the best neighborhoods"
+        "by Address",
+        "by Account/Contact",
+        "by District",
+        "by Region/Micromarket",
+        "by MRT"
     ];
     const [hasSearched, setHasSearched] = useState(false);
     const inputRef = useRef(null);
@@ -39,15 +44,42 @@ const PropertyResult = () => {
     const categories = [
         { key: 'Address', label: 'Search by Address' },
         { key: 'Account/Contacts', label: 'Search by Account/Contacts' },
-        { key: 'Region/Micromarket', label: 'Search by Region/Micromarket' }
+        { key: 'District', label: 'Search by District' },
+        { key: 'Micromarket', label: 'Search by Micromarket' },
+        { key: 'MRT', label: 'Search by MRT' },
+
     ];
     const results = ['test search'];
+
+    const [formAddress, setFormAddress] = useState({
+        buildingName: '',
+        streetNumber: '',
+        streetName: '',
+        postalCode: ''
+    });
 
     useEffect(() => {
         const interval = setInterval(changePlaceholder, 3000);
         return () => clearInterval(interval); // Cleanup interval on unmount
     }, [index]);
 
+    useEffect(() => {
+        const interval = setInterval(() => {
+          triggerPlaceholderChange();
+        }, 3000);
+    
+        return () => clearInterval(interval);
+      }, [index]);
+    
+      // Trigger placeholder change with animation
+      const triggerPlaceholderChange = () => {
+        setIsAnimating(true); // Start animation
+        setTimeout(() => {
+          setIndex((prevIndex) => (prevIndex + 1) % placeholders.length);
+          setIsAnimating(false); // End animation after the transition
+        }, 500); // Match the duration of the CSS animation
+      };
+      
     const changePlaceholder = () => {
         setIndex((prevIndex) => (prevIndex + 1) % placeholders.length);
     };
@@ -105,7 +137,7 @@ const PropertyResult = () => {
         setInputValue(event.target.value);
     };
 
-    const showPlaceholder = !isFocused && !inputValue;
+    // const showPlaceholder = !isFocused && !inputValue;
     const currentPlaceholder = placeholders[index];
     const previousPlaceholder = placeholders[(index - 1 + placeholders.length) % placeholders.length];
 
@@ -188,12 +220,16 @@ const PropertyResult = () => {
         executeSearch();
     }, [formData, hasSearched]);
 
+    const handleFormChange = (updatedForm) => {
+        setFormAddress(updatedForm);
+    };
+
     return (
         <div className='h-screen'>
 
             <div className="flex flex-col relative left-1/2 transform -translate-x-1/2 py-2 z-50 flex justify-center items-center shadow-lg shadow-b">
 
-                <div className="w-4/6 bg-gray-300 bg-opacity-80 p-2 backdrop-blur-xs rounded-xl shadow-lg">
+                <div className="bg-gray-300 bg-opacity-80 p-2 backdrop-blur-xs rounded-xl shadow-lg">
 
                     <div className="flex flex-col ">
                         <div className="w-full flex justify-between items-center">
@@ -201,25 +237,13 @@ const PropertyResult = () => {
                                 <div ref={containerRef}
                                     className="relative w-80 flex items-center bg-white rounded-lg shadow-lg">
                                     <div
-                                        className={`absolute ml-16 inset-0 flex items-center transition-all duration-500 ease-in-out transform ${showPlaceholder ? '' : 'pointer-events-none'}`}
-                                        style={{ pointerEvents: showPlaceholder ? 'auto' : 'none' }}
-                                        onClick={() => inputRef.current.focus()}
+                                        className={`absolute ml-16 inset-0 flex items-center pointer-events-none transition-all duration-500 ease-in-out ${isAnimating ? 'slide-out' : 'slide-in'
+                                            }`}
                                     >
                                         {showPlaceholder && (
-                                            <>
-                                                <span
-
-                                                    className={`absolute w-auto transition-transform duration-500 text-gray-400 ${index === 0 ? 'translate-y-0' : '-translate-y-5 opacity-0'}`}
-                                                >
-                                                    {previousPlaceholder}
-                                                </span>
-                                                <span
-
-                                                    className={`absolute w-auto transition-transform duration-500 text-gray-400 ${index > 0 ? 'translate-y-0 opacity-100' : 'translate-y-5 opacity-0'}`}
-                                                >
-                                                    {currentPlaceholder}
-                                                </span>
-                                            </>
+                                            <span className="text-gray-400">
+                                                {currentPlaceholder}
+                                            </span>
                                         )}
                                     </div>
                                     <input
@@ -278,7 +302,7 @@ const PropertyResult = () => {
                                 </span>
                             </div>
 
-                            <div className='flex gap-2'>
+                            <div className='flex gap-2 pl-2'>
                                 <span
                                     onClick={() => handleFiltersClick('filter')}
                                     className='flex items-center text-gray-600 gap-2 py-2 px-3 bg-white text-sm font-semibold rounded-lg shadow-lg'>
@@ -288,7 +312,7 @@ const PropertyResult = () => {
                                 <span
                                     onClick={() => handleFiltersClick('propertyType')}
                                     className='flex items-center text-gray-600 gap-2 py-2 px-3 bg-white text-sm font-semibold rounded-lg shadow-lg'>
-                                    <span>Property Type</span>
+                                    <span className='whitespace-nowrap overflow-hidden text-ellipsis'>Property Type</span>
                                     <svg className="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
                                     </svg>
@@ -320,47 +344,10 @@ const PropertyResult = () => {
                             </div>
                         </div>
                     </div>
-
-                    <div className="relative inline-flex bg-gray-100 gap-2 rounded-full shadow-lg mt-3">
-                        {/* Active Background Slider */}
-                        <div
-                            className="absolute top-0 left-0 h-full bg-c-teal rounded-full transition-all duration-300 ease-in-out"
-                            style={{
-                                width: `${sliderStyle.width}px`,
-                                left: `${sliderStyle.left}px`,
-                            }}
-                        ></div>
-
-                        {/* Button Items */}
-                        <span
-                            ref={buttonRefs.Buy}
-                            onClick={() => handleButtonClick('Buy')}
-                            className={`relative z-10 py-1 px-4 rounded-full cursor-pointer text-sm font-bold transition-colors duration-100 ease-in-out 
-          ${activeButton === 'Buy' ? 'text-white' : 'text-gray-700 hover:bg-gray-200'}`}
-                        >
-                            Buy
-                        </span>
-                        <span
-                            ref={buttonRefs.Rent}
-                            onClick={() => handleButtonClick('Rent')}
-                            className={`relative z-10 py-1 px-4 rounded-full cursor-pointer text-sm font-bold transition-colors duration-100 ease-in-out 
-          ${activeButton === 'Rent' ? 'text-white' : 'text-gray-700 hover:bg-gray-200'}`}
-                        >
-                            Rent
-                        </span>
-                        <span
-                            ref={buttonRefs.FindAgent}
-                            onClick={() => handleButtonClick('FindAgent')}
-                            className={`relative z-10 py-1 px-4 rounded-full cursor-pointer text-sm font-bold transition-colors duration-100 ease-in-out 
-          ${activeButton === 'FindAgent' ? 'text-white' : 'text-gray-700 hover:bg-gray-200'}`}
-                        >
-                            Find Agent
-                        </span>
-                    </div>
                 </div>
             </div>
 
-            <ModalSearch isVisible={isModalVisible} onClose={() => setIsModalVisible(false)} category={category} />
+            <ModalSearch isVisible={isModalVisible} onClose={() => setIsModalVisible(false)} category={category} form={formAddress} onFormChange={handleFormChange} setQuery={setQuery} onClick={handleSearchClick} />
             <ModalFilter isVisible={isModalFilterVisible} onClose={() => setIsModalFilterVisible(false)} filter={filter} />
 
             <div className='flex justify-center'>
