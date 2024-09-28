@@ -14,7 +14,7 @@ export default function NumberInput({category, input, setInput}){
                     type="number" 
                     id="number-input" 
                     aria-describedby="helper-text-explanation" 
-                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" 
+                    className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:outline-none focus:ring-c-teal focus:border-c-teal block w-full p-1 pl-4" 
                     placeholder="From" 
                     value={input}
                     onChange={handleInputChange}
@@ -29,7 +29,7 @@ export default function NumberInput({category, input, setInput}){
                 type="number" 
                 id="number-input" 
                 aria-describedby="helper-text-explanation" 
-                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" 
+                className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:outline-none focus:ring-c-teal focus:border-c-teal block w-full p-1 pl-4" 
                 placeholder="15" 
                 value={input}
                 onChange={handleInputChange}
@@ -44,7 +44,7 @@ export default function NumberInput({category, input, setInput}){
                 type="number" 
                 id="number-input" 
                 aria-describedby="helper-text-explanation" 
-                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" 
+                className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:outline-none focus:ring-c-teal focus:border-c-teal block w-full p-1 pl-4" 
                 placeholder="To" 
                 value={input}
                 onChange={handleInputChange}
