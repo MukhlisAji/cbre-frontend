@@ -45,7 +45,7 @@ const PropertyResult = () => {
         { key: 'Address', label: 'Search by Address' },
         { key: 'Account/Contacts', label: 'Search by Account/Contacts' },
         { key: 'District', label: 'Search by District' },
-        { key: 'Region/Micromarket', label: 'Search by Region/Micromarket' },
+        { key: 'Micromarket', label: 'Search by Micromarket' },
         { key: 'MRT', label: 'Search by MRT' },
 
     ];

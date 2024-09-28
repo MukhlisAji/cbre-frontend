@@ -321,24 +321,24 @@ const SearchArea = () => {
               <span
                 ref={buttonRefs.All}
                 onClick={() => handleButtonClick('All')}
-                className={`relative z-10 py-1 px-4 rounded-full cursor-pointer text-sm font-bold transition-colors duration-100 ease-in-out
-                ${activeButton === 'All' ? 'bg-c-teal text-white' : ' text-gray-600 bg-gray-300 hover:bg-gray-400'}`}
+                className={`relative z-10 py-1 px-4 rounded-full cursor-pointer text-sm font-semibold transition-colors duration-100 ease-in-out
+                ${activeButton === 'All' ? 'bg-c-teal text-white' : ' text-gray-300 bg-black/10 hover:bg-black/20'}`}
                 >
                 All
               </span>
               <span
                 ref={buttonRefs.Lease}
                 onClick={() => handleButtonClick('Lease')}
-                className={`relative z-10 py-1 px-4 rounded-full cursor-pointer text-sm font-bold transition-colors duration-100 ease-in-out
-                ${activeButton === 'Lease' ? 'bg-c-teal text-white' : ' text-gray-600 bg-gray-300 hover:bg-gray-200'}`}
+                className={`relative z-10 py-1 px-4 rounded-full cursor-pointer text-sm font-semibold transition-colors duration-100 ease-in-out
+                ${activeButton === 'Lease' ? 'bg-c-teal text-white' : 'text-gray-300 bg-black/10 hover:bg-black/20'}`}
                 >
                 For Lease
               </span>
               <span
                 ref={buttonRefs.Sale}
                 onClick={() => handleButtonClick('Sale')}
-                className={`relative z-10 py-1 px-4 rounded-full cursor-pointer text-sm font-bold transition-colors duration-100 ease-in-out
-                ${activeButton === 'Sale' ? 'bg-c-teal text-white' : ' text-gray-600 bg-gray-300 hover:bg-gray-200'}`}
+                className={`relative z-10 py-1 px-4 rounded-full cursor-pointer text-sm font-semibold transition-colors duration-100 ease-in-out
+                ${activeButton === 'Sale' ? 'bg-c-teal text-white' : ' text-gray-300 bg-black/10 hover:bg-black/20'}`}
                 >
                 For Sale
               </span>
