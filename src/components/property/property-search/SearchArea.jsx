@@ -7,6 +7,7 @@ import ModalSearch from './modal/ModalSearch';
 import ModalFilter from './modal/ModalFilter';
 import { generateTransactionId } from '../../lib/api/Authorization';
 import './SearchArea.css';
+import homeImage from '../../../../src/assets/home.avif';
 
 
 const SearchArea = () => {
@@ -180,7 +181,7 @@ const SearchArea = () => {
       {/* <div className="relative flex justify-center items-center h-80 w-4/5 mx-auto"> */}
       <img
         className="relative flex justify-center items-center h-80 w-full max-w-[1200px] mx-auto rounded-xl"
-        src="/src/assets/home.avif"
+        src={homeImage}
         alt="Scenery"
       />
       {/* </div> */}
