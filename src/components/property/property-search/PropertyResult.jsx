@@ -1,5 +1,4 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { ImageSlider } from './ImageSlider';
 import { LuSettings2 } from "react-icons/lu";
 import { IoSearch } from 'react-icons/io5';
 import { useLocation, useNavigate } from 'react-router-dom';

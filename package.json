@@ -14,7 +14,6 @@
     "@headlessui/react": "^2.1.2",
     "@mapbox/mapbox-gl-draw": "^1.4.3",
     "@mapbox/mapbox-gl-geocoder": "^5.0.2",
-    "@material-tailwind/react": "^2.1.10",
     "@mui/icons-material": "^5.16.4",
     "@mui/material": "^5.16.4",
     "@mui/x-date-pickers": "^7.12.1",
