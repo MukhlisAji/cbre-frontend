@@ -179,9 +179,9 @@ const SearchArea = () => {
       {/* carousel */}
       {/* <div className="relative flex justify-center items-center h-80 w-4/5 mx-auto"> */}
       <img
-        className="relative flex justify-center items-center h-80 w-5/6 w-[1200px] mx-auto rounded-xl"
-        src="https://images.unsplash.com/photo-1494526585095-c41746248156?q=80&w=3270&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-        alt="Beautiful scenery"
+        className="relative flex justify-center items-center h-80 w-full max-w-[1200px] mx-auto rounded-xl"
+        src="/src/assets/home.avif"
+        alt="Scenery"
       />
       {/* </div> */}
 
@@ -196,9 +196,8 @@ const SearchArea = () => {
                 <div ref={containerRef}
                   className="relative w-80 flex items-center bg-white rounded-lg shadow-lg">
                   <div
-                    className={`absolute ml-16 inset-0 flex items-center pointer-events-none transition-all duration-500 ease-in-out ${
-                      isAnimating ? 'slide-out' : 'slide-in'
-                    }`}
+                    className={`absolute ml-16 inset-0 flex items-center pointer-events-none transition-all duration-500 ease-in-out ${isAnimating ? 'slide-out' : 'slide-in'
+                      }`}
                   >
                     {showPlaceholder && (
                       <span className="text-gray-400">
@@ -323,7 +322,7 @@ const SearchArea = () => {
                 onClick={() => handleButtonClick('All')}
                 className={`relative z-10 py-1 px-4 rounded-full cursor-pointer text-sm font-semibold transition-colors duration-100 ease-in-out
                 ${activeButton === 'All' ? 'bg-c-teal text-white' : ' text-gray-300 bg-black/10 hover:bg-black/20'}`}
-                >
+              >
                 All
               </span>
               <span
@@ -331,7 +330,7 @@ const SearchArea = () => {
                 onClick={() => handleButtonClick('Lease')}
                 className={`relative z-10 py-1 px-4 rounded-full cursor-pointer text-sm font-semibold transition-colors duration-100 ease-in-out
                 ${activeButton === 'Lease' ? 'bg-c-teal text-white' : 'text-gray-300 bg-black/10 hover:bg-black/20'}`}
-                >
+              >
                 For Lease
               </span>
               <span
@@ -339,7 +338,7 @@ const SearchArea = () => {
                 onClick={() => handleButtonClick('Sale')}
                 className={`relative z-10 py-1 px-4 rounded-full cursor-pointer text-sm font-semibold transition-colors duration-100 ease-in-out
                 ${activeButton === 'Sale' ? 'bg-c-teal text-white' : ' text-gray-300 bg-black/10 hover:bg-black/20'}`}
-                >
+              >
                 For Sale
               </span>
             </div>
@@ -352,7 +351,7 @@ const SearchArea = () => {
 
       </div>
 
-      <ModalSearch isVisible={isModalVisible} onClose={() => setIsModalVisible(false)} category={category} form={formAddress} onFormChange={handleFormChange} setQuery={setQuery} onClick={handleSearchClick}/>
+      <ModalSearch isVisible={isModalVisible} onClose={() => setIsModalVisible(false)} category={category} form={formAddress} onFormChange={handleFormChange} setQuery={setQuery} onClick={handleSearchClick} />
       <ModalFilter isVisible={isModalFilterVisible} onClose={() => setIsModalFilterVisible(false)} filter={filter} />
 
     </div>
