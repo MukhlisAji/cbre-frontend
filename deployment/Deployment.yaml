@@ -19,7 +19,7 @@ spec:
       securityContext:
       containers:
       - name: one-app-container
-        image: oneapp-docker-nonprod.us.artifactory.gcso.cbre.com/frontend:0.5
+        image: oneapp-docker-nonprod.us.artifactory.gcso.cbre.com/frontend:0.6
         ports:
         - containerPort: 8080
         securityContext:
