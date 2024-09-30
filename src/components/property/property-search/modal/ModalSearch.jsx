@@ -160,7 +160,7 @@ export default function ModalSearch({ isVisible, onClose, category, form, onForm
                 margin="dense"
                 sx={cusInput}
                 onChange={handleInputChange}
-                disabled={disable.buildingName}
+                // disabled={disable.buildingName}
               />
               <TextField
                 type="text"
@@ -172,7 +172,7 @@ export default function ModalSearch({ isVisible, onClose, category, form, onForm
                 margin="dense"
                 sx={cusInput}
                 onChange={handleInputChange}
-                disabled={disable.streetName}
+                // disabled={disable.streetName}
               />
             </Box>
           </div>
@@ -188,7 +188,7 @@ export default function ModalSearch({ isVisible, onClose, category, form, onForm
               size="small"
               margin="dense"
               sx={cusInput}
-              disabled={disable.streetNumber}
+              // disabled={disable.streetNumber}
             />
             <TextField
               type="number"
@@ -200,7 +200,7 @@ export default function ModalSearch({ isVisible, onClose, category, form, onForm
               size="small"
               margin="dense"
               sx={cusInput}
-              disabled={disable.postalCode}
+              // disabled={disable.postalCode}
             />
           </div>
         </div>
