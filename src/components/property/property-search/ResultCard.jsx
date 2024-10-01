@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
 // Card component
 const PropertyCard = ({ property }) => {
+
     return (
         <div className="flex bg-white shadow-md rounded-lg overflow-hidden mb-6">
             {/* Image Section */}
@@ -39,8 +40,28 @@ const PropertyCard = ({ property }) => {
 
 // Main component that renders the list of property cards
 const ResultCard = ({ resultSet }) => { // Destructure resultSet from props
+    const [sectionHeight, setSectionHeight] = useState(0);
+
+      useEffect(() => {
+          const handleResize = () => {
+              const screenHeight = window.innerHeight;
+              const newHeight = screenHeight - 400;
+              setSectionHeight(newHeight);
+          };
+  
+          handleResize();
+  
+          // Add event listener to handle window resize
+          window.addEventListener('resize', handleResize);
+  
+          // Clean up event listener on component unmount
+          return () => {
+              window.removeEventListener('resize', handleResize);
+          };
+      }, []);
+      
     return (
-        <div className="p-4 h-96 overflow-y-scroll">
+        <div style={{ height: `${sectionHeight}px` }} className="p-4 h-96">
             {resultSet.propertyInformation && resultSet.propertyInformation.map((property, index) => (
                 <PropertyCard key={index} property={property} />
             ))}

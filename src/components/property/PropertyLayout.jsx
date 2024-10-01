@@ -103,7 +103,7 @@ export default function PropertyLayout() {
                         </div>
 
                         {isMenuOpen('accounts') && (
-                            <div className="absolute mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-20">
+                            <div className="absolute mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-30">
                                 <div className="py-1" role="menu" aria-orientation="vertical" aria-labelledby="options-menu">
                                     <div onClick={() => openModal('account')} className="block px-4 py-2 text-sm text-gray-700 cursor-pointer hover:bg-gray-100 hover:text-gray-900 hover:no-underline" role="menuitem">
                                         <span className="flex items-center">
@@ -131,7 +131,7 @@ export default function PropertyLayout() {
                         </div>
 
                         {isMenuOpen('contacts') && (
-                            <div className="absolute mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-20">
+                            <div className="absolute mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-30">
                                 <div className="py-1" role="menu" aria-orientation="vertical" aria-labelledby="options-menu">
                                     <div onClick={() => openModal('contact')} className="block px-4 py-2 text-sm text-gray-700 cursor-pointer hover:bg-gray-100 hover:text-gray-900 hover:no-underline" role="menuitem">
                                         <span className="flex items-center">
@@ -161,7 +161,7 @@ export default function PropertyLayout() {
                         </div>
 
                         {isMenuOpen('properties') && (
-                            <div className="absolute mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-20">
+                            <div className="absolute mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-30">
                                 <div className="py-1" role="menu" aria-orientation="vertical" aria-labelledby="options-menu">
                                     <Link onClick={() => openModal('properties')} className="block px-4 py-2 text-sm text-gray-700 cursor-pointer hover:bg-gray-100 hover:text-gray-900 hover:no-underline" role="menuitem">
                                         <span className="flex items-center">

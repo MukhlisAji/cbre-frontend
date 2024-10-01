@@ -54,6 +54,23 @@ const SearchArea = () => {
     streetName: '',
     postalCode: ''
   });
+  const [formDistrict, setFormDistrict] = useState([]);
+
+  const handleFormChange = (updatedForm) => {
+    if (category === 'Address') {
+      setFormAddress(updatedForm);
+      console.log("Updated Address Form:", updatedForm);
+    } else if (category === 'District') {
+      setFormDistrict(updatedForm);
+      console.log("Updated District Form:", updatedForm);
+    }
+  };
+
+  const getForm = () => {
+    return category === 'Address' ? formAddress : formDistrict;
+  };
+
+
 
   // useEffect(() => {
   //   const interval = setInterval(changePlaceholder, 3000);
@@ -99,10 +116,12 @@ const SearchArea = () => {
   };
 
   const handleSearch = () => {
+    // const stateData = category === "Address" ? formAddress : formDistrict;
 
-    navigate('result', { state: { formAddress } });
+    navigate('result', { state: { form: getForm(), category } });
     setIsExpanded(false);
   };
+
 
   const handleSearchClick = () => {
     handleSearch();
@@ -172,10 +191,6 @@ const SearchArea = () => {
 
 
 
-  const handleFormChange = (updatedForm) => {
-    setFormAddress(updatedForm);
-  };
-
   return (
     <div>
       {!isClassic ?
@@ -190,7 +205,7 @@ const SearchArea = () => {
           {/* </div> */}
 
           {/* search area */}
-          <div className="relative flex flex-col left-1/2 transform -translate-x-1/2 -mt-20 pt-2 z-50 flex justify-center items-center px-24">
+          <div className="relative flex flex-col left-1/2 transform -translate-x-1/2 -mt-20 pt-2 z-30 flex justify-center items-center px-24">
 
             <div className="bg-black bg-opacity-60 p-5 backdrop-blur-xs rounded-xl shadow-lg">
 
@@ -347,7 +362,7 @@ const SearchArea = () => {
                   </span>
                 </div>
                 <div className="pt-6 px-1 text-right flex items-center">
-                  <span onClick={()=> setIsClassic(true)} className='text-gray-300 text-xs hover:texr.gray-300/80 cursor-pointer'>Classic View</span>
+                  <span onClick={() => setIsClassic(true)} className='text-gray-300 text-xs hover:texr.gray-300/80 cursor-pointer'>Classic View</span>
                 </div>
               </div>
 
@@ -355,7 +370,16 @@ const SearchArea = () => {
 
           </div>
 
-          <ModalSearch isVisible={isModalVisible} onClose={() => setIsModalVisible(false)} category={category} form={formAddress} onFormChange={handleFormChange} setQuery={setQuery} onClick={handleSearchClick} />
+          {/* Modal search component */}
+          <ModalSearch
+            isVisible={isModalVisible}
+            onClose={() => setIsModalVisible(false)}
+            category={category}
+            form={getForm()} // Dynamically pass the form based on selected category
+            onFormChange={handleFormChange}
+            setQuery={setQuery}
+            onClick={handleSearchClick}
+          />          
           <ModalFilter isVisible={isModalFilterVisible} onClose={() => setIsModalFilterVisible(false)} filter={filter} />
 
         </div>

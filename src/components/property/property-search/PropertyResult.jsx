@@ -27,8 +27,10 @@ const PropertyResult = () => {
     const [placeholderText, setPlaceholderText] = useState('Search');
     const location = useLocation();
     const [isLoading, setIsLoading] = useState(false);
-    const formData = location.state?.formAddress;
-    const [isAnimating, setIsAnimating] = useState(false); // For managing animation state
+    // const formData = location.state?.formAddress;
+    const searchCategory = location.state?.category;
+    const formData = location.state?.form;
+    const [isAnimating, setIsAnimating] = useState(false);
     const [showPlaceholder, setShowPlaceholder] = useState(true);
     const placeholders = [
         "by Address",
@@ -57,6 +59,21 @@ const PropertyResult = () => {
         postalCode: ''
     });
 
+    const [formDistrict, setFormDistrict] = useState([]);
+    const handleFormChange = (updatedForm) => {
+        if (category === 'Address') {
+            setFormAddress(updatedForm);
+            console.log("Updated Address Form:", updatedForm);
+        } else if (category === 'District') {
+            setFormDistrict(updatedForm);
+            console.log("Updated District Form:", updatedForm);
+        }
+    };
+
+    const getForm = () => {
+        return category === 'Address' ? formAddress : formDistrict;
+    };
+
     useEffect(() => {
         const interval = setInterval(changePlaceholder, 3000);
         return () => clearInterval(interval); // Cleanup interval on unmount
@@ -64,21 +81,21 @@ const PropertyResult = () => {
 
     useEffect(() => {
         const interval = setInterval(() => {
-          triggerPlaceholderChange();
+            triggerPlaceholderChange();
         }, 3000);
-    
+
         return () => clearInterval(interval);
-      }, [index]);
-    
-      // Trigger placeholder change with animation
-      const triggerPlaceholderChange = () => {
+    }, [index]);
+
+    // Trigger placeholder change with animation
+    const triggerPlaceholderChange = () => {
         setIsAnimating(true); // Start animation
         setTimeout(() => {
-          setIndex((prevIndex) => (prevIndex + 1) % placeholders.length);
-          setIsAnimating(false); // End animation after the transition
+            setIndex((prevIndex) => (prevIndex + 1) % placeholders.length);
+            setIsAnimating(false); // End animation after the transition
         }, 500); // Match the duration of the CSS animation
-      };
-      
+    };
+
     const changePlaceholder = () => {
         setIndex((prevIndex) => (prevIndex + 1) % placeholders.length);
     };
@@ -86,6 +103,7 @@ const PropertyResult = () => {
     const handleFocus = () => {
         setIsFocused(true);
         setPlaceholderText('');
+        setShowPlaceholder(false);
         setIsExpanded(true);
     };
 
@@ -96,10 +114,6 @@ const PropertyResult = () => {
 
     const handleSearchChange = (e) => {
         setQuery(e.target.value);
-    };
-
-    const handleSearchClick = () => {
-        handleSearch();
     };
 
     const handleKeyDown = (e) => {
@@ -164,12 +178,18 @@ const PropertyResult = () => {
         }
     };
 
+
+    const handleSearchClick = () => {
+        executeSearch(getForm());
+    };
+
     const handleSearch = async (data) => {
         console.log('Search initiated with formData:', data); // Debugging log
         const transactionId = generateTransactionId();
+        const searchBy = category === "Address" ? "searchbyaddress" : "searchbydistrict";
 
         try {
-            const response = await fetch(`${CONFIG.PROPERTY_SERVICE}/searchbyaddress`, {
+            const response = await fetch(`${CONFIG.PROPERTY_SERVICE}/${searchBy}`, {
                 method: 'POST',
                 headers: {
                     'transactionId': transactionId,
@@ -181,9 +201,8 @@ const PropertyResult = () => {
             if (!response.ok) {
                 throw new Error('Network response was not ok');
             }
-
             const result = await response.json();
-            console.log('Search results:', result); // Debugging log
+            console.log('Search results:', result);
             return result;
         } catch (error) {
             console.error('Error during search:', error);
@@ -191,42 +210,71 @@ const PropertyResult = () => {
         }
     };
 
-    useEffect(() => {
-        const executeSearch = async () => {
-            if (formData && !hasSearched) {
-                console.log('Executing search...'); // Debugging log
-                setIsLoading(true);
-                setHasSearched(true);
+    const executeSearch = async (formData) => {
+        if (formData) {
+            console.log('Executing search...'); // Debugging log
+            setIsLoading(true);
+            setHasSearched(true);
 
-                try {
-                    const result = await handleSearch(formData);
+            try {
+                const result = await handleSearch(formData);
 
-                    if (result.statusCode === "00") {
-                        setResultData(result.resultSet);
-                    }
-
-                } catch (error) {
-                    console.error('Error during submission:', error);
-                    alert(`Failed to search. Please try again.`);
-                } finally {
-                    setIsLoading(false);
+                if (result.statusCode === "00") {
+                    setResultData(result.resultSet);
                 }
-            } else {
-                console.log('Search skipped: either formData is null or search has already been performed.');
+            } catch (error) {
+                console.error('Error during submission:', error);
+                alert(`Failed to search. Please try again.`);
+            } finally {
+                setIsLoading(false);
             }
-        };
+        } else {
+            console.log('Search skipped: formData is null.');
+        }
+    };
 
-        executeSearch();
+    useEffect(() => {
+        if (formData && !hasSearched) {
+            executeSearch(formData);
+        } else {
+            console.log('Search skipped: either formData is null or search has already been performed.');
+        }
     }, [formData, hasSearched]);
 
-    const handleFormChange = (updatedForm) => {
-        setFormAddress(updatedForm);
+
+    // useEffect(() => {
+    //     console.log("form update ", formDistrict);
+    // })
+
+    // Function to set initial data
+    const setInitialData = () => {
+        if (searchCategory === 'Address') {
+            setFormAddress({
+                buildingName: formData.buildingName || '',
+                streetNumber: formData.streetNumber || '',
+                streetName: formData.streetName || '',
+                postalCode: formData.postalCode || ''
+            });
+        } else if (searchCategory === 'District') {
+            setFormDistrict(formData);
+        }
     };
+
+    useEffect(() => {
+        setInitialData(); // Call the function to set the initial data
+    }, [searchCategory, formData]);
+
+    // This effect will run whenever formDistrict changes
+    useEffect(() => {
+        console.log("Updated formDistrict:", formDistrict);
+    }, [formDistrict]);
+
+
 
     return (
         <div className='h-screen'>
 
-            <div className="flex flex-col relative left-1/2 transform -translate-x-1/2 py-2 z-50 flex justify-center items-center shadow-lg shadow-b">
+            <div className="flex flex-col relative left-1/2 transform -translate-x-1/2 py-2 z-20 flex justify-center items-center shadow-lg shadow-b">
 
                 <div className="bg-gray-300 bg-opacity-80 p-2 backdrop-blur-xs rounded-xl shadow-lg">
 
@@ -257,7 +305,7 @@ const PropertyResult = () => {
                                     />
 
                                     {isExpanded && (
-                                        <div className="absolute top-12 w-full h-auto bg-white border rounded-md shadow-lg z-50 flex">
+                                        <div className="absolute top-12 w-full h-auto bg-white border rounded-md shadow-lg z-30 flex">
                                             <div className="relative w-full">
                                                 {categories.length > 0 && (
                                                     <div className="mb-2 text-c-dark-grayish">
@@ -346,7 +394,17 @@ const PropertyResult = () => {
                 </div>
             </div>
 
-            <ModalSearch isVisible={isModalVisible} onClose={() => setIsModalVisible(false)} category={category} form={formAddress} onFormChange={handleFormChange} setQuery={setQuery} onClick={handleSearchClick} />
+
+            {/* Modal search component */}
+            <ModalSearch
+                isVisible={isModalVisible}
+                onClose={() => setIsModalVisible(false)}
+                category={category}
+                form={getForm()}
+                onFormChange={handleFormChange}
+                setQuery={setQuery}
+                onClick={handleSearchClick}
+            />
             <ModalFilter isVisible={isModalFilterVisible} onClose={() => setIsModalFilterVisible(false)} filter={filter} />
 
             <div className='flex justify-center'>

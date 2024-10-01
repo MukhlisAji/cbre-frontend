@@ -51,7 +51,7 @@ export default function ResultSection({ resultData }) {
                 </span>
             </div>
 
-            <div className="w-full flex justify-between items-center py-4 px-2">
+            <div className="w-full flex justify-between items-center py-4 px-2 border-b-2">
                 {/* Left Side: Homes Count and Save Search */}
                 <div className="flex flex-col justify-start space-y-5">
                     <span className="text-sm text-gray-500">33,928 Homes for Rent in Singapore</span>
@@ -75,7 +75,7 @@ export default function ResultSection({ resultData }) {
                 </div>
             </div>
 
-            <div className="flex items-center">
+            <div className="flex w-full items-center justify-start overflow-y-scroll">
                 <ResultCard resultSet={resultData} />
             </div>
         </div >
