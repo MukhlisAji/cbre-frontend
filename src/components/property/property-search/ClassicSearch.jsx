@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-export default function ClassicSearch() {
+export default function ClassicSearch(filter) {
     const [formState, setFormState] = useState({
         buildingName: '',
         streetNumber: '',
@@ -27,60 +27,62 @@ export default function ClassicSearch() {
 
     return (
         <div className="bg-gray-100 p-6 rounded-md max-w-full mx-auto">
-            <h2 className="text-lg font-bold mb-4">Basic Search Criteria</h2>
+            {!filter && <h2 className="text-lg font-bold mb-4">Basic Search Criteria</h2>}
 
             <div className="grid grid-cols-2 gap-10">
                 <div>
                     {/* Building, Street, Postal Code */}
-                    <div className="grid grid-cols-4 gap-4">
-                        <div className="col-span-4">
-                            <label className="block text-sm font-medium mb-1">Building Name</label>
-                            <input
-                                type="text"
-                                name="buildingName"
-                                value={formState.buildingName}
-                                onChange={handleInputChange}
-                                className="w-full p-2 border border-gray-300 rounded-md"
-                                placeholder="Building Name"
-                            />
-                        </div>
+                    {!filter &&
+                        <div className="grid grid-cols-4 gap-4">
+                            <div className="col-span-4">
+                                <label className="block text-sm font-medium mb-1">Building Name</label>
+                                <input
+                                    type="text"
+                                    name="buildingName"
+                                    value={formState.buildingName}
+                                    onChange={handleInputChange}
+                                    className="w-full p-2 border border-gray-300 rounded-md"
+                                    placeholder="Building Name"
+                                />
+                            </div>
 
-                        <div className="col-span-1">
-                            <label className="block text-sm font-medium mb-1">Street #</label>
-                            <input
-                                type="text"
-                                name="streetNumber"
-                                value={formState.streetNumber}
-                                onChange={handleInputChange}
-                                className="w-full p-2 border border-gray-300 rounded-md"
-                                placeholder="Street #"
-                            />
-                        </div>
+                            <div className="col-span-1">
+                                <label className="block text-sm font-medium mb-1">Street #</label>
+                                <input
+                                    type="text"
+                                    name="streetNumber"
+                                    value={formState.streetNumber}
+                                    onChange={handleInputChange}
+                                    className="w-full p-2 border border-gray-300 rounded-md"
+                                    placeholder="Street #"
+                                />
+                            </div>
 
-                        <div className="col-span-2">
-                            <label className="block text-sm font-medium mb-1">Street Name</label>
-                            <input
-                                type="text"
-                                name="streetName"
-                                value={formState.streetName}
-                                onChange={handleInputChange}
-                                className="w-full p-2 border border-gray-300 rounded-md"
-                                placeholder="Street Name"
-                            />
-                        </div>
+                            <div className="col-span-2">
+                                <label className="block text-sm font-medium mb-1">Street Name</label>
+                                <input
+                                    type="text"
+                                    name="streetName"
+                                    value={formState.streetName}
+                                    onChange={handleInputChange}
+                                    className="w-full p-2 border border-gray-300 rounded-md"
+                                    placeholder="Street Name"
+                                />
+                            </div>
 
-                        <div className="col-span-1">
-                            <label className="block text-sm font-medium mb-1">Postal Code</label>
-                            <input
-                                type="text"
-                                name="postalCode"
-                                value={formState.postalCode}
-                                onChange={handleInputChange}
-                                className="w-full p-2 border border-gray-300 rounded-md"
-                                placeholder="Postal Code"
-                            />
+                            <div className="col-span-1">
+                                <label className="block text-sm font-medium mb-1">Postal Code</label>
+                                <input
+                                    type="text"
+                                    name="postalCode"
+                                    value={formState.postalCode}
+                                    onChange={handleInputChange}
+                                    className="w-full p-2 border border-gray-300 rounded-md"
+                                    placeholder="Postal Code"
+                                />
+                            </div>
                         </div>
-                    </div>
+                    }
 
                     {/* Region and Micromarket */}
                     <div className="mt-4 grid grid-cols-2 gap-4">
@@ -329,10 +331,12 @@ export default function ClassicSearch() {
 
 
             {/* Action Buttons */}
-            <div className="mt-4 flex space-x-2 justify-end">
-                <button className="bg-c-teal text-white py-2 px-4 text-sm rounded-md hover:bg-c-teal/80">Advanced Criteria</button>
-                <button className="bg-c-teal text-white py-2 px-4 text-sm rounded-md hover:bg-c-teal/80">Search</button>
-            </div>
+            {!filter &&
+                <div className="mt-4 flex space-x-2 justify-end">
+                    <button className="bg-c-teal text-white py-2 px-4 text-sm rounded-md hover:bg-c-teal/80">Advanced Criteria</button>
+                    <button className="bg-c-teal text-white py-2 px-4 text-sm rounded-md hover:bg-c-teal/80">Search</button>
+                </div>
+            }
         </div>
     );
 };

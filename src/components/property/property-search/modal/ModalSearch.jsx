@@ -45,6 +45,30 @@ export default function ModalSearch({ isVisible, onClose, category, form, onForm
   const label = { inputProps: { 'aria-label': 'Checkbox demo' } };
 
 
+  const handleSetQuery = () => {
+    let queryString = '';
+
+    if (category === 'District') {
+      // Include only district-related fields, adjust as per your state
+      queryString = `${form ? form : ''}`.trim();
+    } else if (category === 'Address') {
+      // Include address-related fields
+      queryString = `${form.buildingName ? form.buildingName : ''},${form.streetNumber ? form.streetNumber : ''},${form.streetName ? form.streetName : ''},${form.postalCode ? form.postalCode : ''}`.trim();
+    }
+
+    // Remove any trailing commas or unnecessary spaces
+    // queryString = queryString.replace(/,\s*$/, '').replace(/\s*,/g, '');
+    console.log('Constructed Query: ', queryString);
+
+    setQuery(queryString); // Update the query with the constructed string
+  };
+
+  const handleActionClick = () => {
+
+    onClick(); // Call the onClick function to navigate
+    onClose(); // Close the modal
+  };
+
   const handleInputChange = (e) => {
     const { id, value } = e.target;
     // Update the parent form via the onFormChange callback
@@ -55,12 +79,17 @@ export default function ModalSearch({ isVisible, onClose, category, form, onForm
   };
 
   const handleClearAll = () => {
-    onFormChange({
-      buildingName: '',
-      streetNumber: '',
-      streetName: '',
-      postalCode: ''
-    });
+    if (category === "Address") {
+      onFormChange({
+        buildingName: '',
+        streetNumber: '',
+        streetName: '',
+        postalCode: ''
+      });
+    } else if (category === "District") {
+      onFormChange([]);
+    }
+
   };
 
   const handleSearch = (e) => {
@@ -462,8 +491,8 @@ export default function ModalSearch({ isVisible, onClose, category, form, onForm
           </div>
 
           {/* All Districts Select */}
-          <div className="mb-4">
-            <label className="flex items-center space-x-2">
+          <div className="mb-4 border-b-2 pb-2">
+            <label className="flex items-center space-x-3 ml-1">
               <input
                 type="checkbox"
                 className="form-checkbox"
@@ -481,23 +510,34 @@ export default function ModalSearch({ isVisible, onClose, category, form, onForm
             </label>
           </div>
 
-          {/* District List */}
-          <ul className="grid grid-cols-2 gap-x-8 gap-y-2">
-            {filteredDistricts.map((district, index) => (
-              <li key={index} className="flex items-center space-x-2">
-                <input
-                  type="checkbox"
-                  className="form-checkbox"
-                  // id={`district-${district.id}`}
-                  checked={district.checked}
-                  onChange={() => toggleDistrict(district)}
-                />
-                <label htmlFor={`district-${district.id}`}>
-                  {district}
-                </label>
-              </li>
-            ))}
+          {/* District list */}
+          <ul className="grid grid-cols-2 gap-4">
+            {filteredDistricts.map((district) => {
+              const isChecked = form.includes(district.name); // Check if district is in formDistrict
+
+              return (
+                <li
+                  key={district.id}
+                  className="flex items-center p-1 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300"
+                >
+                  <input
+                    type="checkbox"
+                    className="form-checkbox text-blue-600 border-gray-300 rounded focus:ring-blue-500 focus:ring-offset-2"
+                    id={`district-${district.id}`}
+                    checked={isChecked} // Set checked based on whether district is in formDistrict
+                    onChange={() => toggleDistrict(district.name)} // Use district.name for toggle
+                  />
+                  <label
+                    htmlFor={`district-${district.id}`}
+                    className="w-full ml-3 text-gray-800 text-md whitespace-nowrap"
+                  >
+                    {district.name}
+                  </label>
+                </li>
+              );
+            })}
           </ul>
+
         </div>
       );
       break;
@@ -523,47 +563,38 @@ export default function ModalSearch({ isVisible, onClose, category, form, onForm
   //   onClick();
   //   onClose();
   // };
-
-  const handleActionClick = () => {
-    let queryString = '';
-
-    if (category === 'District') {
-      // Include only district-related fields, adjust as per your state
-      queryString = `${form.district ? form.district : ''}`.trim();
-    } else if (category === 'Address') {
-      // Include address-related fields
-      queryString = `${form.buildingName ? form.buildingName : ''},${form.streetNumber ? form.streetNumber : ''},${form.streetName ? form.streetName : ''},${form.postalCode ? form.postalCode : ''}`.trim();
-    }
-
-    // Remove any trailing commas or unnecessary spaces
-    queryString = queryString.replace(/,\s*$/, '').replace(/\s*,/g, '');
-
-    setQuery(queryString); // Update the query with the constructed string
-    onClick(); // Call the onClick function to navigate
-    onClose(); // Close the modal
+  const handleBackdropClick = (e) => {
+    // Close modal when clicking on the backdrop
+    if (onClose) onClose();
   };
 
+  const handleModalContentClick = (e) => {
+    // Prevent the modal from closing when clicking inside the modal
+    e.stopPropagation();
+  };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-      <div
-        className={`bg-white rounded-lg shadow-lg w-full ${category === 'Micromarket' || category === 'District' ? 'max-w-5xl h-4/5' : 'max-w-md'
-          }`}
-      >        {/* Header */}
+    <div className={`fixed inset-0 flex items-center justify-center z-50 ${onClose ? 'animate-fade-in' : 'animate-fade-out'}`} onClick={handleBackdropClick}>
+      <div className="absolute inset-0 bg-black opacity-50"></div>
+      <div className={`relative flex flex-col w-full ${category === 'Micromarket' || category === 'District' ? 'max-w-5xl h-4/5' : 'max-w-md'
+        } bg-white shadow-lg rounded-lg`} onClick={handleModalContentClick}
+      >
+        {/* Header */}
         <div className="flex bg-c-teal justify-between items-center p-4 border-b rounded-t-lg">
-          <span className="text-lg text-white font-semibold">Search by {category}</span>
+          <span className="text-lg text-white font-semibold">Basic Search Criteria</span>
           <span onClick={onClose} className="cursor-pointer text-white text-lg hover:text-white/80">
             &times;
           </span>
         </div>
 
         {/* Modal Content */}
-        <div className="p-4 overflow-y-auto h-5/6">
-          {content}
-        </div>
+        <main className="flex-1 h-full overflow-y-auto">
+          <div className="p-2 relative">
+            {content}
+          </div>
+        </main>
 
-        {/* Footer */}
-        <div className="p-4 border-t flex justify-between space-x-4">
+        <footer className="px-4 sticky bottom-0 bg-neutral-100 py-3 flex items-center gap-2 justify-between border-t border-neutral-500 shadow-md z-10 rounded-b-lg">
           <button
             onClick={handleClearAll}
             className="text-red-600 text-sm underline"
@@ -573,15 +604,17 @@ export default function ModalSearch({ isVisible, onClose, category, form, onForm
           {/* {category === 'District' ? : } */}
           <button
             onClick={handleActionClick}
-            className="py-1 text-sm bg-c-teal text-white rounded-md hover:bg-c-teal/80"
+            className="py-y text-sm bg-c-teal text-white rounded-md hover:bg-c-teal/80"
           >
             {category === 'District' ? 'Apply' : 'Search'}
           </button>
 
+        </footer>
 
-        </div>
       </div>
     </div>
+
+
 
   );
 };

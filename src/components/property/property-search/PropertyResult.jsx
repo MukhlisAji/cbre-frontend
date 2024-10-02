@@ -8,12 +8,12 @@ import ResultSection from './ResultSection';
 import { generateTransactionId } from '../../lib/api/Authorization';
 import { CONFIG } from '../../../config';
 import './SearchArea.css';
+import PopoverFilter from './modal/PopoverFilter';
 
 
 const PropertyResult = () => {
 
     const [isExpanded, setIsExpanded] = useState(false);
-    const [query, setQuery] = useState('');
     const [resultData, setResultData] = useState('');
     const [hoveredItem, setHoveredItem] = useState(null);
     const [category, setCategory] = useState('');
@@ -30,8 +30,10 @@ const PropertyResult = () => {
     // const formData = location.state?.formAddress;
     const searchCategory = location.state?.category;
     const formData = location.state?.form;
+    const searchedQuery = location.state?.query;
+    const [query, setQuery] = useState(searchedQuery ? searchedQuery : '');
     const [isAnimating, setIsAnimating] = useState(false);
-    const [showPlaceholder, setShowPlaceholder] = useState(true);
+    const [showPlaceholder, setShowPlaceholder] = useState(!query);
     const placeholders = [
         "by Address",
         "by Account/Contact",
@@ -59,6 +61,24 @@ const PropertyResult = () => {
         postalCode: ''
     });
 
+    const handleSetQuery = (form) => {
+        let queryString = '';
+
+        if (category === 'District') {
+            // Include only district-related fields, adjust as per your state
+            queryString = `${form ? form : ''}`.trim();
+        } else if (category === 'Address') {
+            // Include address-related fields
+            queryString = `${form.buildingName ? form.buildingName : ''},${form.streetNumber ? form.streetNumber : ''},${form.streetName ? form.streetName : ''},${form.postalCode ? form.postalCode : ''}`.trim();
+        }
+
+        // Remove any trailing commas or unnecessary spaces
+        // queryString = queryString.replace(/,\s*$/, '').replace(/\s*,/g, '');
+        console.log('Constructed Query: ', queryString);
+
+        setQuery(queryString); // Update the query with the constructed string
+    };
+
     const [formDistrict, setFormDistrict] = useState([]);
     const handleFormChange = (updatedForm) => {
         if (category === 'Address') {
@@ -68,6 +88,7 @@ const PropertyResult = () => {
             setFormDistrict(updatedForm);
             console.log("Updated District Form:", updatedForm);
         }
+        handleSetQuery(updatedForm);
     };
 
     const getForm = () => {
@@ -109,7 +130,8 @@ const PropertyResult = () => {
 
     const handleBlur = () => {
         setIsFocused(false);
-        setPlaceholderText(inputValue ? '' : 'Search');
+        setPlaceholderText(query ? '' : 'Search');
+        setShowPlaceholder(query ? false : true);
     };
 
     const handleSearchChange = (e) => {
@@ -234,6 +256,8 @@ const PropertyResult = () => {
     };
 
     useEffect(() => {
+        // setQuery(searchedQuery);
+        console.log("searchedQuery : ", searchedQuery);
         if (formData && !hasSearched) {
             executeSearch(formData);
         } else {
@@ -269,8 +293,15 @@ const PropertyResult = () => {
         console.log("Updated formDistrict:", formDistrict);
     }, [formDistrict]);
 
+    const [activePopover, setActivePopover] = useState(null);
 
-
+    const handlePopoverClick = (category) => {
+        if (activePopover === category) {
+          setActivePopover(null); // Close the popover if the same button is clicked again
+        } else {
+          setActivePopover(category); // Set the clicked button as active
+        }
+      };
     return (
         <div className='h-screen'>
 
@@ -349,45 +380,83 @@ const PropertyResult = () => {
                                 </span>
                             </div>
 
-                            <div className='flex gap-2 pl-2'>
+                            <div className='flex gap-2 ml-2'>
                                 <span
                                     onClick={() => handleFiltersClick('filter')}
-                                    className='flex items-center text-gray-600 gap-2 py-2 px-3 bg-white text-sm font-semibold rounded-lg shadow-lg'>
+                                    className='flex items-center text-gray-600 gap-2 py-1.5 px-3 bg-white text-xs font-semibold rounded-lg shadow-lg cursor-pointer'>
                                     <LuSettings2 className='text-md' />
                                     Filter
                                 </span>
-                                <span
-                                    onClick={() => handleFiltersClick('propertyType')}
-                                    className='flex items-center text-gray-600 gap-2 py-2 px-3 bg-white text-sm font-semibold rounded-lg shadow-lg'>
-                                    <span className='whitespace-nowrap overflow-hidden text-ellipsis'>Property Type</span>
-                                    <svg className="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
-                                    </svg>
-                                </span>
-                                <span
-                                    onClick={() => handleFiltersClick('price')}
-                                    className='flex items-center text-gray-600 gap-2 py-2 px-3 bg-white text-sm font-semibold rounded-lg shadow-lg'>
-                                    <span>Price</span>
-                                    <svg className="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
-                                    </svg>
-                                </span>
-                                <span
-                                    onClick={() => handleFiltersClick('size')}
-                                    className='flex items-center text-gray-600 gap-2 py-2 px-3 bg-white text-sm font-semibold rounded-lg shadow-lg'>
-                                    <span>Size</span>
-                                    <svg className="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
-                                    </svg>
-                                </span>
-                                <span
-                                    onClick={() => handleFiltersClick('availibility')}
-                                    className='flex items-center text-gray-600 gap-2 py-2 px-3 bg-white text-sm font-semibold rounded-lg shadow-lg'>
-                                    <span className=''>Availability</span>
-                                    <svg className="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
-                                    </svg>
-                                </span>
+                                <div className="relative inline-block text-left">
+                                    <span
+                                        className='flex items-center text-gray-600 gap-2 py-2.5 px-3 whitespace-nowrap bg-white text-xs font-semibold rounded-lg shadow-lg cursor-pointer'
+                                        onClick={() => handlePopoverClick('propertyType')}
+                                    >
+                                        <span>Property Type</span>
+                                        <svg className="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
+                                        </svg>
+                                    </span>
+
+                                    <PopoverFilter
+                                        isVisible={activePopover === 'propertyType'}
+                                        category="propertyType"
+                                        onClose={() => setActivePopover(null)}
+                                    />
+                                </div>
+
+                                <div className="relative inline-block text-left">
+                                    <span
+                                        className="flex items-center text-gray-600 gap-3 py-2.5 px-3 whitespace-nowrap bg-white text-xs font-semibold rounded-lg shadow-lg cursor-pointer"
+                                        onClick={() => handlePopoverClick('rent')}
+                                    >
+                                        <span>Rent/Transacted</span>
+                                        <svg className="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
+                                        </svg>
+                                    </span>
+
+                                    <PopoverFilter
+                                        isVisible={activePopover === 'rent'}
+                                        category="rent"
+                                        onClose={() => setActivePopover(null)}
+                                    />
+                                </div>
+
+                                <div className="relative inline-block text-left">
+                                    <span
+                                        className="flex items-center text-gray-600 gap-2 py-2.5 whitespace-nowrap px-3 bg-white text-xs font-semibold rounded-lg shadow-lg cursor-pointer"
+                                        onClick={() => handlePopoverClick('size')}
+                                    >
+                                        <span>Size</span>
+                                        <svg className="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
+                                        </svg>
+                                    </span>
+
+                                    <PopoverFilter
+                                        isVisible={activePopover === 'size'}
+                                        category="size"
+                                        onClose={() => setActivePopover(null)}
+                                    />
+                                </div>
+                                <div className="relative inline-block text-left">
+                                    <span
+                                        className="flex items-center text-gray-600 gap-3 py-2.5 px-3 whitespace-nowrap bg-white text-xs font-semibold rounded-lg shadow-lg cursor-pointer"
+                                        onClick={() => handlePopoverClick('availability')}
+                                    >
+                                        <span>Availability</span>
+                                        <svg className="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
+                                        </svg>
+                                    </span>
+
+                                    <PopoverFilter
+                                        isVisible={activePopover === 'availability'}
+                                        category="availability"
+                                        onClose={() => setActivePopover(null)}
+                                    />
+                                </div>
                             </div>
                         </div>
                     </div>

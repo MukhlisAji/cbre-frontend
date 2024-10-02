@@ -25,6 +25,7 @@ export default {
         "c-light-grayish": "#7A8A98",
         "c-dark-grayish": "#012A2D",
         // "bg-neutral-100": "#7A8A98",
+        "c-red": "#AD2A2A",
       },
       keyframes: {
         'fade-in-out': {
