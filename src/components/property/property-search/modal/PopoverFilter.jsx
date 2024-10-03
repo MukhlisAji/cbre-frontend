@@ -1,5 +1,6 @@
 import { Box, FormControl, InputLabel, MenuItem, Select, Slider, TextField } from '@mui/material';
 import React, { useEffect, useRef, useState } from 'react';
+import DatePickerField from '../../../shared/element/DatePickerField';
 
 function yearText(value) {
   return `${value}`; // Return the year as a label
@@ -18,7 +19,12 @@ const PopoverFilter = ({ isVisible, category, onClose }) => {
   };
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (popoverRef.current && !popoverRef.current.contains(event.target)) {
+      // Check if the click is outside of the popover but also not part of the dropdown or select component
+      const popoverContainsTarget = popoverRef.current && popoverRef.current.contains(event.target);
+      const isPartOfSelect = event.target.closest('.MuiSelect-root, .MuiSelect-menu, .MuiPaper-root');
+
+      // Only close the popover if it's not part of the select dropdown
+      if (!popoverContainsTarget && !isPartOfSelect) {
         onClose(); // Call the onClose function if clicked outside
       }
     };
@@ -32,6 +38,8 @@ const PopoverFilter = ({ isVisible, category, onClose }) => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [isVisible, onClose]);
+
+
   if (!isVisible) return null;
 
   const handleButtonClick = (button) => {
@@ -170,7 +178,7 @@ const PopoverFilter = ({ isVisible, category, onClose }) => {
                     // value={age}
                     label="Sizez Type"
                     // onChange={handleChange}
-                    sx={cusInput}
+                    // sx={cusInput}
 
                   >
                     <MenuItem value={10}>Option</MenuItem>
@@ -240,19 +248,12 @@ const PopoverFilter = ({ isVisible, category, onClose }) => {
                 autoComplete="off"
                 size="small"
               >
-                <TextField
-                  type="text"
-                  required
-                  id="from"
-                  label="From"
-                  size="small"
-                  // value={form.buildingName}
-                  margin="dense"
-                  sx={cusInput}
-                // onChange={(e) => onFormChange({ ...form, buildingName: e.target.value })}
-                />
+                <DatePickerField />
+
                 <span>-</span>
-                <TextField
+                <DatePickerField />
+
+                {/* <TextField
                   type="text"
                   required
                   id="to"
@@ -262,7 +263,7 @@ const PopoverFilter = ({ isVisible, category, onClose }) => {
                   margin="dense"
                   sx={cusInput}
                 // onChange={(e) => onFormChange({ ...form, streetName: e.target.value })}
-                />
+                /> */}
               </Box>
             </div>
           </div>
@@ -273,7 +274,7 @@ const PopoverFilter = ({ isVisible, category, onClose }) => {
   };
 
   return (
-    <div ref={popoverRef}  className="absolute z-10 mt-2 right-0 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
+    <div ref={popoverRef} className="absolute z-10 mt-2 right-0 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
       <main className="flex-1 overflow-y-auto">
         <div className="relative">
           {getPopoverContent(category)}
