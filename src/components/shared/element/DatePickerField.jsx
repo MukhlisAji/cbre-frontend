@@ -7,7 +7,7 @@ import { createTheme, ThemeProvider } from '@mui/material';
 
 const currentYear = dayjs();
 
-export default function DatePickerField() {
+export default function DatePickerField({ label }) {
   const darkGreen = '#5a8184';
   const [availableDate, setAvailableDate] = useState(null);
 
@@ -40,14 +40,22 @@ export default function DatePickerField() {
                   borderColor: darkGreen,
                 },
               },
+              '& .MuiInputLabel-root': {
+                // Center the label vertically by adjusting its transform property
+                transform: 'translate(30%, 50%)',
+                // Adjust font-size if necessary
+                fontSize: '14px',
+              },
               '& .MuiInputLabel-root.Mui-focused': {
                 color: darkGreen,
+                transform: 'translate(30%, -50%) scale(0.75)', // Adjust label when focused
               },
             },
           },
         },
       },
     });
+
 
   const cusInput = {
     '& .MuiOutlinedInput-root': {
@@ -67,7 +75,7 @@ export default function DatePickerField() {
     <ThemeProvider theme={newTheme}>
       <LocalizationProvider dateAdapter={AdapterDayjs}>
         <DatePicker
-          // label="Years in descending order"
+          label={label}
           sx={{ width: 1, bgcolor: 'white' }}
           maxDate={currentYear}
           openTo="year"

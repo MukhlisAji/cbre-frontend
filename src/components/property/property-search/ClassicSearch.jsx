@@ -1,4 +1,7 @@
 import React, { useState } from "react";
+import MultipleSelect from "../../shared/element/MultipleSelect";
+import { Box, FormControl, InputLabel, MenuItem, Select, TextField } from "@mui/material";
+import DatePickerField from "../../shared/element/DatePickerField";
 
 export default function ClassicSearch(filter) {
     const [formState, setFormState] = useState({
@@ -25,12 +28,31 @@ export default function ClassicSearch(filter) {
         setFormState({ ...formState, [name]: value });
     };
 
+    const darkGreen = '#5a8184';
+    const red = "#AD2A2A";
+    const cusInput = {
+        '& .MuiOutlinedInput-root': {
+            backgroundColor: 'white', // Set background color to white
+            '&:hover fieldset': {
+                borderColor: darkGreen,
+            },
+            '&.Mui-focused fieldset': {
+                borderColor: darkGreen,
+            },
+        },
+        '& .MuiInputLabel-root.Mui-focused': {
+            color: darkGreen,
+        },
+    };
+
+
+
     return (
         <div className="bg-gray-100 p-6 rounded-md max-w-full mx-auto">
             {!filter && <h2 className="text-lg font-bold mb-4">Basic Search Criteria</h2>}
 
-            <div className="grid grid-cols-2 gap-10">
-                <div>
+            <div className="grid grid-cols-5 gap-10">
+                <div className="col-span-2">
                     {/* Building, Street, Postal Code */}
                     {!filter &&
                         <div className="grid grid-cols-4 gap-4">
@@ -85,80 +107,92 @@ export default function ClassicSearch(filter) {
                     }
 
                     {/* Region and Micromarket */}
-                    <div className="mt-4 grid grid-cols-2 gap-4">
-                        <div>
-                            <label className="block text-sm font-medium mb-1">Region</label>
-                            <select
-                                multiple
-                                name="region"
-                                value={formState.region}
-                                onChange={(e) => setFormState({ ...formState, region: [...e.target.selectedOptions].map(opt => opt.value) })}
-                                className="w-full p-2 border border-gray-300 rounded-md"
-                            >
-                                <option value="Region 1">Region 1</option>
-                                <option value="Region 2">Region 2</option>
-                            </select>
+                    <div className="mb-4 space-y-4">
+                        <div className="space-y-2">
+                            <span className='text-sm mt-8 font-semibold text-gray-600'>Region</span>
+                            <MultipleSelect label="" />
                         </div>
 
-                        <div>
-                            <label className="block text-sm font-medium mb-1">Micromarket</label>
-                            <select
-                                multiple
-                                name="micromarket"
-                                value={formState.micromarket}
-                                onChange={(e) => setFormState({ ...formState, micromarket: [...e.target.selectedOptions].map(opt => opt.value) })}
-                                className="w-full p-2 border border-gray-300 rounded-md"
-                            >
-                                <option value="Micromarket 1">Micromarket 1</option>
-                                <option value="Micromarket 2">Micromarket 2</option>
-                            </select>
+                        <div className="space-y-2">
+                            <span className='text-sm mt-8 font-semibold text-gray-600'>Micromarket</span>
+                            <MultipleSelect label="" />
+
                         </div>
                     </div>
 
                     {/* Size Section */}
-                    <div className="mt-4 grid grid-cols-3 gap-4">
-                        <div>
-                            <label className="block text-sm font-medium mb-1">Size Type</label>
-                            <select
-                                name="sizeType"
-                                value={formState.sizeType}
-                                onChange={handleInputChange}
-                                className="w-full p-2 border border-gray-300 rounded-md"
-                            >
-                                <option value="">Select Size Type</option>
-                                <option value="Type 1">Type 1</option>
-                            </select>
-                        </div>
+                    <div className="space-y-">
 
-                        <div>
-                            <label className="block text-sm font-medium mb-1">From</label>
-                            <input
-                                type="text"
-                                name="sizeFrom"
-                                value={formState.sizeFrom}
-                                onChange={handleInputChange}
-                                className="w-full p-2 border border-gray-300 rounded-md"
-                                placeholder="From"
-                            />
-                        </div>
+                        <span className='text-sm font-semibold text-gray-600'>Size</span>
+                        <div className="mt- grid grid-cols- gap-4">
+                            <div className="col-span-">
+                                {/* <span className='text-sm font-semibold text-gray-600'>Size</span> */}
+                                <Box
+                                    component="form"
+                                    sx={{
+                                        display: 'flex',
+                                        gap: '16px',
+                                        alignItems: 'center',
+                                        '& .MuiTextField-root': { width: '100%' },
+                                    }}
+                                    noValidate
+                                    autoComplete="off"
+                                    size="small"
+                                >
 
-                        <div>
-                            <label className="block text-sm font-medium mb-1">To</label>
-                            <input
-                                type="text"
-                                name="sizeTo"
-                                value={formState.sizeTo}
-                                onChange={handleInputChange}
-                                className="w-full p-2 border border-gray-300 rounded-md"
-                                placeholder="To"
-                            />
+                                    <FormControl sx={cusInput} fullWidth>
+                                        <InputLabel sx={cusInput} size="small" id="sizeType">Size Type</InputLabel>
+                                        <Select
+                                            size="small"
+                                            labelId="sizeType"
+                                            id="sizeType"
+                                            // value={age}
+                                            label="Size Type"
+                                        // onChange={handleChange}
+                                        // sx={cusInput}
+
+                                        >
+                                            <MenuItem value={10}>Option</MenuItem>
+                                            <MenuItem value={20}>Option</MenuItem>
+                                            <MenuItem value={30}>Option</MenuItem>
+                                        </Select>
+                                    </FormControl>
+                                    <FormControl sx={cusInput} fullWidth>
+                                        <TextField
+                                            type="number"
+                                            required
+                                            id="from"
+                                            label="From"
+                                            size="small"
+                                            // value={form.buildingName}
+                                            margin="dense"
+                                            sx={cusInput}
+                                        // onChange={(e) => onFormChange({ ...form, buildingName: e.target.value })}
+                                        />
+                                    </FormControl>
+                                    <FormControl sx={cusInput} fullWidth>
+
+                                        <TextField
+                                            type="number"
+                                            required
+                                            id="to"
+                                            label="To"
+                                            size="small"
+                                            // value={form.streetName}
+                                            margin="dense"
+                                            sx={cusInput}
+                                        // onChange={(e) => onFormChange({ ...form, streetName: e.target.value })}
+                                        />
+                                    </FormControl>
+                                </Box>
+                            </div>
                         </div>
                     </div>
                     {/* Possession Status */}
                     <div className="grid grid-cols-2 gap-4 mt-4">
-                        <div>
-                            <label className="block text-sm font-medium mb-1">Possession Status</label>
-                            <div className="flex flex-col space-y-2">
+                        <div className="space-y-2">
+                            <label className='text-sm font-semibold text-gray-600'>Possession Status</label>
+                            <div className="flex text-sm text-gray-600 flex-col space-y-2">
                                 <label><input type="checkbox" /> Field Name</label>
                                 <label><input type="checkbox" /> Field Name</label>
                                 <label><input type="checkbox" /> Field Name</label>
@@ -167,9 +201,9 @@ export default function ClassicSearch(filter) {
                             </div>
                         </div>
                         {/* Space Status */}
-                        <div>
-                            <label className="block text-sm font-medium mb-1">Space Status</label>
-                            <div className="flex flex-col space-y-2">
+                        <div className="space-y-2">
+                            <label className='text-sm font-semibold text-gray-600'>Space Status</label>
+                            <div className="flex text-sm text-gray-600 flex-col space-y-2">
                                 <label><input type="checkbox" /> Field Name</label>
                                 <label><input type="checkbox" /> Field Name</label>
                                 <label><input type="checkbox" /> Field Name</label>
@@ -185,13 +219,13 @@ export default function ClassicSearch(filter) {
 
                 </div>
 
-                <div>
-                    <div className="mt-4 grid gap-4">
+                <div className="col-span-3">
+                    <div className="mt-4 grid gap-4 mb-4">
 
                         {/* Zoning */}
-                        <div>
-                            <label className="block text-sm font-medium mb-1">Zoning</label>
-                            <div className="grid grid-cols-4 gap-2">
+                        <div className="space-y-2">
+                            <label className='text-sm font-semibold text-gray-600'>Zoning</label>
+                            <div className="grid text-sm text-gray-600 grid-cols-4 gap-2">
                                 <label><input type="checkbox" /> Field Name</label>
                                 <label><input type="checkbox" /> Field Name</label>
                                 <label><input type="checkbox" /> Field Name</label>
@@ -211,9 +245,9 @@ export default function ClassicSearch(filter) {
                         </div>
 
                         {/* Property Usage */}
-                        <div>
-                            <label className="block text-sm font-medium mb-1">Property Usage</label>
-                            <div className="grid grid-cols-4 gap-2">
+                        <div className="space-y-2">
+                            <label className='text-sm font-semibold text-gray-600'>Property Usage</label>
+                            <div className="grid text-sm text-gray-600 grid-cols-4 gap-2">
                                 <label><input type="checkbox" /> Field Name</label>
                                 <label><input type="checkbox" /> Field Name</label>
                                 <label><input type="checkbox" /> Field Name</label>
@@ -233,52 +267,121 @@ export default function ClassicSearch(filter) {
                         </div>
                     </div>
                     {/* Rent and Other Inputs */}
-                    <div className="mt-4 grid grid-cols-4 gap-4">
-                        <div>
-                            <label className="block text-sm font-medium mb-1">Rent Type</label>
-                            <select
-                                name="rentType"
-                                value={formState.rentType}
-                                onChange={handleInputChange}
-                                className="w-full p-2 border border-gray-300 rounded-md"
-                            >
-                                <option value="">Select Rent Type</option>
-                            </select>
-                        </div>
+                    <div className="space-y-0.5">
+                        <span className='text-sm font-semibold text-gray-600'>Rent</span>
+                        <div className="mt-4 grid grid-cols-4 gap-2">
+                            <div className="col-span-3">
+                                <Box
+                                    component="form"
+                                    sx={{
+                                        display: 'flex',
+                                        gap: '12px',
+                                        alignItems: 'center',
+                                        '& .MuiTextField-root': { width: '100%' },
+                                    }}
+                                    noValidate
+                                    autoComplete="off"
+                                    size="small"
+                                >
 
-                        <div>
-                            <label className="block text-sm font-medium mb-1">Rent From</label>
-                            <input
-                                type="text"
-                                name="rentFrom"
-                                value={formState.rentFrom}
-                                onChange={handleInputChange}
-                                className="w-full p-2 border border-gray-300 rounded-md"
-                                placeholder="From"
-                            />
-                        </div>
+                                    <FormControl sx={cusInput} fullWidth>
+                                        <InputLabel sx={cusInput} size="small" id="sizeType">Rent Type</InputLabel>
+                                        <Select
+                                            size="small"
+                                            labelId="sizeType"
+                                            id="sizeType"
+                                            // value={age}
+                                            label="Size Type"
+                                        // onChange={handleChange}
+                                        // sx={cusInput}
 
-                        <div>
-                            <label className="block text-sm font-medium mb-1">Rent To</label>
-                            <input
-                                type="text"
-                                name="rentTo"
-                                value={formState.rentTo}
-                                onChange={handleInputChange}
-                                className="w-full p-2 border border-gray-300 rounded-md"
-                                placeholder="To"
-                            />
-                        </div>
+                                        >
+                                            <MenuItem value={10}>Option</MenuItem>
+                                            <MenuItem value={20}>Option</MenuItem>
+                                            <MenuItem value={30}>Option</MenuItem>
+                                        </Select>
+                                    </FormControl>
+                                    <FormControl sx={cusInput} fullWidth>
+                                        <TextField
+                                            type="number"
+                                            required
+                                            id="from"
+                                            label="From"
+                                            size="small"
+                                            // value={form.buildingName}
+                                            margin="dense"
+                                            sx={cusInput}
+                                        // onChange={(e) => onFormChange({ ...form, buildingName: e.target.value })}
+                                        />
+                                    </FormControl>
+                                    <FormControl sx={cusInput} fullWidth>
 
-                        <div className="flex items-center space-x-2">
-                            <input type="checkbox" name="viewToOffer" />
-                            <label>View to Offer</label>
+                                        <TextField
+                                            type="number"
+                                            required
+                                            id="to"
+                                            label="To"
+                                            size="small"
+                                            // value={form.streetName}
+                                            margin="dense"
+                                            sx={cusInput}
+                                        // onChange={(e) => onFormChange({ ...form, streetName: e.target.value })}
+                                        />
+                                    </FormControl>
+                                </Box>
+                            </div>
+
+                            <div className="col-span-1 flex items-center space-x-1">
+                                <input type="checkbox" name="viewToOffer" />
+                                <label className="text-gray-600 text-sm">View to Offer</label>
+                            </div>
                         </div>
                     </div>
 
+
                     {/* Date Fields */}
-                    <div className="mt-4 grid grid-cols-4 gap-4">
-                        <div>
+                    <div className="mt-4 grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                            <span className='text-sm font-semibold text-gray-600'>Availability</span>
+                            <Box
+                                component="form"
+                                sx={{
+                                    display: 'flex', // Set Box to flex layout
+                                    flexDirection: 'row',
+                                    gap: '12px',
+                                    alignItems: 'center',
+                                    '& .MuiTextField-root': { width: '100%' },
+                                }}
+                                noValidate
+                                autoComplete="off"
+                                size="small"
+                            >
+                                <DatePickerField label="From" />
+
+                                <DatePickerField label="To" />
+                            </Box>
+                        </div>
+                        <div className="space-y-2">
+                            <span className='text-sm font-semibold text-gray-600'>Last Update</span>
+                            <Box
+                                component="form"
+                                sx={{
+                                    display: 'flex', // Set Box to flex layout
+                                    flexDirection: 'row',
+                                    gap: '8px',
+                                    alignItems: 'center',
+                                    '& .MuiTextField-root': { width: '100%' },
+                                }}
+                                noValidate
+                                autoComplete="off"
+                                size="small"
+                            >
+                                <DatePickerField label="From" />
+
+                                <DatePickerField label="To" />
+                            </Box>
+                        </div>
+                        {/* <div>
                             <label className="block text-sm font-medium mb-1">Available From</label>
                             <input
                                 type="date"
@@ -320,7 +423,7 @@ export default function ClassicSearch(filter) {
                                 onChange={handleInputChange}
                                 className="w-full p-2 border border-gray-300 rounded-md"
                             />
-                        </div>
+                        </div> */}
                     </div>
                 </div>
             </div>

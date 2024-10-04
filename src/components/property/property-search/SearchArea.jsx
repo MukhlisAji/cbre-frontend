@@ -426,7 +426,7 @@ const SearchArea = () => {
                   </span>
                 </div>
                 <div className="pt-6 px-1 text-right flex items-center">
-                  <span onClick={() => setIsClassic(true)} className='text-gray-300 text-xs hover:texr.gray-300/80 cursor-pointer'>Classic View</span>
+                  <span onClick={() => setIsClassic(true)} className='bg-black/10 hover:bg-black/20 py-1.5 px-3 rounded-full text-gray-300 text-xs hover:texr.gray-300/80 cursor-pointer'>Classic View</span>
                 </div>
               </div>
 
@@ -448,7 +448,7 @@ const SearchArea = () => {
 
         </div>
         :
-        <ClassicSearch />}
+        <ClassicSearch filter={false} />}
     </div>
   );
 };
