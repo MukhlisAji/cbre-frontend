@@ -6,7 +6,7 @@ metadata:
 spec:
   ingressClassName: nginx-private
   rules:
-  - host: one-uat.cbre.com.sg
+  - host: one_uat.cbre.com.sg
   # - host: one.cbre.com.sg
     http:
       paths:
