@@ -71,7 +71,7 @@ export default function ModalFilter({ isVisible, onClose, filter }) {
     //   <div className={`bg-white rounded-lg shadow-lg w-full ${filter === "filter" ? "max-w-6xl h-3/4" : "max-w-md"}`}>
     <div className={`fixed inset-0 flex items-center justify-center z-50 ${onClose ? 'animate-fade-in' : 'animate-fade-out'}`} onClick={handleBackdropClick}>
       <div className="absolute inset-0 bg-black opacity-50"></div>
-      <div className="relative flex flex-col w-3/4 bg-white shadow-lg rounded-lg" onClick={handleModalContentClick}>
+      <div className="relative flex flex-col w-4/5 bg-white shadow-lg rounded-lg" onClick={handleModalContentClick}>
         {/* Header */}
         <div className="flex bg-c-teal justify-between items-center p-4 border-b rounded-t-lg">
           <span className="text-lg text-white font-semibold">Basic Search Criteria</span>

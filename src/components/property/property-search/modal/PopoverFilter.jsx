@@ -135,28 +135,28 @@ const PopoverFilter = ({ isVisible, category, onClose }) => {
               <span
                 onClick={() => handleButtonClick('All')}
                 className={`relative z-10 py-1 px-4 rounded-full cursor-pointer text-sm font-semibold transition-colors duration-100 ease-in-out
-                ${activeButton === 'All' ? 'bg-c-teal text-white' : 'text-c-red bg-black/10 hover:bg-black/20'}`}
+                ${activeButton === 'All' ? 'bg-c-teal text-white' : 'text-gray-600 bg-black/10 hover:bg-black/20'}`}
               >
                 All
               </span>
               <span
                 onClick={() => handleButtonClick('Office')}
                 className={`relative z-10 py-1 px-4 rounded-full cursor-pointer text-sm font-semibold transition-colors duration-100 ease-in-out
-                ${activeButton === 'Office' ? 'bg-c-teal text-white' : 'text-c-red bg-black/10 hover:bg-black/20'}`}
+                ${activeButton === 'Office' ? 'bg-c-teal text-white' : 'text-gray-600 bg-black/10 hover:bg-black/20'}`}
               >
                 Office
               </span>
               <span
                 onClick={() => handleButtonClick('Industrial')}
                 className={`relative z-10 py-1 px-4 rounded-full cursor-pointer text-sm font-semibold transition-colors duration-100 ease-in-out
-                ${activeButton === 'Industrial' ? 'bg-c-teal text-white' : 'text-c-red bg-black/10 hover:bg-black/20'}`}
+                ${activeButton === 'Industrial' ? 'bg-c-teal text-white' : 'text-gray-600 bg-black/10 hover:bg-black/20'}`}
               >
                 Industrial
               </span>
               <span
                 onClick={() => handleButtonClick('Retail')}
                 className={`relative z-10 py-1 px-4 rounded-full cursor-pointer text-sm font-semibold transition-colors duration-100 ease-in-out
-                ${activeButton === 'Retail' ? 'bg-c-teal text-white' : 'text-c-red bg-black/10 hover:bg-black/20'}`}
+                ${activeButton === 'Retail' ? 'bg-c-teal text-white' : 'text-gray-600 bg-black/10 hover:bg-black/20'}`}
               >
                 Retail
               </span>

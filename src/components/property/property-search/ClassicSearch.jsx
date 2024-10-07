@@ -65,7 +65,7 @@ export default function ClassicSearch({ filter }) {
         <div className="bg-gray-100 p-6 rounded-md max-w-full mx-auto">
             {!filter && <h2 className="text-lg font-bold mb-4">Basic Search Criteria</h2>}
 
-            <div className="grid grid-cols-5 gap-10">
+            <div className="grid grid-cols-6 gap-10">
                 <div className="col-span-2">
                     {/* Building, Street, Postal Code */}
                     {!filter &&
@@ -207,7 +207,7 @@ export default function ClassicSearch({ filter }) {
 
                 </div>
 
-                <div className="col-span-3">
+                <div className="col-span-4">
                     <div className="mt-4 grid gap-4 mb-4">
 
                         {/* Zoning */}
@@ -255,7 +255,9 @@ export default function ClassicSearch({ filter }) {
                         </div>
                     </div>
                     {/* Rent and Other Inputs */}
-                    <div className="space-y-0.5">
+                    <div className="space-y-1">
+                    <span className='text-sm font-semibold text-gray-600'>Rent</span>
+
                         <div className="mt-4 grid grid-cols-4 gap-2">
                             <div className="col-span-3">
                                 <Box sx={{ display: 'flex', justifyContent: 'space-between', width: '100%', gap: '8px' }}>
@@ -277,13 +279,13 @@ export default function ClassicSearch({ filter }) {
                                         </Select>
                                     </FormControl>
                                     <TextField
-                                        label="Rent From"
+                                        label="From"
                                         type="number"
                                         size="small"
                                         sx={cusInput} />
 
                                     <TextField
-                                        label="Rent To"
+                                        label="To"
                                         type="number"
                                         size="small"
                                         sx={cusInput} />
@@ -299,7 +301,7 @@ export default function ClassicSearch({ filter }) {
                     {/* Date Fields */}
                     <div className="mt-4 grid grid-cols-2 gap-2">
                         <div className="space-y-2">
-                            {/* <span className='text-sm font-semibold text-gray-600'>Availability</span> */}
+                            <span className='text-sm font-semibold text-gray-600'>Availability</span>
                             <Box
                                 component="form"
                                 sx={{
@@ -314,19 +316,19 @@ export default function ClassicSearch({ filter }) {
                                 size="small"
                             >
                                 <DatePicker
-                                    label="Availability From"
+                                    label="From"
                                     slotProps={{ textField: { size: 'small' } }}
                                     sx={cusInput}
                                 />
                                 <DatePicker
-                                    label="Availability To"
+                                    label="To"
                                     slotProps={{ textField: { size: 'small' } }}
                                     sx={cusInput}
                                 />
                             </Box>
                         </div>
                         <div className="space-y-2">
-                            {/* <span className='text-sm font-semibold text-gray-600'>Last Update</span> */}
+                            <span className='text-sm font-semibold text-gray-600'>Last Update</span>
                             <Box
                                 component="form"
                                 sx={{
@@ -341,13 +343,13 @@ export default function ClassicSearch({ filter }) {
                                 size="small"
                             >
                                 <DatePicker
-                                    label="Last Update From"
-                                    slotProps={{ textField: { size: 'small' } }}
+                                    label="From"
+                                    slotProps={{ textField: { size: 'small',  shrink: true } }}
                                     sx={cusInput}
                                 />
                                 <DatePicker
-                                    label="Last Update To"
-                                    slotProps={{ textField: { size: 'small' } }}
+                                    label="To"
+                                    slotProps={{ textField: { size: 'small', shrink: true } }}
                                     sx={cusInput}
                                 />
                             </Box>
