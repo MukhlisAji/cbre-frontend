@@ -7,7 +7,7 @@ import { createTheme, ThemeProvider } from '@mui/material';
 
 const currentYear = dayjs();
 
-export default function DatePickerField({ label }) {
+export default function DatePickerField({views, openTo}) {
   const darkGreen = '#5a8184';
   const [availableDate, setAvailableDate] = useState(null);
 
@@ -20,7 +20,7 @@ export default function DatePickerField({ label }) {
             root: {
               '& .MuiInputBase-root': {
                 fontSize: '14px',
-                padding: '5px 16px 5px 4px',
+                padding: '5px 12px 5px 0px',
 
                 '& .MuiInputAdornment-root': {
                   '& .MuiSvgIcon-root': {
@@ -75,11 +75,11 @@ export default function DatePickerField({ label }) {
     <ThemeProvider theme={newTheme}>
       <LocalizationProvider dateAdapter={AdapterDayjs}>
         <DatePicker
-          label={label}
+          // label={label}
           sx={{ width: 1, bgcolor: 'white' }}
           maxDate={currentYear}
-          openTo="year"
-          views={['year']}
+          openTo={openTo}
+          views={views}
           yearsOrder="desc"
           value={availableDate}
           onChange={(date) => setAvailableDate(date)}

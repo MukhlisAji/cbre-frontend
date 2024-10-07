@@ -1,9 +1,18 @@
 import React, { useState } from "react";
 import MultipleSelect from "../../shared/element/MultipleSelect";
-import { Box, FormControl, InputLabel, MenuItem, Select, TextField } from "@mui/material";
+import { Box, FormControl, InputLabel, MenuItem, Select, styled, TextField } from "@mui/material";
 import DatePickerField from "../../shared/element/DatePickerField";
+import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 
-export default function ClassicSearch(filter) {
+export default function ClassicSearch({ filter }) {
+    const [rentType, setRentType] = useState('');
+    const [rentFrom, setRentFrom] = useState('');
+    const [rentTo, setRentTo] = useState('');
+
+    const handleRentTypeChange = (event) => {
+        setRentType(event.target.value);
+    };
     const [formState, setFormState] = useState({
         buildingName: '',
         streetNumber: '',
@@ -31,6 +40,7 @@ export default function ClassicSearch(filter) {
     const darkGreen = '#5a8184';
     const red = "#AD2A2A";
     const cusInput = {
+        width: '100%',
         '& .MuiOutlinedInput-root': {
             backgroundColor: 'white', // Set background color to white
             '&:hover fieldset': {
@@ -45,7 +55,11 @@ export default function ClassicSearch(filter) {
         },
     };
 
-
+    const SmallSelect = styled(Select)(({ theme }) => ({
+        '& .MuiSelect-select': {
+            fontSize: '0.9rem',
+        },
+    }));
 
     return (
         <div className="bg-gray-100 p-6 rounded-md max-w-full mx-auto">
@@ -121,69 +135,43 @@ export default function ClassicSearch(filter) {
                     </div>
 
                     {/* Size Section */}
-                    <div className="space-y-">
+                    <div className="space-y-2">
 
                         <span className='text-sm font-semibold text-gray-600'>Size</span>
                         <div className="mt- grid grid-cols- gap-4">
                             <div className="col-span-">
                                 {/* <span className='text-sm font-semibold text-gray-600'>Size</span> */}
-                                <Box
-                                    component="form"
-                                    sx={{
-                                        display: 'flex',
-                                        gap: '16px',
-                                        alignItems: 'center',
-                                        '& .MuiTextField-root': { width: '100%' },
-                                    }}
-                                    noValidate
-                                    autoComplete="off"
-                                    size="small"
-                                >
-
-                                    <FormControl sx={cusInput} fullWidth>
+                                <Box sx={{ display: 'flex', justifyContent: 'space-between', width: '100%', gap: '8px' }}>
+                                    <FormControl sx={cusInput} widthfull>
                                         <InputLabel sx={cusInput} size="small" id="sizeType">Size Type</InputLabel>
+                                        {/* <SmallSelect */}
                                         <Select
                                             size="small"
                                             labelId="sizeType"
                                             id="sizeType"
-                                            // value={age}
+                                            value={rentType}
                                             label="Size Type"
-                                        // onChange={handleChange}
+                                            onChange={handleRentTypeChange}
                                         // sx={cusInput}
 
                                         >
-                                            <MenuItem value={10}>Option</MenuItem>
-                                            <MenuItem value={20}>Option</MenuItem>
-                                            <MenuItem value={30}>Option</MenuItem>
+                                            <MenuItem value={10} sx={{ fontSize: '0.9rem' }}>Option</MenuItem>
+                                            <MenuItem value={20} sx={{ fontSize: '0.9rem' }}>Option</MenuItem>
+                                            <MenuItem value={30} sx={{ fontSize: '0.9rem' }}>Option</MenuItem>
                                         </Select>
+                                        {/* </SmallSelect> */}
                                     </FormControl>
-                                    <FormControl sx={cusInput} fullWidth>
-                                        <TextField
-                                            type="number"
-                                            required
-                                            id="from"
-                                            label="From"
-                                            size="small"
-                                            // value={form.buildingName}
-                                            margin="dense"
-                                            sx={cusInput}
-                                        // onChange={(e) => onFormChange({ ...form, buildingName: e.target.value })}
-                                        />
-                                    </FormControl>
-                                    <FormControl sx={cusInput} fullWidth>
+                                    <TextField
+                                        label="From"
+                                        type="number"
+                                        size="small"
+                                        sx={cusInput} />
 
-                                        <TextField
-                                            type="number"
-                                            required
-                                            id="to"
-                                            label="To"
-                                            size="small"
-                                            // value={form.streetName}
-                                            margin="dense"
-                                            sx={cusInput}
-                                        // onChange={(e) => onFormChange({ ...form, streetName: e.target.value })}
-                                        />
-                                    </FormControl>
+                                    <TextField
+                                        label="To"
+                                        type="number"
+                                        size="small"
+                                        sx={cusInput} />
                                 </Box>
                             </div>
                         </div>
@@ -268,23 +256,10 @@ export default function ClassicSearch(filter) {
                     </div>
                     {/* Rent and Other Inputs */}
                     <div className="space-y-0.5">
-                        <span className='text-sm font-semibold text-gray-600'>Rent</span>
                         <div className="mt-4 grid grid-cols-4 gap-2">
                             <div className="col-span-3">
-                                <Box
-                                    component="form"
-                                    sx={{
-                                        display: 'flex',
-                                        gap: '12px',
-                                        alignItems: 'center',
-                                        '& .MuiTextField-root': { width: '100%' },
-                                    }}
-                                    noValidate
-                                    autoComplete="off"
-                                    size="small"
-                                >
-
-                                    <FormControl sx={cusInput} fullWidth>
+                                <Box sx={{ display: 'flex', justifyContent: 'space-between', width: '100%', gap: '8px' }}>
+                                    <FormControl sx={cusInput} widthfull>
                                         <InputLabel sx={cusInput} size="small" id="sizeType">Rent Type</InputLabel>
                                         <Select
                                             size="small"
@@ -301,68 +276,30 @@ export default function ClassicSearch(filter) {
                                             <MenuItem value={30}>Option</MenuItem>
                                         </Select>
                                     </FormControl>
-                                    <FormControl sx={cusInput} fullWidth>
-                                        <TextField
-                                            type="number"
-                                            required
-                                            id="from"
-                                            label="From"
-                                            size="small"
-                                            // value={form.buildingName}
-                                            margin="dense"
-                                            sx={cusInput}
-                                        // onChange={(e) => onFormChange({ ...form, buildingName: e.target.value })}
-                                        />
-                                    </FormControl>
-                                    <FormControl sx={cusInput} fullWidth>
+                                    <TextField
+                                        label="Rent From"
+                                        type="number"
+                                        size="small"
+                                        sx={cusInput} />
 
-                                        <TextField
-                                            type="number"
-                                            required
-                                            id="to"
-                                            label="To"
-                                            size="small"
-                                            // value={form.streetName}
-                                            margin="dense"
-                                            sx={cusInput}
-                                        // onChange={(e) => onFormChange({ ...form, streetName: e.target.value })}
-                                        />
-                                    </FormControl>
+                                    <TextField
+                                        label="Rent To"
+                                        type="number"
+                                        size="small"
+                                        sx={cusInput} />
                                 </Box>
                             </div>
-
-                            <div className="col-span-1 flex items-center space-x-1">
-                                <input type="checkbox" name="viewToOffer" />
-                                <label className="text-gray-600 text-sm">View to Offer</label>
+                            <div className="col-span-1 flex items-center space-x-1 text-sm text-gray-600">
+                                <label><input type="checkbox" /> View to Offer</label>
                             </div>
                         </div>
                     </div>
 
 
                     {/* Date Fields */}
-                    <div className="mt-4 grid grid-cols-2 gap-4">
+                    <div className="mt-4 grid grid-cols-2 gap-2">
                         <div className="space-y-2">
-                            <span className='text-sm font-semibold text-gray-600'>Availability</span>
-                            <Box
-                                component="form"
-                                sx={{
-                                    display: 'flex', // Set Box to flex layout
-                                    flexDirection: 'row',
-                                    gap: '12px',
-                                    alignItems: 'center',
-                                    '& .MuiTextField-root': { width: '100%' },
-                                }}
-                                noValidate
-                                autoComplete="off"
-                                size="small"
-                            >
-                                <DatePickerField label="From" />
-
-                                <DatePickerField label="To" />
-                            </Box>
-                        </div>
-                        <div className="space-y-2">
-                            <span className='text-sm font-semibold text-gray-600'>Last Update</span>
+                            {/* <span className='text-sm font-semibold text-gray-600'>Availability</span> */}
                             <Box
                                 component="form"
                                 sx={{
@@ -376,54 +313,46 @@ export default function ClassicSearch(filter) {
                                 autoComplete="off"
                                 size="small"
                             >
-                                <DatePickerField label="From" />
-
-                                <DatePickerField label="To" />
+                                <DatePicker
+                                    label="Availability From"
+                                    slotProps={{ textField: { size: 'small' } }}
+                                    sx={cusInput}
+                                />
+                                <DatePicker
+                                    label="Availability To"
+                                    slotProps={{ textField: { size: 'small' } }}
+                                    sx={cusInput}
+                                />
                             </Box>
                         </div>
-                        {/* <div>
-                            <label className="block text-sm font-medium mb-1">Available From</label>
-                            <input
-                                type="date"
-                                name="availableFrom"
-                                value={formState.availableFrom}
-                                onChange={handleInputChange}
-                                className="w-full p-2 border border-gray-300 rounded-md"
-                            />
+                        <div className="space-y-2">
+                            {/* <span className='text-sm font-semibold text-gray-600'>Last Update</span> */}
+                            <Box
+                                component="form"
+                                sx={{
+                                    display: 'flex', // Set Box to flex layout
+                                    flexDirection: 'row',
+                                    gap: '8px',
+                                    alignItems: 'center',
+                                    '& .MuiTextField-root': { width: '100%' },
+                                }}
+                                noValidate
+                                autoComplete="off"
+                                size="small"
+                            >
+                                <DatePicker
+                                    label="Last Update From"
+                                    slotProps={{ textField: { size: 'small' } }}
+                                    sx={cusInput}
+                                />
+                                <DatePicker
+                                    label="Last Update To"
+                                    slotProps={{ textField: { size: 'small' } }}
+                                    sx={cusInput}
+                                />
+                            </Box>
                         </div>
 
-                        <div>
-                            <label className="block text-sm font-medium mb-1">Available To</label>
-                            <input
-                                type="date"
-                                name="availableTo"
-                                value={formState.availableTo}
-                                onChange={handleInputChange}
-                                className="w-full p-2 border border-gray-300 rounded-md"
-                            />
-                        </div>
-
-                        <div>
-                            <label className="block text-sm font-medium mb-1">Last Updated From</label>
-                            <input
-                                type="date"
-                                name="lastUpdatedFrom"
-                                value={formState.lastUpdatedFrom}
-                                onChange={handleInputChange}
-                                className="w-full p-2 border border-gray-300 rounded-md"
-                            />
-                        </div>
-
-                        <div>
-                            <label className="block text-sm font-medium mb-1">Last Updated To</label>
-                            <input
-                                type="date"
-                                name="lastUpdatedTo"
-                                value={formState.lastUpdatedTo}
-                                onChange={handleInputChange}
-                                className="w-full p-2 border border-gray-300 rounded-md"
-                            />
-                        </div> */}
                     </div>
                 </div>
             </div>
