@@ -37,7 +37,6 @@ export default function MultipleSelect({label}) {
           <TextField
             {...params}
             label={label}
-            placeholder="Favorites"
             size='small'
           />
         )}
