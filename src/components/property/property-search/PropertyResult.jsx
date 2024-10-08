@@ -16,7 +16,6 @@ const PropertyResult = () => {
     const [isExpanded, setIsExpanded] = useState(false);
     const [resultData, setResultData] = useState('');
     const [hoveredItem, setHoveredItem] = useState(null);
-    const [category, setCategory] = useState('');
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [isModalFilterVisible, setIsModalFilterVisible] = useState(false);
     const [filter, setFilter] = useState('');
@@ -31,6 +30,7 @@ const PropertyResult = () => {
     const searchCategory = location.state?.category;
     const formData = location.state?.form;
     const searchedQuery = location.state?.query;
+    const [category, setCategory] = useState(searchCategory ? searchCategory : '');
     const [query, setQuery] = useState(searchedQuery ? searchedQuery : '');
     const [isAnimating, setIsAnimating] = useState(false);
     const [showPlaceholder, setShowPlaceholder] = useState(!query);
@@ -64,7 +64,7 @@ const PropertyResult = () => {
     const handleSetQuery = (form) => {
         let queryString = '';
 
-        if (category === 'District') {
+        if (category === 'District' || category === 'MRT') {
             // Include only district-related fields, adjust as per your state
             queryString = `${form ? form : ''}`.trim();
         } else if (category === 'Address') {
@@ -80,6 +80,7 @@ const PropertyResult = () => {
     };
 
     const [formDistrict, setFormDistrict] = useState([]);
+    const [formMrt, setFormMRT] = useState([]);
     const handleFormChange = (updatedForm) => {
         if (category === 'Address') {
             setFormAddress(updatedForm);
@@ -87,13 +88,26 @@ const PropertyResult = () => {
         } else if (category === 'District') {
             setFormDistrict(updatedForm);
             console.log("Updated District Form:", updatedForm);
+        } else if (category === "MRT") {
+            setFormMRT(updatedForm);
+            console.log("Updated MRT Form:", updatedForm);
+
         }
         handleSetQuery(updatedForm);
     };
 
     const getForm = () => {
-        return category === 'Address' ? formAddress : formDistrict;
-    };
+        if (category === 'Address') {
+          return formAddress;
+        } else if (category === 'District') {
+          return formDistrict;
+        } else if (category === "MRT") {
+          return formMrt;
+        }else{
+          return formDistrict;
+        }
+      };
+    
 
     useEffect(() => {
         const interval = setInterval(changePlaceholder, 3000);
@@ -208,8 +222,13 @@ const PropertyResult = () => {
     const handleSearch = async (data) => {
         console.log('Search initiated with formData:', data); // Debugging log
         const transactionId = generateTransactionId();
-        const searchBy = category === "Address" ? "searchbyaddress" : "searchbydistrict";
+        const searchBy = category === "Address"
+            ? "searchbyaddress"
+            : category === "MRT"
+                ? "searchbymrts"
+                : "searchbydistrict";
 
+        console.log('searchby ', searchBy);
         try {
             const response = await fetch(`${CONFIG.PROPERTY_SERVICE}/${searchBy}`, {
                 method: 'POST',
@@ -258,6 +277,8 @@ const PropertyResult = () => {
     useEffect(() => {
         // setQuery(searchedQuery);
         console.log("searchedQuery : ", searchedQuery);
+        console.log("formData : ", formData);
+
         if (formData && !hasSearched) {
             executeSearch(formData);
         } else {
@@ -281,6 +302,8 @@ const PropertyResult = () => {
             });
         } else if (searchCategory === 'District') {
             setFormDistrict(formData);
+        } else if (searchCategory === 'MRT'){
+            setFormMRT(formData);
         }
     };
 
@@ -297,11 +320,11 @@ const PropertyResult = () => {
 
     const handlePopoverClick = (category) => {
         if (activePopover === category) {
-          setActivePopover(null); // Close the popover if the same button is clicked again
+            setActivePopover(null); // Close the popover if the same button is clicked again
         } else {
-          setActivePopover(category); // Set the clicked button as active
+            setActivePopover(category); // Set the clicked button as active
         }
-      };
+    };
     return (
         <div className='h-screen'>
 

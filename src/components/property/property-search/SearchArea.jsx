@@ -57,11 +57,12 @@ const SearchArea = () => {
     postalCode: ''
   });
   const [formDistrict, setFormDistrict] = useState([]);
+  const [formMrt, setFormMRT] = useState([]);
 
   const handleSetQuery = (form) => {
     let queryString = '';
 
-    if (category === 'District') {
+    if (category === 'District' || category === 'MRT' ) {
       // Include only district-related fields, adjust as per your state
       queryString = `${form ? form : ''}`.trim();
     } else if (category === 'Address') {
@@ -83,12 +84,23 @@ const SearchArea = () => {
     } else if (category === 'District') {
       setFormDistrict(updatedForm);
       console.log("Updated District Form:", updatedForm);
+    } else if (category === "MRT") {
+      setFormMRT(updatedForm);
+      console.log("Updated MRT Form:", updatedForm);
     }
     handleSetQuery(updatedForm);
   };
 
   const getForm = () => {
-    return category === 'Address' ? formAddress : formDistrict;
+    if (category === 'Address') {
+      return formAddress;
+    } else if (category === 'District') {
+      return formDistrict;
+    } else if (category === "MRT") {
+      return formMrt;
+    }else{
+      return formDistrict;
+    }
   };
 
 
@@ -137,8 +149,6 @@ const SearchArea = () => {
   };
 
   const handleSearch = () => {
-    // const stateData = category === "Address" ? formAddress : formDistrict;
-
     navigate('result', { state: { form: getForm(), category, query } });
     console.log("Query: ", query);
     setIsExpanded(false);
@@ -439,7 +449,7 @@ const SearchArea = () => {
             isVisible={isModalVisible}
             onClose={() => setIsModalVisible(false)}
             category={category}
-            form={getForm()} // Dynamically pass the form based on selected category
+            form={getForm()}
             onFormChange={handleFormChange}
             setQuery={setQuery}
             onClick={handleSearchClick}

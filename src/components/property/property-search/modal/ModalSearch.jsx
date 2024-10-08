@@ -16,14 +16,19 @@ import {
 import { Search, Clear } from "@mui/icons-material";
 import { CONTACTDATADUMMY, DISTRICTDATA } from "../../../lib/const/DummyData";
 import MRTStations from "./MRTStations";
-import useFetchDistricts from "../../PropertyResource";
+import PropertyResource from "../../PropertyResource";
 
 export default function ModalSearch({ isVisible, onClose, category, form, onFormChange, setQuery, onClick }) {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('Main'); // Default category
   const [selectedSubcategory, setSelectedSubcategory] = useState('CBD'); // Default subcategory
   // const [districts, setDistricts] = useState(DISTRICTDATA);
-  const { districts, setDistricts } = useFetchDistricts();
+  const { districts, setDistricts, fetchDistricts } = PropertyResource();
+
+  // Automatically fetch districts when the component mounts
+  useEffect(() => {
+    fetchDistricts(); // This will run only once on component mount
+  }, []);
 
   if (!isVisible) return null;
 
@@ -543,7 +548,7 @@ export default function ModalSearch({ isVisible, onClose, category, form, onForm
       break;
     case 'MRT':
       content = (
-        <MRTStations />
+        <MRTStations form={form} onFormChange={onFormChange}/>
       )
       break;
     default:
@@ -576,12 +581,12 @@ export default function ModalSearch({ isVisible, onClose, category, form, onForm
   return (
     <div className={`fixed inset-0 flex items-center justify-center z-50 ${onClose ? 'animate-fade-in' : 'animate-fade-out'}`} onClick={handleBackdropClick}>
       <div className="absolute inset-0 bg-black opacity-50"></div>
-      <div className={`relative flex flex-col w-full ${category === 'Micromarket' || category === 'District' ? 'max-w-5xl h-4/5' : 'max-w-md'
+      <div className={`relative flex flex-col w-full ${category === 'Micromarket' || category === 'District' || category === "MRT" ? 'max-w-5xl h-4/5' : 'max-w-md'
         } bg-white shadow-lg rounded-lg`} onClick={handleModalContentClick}
       >
         {/* Header */}
         <div className="flex bg-c-teal justify-between items-center p-4 border-b rounded-t-lg">
-          <span className="text-lg text-white font-semibold">Basic Search Criteria</span>
+          <span className="text-lg text-white font-semibold">Search by {category}</span>
           <span onClick={onClose} className="cursor-pointer text-white text-lg hover:text-white/80">
             &times;
           </span>

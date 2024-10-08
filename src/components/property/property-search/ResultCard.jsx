@@ -21,7 +21,7 @@ const PropertyCard = ({ property }) => {
                 {/* Details */}
                 <div className="flex space-x-2 mt-2">
                     {/* Display the number of spaces available */}
-                    <p className="text-gray-700">{property.spaceInformation.length} spaces available</p>
+                    <p className="text-gray-700">{property.floorInformation.length} spaces available</p>
                 </div>
                 <p className="text-gray-500 mt-1">Type: {property.propertyType.join(', ')}</p>
 
