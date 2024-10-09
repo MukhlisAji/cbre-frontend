@@ -8,7 +8,7 @@ import { useParams } from 'react-router-dom';
 import { Tab } from '@headlessui/react';
 import classNames from 'classnames';
 import { PROPERTYCATEGORIES, PROPERTYDETAILS } from '../../lib/const/AppContant';
-import PropertyInfo from './property-detail/propertyInfo';
+import PropertyInfo from './property-detail/PropertyInfo';
 
 export default function PropertyDetails() {
     const [selectedIndex, setSelectedIndex] = useState(0);
