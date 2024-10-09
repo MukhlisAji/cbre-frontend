@@ -5,7 +5,7 @@ import DatePickerField from "../../shared/element/DatePickerField";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 
 
-export default function AdvanceSearch({ filter, setAdvanceSearch }) {
+export default function AdvanceSearch({ filter, handleAdvanceSearch }) {
     const [rentType, setRentType] = useState('');
     const [rentFrom, setRentFrom] = useState('');
     const [rentTo, setRentTo] = useState('');
@@ -85,9 +85,9 @@ export default function AdvanceSearch({ filter, setAdvanceSearch }) {
 
     return (
         <>
-            {!filter && <h2 className="text-lg font-bold mb-4">Advance Search Criteria</h2>}
+            {!filter && <h2 className="px-6 py-2 text-lg font-bold mb-4">Advance Search Criteria</h2>}
 
-            <div style={{ height: `${sectionHeight}px` }} className="grid grid-cols-6 gap-10 overflow-y-auto">
+            <div style={{ height: `${sectionHeight}px` }} className="p-6 grid grid-cols-6 gap-10 overflow-y-auto">
                 {/* First Column */}
                 <div className="col-span-3 space-y-4">
                     {/* TOP (From-To) */}
@@ -317,17 +317,34 @@ export default function AdvanceSearch({ filter, setAdvanceSearch }) {
                                 onChange={handleInputChange}
                                 name="carSpaces"
                             />
-                            <span className="self-center">and over</span>
+                            <span className="self-center whitespace-nowrap">and over</span>
                         </Box>
                     </div>
                 </div>
             </div>
-            {!filter &&
-                <div className="mt-4 flex space-x-2 justify-start">
-                    <button onClick={() => { setAdvanceSearch(false) }} className="bg-white text-gray-600 py-2 px-4 text-sm rounded-md hover:bg-white/80 border border-gray-700">Basic Criteria</button>
+            {!filter ? (
+                <div className="px-6 mt-4 flex space-x-2 justify-start">
+                    <button onClick={handleAdvanceSearch} className="bg-white text-gray-600 py-2 px-4 text-sm rounded-md hover:bg-white/80 border border-gray-700">Basic Criteria</button>
                     <button className="bg-c-teal text-white py-2 px-4 text-sm rounded-md hover:bg-c-teal/80">Search</button>
                 </div>
-            }
+            ) : (
+                <footer className="px-4 sticky bottom-0 bg-neutral-100 py-3 flex items-center gap-2 justify-end border-t border-neutral-500 shadow-md z-10 rounded-b-lg">
+                    <button
+                        onClick={handleAdvanceSearch}
+                        className="py-2 text-sm bg-c-teal text-white rounded-md hover:bg-c-teal/80"
+                    >
+                        Basic Criteria
+
+                    </button>
+                    <button
+                        // onClick={handleSave}
+                        // disabled={!isFormValid}
+                        className="py-2 text-sm bg-c-teal text-white rounded-md hover:bg-c-teal/80"
+                    >
+                        Search
+                    </button>
+                </footer>
+            )}
         </>
     )
 }

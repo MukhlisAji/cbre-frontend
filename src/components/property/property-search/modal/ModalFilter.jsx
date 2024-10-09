@@ -1,9 +1,14 @@
-import React from "react";
+import React, { useState } from "react";
 import FilterContent from "./FilterContent";
 import ClassicSearch from "../ClassicSearch";
 
 export default function ModalFilter({ isVisible, onClose, filter }) {
   if (!isVisible) return null;
+  const [advanceSearch, setAdvanceSearch] = useState(false);
+
+  const handleAdvanceSearchFilter = () => {
+        setAdvanceSearch(!advanceSearch); 
+};
 
   let content;
   console.log('filter', filter);
@@ -12,43 +17,7 @@ export default function ModalFilter({ isVisible, onClose, filter }) {
     case 'filter':
       content = (
         <div>
-          <ClassicSearch filter={true} />
-        </div>
-      );
-      break;
-    case 'propertyType':
-      content = (
-        <div>
-          <label className="block mb-2">Enter Account/Contact:</label>
-          <input type="text" className="form-input w-full p-2 border" placeholder="Enter account/contact" />
-          <button className="mt-4 bg-blue-500 text-white py-2 px-4 rounded">Search</button>
-        </div>
-      );
-      break;
-    case 'Price':
-      content = (
-        <div>
-          <label className="block mb-2">Enter Region/Micromarket:</label>
-          <input type="text" className="form-input w-full p-2 border" placeholder="Enter region/micromarket" />
-          <button className="mt-4 bg-blue-500 text-white py-2 px-4 rounded">Search</button>
-        </div>
-      );
-      break;
-    case 'Size':
-      content = (
-        <div>
-          <label className="block mb-2">Enter Region/Micromarket:</label>
-          <input type="text" className="form-input w-full p-2 border" placeholder="Enter region/micromarket" />
-          <button className="mt-4 bg-blue-500 text-white py-2 px-4 rounded">Search</button>
-        </div>
-      );
-      break;
-    case 'Availibility':
-      content = (
-        <div>
-          <label className="block mb-2">Enter Region/Micromarket:</label>
-          <input type="text" className="form-input w-full p-2 border" placeholder="Enter region/micromarket" />
-          <button className="mt-4 bg-blue-500 text-white py-2 px-4 rounded">Search</button>
+          <ClassicSearch filter={true} handleAdvanceSearch={handleAdvanceSearchFilter} setAdvanceSearch={setAdvanceSearch}/>
         </div>
       );
       break;
@@ -74,7 +43,7 @@ export default function ModalFilter({ isVisible, onClose, filter }) {
       <div className="relative flex flex-col w-4/5 bg-white shadow-lg rounded-lg" onClick={handleModalContentClick}>
         {/* Header */}
         <div className="flex bg-c-teal justify-between items-center p-4 border-b rounded-t-lg">
-          <span className="text-lg text-white font-semibold">Basic Search Criteria</span>
+          <span className="text-lg text-white font-semibold">{advanceSearch ? "Advance Search Criteria" : "Basic Search Criteria"}</span>
           <span onClick={onClose} className="cursor-pointer text-white text-lg hover:text-white/80">
             &times;
           </span>
@@ -87,7 +56,7 @@ export default function ModalFilter({ isVisible, onClose, filter }) {
           </div>
         </main>
 
-        <footer className="px-4 sticky bottom-0 bg-neutral-100 py-3 flex items-center gap-2 justify-end border-t border-neutral-500 shadow-md z-10 rounded-b-lg">
+        {/* <footer className="px-4 sticky bottom-0 bg-neutral-100 py-3 flex items-center gap-2 justify-end border-t border-neutral-500 shadow-md z-10 rounded-b-lg">
           <button
             // onClick={onClose}
             className="py-2 text-sm bg-c-teal text-white rounded-md hover:bg-c-teal/80"
@@ -102,7 +71,7 @@ export default function ModalFilter({ isVisible, onClose, filter }) {
           >
             Search
           </button>
-        </footer>
+        </footer> */}
 
       </div>
     </div>

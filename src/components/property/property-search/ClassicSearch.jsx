@@ -6,11 +6,26 @@ import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import AdvanceSearch from "./AdvanceSearch";
 
-export default function ClassicSearch({ filter }) {
+export default function ClassicSearch({ filter, handleAdvanceSearchFilter, setAdvanceSearch }) {
     const [rentType, setRentType] = useState('');
     const [rentFrom, setRentFrom] = useState('');
     const [rentTo, setRentTo] = useState('');
-    const [advanceSearch, setAdvanceSearch] = useState(false);
+    const [advanceSearch, setInternalAdvanceSearch] = useState(false);
+
+    const handleAdvanceSearch = () => {
+        if (handleAdvanceSearchFilter) {
+            handleAdvanceSearchFilter();
+        } else {
+            setInternalAdvanceSearch(!advanceSearch);
+            handleModalTitle();
+        }
+    };
+
+    const handleModalTitle = () => {
+        if (setAdvanceSearch) {
+            setAdvanceSearch(!advanceSearch);
+        }
+    }
 
     const handleRentTypeChange = (event) => {
         setRentType(event.target.value);
@@ -86,13 +101,13 @@ export default function ClassicSearch({ filter }) {
     const resize = { resizerHighlight: "#3b82f6", resizerWidth: 3 };
 
     return (
-        <div className="bg-gray-100 p-6 rounded-md max-w-full mx-auto">
+        <div className="bg-gray-100 rounded-md max-w-full mx-auto">
             {!advanceSearch ?
                 (
                     <>
-                        {!filter && <h2 className="text-lg font-bold mb-4">Basic Search Criteria</h2>}
+                        {!filter && <h2 className="px-6 py-2 text-lg font-bold mb-4">Basic Search Criteria</h2>}
 
-                        <div style={{ height: `${sectionHeight}px` }} className="grid grid-cols-6 gap-10 overflow-y-auto">
+                        <div style={{ height: `${sectionHeight}px` }} className=" p-6 grid grid-cols-6 gap-10 overflow-y-auto">
                             <div className="col-span-2">
                                 {/* Building, Street, Postal Code */}
                                 {!filter &&
@@ -392,15 +407,35 @@ export default function ClassicSearch({ filter }) {
 
 
                         {/* Action Buttons */}
-                        {!filter &&
-                            <div className="mt-4 flex space-x-2 justify-start">
-                                <button onClick={() => { setAdvanceSearch(true) }} className="bg-white text-gray-600 py-2 px-4 text-sm rounded-md hover:bg-white/80 border border-gray-700">Advanced Criteria</button>
+                        {!filter ? (
+                            <div className="px-6 mt-4 flex space-x-2 justify-start">
+                                <button onClick={handleAdvanceSearch} className="bg-white text-gray-600 py-2 px-4 text-sm rounded-md hover:bg-white/80 border border-gray-700">Advanced Criteria</button>
                                 <button className="bg-c-teal text-white py-2 px-4 text-sm rounded-md hover:bg-c-teal/80">Search</button>
                             </div>
-                        }
+                        ) : (
+                            <footer className="px-4 sticky bottom-0 bg-neutral-100 py-3 flex items-center gap-2 justify-end border-t border-neutral-500 shadow-md z-10 rounded-b-lg">
+                                <button
+                                    onClick={handleAdvanceSearch}
+                                    className="py-2 text-sm bg-c-teal text-white rounded-md hover:bg-c-teal/80"
+                                >
+                                    Advance Criteria
+
+                                </button>
+                                <button
+                                    // onClick={handleSave}
+                                    // disabled={!isFormValid}
+                                    className="py-2 text-sm bg-c-teal text-white rounded-md hover:bg-c-teal/80"
+                                >
+                                    Search
+                                </button>
+                            </footer>
+                        )}
                     </>
                 ) : (
-                    <AdvanceSearch filter={false} setAdvanceSearch={setAdvanceSearch}/>
+                    <div className="flex flex-col">
+                        <AdvanceSearch filter={filter} handleAdvanceSearch={handleAdvanceSearch} />
+
+                    </div>
                 )}
         </div>
     );
