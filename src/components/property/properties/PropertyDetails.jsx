@@ -8,6 +8,7 @@ import { useParams } from 'react-router-dom';
 import { Tab } from '@headlessui/react';
 import classNames from 'classnames';
 import { PROPERTYCATEGORIES, PROPERTYDETAILS } from '../../lib/const/AppContant';
+import PropertyInfo from './property-detail/propertyInfo';
 
 export default function PropertyDetails() {
     const [selectedIndex, setSelectedIndex] = useState(0);
@@ -116,51 +117,15 @@ export default function PropertyDetails() {
                         <Tab.Panel
                             key={idx}
                             className={classNames(
-                                'bg-white rounded-b-lg p-3 shadow-md',
+                                'bg-white rounded-b-lg p-2 shadow-md',
                                 'focus:outline-none ring-white ring-opacity-60'
                             )}
                         >
                             <div className="space-y-4">
                                 {tab === "Property" && (
-                                    <div className="flex text-sm whitespace-nowrap p-4 space-x-4">
-                                        <div className="w-64 h-screen bg-gray-100 shadow-lg">
-                                            {PROPERTYCATEGORIES.map((category, index) => (
-                                                <div key={index} className="mb-6">
-                                                    {/* <h2 className="text-lg font-semibold px-4 a my-4">{category.title}</h2> */}
-                                                    <ul className="">
-                                                        {category.items.map((item, idx) => (
-                                                            <li key={idx} className="flex px-4 items-center space-x-2 cursor-pointer py-2 hover:bg-gray-200">
-                                                                <span className={`w-2 h-3 bg-${item.color} rounded-full`}></span>
-                                                                <span className="">
-                                                                    {item.label}
-                                                                </span>
-                                                            </li>
-                                                        ))}
-                                                    </ul>
-                                                </div>
-                                            ))}
-                                        </div>
-
-                                        <div className='w-full flex flex-col space-y-4'>
-                                            {PROPERTYDETAILS.sections.map((section, index) => (
-                                                <div className="w-full mx-auto bg-white shadow-md rounded-md p-4 border border-gray-200">
-                                                    <div className="border-b border-green-600 pb-2 mb-4">
-                                                        <h2 className="text-c-teal text-lg font-semibold">{section.title}</h2>
-                                                    </div>
-                                                    <div className="grid grid-cols-2 gap-y-2">
-                                                        {section.fields.map((field, index) => (
-                                                            <div className="flex text-sm space-x-4" key={index}>
-                                                                <div className="font-semibold text-gray-800 w-2/5 truncate">{field.label}</div>
-                                                                <div className="text-gray-600 w-full sm:w-2/3 truncate">{field.value ? field.value : '-'}</div>
-                                                            </div>
-                                                        ))}
-                                                    </div>
-                                                    <div class="col-span-2 mt-6">
-                                                        <button class="bg-c-teal text-white py-1 px-4 text-sm rounded hover:bg-c-teal/80">Edit</button>
-                                                    </div>
-                                                </div>))}
-                                        </div>
-                                    </div>
+                                        
+                                    <PropertyInfo/>
+                                       
                                 )}
                                 {tab === "Stocking Plan" && (
                                     <div>

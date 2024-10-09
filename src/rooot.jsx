@@ -48,6 +48,7 @@ import PropertySearchForm from "./components/property/property-search/PropertySe
 import PropertyDetails from "./components/property/properties/PropertyDetails";
 import SearchArea from "./components/property/property-search/SearchArea";
 import PropertyResult from "./components/property/property-search/PropertyResult";
+import ClassicSearch from "./components/property/property-search/ClassicSearch";
 
 Modal.setAppElement("#root");
 
@@ -77,7 +78,7 @@ function App() {
                 <Route path="contacts/details/:id" element={<ContactDetails />} />
 
                 <Route path="properties" element={<Properties />} />
-                <Route path="properties/search" element={<PropertySearchForm />} />
+                <Route path="properties/search" element={<ClassicSearch />} />
                 <Route path="properties/details/:id" element={<PropertyDetails />} />
 
 

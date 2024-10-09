@@ -39,9 +39,9 @@ const PROPERTYCATEGORIES = [
             { color: "yellow-500", label: "Ancillary Facilities" },
             { color: "teal-500", label: "Airconditioning" },
             { color: "gray-400", label: "Office Information" },
-            { color: "red-400", label: "Industrial Information" },
+            { color: "red-500", label: "Industrial Information" },
             { color: "gray-400", label: "Retail Information" },
-            { color: "blue-400", label: "Agency" },
+            { color: "blue-500", label: "Agency" },
             { color: "gray-400", label: "Notification Log" },
         ],
     },
@@ -77,6 +77,107 @@ const PROPERTYDETAILS = {
                 { label: "Refurbishment Completion Date", value: "" },
                 { label: "Refurbishment Date", value: "" },
                 { label: "Expected Refurbishment Date", value: "" }
+            ]
+        },
+        {
+            title: "Parking",
+            fields: [
+                { label: "Car Park Lots", value: "" },
+                { label: "Allocation Ratio", value: "1: Sq Ft leased" },
+                { label: "Parking Details", value: "Lorry Lots:\nMotorcycle Lots:" },
+                { label: "Parking Fee (Subject to GST)", value: "Seasonal: S$ /lot/mth\nNon-Reserved: S$ /lot/mth" }
+            ]
+        },
+        {
+            title: "Public Transportation",
+            fields: [
+                { label: "MRT1", value: "Covered Access Walk" },
+                { label: "MRT2", value: "Covered Access Walk" },
+                { label: "MRT3", value: "Covered Access Walk" },
+                { label: "BUS", value: "Others" }
+            ]
+        },
+        {
+            title: "Standards",
+            fields: [
+                { label: "Green Mark", value: "WELLS" },
+                { label: "LEED Certification", value: "No\nWiredscore" }
+            ]
+        },
+        {
+            title: "Property Management",
+            fields: [
+                { label: "PM In-House", value: "", type: "checkbox" }, // Checkbox field for in-house management
+                { label: "Service Charges", value: "" },
+                { label: "PM Co.", value: "", type: "checkbox" }, // Checkbox field for Property Management Company
+                { label: "CBRE Managed", value: "CBRE Managed", type: "checkbox" }, // Checkbox field with "CBRE Managed"
+                { label: "Management Contract Length (Month)", value: "" },
+                { label: "Management Start Date", value: "" },
+                { label: "Management Expiry Date", value: "" }
+            ]
+        },
+        {
+            title: "Elevators",
+            fields: [
+                { label: "# of Passenger Lift", value: "" },
+                { label: "Car Park Lift to G/F", value: "" },
+                { label: "Service Lift", value: "" },
+                { label: "Cargo Lift", value: "" },
+                { label: "Lift Zones #", value: "VIP Lift" },
+                { label: "Service Lift Dimension", value: "" },
+                { label: "Cargo Lift Dimension", value: "" },
+                { label: "Lift Details", value: "- Passenger Lift:\n- Cargo Lift:" }
+            ]
+        },
+        {
+            title: "Specifications",
+            fields: [
+                { label: "Floor To Ceiling Height", value: "" },
+                { label: "Ceiling Grid/Floor Loading Details", value: "" },
+                { label: "Floor Loading", value: "" },
+                { label: "Floor System", value: "" },
+                { label: "Power System", value: "Power" },
+                { label: "Phase", value: "" },
+                { label: "Power System Details", value: "" },
+                { label: "Sprinklers", value: "", type: "checkbox" }, // Checkbox for Sprinklers
+                { label: "Emergency Generator", value: "No" },
+                { label: "Landlord Provision Remark", value: "" }
+            ]
+        },
+        {
+            title: "Ancillary Facilities",
+            fields: [
+                { label: "Trading Floor", value: "No" },
+                { label: "IT & Telecommunication System", value: "" },
+                { label: "Security System", value: "" },
+                { label: "Fire Safety System", value: "" },
+                { label: "Common Facilities on Typical Floor", value: "" },
+                { label: "Facility Public Remarks", value: "" },
+                { label: "Facility Private Remarks", value: "" }
+            ]
+        },
+        {
+            title: "Airconditioning",
+            fields: [
+                { label: "A/C System", value: "Water 24Hrs for A/C" },
+                { label: "Standard A/C Charges", value: "A/C Ad-hoc Charges" },
+                { label: "Water 24Hrs for A/C", value: "No" },
+                { label: "Chilled Water Tap-Off", value: "" },
+                { label: "Condensing Water Tap-Off", value: "" },
+                { label: "Public Remarks", value: "" },
+                { label: "Private Remarks", value: "" }
+            ]
+        },
+        {
+            title: "Industrial Information",
+            fields: [
+                { label: "Type of Use", value: "" },
+                { label: "Type of Loading Bays", value: "" },
+                { label: "Total Loading Bays", value: "" },
+                { label: "Loading Bay Details", value: "" },
+                { label: "Other General Details", value: "" },
+                { label: "Cranes (Y/N)", value: "", type: "checkbox" }, // Checkbox for cranes
+                { label: "Accessible For", value: "" }
             ]
         }
     ]
