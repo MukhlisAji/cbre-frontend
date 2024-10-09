@@ -35,9 +35,9 @@ function Map2D() {
 
   const[isSearch, setIsSearch]= useState(null)
   const { isSidebarOpen, isCollapsed2dSearchOpen } = useAppContext();
-  const [build] = useAtom(buildAtom)
+  // const [build] = useAtom(buildAtom)
   
-  console.log({ build })
+  // console.log({ build })
 
   useEffect(() => {
     if (!map.current || !mapContainer.current) return;

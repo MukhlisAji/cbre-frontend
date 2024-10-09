@@ -477,6 +477,8 @@ export function useMap(styleMap, map, zoom, triggerRadius) {
   };
 
 const mapApi = async (responseData) => {
+  console.log("bejir", responseData);
+  
     removeMarkers();
     setDataMap(responseData.data);
     responseData.data.forEach((item, index) => {

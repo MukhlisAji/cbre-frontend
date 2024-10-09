@@ -112,7 +112,6 @@ export default function TwoDSearch({ mapApi, map }) {
   const handleSearch = () => {
     console.log("Searching for:", searchQuery);
     setShowResults(true);
-    set
   };
 
   const handleResetButton = () => {
@@ -176,13 +175,14 @@ export default function TwoDSearch({ mapApi, map }) {
       };
 
       console.log("Searching for:", searchQuery);
-      const res = await fetch(`${CONFIG_APP.MAPBOX_API}/master-filter`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(body),
-      });
+      // const res = await fetch(`${CONFIG_APP.MAPBOX_API}/master-filter`, {
+      //   method: "POST",
+      //   headers: {
+      //     "Content-Type": "application/json",
+      //   },
+      //   body: JSON.stringify(body),
+      // });
+      const res = await fetch(`https://6b67f953cd39.ngrok.app/map-export`);
 
       if (!res.ok) {
         throw new Error(`HTTP error! status: ${res.status}`);
