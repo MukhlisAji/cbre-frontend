@@ -7,6 +7,7 @@ import { CONFIG } from '../../../config';
 import { useParams } from 'react-router-dom';
 import { Tab } from '@headlessui/react';
 import classNames from 'classnames';
+import { PROPERTYCATEGORIES, PROPERTYDETAILS } from '../../lib/const/AppContant';
 
 export default function PropertyDetails() {
     const [selectedIndex, setSelectedIndex] = useState(0);
@@ -18,13 +19,9 @@ export default function PropertyDetails() {
     const { id } = useParams();
 
     const tabs = [
-        "Basic",
-        "Details",
+        "Property",
         "Stacking Plan",
-        "Space Detail",
-        "Property Accounts and Contacts",
         "Property Images and Documents",
-        "Notificaaation Log",
     ];
 
     const toggleVisibility = (section) => {
@@ -120,103 +117,65 @@ export default function PropertyDetails() {
                             key={idx}
                             className={classNames(
                                 'bg-white rounded-b-lg p-3 shadow-md',
-                                'focus:outline-none focus:ring-2 ring-offset-2 ring-offset-blue-400 ring-white ring-opacity-60'
+                                'focus:outline-none ring-white ring-opacity-60'
                             )}
                         >
                             <div className="space-y-4">
-                                {tab === "Basic" && (
-                                    <div className="text-sm p-4">
-                                        <h2 className="text-lg font-bold mb-4">Basic Information</h2>
-                                        <div className="grid grid-cols-2 gap-x-8 gap-y-4">
-                                            {/* Basic Information Fields */}
-                                            <div className="flex justify-between">
-                                                <span className="font-semibold">Region-Micromarket</span>
-                                                <span>Region 1</span>
-                                            </div>
-                                            <div className="flex justify-between">
-                                                <span className="font-semibold">Property Address</span>
-                                                <span>Address</span>
-                                            </div>
-                                            <div className="flex justify-between">
-                                                <span className="font-semibold">Property Description</span>
-                                                <span>Description</span>
-                                            </div>
-                                            <div className="flex justify-between">
-                                                <span className="font-semibold">Public Transportation</span>
-                                                <span>MRT</span>
-                                            </div>
-                                            <div className="flex justify-between">
-                                                <span className="font-semibold">Zoning</span>
-                                                <span>Business 1</span>
-                                            </div>
-                                            <div className="flex justify-between">
-                                                <span className="font-semibold">No. of Floors</span>
-                                                <span>10</span>
-                                            </div>
-                                            <div className="flex justify-between">
-                                                <span className="font-semibold">Total NLA</span>
-                                                <span>5000 SqFt</span>
-                                            </div>
-                                            <div className="flex justify-between">
-                                                <span className="font-semibold">Typical Floor Area (min-max)</span>
-                                                <span>200-400 SqFt</span>
-                                            </div>
-                                            <div className="flex justify-between">
-                                                <span className="font-semibold">TOP Date</span>
-                                                <span>01/01/2021</span>
-                                            </div>
+                                {tab === "Property" && (
+                                    <div className="flex text-sm whitespace-nowrap p-4 space-x-4">
+                                        <div className="w-64 h-screen bg-gray-100 shadow-lg">
+                                            {PROPERTYCATEGORIES.map((category, index) => (
+                                                <div key={index} className="mb-6">
+                                                    {/* <h2 className="text-lg font-semibold px-4 a my-4">{category.title}</h2> */}
+                                                    <ul className="">
+                                                        {category.items.map((item, idx) => (
+                                                            <li key={idx} className="flex px-4 items-center space-x-2 cursor-pointer py-2 hover:bg-gray-200">
+                                                                <span className={`w-2 h-3 bg-${item.color} rounded-full`}></span>
+                                                                <span className="">
+                                                                    {item.label}
+                                                                </span>
+                                                            </li>
+                                                        ))}
+                                                    </ul>
+                                                </div>
+                                            ))}
                                         </div>
 
-                                        {/* Divider */}
-                                        <hr className="my-4 border-t border-neutral-300" />
-
-                                        <h2 className="text-lg font-bold mb-4">Specifications</h2>
-                                        <div className="grid grid-cols-2 gap-x-8 gap-y-4">
-                                            {/* Specifications Fields */}
-                                            <div className="flex justify-between">
-                                                <span className="font-semibold">A/C System</span>
-                                                <span>Central</span>
-                                            </div>
-                                            <div className="flex justify-between">
-                                                <span className="font-semibold">Floor to Ceiling Height</span>
-                                                <span>3 meters</span>
-                                            </div>
-                                            <div className="flex justify-between">
-                                                <span className="font-semibold">Floor System</span>
-                                                <span>Raised</span>
-                                            </div>
-                                            <div className="flex justify-between">
-                                                <span className="font-semibold">Floor Loading</span>
-                                                <span>5 KN/Sqm</span>
-                                            </div>
-                                            <div className="flex justify-between">
-                                                <span className="font-semibold">Elevator</span>
-                                                <span>3 elevators</span>
-                                            </div>
-                                            <div className="flex justify-between">
-                                                <span className="font-semibold">Service Charge</span>
-                                                <span>$2 per SqFt</span>
-                                            </div>
-                                            <div className="flex justify-between">
-                                                <span className="font-semibold">Landlord Provision</span>
-                                                <span>Yes</span>
-                                            </div>
-                                            <div className="flex justify-between">
-                                                <span className="font-semibold">Green Mark</span>
-                                                <span>Platinum</span>
-                                            </div>
+                                        <div className='w-full flex flex-col space-y-4'>
+                                            {PROPERTYDETAILS.sections.map((section, index) => (
+                                                <div className="w-full mx-auto bg-white shadow-md rounded-md p-4 border border-gray-200">
+                                                    <div className="border-b border-green-600 pb-2 mb-4">
+                                                        <h2 className="text-c-teal text-lg font-semibold">{section.title}</h2>
+                                                    </div>
+                                                    <div className="grid grid-cols-2 gap-y-2">
+                                                        {section.fields.map((field, index) => (
+                                                            <div className="flex text-sm space-x-4" key={index}>
+                                                                <div className="font-semibold text-gray-800 w-2/5 truncate">{field.label}</div>
+                                                                <div className="text-gray-600 w-full sm:w-2/3 truncate">{field.value ? field.value : '-'}</div>
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                    <div class="col-span-2 mt-6">
+                                                        <button class="bg-c-teal text-white py-1 px-4 text-sm rounded hover:bg-c-teal/80">Edit</button>
+                                                    </div>
+                                                </div>))}
                                         </div>
                                     </div>
                                 )}
-                                {tab === "Details" && (
+                                {tab === "Stocking Plan" && (
                                     <div>
                                         {/* <h2 className="text-sm font-bold mb-4">Details</h2> */}
                                         <p>No items to display.</p>
                                     </div>
                                 )}
-                                {/* Add more content for other tabs here */}
+                                {tab === "Property Images and Documents" && (
+                                    <div>
+                                        {/* <h2 className="text-sm font-bold mb-4">Details</h2> */}
+                                        <p>No items to display.</p>
+                                    </div>
+                                )}
                                 <div>
-                                    <p className='text-sm'>Have a query regarding this account? <a href="#" className="text-blue-500">Click Here</a></p>
+                                    {/* <p className='text-sm'>Have a query regarding this account? <a href="#" className="text-blue-500">Click Here</a></p> */}
                                 </div>
                             </div>
                         </Tab.Panel>

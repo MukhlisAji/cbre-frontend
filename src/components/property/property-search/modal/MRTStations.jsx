@@ -1,41 +1,61 @@
 import { Checkbox } from "@mui/material";
-import React, { useState } from "react";
-import { FaChevronDown } from "react-icons/fa"; // For arrow icon
+import React, { useEffect, useState } from "react";
+import PropertyResource from "../../PropertyResource";
 
-const MRTStations = () => {
+const MRTStations = ({ form, onFormChange, setSelectedStations }) => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedLines, setSelectedLines] = useState([]);
+  const { mrtStations, setMrtStations, fetchMRTStations } = PropertyResource();
 
-  const lines = [
-    { code: "EW", name: "East-West Line", color: "bg-green-500" },
-    { code: "NS", name: "North-South Line", color: "bg-red-500" },
-    { code: "NE", name: "North-East Line", color: "bg-purple-500" },
-    { code: "CC", name: "Circle Line", color: "bg-orange-500" },
-    { code: "DT", name: "Downtown Line", color: "bg-blue-500" },
-    { code: "TE", name: "Thomson-East Line", color: "bg-yellow-700" },
-    { code: "BP", name: "Bukit-Panjang LRT Line", color: "bg-gray-500" },
-    { code: "SK", name: "Sengkang LRT Line", color: "bg-gray-600" },
-    { code: "PG", name: "Punggol LRT Line", color: "bg-gray-700" },
-  ];
+  useEffect(() => {
+    fetchMRTStations();
+  }, []);
 
-  const handleLineSelect = (code) => {
-    setSelectedLines((prev) =>
-      prev.includes(code) ? prev.filter((c) => c !== code) : [...prev, code]
-    );
+  // Filter stations based on the search term
+  const filteredStations = mrtStations.filter((station) =>
+    station.label.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  // Toggle station selection
+  // const toggleStation = (station) => {
+  //   const isSelected = form.includes(station.value);
+  //   console.log('stationvalu ', station.value);
+  //   console.log('stationvalu ', isSelected);
+
+
+  //   // Update the form in the parent component
+  //   const updatedForm = isSelected
+  //     ? form.filter((value) => value !== station.value) // Remove if already selected
+  //     : [...form, station.value]; // Add if not selected
+  //   console.log("updatedForm " , updatedForm);
+  //   onFormChange(updatedForm); // Pass the updated form to the parent
+  // };
+
+  const toggleStation = (station) => {
+    setMrtStations((prevStations) => {
+      return prevStations.map((s) => {
+        if (s.value === station.value) {
+          const newChecked = !s.checked; // Toggle the checked state
+
+          // Update the form in the parent component
+          const updatedForm = newChecked
+            ? [...form, station.value] // If checked, add to form
+            : form.filter((value) => value !== station.value); // If unchecked, remove from form
+
+          onFormChange(updatedForm); // Pass the updated form to the parent
+          return { ...s, checked: newChecked }; // Update station's checked state
+        }
+        return s; // Return the unchanged station
+      });
+    });
   };
-
-  const label = { inputProps: { 'aria-label': 'Checkbox demo' } };
 
 
   return (
     <div className="px-5 mx-auto">
       <div className="flex text-sm items-center justify-between mb-4">
-        <span>Select Line or Train Station
-        </span>
+        <span className="text-gray-600 text-sm font-medium">Select Train Station</span>
         <label className="ml-2 flex text-sm items-center">
-          <Checkbox {...label}
-          size="small"
-          />
+          <Checkbox size="small" />
           Future Lines
         </label>
       </div>
@@ -47,22 +67,39 @@ const MRTStations = () => {
         onChange={(e) => setSearchTerm(e.target.value)}
       />
 
-      {lines.map((line) => (
-        <div key={line.code} className="border-b py-1.5 flex items-center justify-between">
-          <div className="flex items-center cursor-pointer">
-            <Checkbox {...label} size="small" checked={selectedLines.includes(line.code)}
-              onChange={() => handleLineSelect(line.code)}
-            />
-            <div
-              className={`h-6 w-6 flex items-center justify-center text-white font-bold text-xs mr-2 rounded-md ${line.color}`}
-            >
-              {line.code}
-            </div>
-            <span className="font-medium text-sm text-gray-600">{line.name}</span>
-          </div>
-          <FaChevronDown className="text-gray-500 cursor-pointer" />
-        </div>
-      ))}
+      <div className="mt-4">
+        <h3 className="font-medium text-gray-600 text-sm mb-2">Available Stations:</h3>
+        <ul className="grid grid-cols gap-4">
+          {filteredStations.map((station) => {
+            const isChecked = form.includes(station.value); // Check if station is in form
+
+            return (
+              <li
+                key={station.value}
+                className="flex items-center p-1 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300"
+              >
+                <input
+                  type="checkbox"
+                  className="form-checkbox text-blue-600 border-gray-300 rounded focus:ring-blue-500 focus:ring-offset-2"
+                  id={`station-${station.value}`}
+                  checked={isChecked} // Set checked based on whether station is in form
+                  onChange={() => toggleStation(station)} // Use station.value for toggle
+                />
+                <div
+                  className={`ml-2 h-6 w-6 flex items-center justify-center text-white font-bold text-xs mr-2 rounded-md ${station.color}`}
+                ></div>
+                <label
+                  htmlFor={`station-${station.value}`}
+                  className="w-full ml-3 text-gray-800 text-md whitespace-nowrap"
+                >
+                  {station.label}
+                </label>
+              </li>
+            );
+          })}
+        </ul>
+
+      </div>
     </div>
   );
 };

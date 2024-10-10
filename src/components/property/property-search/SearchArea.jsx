@@ -9,6 +9,7 @@ import { generateTransactionId } from '../../lib/api/Authorization';
 import './SearchArea.css';
 import homeImage from '../../../../src/assets/home.avif';
 import ClassicSearch from './ClassicSearch';
+import PopoverFilter from './modal/PopoverFilter';
 
 
 const SearchArea = () => {
@@ -26,7 +27,8 @@ const SearchArea = () => {
   const [inputValue, setInputValue] = useState('');
   const [placeholderText, setPlaceholderText] = useState('Search');
   const [isAnimating, setIsAnimating] = useState(false); // For managing animation state
-  const [showPlaceholder, setShowPlaceholder] = useState(true);
+  const [showPlaceholder, setShowPlaceholder] = useState(!query);
+  const [displayPopover, setDisplayPopover] = useState(false);
   const placeholders = [
     "by Address",
     "by Account/Contact",
@@ -54,6 +56,54 @@ const SearchArea = () => {
     streetName: '',
     postalCode: ''
   });
+  const [formDistrict, setFormDistrict] = useState([]);
+  const [formMrt, setFormMRT] = useState([]);
+
+  const handleSetQuery = (form) => {
+    let queryString = '';
+
+    if (category === 'District' || category === 'MRT' ) {
+      // Include only district-related fields, adjust as per your state
+      queryString = `${form ? form : ''}`.trim();
+    } else if (category === 'Address') {
+      // Include address-related fields
+      queryString = `${form.buildingName ? form.buildingName : ''},${form.streetNumber ? form.streetNumber : ''},${form.streetName ? form.streetName : ''},${form.postalCode ? form.postalCode : ''}`.trim();
+    }
+
+    // Remove any trailing commas or unnecessary spaces
+    // queryString = queryString.replace(/,\s*$/, '').replace(/\s*,/g, '');
+    console.log('Constructed Query: ', queryString);
+
+    setQuery(queryString); // Update the query with the constructed string
+  };
+
+  const handleFormChange = (updatedForm) => {
+    if (category === 'Address') {
+      setFormAddress(updatedForm);
+      console.log("Updated Address Form:", updatedForm);
+    } else if (category === 'District') {
+      setFormDistrict(updatedForm);
+      console.log("Updated District Form:", updatedForm);
+    } else if (category === "MRT") {
+      setFormMRT(updatedForm);
+      console.log("Updated MRT Form:", updatedForm);
+    }
+    handleSetQuery(updatedForm);
+  };
+
+  const getForm = () => {
+    if (category === 'Address') {
+      return formAddress;
+    } else if (category === 'District') {
+      return formDistrict;
+    } else if (category === "MRT") {
+      return formMrt;
+    }else{
+      return formDistrict;
+    }
+  };
+
+
 
   // useEffect(() => {
   //   const interval = setInterval(changePlaceholder, 3000);
@@ -90,7 +140,7 @@ const SearchArea = () => {
 
   const handleBlur = () => {
     setIsFocused(false);
-    setPlaceholderText(inputValue ? '' : 'Search');
+    setPlaceholderText(query ? '' : 'Search');
     setShowPlaceholder(query ? false : true);
   };
 
@@ -99,12 +149,14 @@ const SearchArea = () => {
   };
 
   const handleSearch = () => {
-
-    navigate('result', { state: { formAddress } });
+    navigate('result', { state: { form: getForm(), category, query } });
+    console.log("Query: ", query);
     setIsExpanded(false);
   };
 
+
   const handleSearchClick = () => {
+    setShowPlaceholder(query ? false : true);
     handleSearch();
   };
 
@@ -122,7 +174,11 @@ const SearchArea = () => {
 
   const handleFiltersClick = (filter) => {
     setFilter(filter);
-    setIsModalFilterVisible(true);
+    if (filter === "filter") {
+      setIsModalFilterVisible(true);
+    } else {
+      setDisplayPopover(true);
+    }
   };
 
   useEffect(() => {
@@ -170,10 +226,14 @@ const SearchArea = () => {
     }
   };
 
+  const [activePopover, setActivePopover] = useState(null);
 
-
-  const handleFormChange = (updatedForm) => {
-    setFormAddress(updatedForm);
+  const handlePopoverClick = (category) => {
+    if (activePopover === category) {
+      setActivePopover(null); // Close the popover if the same button is clicked again
+    } else {
+      setActivePopover(category); // Set the clicked button as active
+    }
   };
 
   return (
@@ -187,10 +247,11 @@ const SearchArea = () => {
             src={homeImage}
             alt="Scenery"
           />
+
           {/* </div> */}
 
           {/* search area */}
-          <div className="relative flex flex-col left-1/2 transform -translate-x-1/2 -mt-20 pt-2 z-50 flex justify-center items-center px-24">
+          <div className="relative flex flex-col left-1/2 transform -translate-x-1/2 -mt-20 pt-2 z-30 flex justify-center items-center px-24">
 
             <div className="bg-black bg-opacity-60 p-5 backdrop-blur-xs rounded-xl shadow-lg">
 
@@ -269,57 +330,85 @@ const SearchArea = () => {
                   <div className='flex gap-2 ml-2'>
                     <span
                       onClick={() => handleFiltersClick('filter')}
-                      className='flex items-center text-gray-600 gap-2 py-2 px-3 bg-white text-xs font-semibold rounded-lg shadow-lg'>
+                      className='flex items-center text-gray-600 gap-2 py-1.5 px-3 bg-white text-xs font-semibold rounded-lg shadow-lg cursor-pointer'>
                       <LuSettings2 className='text-md' />
                       Filter
                     </span>
-                    <span
-                      onClick={() => handleFiltersClick('propertyType')}
-                      className='flex items-center text-gray-600 gap-2 py-2 px-3 bg-white text-xs font-semibold rounded-lg shadow-lg'>
-                      <span className='whitespace-nowrap overflow-hidden text-ellipsis'>Property Type</span>
-                      <svg className="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
-                      </svg>
-                    </span>
-                    <span
-                      onClick={() => handleFiltersClick('price')}
-                      className='flex items-center text-gray-600 gap-2 py-2 px-3 bg-white text-xs font-semibold rounded-lg shadow-lg'>
-                      <span>Rent/Transacted</span>
-                      <svg className="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
-                      </svg>
-                    </span>
-                    <span
-                      onClick={() => handleFiltersClick('size')}
-                      className='flex items-center text-gray-600 gap-2 py-2 px-3 bg-white text-xs font-semibold rounded-lg shadow-lg'>
-                      <span>Size</span>
-                      <svg className="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
-                      </svg>
-                    </span>
-                    <span
-                      onClick={() => handleFiltersClick('availibility')}
-                      className='flex items-center text-gray-600 gap-2 py-2 px-3 bg-white text-sm font-semibold rounded-lg shadow-lg'>
-                      <span className=''>Availability</span>
-                      <svg className="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
-                      </svg>
-                    </span>
+                    <div className="relative inline-block text-left">
+                      <span
+                        className='flex items-center text-gray-600 gap-2 py-2.5 px-3 whitespace-nowrap bg-white text-xs font-semibold rounded-lg shadow-lg cursor-pointer'
+                        onClick={() => handlePopoverClick('propertyType')}
+                      >
+                        <span>Property Type</span>
+                        <svg className="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                      </span>
+
+                      <PopoverFilter
+                        isVisible={activePopover === 'propertyType'}
+                        category="propertyType"
+                        onClose={() => setActivePopover(null)}
+                      />
+                    </div>
+
+                    <div className="relative inline-block text-left">
+                      <span
+                        className="flex items-center text-gray-600 gap-3 py-2.5 px-3 whitespace-nowrap bg-white text-xs font-semibold rounded-lg shadow-lg cursor-pointer"
+                        onClick={() => handlePopoverClick('rent')}
+                      >
+                        <span>Rent/Transacted</span>
+                        <svg className="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                      </span>
+
+                      <PopoverFilter
+                        isVisible={activePopover === 'rent'}
+                        category="rent"
+                        onClose={() => setActivePopover(null)}
+                      />
+                    </div>
+
+                    <div className="relative inline-block text-left">
+                      <span
+                        className="flex items-center text-gray-600 gap-2 py-2.5 whitespace-nowrap px-3 bg-white text-xs font-semibold rounded-lg shadow-lg cursor-pointer"
+                        onClick={() => handlePopoverClick('size')}
+                      >
+                        <span>Size</span>
+                        <svg className="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                      </span>
+
+                      <PopoverFilter
+                        isVisible={activePopover === 'size'}
+                        category="size"
+                        onClose={() => setActivePopover(null)}
+                      />
+                    </div>
+                    <div className="relative inline-block text-left">
+                      <span
+                        className="flex items-center text-gray-600 gap-3 py-2.5 px-3 whitespace-nowrap bg-white text-xs font-semibold rounded-lg shadow-lg cursor-pointer"
+                        onClick={() => handlePopoverClick('availability')}
+                      >
+                        <span>Availability</span>
+                        <svg className="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                      </span>
+
+                      <PopoverFilter
+                        isVisible={activePopover === 'availability'}
+                        category="availability"
+                        onClose={() => setActivePopover(null)}
+                      />
+                    </div>
                   </div>
                 </div>
               </div>
-
               <div className='flex justify-between items-center'>
                 <div className="relative inline-flex gap-2 rounded-full mt-6">
-                  {/* Active Background Slider */}
-                  {/* <div
-                className="absolute top-0 left-0 h-full bg-c-teal rounded-full transition-all duration-300 ease-in-out"
-                style={{
-                  width: `${sliderStyle.width}px`,
-                  left: `${sliderStyle.left}px`,
-                }}
-              ></div> */}
-
                   {/* Button Items */}
                   <span
                     ref={buttonRefs.All}
@@ -347,7 +436,7 @@ const SearchArea = () => {
                   </span>
                 </div>
                 <div className="pt-6 px-1 text-right flex items-center">
-                  <span onClick={()=> setIsClassic(true)} className='text-gray-300 text-xs hover:texr.gray-300/80 cursor-pointer'>Classic View</span>
+                  <span onClick={() => setIsClassic(true)} className='bg-black/10 hover:bg-black/20 py-1.5 px-3 rounded-full text-gray-300 text-xs hover:texr.gray-300/80 cursor-pointer'>Classic View</span>
                 </div>
               </div>
 
@@ -355,12 +444,21 @@ const SearchArea = () => {
 
           </div>
 
-          <ModalSearch isVisible={isModalVisible} onClose={() => setIsModalVisible(false)} category={category} form={formAddress} onFormChange={handleFormChange} setQuery={setQuery} onClick={handleSearchClick} />
+          {/* Modal search component */}
+          <ModalSearch
+            isVisible={isModalVisible}
+            onClose={() => setIsModalVisible(false)}
+            category={category}
+            form={getForm()}
+            onFormChange={handleFormChange}
+            setQuery={setQuery}
+            onClick={handleSearchClick}
+          />
           <ModalFilter isVisible={isModalFilterVisible} onClose={() => setIsModalFilterVisible(false)} filter={filter} />
 
         </div>
         :
-        <ClassicSearch />}
+        <ClassicSearch filter={false} />}
     </div>
   );
 };
