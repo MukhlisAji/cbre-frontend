@@ -125,10 +125,20 @@ const BUILDINGDATADUMMY = [{
 ]
 
 const PROPERTYCOLUMNDUMMY = [
-  { "label": "Property Name", "accessor": "propertyName", "isClickable": true, "url": "details" },
-  { "label": "Address", "accessor": "address" },
-  { "label": "Total NLA", "accessor": "totalNLA" },
-  { "label": "Floor", "accessor": "floor" }
+  { "label": "Property Name", "accessor": "buildingName", "isClickable": true, "url": "details" },
+  { "label": "Address", "accessor": "propertyAddress" },
+  { "label": "Total NLA", "accessor": "totalNLAAndVacantArea" },
+  { "label": "Grade", "accessor": "grade" },
+  { "label": "Region", "accessor": "region" },
+  { "label": "Zoning", "accessor": "zoning" },
+  { "label": "Status", "accessor": "buildingStatus" },
+  { "label": "Floor", "accessor": "district" },
+  { "label": "Floor", "accessor": "floorInformation" },
+  { "label": "Street No", "accessor": "streetNumber" },
+  { "label": "Street Name", "accessor": "streetName" },
+  { "label": "Postal Code", "accessor": "postalCode" },
+
+
 ];
 
 

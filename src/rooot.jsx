@@ -78,7 +78,7 @@ function App() {
                 <Route path="contacts/details/:id" element={<ContactDetails />} />
 
                 <Route path="properties" element={<Properties />} />
-                <Route path="properties/search" element={<ClassicSearch />} />
+                <Route path="properties/search" element={<PropertySearchForm />} />
                 <Route path="properties/details/:id" element={<PropertyDetails />} />
 
 

@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { RiPencilFill } from 'react-icons/ri';
+import { CONFIG } from '../../../../../config';
+import { generateTransactionId } from '../../../../lib/api/Authorization';
 
 export default function DetailsInfo({ data, onClose, isEdit, setIsEdit }) {
     const [kind, setKind] = useState(data?.kind || 'Developer');
@@ -45,10 +47,10 @@ export default function DetailsInfo({ data, onClose, isEdit, setIsEdit }) {
         };
 
         try {
-            const response = await fetch('https://a9b2-103-55-53-254.ngrok-free.app/cbre/property/accounts-contacts', {
+            const response = await fetch(`${CONFIG.PROPERTY_SERVICE}/accounts-contacts`, {
                 method: 'POST',
                 headers: {
-                    'transactionId': '4646765766',
+                    'transactionId': generateTransactionId(),
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify(dataToSend),

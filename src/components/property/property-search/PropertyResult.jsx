@@ -60,6 +60,15 @@ const PropertyResult = () => {
         streetName: '',
         postalCode: ''
     });
+    const [formDistrict, setFormDistrict] = useState([]);
+    const [formMrt, setFormMRT] = useState([]);
+    const [formAccount, setFormAccount] = useState({
+        keyword: '',
+        type: '',
+        pageNo: 1,
+        pageSize: 10
+    })
+
 
     const handleSetQuery = (form) => {
         let queryString = '';
@@ -70,6 +79,8 @@ const PropertyResult = () => {
         } else if (category === 'Address') {
             // Include address-related fields
             queryString = `${form.buildingName ? form.buildingName : ''},${form.streetNumber ? form.streetNumber : ''},${form.streetName ? form.streetName : ''},${form.postalCode ? form.postalCode : ''}`.trim();
+        } else if (category === "Account/Contacts") {
+            queryString = `${form.keyword ? form.keyword : ''}, ${form.type ? form.type : ''}, ${form.pageNo ? form.pageNo : ''}, ${form.pageSize ? form.pageSize : ''}`.trim();
         }
 
         // Remove any trailing commas or unnecessary spaces
@@ -79,8 +90,6 @@ const PropertyResult = () => {
         setQuery(queryString); // Update the query with the constructed string
     };
 
-    const [formDistrict, setFormDistrict] = useState([]);
-    const [formMrt, setFormMRT] = useState([]);
     const handleFormChange = (updatedForm) => {
         if (category === 'Address') {
             setFormAddress(updatedForm);
@@ -91,23 +100,30 @@ const PropertyResult = () => {
         } else if (category === "MRT") {
             setFormMRT(updatedForm);
             console.log("Updated MRT Form:", updatedForm);
-
+        } else if (category === "Account/Contacts") {
+            setFormAccount(updatedForm);
+            console.log("Updated Account Form:", updatedForm);
+        } else if (category === 'Micromarket') {
+            setFormDistrict(updatedForm);
+            console.log("Updated Micromarket Form:", updatedForm);
         }
         handleSetQuery(updatedForm);
     };
 
     const getForm = () => {
         if (category === 'Address') {
-          return formAddress;
+            return formAddress;
         } else if (category === 'District') {
-          return formDistrict;
+            return formDistrict;
         } else if (category === "MRT") {
-          return formMrt;
-        }else{
-          return formDistrict;
+            return formMrt;
+        } else if (category === "Account/Contacts") {
+            return formAccount;
+        } else if (category === 'Micromarket') {
+            return formDistrict;
         }
-      };
-    
+    };
+
 
     useEffect(() => {
         const interval = setInterval(changePlaceholder, 3000);
@@ -226,7 +242,9 @@ const PropertyResult = () => {
             ? "searchbyaddress"
             : category === "MRT"
                 ? "searchbymrts"
-                : "searchbydistrict";
+                : category === "Account/Contacts"
+                    ? "searchbyaccountscontacts"
+                    : "searchbydistrict";
 
         console.log('searchby ', searchBy);
         try {
@@ -302,8 +320,10 @@ const PropertyResult = () => {
             });
         } else if (searchCategory === 'District') {
             setFormDistrict(formData);
-        } else if (searchCategory === 'MRT'){
+        } else if (searchCategory === 'MRT') {
             setFormMRT(formData);
+        } else if (searchCategory === 'Account/Contacts') {
+            setFormAccount(formData);
         }
     };
 

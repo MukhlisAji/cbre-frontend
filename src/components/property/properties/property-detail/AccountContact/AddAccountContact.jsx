@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { FaSearch } from "react-icons/fa";
 import DetailsInfo from "./DetailsInfo";
+import { CONFIG } from "../../../../../config";
+import { generateTransactionId } from "../../../../lib/api/Authorization";
 
 
 export default function AddAccountContact({ onClose }) {
@@ -24,10 +26,10 @@ export default function AddAccountContact({ onClose }) {
 
     const handleSearchClick = async () => {
         try {
-            const response = await fetch(`http://localhost:8082/cbre/property/accounts-contacts?keyword=${searchTerm}`, {
+            const response = await fetch(`${CONFIG.PROPERTY_SERVICE}/accounts-contacts?keyword=${searchTerm}`, {
                 method: 'GET',
                 headers: {
-                    'transactionId': '4646765766',
+                    'transactionId': generateTransactionId(),
                 },
             });
 

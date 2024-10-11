@@ -4,6 +4,7 @@ import DetailsInfo from "./DetailsInfo";
 import AddAccountContact from "./AddAccountContact";
 import AccountForm from "../../../account/AccountForm";
 import ContactForm from "../../../contact/ContactForm";
+import { CONFIG } from "../../../../../config";
 
 
 export default function AccountContactInfo() {
@@ -79,7 +80,7 @@ export default function AccountContactInfo() {
    useEffect(() => {
        const fetchData = async () => {
            try {
-               const response = await fetch('http://localhost:8082/cbre/property/183933/accounts-contacts', {
+               const response = await fetch(`${CONFIG.PROPERTY_SERVICE}/183933/accounts-contacts`, {
                    method: 'GET',
                    headers: {
                        'transactionId': '4646765766',
