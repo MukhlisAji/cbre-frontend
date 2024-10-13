@@ -2,14 +2,28 @@ import React, { useState, useEffect } from 'react';
 import { RiPencilFill } from 'react-icons/ri';
 import { CONFIG } from '../../../../../config';
 import { generateTransactionId } from '../../../../lib/api/Authorization';
+import PropertyResource from '../../../PropertyResource';
 
 export default function DetailsInfo({ data, onClose, isEdit, setIsEdit }) {
     const [kind, setKind] = useState(data?.kind || 'Developer');
     const [isSaving, setIsSaving] = useState(false); // Track save status
+    const { propertyResources, fetchPropertyResources } = PropertyResource();
+
+    useEffect(() => {
+        fetchPropertyResources();
+    }, []);
 
     const handleKindChange = (event) => {
-        setKind(event.target.value);
+        const selectedValue = event.target.value;
+        const selectedKind = propertyResources.propertyContactKind.find(
+            (option) => option.accountContactType === selectedValue
+        );
+
+        if (selectedKind) {
+            setKind(selectedKind.accountContactTypeId); // Set the id
+        }
     };
+
 
     const handleBackdropClick = (e) => {
         if (onClose) onClose();
@@ -104,20 +118,18 @@ export default function DetailsInfo({ data, onClose, isEdit, setIsEdit }) {
                                     className="w-2/3 px-2 py-2 bg-white border border-gray-100 rounded-md shadow-sm focus:outline-none focus:ring-0.5 focus:ring-c-teal focus:border-c-teal"
                                     disabled={!isEdit}
                                 >
-                                    <option value="">Select</option>
-                                    <option value="Asset Manager">Asset Manager</option>
-                                    <option value="Consultant">Consultant</option>
-                                    <option value="Developer">Developer</option>
-                                    <option value="Fund Manager">Fund Manager</option>
-                                    <option value="Landlord / Owner">Landlord / Owner</option>
-                                    <option value="Licensee">Licensee</option>
-                                    <option value="Maintenance Agency">Maintenance Agency</option>
-                                    <option value="Operator / Manager">Operator / Manager</option>
-                                    <option value="Outside Broker">Outside Broker</option>
-                                    <option value="Owner Investor">Owner Investor</option>
-                                    <option value="Owner Occupier">Owner Occupier</option>
-                                    <option value="Owner Representative">Owner Representative</option>
-                                    <option value="Property Manager">Property Manager</option>
+
+                                    {propertyResources ? (
+                                        propertyResources.propertyContactKind.map((option) => (
+                                            <option key={option.accountContactTypeId} value={option.accountContactType}>
+                                                {option.accountContactType}
+                                            </option>
+                                        ))
+                                    ) : (
+                                        <option value="">No option</option>
+                                    )}
+
+
                                 </select>
                                 <RiPencilFill className="text-sm ml-2 cursor-pointer hover:text-c-teal" onClick={handleEditClick} />
                             </div>

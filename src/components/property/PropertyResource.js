@@ -95,7 +95,7 @@ export default function PropertyResource() {
   const fetchPropertyResources = async () => {
     try {
       const response = await fetch(
-        'https://142601f11c08.ngrok.app/cbre/property/resources?includes=propertyContactKind', 
+        `${CONFIG.PROPERTY_SERVICE}/resources?includes=propertyContactKind`, 
         {
           method: 'GET',
           headers: {
@@ -118,7 +118,7 @@ export default function PropertyResource() {
 
   const fetchProperties = async () => {
     try {
-      const response = await fetch('https://142601f11c08.ngrok.app/cbre/properties?pageNo=2&pageSize=10', {
+      const response = await fetch('https://57aeb6a87923.ngrok.app/cbre/properties?pageNo=2&pageSize=10', {
         method: 'GET',
         headers: {
           'transactionId': transactionId,

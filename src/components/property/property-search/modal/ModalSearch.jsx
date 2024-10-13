@@ -266,7 +266,7 @@ export default function ModalSearch({ isVisible, onClose, category, form, onForm
                   form.type
                     ? propertyResources.propertyContactKind.find(
                       (option) => option.accountContactType === form.type
-                    ) || null // Find the matching option, or set to null if not found
+                    ) || null 
                     : null
                 } options={propertyResources && propertyResources.propertyContactKind ? propertyResources.propertyContactKind : []}
                 getOptionLabel={(option) => option.accountContactType}
