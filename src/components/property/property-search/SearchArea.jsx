@@ -65,9 +65,6 @@ const SearchArea = () => {
     pageSize: 10
   });
 
-
-
-
   const [formMrt, setFormMRT] = useState({
     mrts: [],
     pageNo: 1,

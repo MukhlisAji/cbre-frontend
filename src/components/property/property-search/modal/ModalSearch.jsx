@@ -108,30 +108,54 @@ export default function ModalSearch({ isVisible, onClose, category, form, onForm
   };
 
 
-
   const toggleDistrict = (districtName) => {
     setDistricts((prevDistricts) => {
-      return prevDistricts.map((district) => {
-        if (district.name === districtName) { // Check using name
-          const newChecked = !district.checked; // Toggle the checked state
+      const updatedDistricts = prevDistricts.map((district) => {
+        if (district.name === districtName) {
+          const newChecked = !district.checked;
 
-          // Update the form in the parent component
-          const updatedDistricts = newChecked
-            ? [...form.districts, district.name] // If checked, add to form
+          // Update the formDistrict in the parent component
+          const updatedFormDistricts = newChecked
+            ? [...form.districts, district.name]
             : form.districts.filter((name) => name !== district.name);
 
-          console.log('updatedDistricts ', updatedDistricts);
-          onFormChange(updatedDistricts); // Pass the updated form to the parent
-          return {
+          // Call onFormChange with the updated formDistrict structure
+          onFormChange({
             ...form,
-            districts: updatedDistricts,
-            pageNo: form.pageNo,
-            pageSize: form.pageSize,
-            checked: newChecked
-          }; // Update district's checked state
+            districts: updatedFormDistricts
+          });
+
+          return { ...district, checked: newChecked };
         }
-        return district; // Return the unchanged district
+        return district;
       });
+
+      return updatedDistricts;
+    });
+  };
+
+  const toggleAllDistricts = () => {
+    const allChecked = districts.every((d) => d.checked);
+    const newCheckedState = !allChecked;
+
+    setDistricts((prevDistricts) => {
+      const updatedDistricts = prevDistricts.map((district) => ({
+        ...district,
+        checked: newCheckedState,
+      }));
+
+      // Update the form.districts in the parent component
+      const updatedFormDistricts = newCheckedState
+        ? updatedDistricts.map((district) => district.name)
+        : [];
+
+      // Call onFormChange with the updated formDistrict structure
+      onFormChange({
+        ...form,
+        districts: updatedFormDistricts
+      });
+
+      return updatedDistricts;
     });
   };
 
@@ -380,14 +404,7 @@ export default function ModalSearch({ isVisible, onClose, category, form, onForm
               <input
                 type="checkbox"
                 className="form-checkbox"
-                onChange={() =>
-                  setDistricts((prevDistricts) =>
-                    prevDistricts.map((district) => ({
-                      ...district,
-                      checked: !districts.every((d) => d.checked),
-                    }))
-                  )
-                }
+                onChange={toggleAllDistricts}
                 checked={districts.every((d) => d.checked)}
               />
               <span>All Districts</span>
@@ -494,7 +511,7 @@ export default function ModalSearch({ isVisible, onClose, category, form, onForm
           {/* District list */}
           <ul className="grid grid-cols-2 gap-4">
             {filteredDistricts.map((district) => {
-              const isChecked = form.includes(district.name); // Check if district is in formDistrict
+              const isChecked = form.districts.includes(district.name); // Check if district is in formDistrict
 
               return (
                 <li

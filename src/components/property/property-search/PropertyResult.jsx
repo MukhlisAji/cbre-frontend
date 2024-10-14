@@ -58,72 +58,90 @@ const PropertyResult = () => {
         buildingName: '',
         streetNumber: '',
         streetName: '',
-        postalCode: ''
-    });
-    const [formDistrict, setFormDistrict] = useState([]);
-    const [formMrt, setFormMRT] = useState([]);
-    const [formAccount, setFormAccount] = useState({
+        postalCode: '',
+        pageNo: 1,
+        pageSize: 10
+      });
+      const [formDistrict, setFormDistrict] = useState({
+        districts: [],
+        pageNo: 1,
+        pageSize: 10
+      });
+    
+      const [formMrt, setFormMRT] = useState({
+        mrts: [],
+        pageNo: 1,
+        pageSize: 10
+      });
+    
+      const [formAccount, setFormAccount] = useState({
         keyword: '',
         type: '',
         pageNo: 1,
         pageSize: 10
-    })
-
-
-    const handleSetQuery = (form) => {
+      })
+    
+      const handleSetQuery = (form) => {
         let queryString = '';
-
-        if (category === 'District' || category === 'MRT') {
-            // Include only district-related fields, adjust as per your state
-            queryString = `${form ? form : ''}`.trim();
+    
+        if (category === 'District') {
+          // Include only district-related fields, adjust as per your state
+          queryString = `${form.districts ? form.districts : ''}`.trim();
         } else if (category === 'Address') {
-            // Include address-related fields
-            queryString = `${form.buildingName ? form.buildingName : ''},${form.streetNumber ? form.streetNumber : ''},${form.streetName ? form.streetName : ''},${form.postalCode ? form.postalCode : ''}`.trim();
+          // Include address-related fields
+          queryString = `${form.buildingName ? form.buildingName : ''},${form.streetNumber ? form.streetNumber : ''},${form.streetName ? form.streetName : ''},${form.postalCode ? form.postalCode : ''}`.trim();
         } else if (category === "Account/Contacts") {
-            queryString = `${form.keyword ? form.keyword : ''}, ${form.type ? form.type : ''}, ${form.pageNo ? form.pageNo : ''}, ${form.pageSize ? form.pageSize : ''}`.trim();
+          queryString = `${form.keyword ? form.keyword : ''}, ${form.type ? form.type : ''}, ${form.pageNo ? form.pageNo : ''}}`;
+        } else if (category === 'MRT' || category === 'Micromarket') {
+          // Include only district-related fields, adjust as per your state
+          queryString = `${form.districts ? form.districts : ''}`.trim();
+        } else if (category === 'Micromarket') {
+          // Include only district-related fields, adjust as per your state
+          queryString = `${form.mrts ? form.mrts : ''}`.trim();
         }
-
+    
         // Remove any trailing commas or unnecessary spaces
         // queryString = queryString.replace(/,\s*$/, '').replace(/\s*,/g, '');
         console.log('Constructed Query: ', queryString);
-
+    
         setQuery(queryString); // Update the query with the constructed string
-    };
-
-    const handleFormChange = (updatedForm) => {
+      };
+    
+      const handleFormChange = (updatedForm) => {
         if (category === 'Address') {
-            setFormAddress(updatedForm);
-            console.log("Updated Address Form:", updatedForm);
+          setFormAddress(updatedForm);
+          console.log("Updated Address Form:", updatedForm);
         } else if (category === 'District') {
-            setFormDistrict(updatedForm);
-            console.log("Updated District Form:", updatedForm);
+          setFormDistrict(updatedForm);
+          console.log("Updated District Form:", updatedForm);
         } else if (category === "MRT") {
-            setFormMRT(updatedForm);
-            console.log("Updated MRT Form:", updatedForm);
+          setFormMRT(updatedForm);
+          console.log("Updated MRT Form:", updatedForm);
         } else if (category === "Account/Contacts") {
-            setFormAccount(updatedForm);
-            console.log("Updated Account Form:", updatedForm);
+          setFormAccount(updatedForm);
+          console.log("Updated Account Form:", updatedForm);
         } else if (category === 'Micromarket') {
-            setFormDistrict(updatedForm);
-            console.log("Updated Micromarket Form:", updatedForm);
+          setFormDistrict(updatedForm);
+          console.log("Updated Micromarket Form:", updatedForm);
         }
         handleSetQuery(updatedForm);
-    };
-
-    const getForm = () => {
+      };
+    
+      const getForm = () => {
         if (category === 'Address') {
-            return formAddress;
+          return formAddress;
         } else if (category === 'District') {
-            return formDistrict;
+          return formDistrict;
         } else if (category === "MRT") {
-            return formMrt;
+          return formMrt;
         } else if (category === "Account/Contacts") {
-            return formAccount;
+          return formAccount;
         } else if (category === 'Micromarket') {
-            return formDistrict;
+          return formDistrict;
         }
-    };
-
+      };
+    
+    
 
     useEffect(() => {
         const interval = setInterval(changePlaceholder, 3000);
