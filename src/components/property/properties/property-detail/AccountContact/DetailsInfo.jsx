@@ -3,26 +3,74 @@ import { RiPencilFill } from 'react-icons/ri';
 import { CONFIG } from '../../../../../config';
 import { generateTransactionId } from '../../../../lib/api/Authorization';
 import PropertyResource from '../../../PropertyResource';
+import Alert from '@mui/material/Alert';
+import CheckIcon from '@mui/icons-material/Check';
+import ErrorIcon from '@mui/icons-material/Error';
+import { Transition } from '@headlessui/react';
 
-export default function DetailsInfo({ data, onClose, isEdit, setIsEdit }) {
-    const [kind, setKind] = useState(data?.kind || 'Developer');
-    const [isSaving, setIsSaving] = useState(false); // Track save status
+
+export default function DetailsInfo({ data, onClose, isDetail }) {
+    const [initialKind, setInitialKind] = useState(data?.kind || '');
+    const [kindLabel, setKindLabel] = useState('');
+    const [kind, setKind] = useState('');
+    const [isSaving, setIsSaving] = useState(false);
     const { propertyResources, fetchPropertyResources } = PropertyResource();
+    const [isLoading, setIsLoading] = useState(true);
+    const [isEdit, setIsEdit] = useState(false);
+    const [alerts, setAlerts] = useState([]);
+
+    const addAlert = (message, severity) => {
+        const newAlert = { id: Date.now(), message, severity };
+        setAlerts(prevAlerts => [...prevAlerts, newAlert]);
+    };
 
     useEffect(() => {
-        fetchPropertyResources();
+        if (alerts.length > 0) {
+            const timer = setTimeout(() => {
+                setAlerts(prevAlerts => prevAlerts.slice(1));
+            }, 5000); // Remove the oldest alert after 5 seconds
+
+            return () => clearTimeout(timer);
+        }
+    }, [alerts]);
+
+
+    useEffect(() => {
+        // Fetch propertyResources
+        fetchPropertyResources()
+            .then(() => {
+                setIsLoading(false);
+            })
+            .catch(error => {
+                console.error("Error fetching property resources:", error);
+                setIsLoading(false);
+            });
+
     }, []);
+
+    useEffect(() => {
+        if (propertyResources?.propertyContactKind && initialKind) {
+            const selectedKind = propertyResources.propertyContactKind.find(
+                (option) => option.accountContactType === initialKind
+            );
+
+            if (selectedKind) {
+                setKindLabel(selectedKind.accountContactTypeId);
+                setKind(selectedKind.accountContactTypeId);
+                console.log('selectedKind ', selectedKind.accountContactType);
+            } else {
+                console.warn(`No matching kind found for ${initialKind}`);
+            }
+        }
+    }, [propertyResources]); // Add dependencies here
 
     const handleKindChange = (event) => {
         const selectedValue = event.target.value;
-        const selectedKind = propertyResources.propertyContactKind.find(
-            (option) => option.accountContactType === selectedValue
-        );
-
-        if (selectedKind) {
-            setKind(selectedKind.accountContactTypeId); // Set the id
-        }
+        console.log("selected value : ", selectedValue);
+        setKindLabel(selectedValue);
+        setKind(selectedValue);
     };
+
 
 
     const handleBackdropClick = (e) => {
@@ -34,7 +82,7 @@ export default function DetailsInfo({ data, onClose, isEdit, setIsEdit }) {
     };
 
     const handleEditClick = () => {
-        setIsEdit(true);
+        setIsEdit(!isEdit);
     };
 
     const handleSaveClick = async () => {
@@ -48,14 +96,14 @@ export default function DetailsInfo({ data, onClose, isEdit, setIsEdit }) {
         const dataToSend = {
             accountContactInformation: [
                 {
-                    buildingId: 12345, // Replace with your hardcoded building ID
+                    buildingId: 183933,
                     accountId: data?.accountId,
                     contactId: data?.contactId,
                     createdBy: 'James',
                     createdTimestamp: new Date().toISOString(),
                     modifiedBy: 'James',
                     modifiedTimestamp: new Date().toISOString(),
-                    kind: kind,
+                    accountContactTypeId: kind,
                 },
             ],
         };
@@ -70,8 +118,11 @@ export default function DetailsInfo({ data, onClose, isEdit, setIsEdit }) {
                 body: JSON.stringify(dataToSend),
             });
 
+            console.log('dataToSend ', dataToSend);
+
             if (!response.ok) {
-                throw new Error(`Error: ${response.statusText}`);
+                const errorData = await response.json();
+                throw new Error(`Error: ${response.statusText} - ${errorData.statusMessage}`);
             }
 
             const responseData = await response.json();
@@ -79,20 +130,37 @@ export default function DetailsInfo({ data, onClose, isEdit, setIsEdit }) {
             if (responseData.statusCode === '00') {
                 setIsEdit(false);
                 setIsSaving(false); // Reset saving flag after successful save
-                alert('Contact information saved successfully!');
+                addAlert('Contact information saved successfully!', 'success');
+
             } else {
                 setIsSaving(false); // Reset saving flag if there's an error
-                alert(`Error saving contact information: ${responseData.statusMessage}`);
+                addAlert(`Error saving contact information: ${responseData.statusMessage}`, 'error');
             }
         } catch (error) {
             console.error('Error saving contact information:', error);
             setIsSaving(false); // Reset saving flag if there's an error
-            alert('An error occurred. Please try again later.');
+            addAlert(`An error occurred. Please try again later`, 'error');
         }
     };
 
     return (
         <div className={`fixed inset-0 flex items-center justify-center z-50 ${onClose ? 'animate-fade-in' : 'animate-fade-out'}`} onClick={handleBackdropClick}>
+            <div className="fixed top-5 right-5 z-50 space-y-2">
+                {alerts.map((alert) => (
+                    <Alert
+                        key={alert.id}
+                        icon={alert.severity === 'success' ? <CheckIcon fontSize="inherit" /> : <ErrorIcon fontSize="inherit" />}
+                        severity={alert.severity}
+                        onClose={() => {
+                            setAlerts(prevAlerts =>
+                                prevAlerts.filter(a => a.id !== alert.id)
+                            );
+                        }}
+                    >
+                        {alert.message}
+                    </Alert>
+                ))}
+            </div>
             <div className="absolute inset-0 bg-black opacity-50"></div>
             <div className="relative flex flex-col w-full max-w-md bg-white shadow-lg rounded-lg" onClick={handleModalContentClick}>
                 {/* Header */}
@@ -102,36 +170,34 @@ export default function DetailsInfo({ data, onClose, isEdit, setIsEdit }) {
                         &times;
                     </span>
                 </div>
-
                 {/* Modal Content */}
                 <main className="flex-1 overflow-y-auto p-4">
                     <div className="relative">
                         <div className="max-w-lg mx-auto bg-white">
                             {/* Kind Dropdown */}
                             <div className="p-2 flex items-center odd:bg-gray-100 even:bg-white">
-                                <label className="block text-sm font-medium text-gray-700 w-1/3">
+                                <label htmlFor="kind-select" className="block text-sm font-medium text-gray-700 w-1/3">
                                     Kind:
                                 </label>
                                 <select
-                                    value={kind}
+                                    value={kindLabel}
                                     onChange={handleKindChange}
                                     className="w-2/3 px-2 py-2 bg-white border border-gray-100 rounded-md shadow-sm focus:outline-none focus:ring-0.5 focus:ring-c-teal focus:border-c-teal"
-                                    disabled={!isEdit}
+                                    disabled={(isDetail && !isEdit) || isLoading}
                                 >
-
-                                    {propertyResources ? (
+                                    {isLoading ? (
+                                        <option value="">Loading...</option>
+                                    ) : propertyResources && propertyResources.propertyContactKind ? (
                                         propertyResources.propertyContactKind.map((option) => (
-                                            <option key={option.accountContactTypeId} value={option.accountContactType}>
+                                            <option key={option.accountContactTypeId} value={option.accountContactTypeId}>
                                                 {option.accountContactType}
                                             </option>
                                         ))
                                     ) : (
-                                        <option value="">No option</option>
+                                        <option value="">No options available</option>
                                     )}
-
-
                                 </select>
-                                <RiPencilFill className="text-sm ml-2 cursor-pointer hover:text-c-teal" onClick={handleEditClick} />
+                                {isDetail && <RiPencilFill className="text-sm ml-2 cursor-pointer hover:text-c-teal" onClick={handleEditClick} />}
                             </div>
 
                             {/* Account Name */}
@@ -179,11 +245,11 @@ export default function DetailsInfo({ data, onClose, isEdit, setIsEdit }) {
                                 </div>
                             </div>
                             {/* Footer */}
-                            <footer className="px-4 sticky bottom-0 bg-neutral-100 py-3 flex items-center gap-2 justify-start border-t border-neutral-500 shadow-md z-10 rounded-b-lg">
+                            <footer className="sticky bottom-0 pt-3 flex items-center gap-2 justify-start border-t border-neutral-500 z-10 rounded-b-lg">
                                 <button onClick={onClose} className="py-2 text-sm bg-white text-gray-600 border rounded-md hover:bg-white/50">
                                     Cancel
                                 </button>
-                                {isEdit && (
+                                {(isEdit || !isDetail) && (
                                     <button className="py-2 text-sm bg-c-teal text-white rounded-md hover:bg-c-teal/80" onClick={handleSaveClick} disabled={isSaving}>
                                         {isSaving ? 'Saving...' : 'Save'}
                                     </button>
@@ -192,7 +258,7 @@ export default function DetailsInfo({ data, onClose, isEdit, setIsEdit }) {
                         </div>
                     </div>
                 </main>
-            </div>
-        </div>
+            </div >
+        </div >
     );
 }

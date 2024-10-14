@@ -16,7 +16,7 @@ export default function AccountContactInfo() {
    const [selectedRowData, setSelectedRowData] = useState(null); // State to store selected row data
    const [tableData, setTableData] = useState([]); // Initialize state for fetched data
    const [loading, setLoading] = useState(true);
-   const [isEdit, setIsEdit] = useState(false);
+//    const [isEdit, setIsEdit] = useState(false);
 
    const dropdownRefs = useRef([]); // Array of refs
 
@@ -25,6 +25,8 @@ export default function AccountContactInfo() {
        setSelectedRowData(rowData); // Set selected row data
        setIsDetailsModalOpen(true);
        setDropdownOpen(null);
+       console.log("data : " , tableData);
+
    };
 
 
@@ -169,7 +171,7 @@ export default function AccountContactInfo() {
 
 
            {/* Modals */}
-           {isDetailsModalOpen && <DetailsInfo data={selectedRowData} onClose={closeDetailsModal} isEdit={isEdit} setIsEdit={setIsEdit}/>}
+           {isDetailsModalOpen && <DetailsInfo data={selectedRowData} onClose={closeDetailsModal} isDetail={true}/>}
            {isAddAccountModalOpen && <AddAccountContact onClose={closeAddAccountModal} />}
            {isModalOpen && modalType === 'account' && (
                <AccountForm onClose={closeModal} />

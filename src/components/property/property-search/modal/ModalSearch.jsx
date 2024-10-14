@@ -91,7 +91,9 @@ export default function ModalSearch({ isVisible, onClose, category, form, onForm
         buildingName: '',
         streetNumber: '',
         streetName: '',
-        postalCode: ''
+        postalCode: '',
+        pageNo: 1,
+        pageSize: 10
       });
     } else if (category === "District" || category === "MRT") {
       onFormChange([]);
@@ -114,12 +116,19 @@ export default function ModalSearch({ isVisible, onClose, category, form, onForm
           const newChecked = !district.checked; // Toggle the checked state
 
           // Update the form in the parent component
-          const updatedForm = newChecked
-            ? [...form, district.name] // If checked, add to form
-            : form.filter((name) => name !== district.name); // If unchecked, remove from form
+          const updatedDistricts = newChecked
+            ? [...form.districts, district.name] // If checked, add to form
+            : form.districts.filter((name) => name !== district.name);
 
-          onFormChange(updatedForm); // Pass the updated form to the parent
-          return { ...district, checked: newChecked }; // Update district's checked state
+          console.log('updatedDistricts ', updatedDistricts);
+          onFormChange(updatedDistricts); // Pass the updated form to the parent
+          return {
+            ...form,
+            districts: updatedDistricts,
+            pageNo: form.pageNo,
+            pageSize: form.pageSize,
+            checked: newChecked
+          }; // Update district's checked state
         }
         return district; // Return the unchanged district
       });
@@ -266,7 +275,7 @@ export default function ModalSearch({ isVisible, onClose, category, form, onForm
                   form.type
                     ? propertyResources.propertyContactKind.find(
                       (option) => option.accountContactType === form.type
-                    ) || null 
+                    ) || null
                     : null
                 } options={propertyResources && propertyResources.propertyContactKind ? propertyResources.propertyContactKind : []}
                 getOptionLabel={(option) => option.accountContactType}
@@ -388,7 +397,7 @@ export default function ModalSearch({ isVisible, onClose, category, form, onForm
           {/* District list */}
           <ul className="grid grid-cols-2 gap-4">
             {filteredDistricts.map((district) => {
-              const isChecked = form.includes(district.name); // Check if district is in formDistrict
+              const isChecked = form.districts.includes(district.name); // Check if district is in formDistrict
 
               return (
                 <li

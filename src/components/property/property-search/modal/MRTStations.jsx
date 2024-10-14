@@ -38,10 +38,13 @@ const MRTStations = ({ form, onFormChange, setSelectedStations }) => {
 
           // Update the form in the parent component
           const updatedForm = newChecked
-            ? [...form, station.value] // If checked, add to form
-            : form.filter((value) => value !== station.value); // If unchecked, remove from form
+            ? [...form.mrts, station.value] // If checked, add to form
+            : form.mrts.filter((value) => value !== station.value); // If unchecked, remove from form
 
-          onFormChange(updatedForm); // Pass the updated form to the parent
+          onFormChange({
+            ...form,
+            mrts: updatedForm
+          });
           return { ...s, checked: newChecked }; // Update station's checked state
         }
         return s; // Return the unchanged station
@@ -71,7 +74,7 @@ const MRTStations = ({ form, onFormChange, setSelectedStations }) => {
         <h3 className="font-medium text-gray-600 text-sm mb-2">Available Stations:</h3>
         <ul className="grid grid-cols gap-4">
           {filteredStations.map((station) => {
-            const isChecked = form.includes(station.value); // Check if station is in form
+            const isChecked = form.mrts.includes(station.value); // Check if station is in form
 
             return (
               <li

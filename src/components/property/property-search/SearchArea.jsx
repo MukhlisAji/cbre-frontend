@@ -55,10 +55,25 @@ const SearchArea = () => {
     buildingName: '',
     streetNumber: '',
     streetName: '',
-    postalCode: ''
+    postalCode: '',
+    pageNo: 1,
+    pageSize: 10
   });
-  const [formDistrict, setFormDistrict] = useState([]);
-  const [formMrt, setFormMRT] = useState([]);
+  const [formDistrict, setFormDistrict] = useState({
+    districts: [],
+    pageNo: 1,
+    pageSize: 10
+  });
+
+
+
+
+  const [formMrt, setFormMRT] = useState({
+    mrts: [],
+    pageNo: 1,
+    pageSize: 10
+  });
+
   const [formAccount, setFormAccount] = useState({
     keyword: '',
     type: '',
@@ -69,14 +84,20 @@ const SearchArea = () => {
   const handleSetQuery = (form) => {
     let queryString = '';
 
-    if (category === 'District' || category === 'MRT' || category === 'Micromarket') {
+    if (category === 'District') {
       // Include only district-related fields, adjust as per your state
-      queryString = `${form ? form : ''}`.trim();
+      queryString = `${form.districts ? form.districts : ''}`.trim();
     } else if (category === 'Address') {
       // Include address-related fields
       queryString = `${form.buildingName ? form.buildingName : ''},${form.streetNumber ? form.streetNumber : ''},${form.streetName ? form.streetName : ''},${form.postalCode ? form.postalCode : ''}`.trim();
     } else if (category === "Account/Contacts") {
-      queryString = `${form.keyword ? form.keyword : ''}, ${form.type ? form.type : ''}, ${form.pageNo ? form.pageNo : ''}, ${form.pageSize ? form.pageSize : ''}`;
+      queryString = `${form.keyword ? form.keyword : ''}, ${form.type ? form.type : ''}, ${form.pageNo ? form.pageNo : ''}}`;
+    } else if (category === 'MRT' || category === 'Micromarket') {
+      // Include only district-related fields, adjust as per your state
+      queryString = `${form.districts ? form.districts : ''}`.trim();
+    } else if (category === 'Micromarket') {
+      // Include only district-related fields, adjust as per your state
+      queryString = `${form.mrts ? form.mrts : ''}`.trim();
     }
 
     // Remove any trailing commas or unnecessary spaces
