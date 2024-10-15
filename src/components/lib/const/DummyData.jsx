@@ -132,7 +132,7 @@ const PROPERTYCOLUMNDUMMY = [
   { "label": "Region", "accessor": "region" },
   { "label": "Zoning", "accessor": "zoning" },
   { "label": "Status", "accessor": "buildingStatus" },
-  { "label": "Floor", "accessor": "district" },
+  { "label": "District", "accessor": "district" },
   { "label": "Floor", "accessor": "floorInformation" },
   { "label": "Street No", "accessor": "streetNumber" },
   { "label": "Street Name", "accessor": "streetName" },

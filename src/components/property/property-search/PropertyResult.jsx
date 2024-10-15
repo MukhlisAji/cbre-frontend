@@ -92,10 +92,10 @@ const PropertyResult = () => {
           queryString = `${form.buildingName ? form.buildingName : ''},${form.streetNumber ? form.streetNumber : ''},${form.streetName ? form.streetName : ''},${form.postalCode ? form.postalCode : ''}`.trim();
         } else if (category === "Account/Contacts") {
           queryString = `${form.keyword ? form.keyword : ''}, ${form.type ? form.type : ''}, ${form.pageNo ? form.pageNo : ''}}`;
-        } else if (category === 'MRT' || category === 'Micromarket') {
+        } else if (category === 'Micromarket') {
           // Include only district-related fields, adjust as per your state
           queryString = `${form.districts ? form.districts : ''}`.trim();
-        } else if (category === 'Micromarket') {
+        } else if (category === 'MRT') {
           // Include only district-related fields, adjust as per your state
           queryString = `${form.mrts ? form.mrts : ''}`.trim();
         }
@@ -231,23 +231,6 @@ const PropertyResult = () => {
         Rent: useRef(null),
         FindAgent: useRef(null),
     };
-
-    useEffect(() => {
-        updateSliderPosition(); // Update the slider position on initial load
-    }, [activeButton]); // Update whenever the active button changes
-
-    const handleButtonClick = (button) => {
-        setActiveButton(button);
-    };
-
-    const updateSliderPosition = () => {
-        const activeButtonRef = buttonRefs[activeButton.replace(' ', '')].current;
-        if (activeButtonRef) {
-            const { width, left } = activeButtonRef.getBoundingClientRect();
-            setSliderStyle({ width, left: left - activeButtonRef.parentNode.getBoundingClientRect().left });
-        }
-    };
-
 
     const handleSearchClick = () => {
         executeSearch(getForm());

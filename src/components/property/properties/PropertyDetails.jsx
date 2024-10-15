@@ -60,36 +60,6 @@ export default function PropertyDetails() {
 
                 </div>
             </div>
-            {/* <div className="flex justify-between items-center bg-white p-2 mb-4 rounded-md shadow-md">
-                <div className="flex space-x-12">
-                    <div className="flex flex-col p-2 ">
-                        <span className="text-xs">{contactData.title}</span>
-                    </div>
-                    <div className="flex flex-col p-2 ">
-                        <span className="text-xs">Account Name</span>
-                        <p className="text-sm cursor-pointer text-green-700 hover:text-c-teal">{contactData.accountContact.accountName}</p>
-                    </div>
-                    <div className="flex p-2 ">
-                        <span className="material-icons text-xs">{contactData.businessPhone}</span>
-                        <IoMdArrowDropdown className='ml-1 cursor-pointer active:rounded-lg active:border active:border-neutral-500' />
-                    </div>
-                    <div className="flex flex-col p-2 ">
-                        <span className="text-xs">Email</span>
-                        <p href="mailto:k.singamsetty@xactdata.com.test" className="text-green-700 hover:text-c-teal text-sm">{contactData.email}</p>
-                    </div>
-                    <div className="flex flex-col p-2 ">
-                        <span className="material-icons text-xs">linkedin</span>
-                        <p className="text-sm">{contactData.linkedin}</p>
-                    </div>
-                    <div className="flex flex-col p-2 ">
-                        <span className="material-icons text-xs">Contact Status</span>
-                        <div className='flex items-center'>
-                            <p className="text-sm">{contactData.status}</p>
-                            <IoCheckmarkCircleOutline className='text-2xl pl-1 text-green-700' />
-                        </div>
-                    </div>
-                </div>
-            </div> */}
 
             {/* Details Section */}
             <Tab.Group selectedIndex={selectedIndex} onChange={setSelectedIndex}>
@@ -112,40 +82,42 @@ export default function PropertyDetails() {
                         </Tab>
                     ))}
                 </Tab.List>
-                <Tab.Panels className="">
-                    {tabs.map((tab, idx) => (
-                        <Tab.Panel
-                            key={idx}
-                            className={classNames(
-                                'bg-white rounded-b-lg p-2 shadow-md',
-                                'focus:outline-none ring-white ring-opacity-60'
-                            )}
-                        >
-                            <div className="space-y-4">
-                                {tab === "Property" && (
-                                        
-                                    <PropertyInfo/>
-                                       
+                <div className="overflow-y-auto h-[calc(100vh-230px)]">
+
+                    <Tab.Panels className="">
+                        {tabs.map((tab, idx) => (
+                            <Tab.Panel
+                                key={idx}
+                                className={classNames(
+                                    'bg-white rounded-b-lg p-2 shadow-md',
+                                    'focus:outline-none ring-white ring-opacity-60'
                                 )}
-                                {tab === "Stocking Plan" && (
+                            >
+                                <div className="space-y-4">
+                                    {tab === "Property" && (
+
+                                        <PropertyInfo />
+
+                                    )}
+                                    {tab === "Stocking Plan" && (
+                                        <div>
+                                            {/* <h2 className="text-sm font-bold mb-4">Details</h2> */}
+                                            <p>No items to display.</p>
+                                        </div>
+                                    )}
+                                    {tab === "Property Images and Documents" && (
+                                        <div>
+                                            {/* <h2 className="text-sm font-bold mb-4">Details</h2> */}
+                                            <p>No items to display.</p>
+                                        </div>
+                                    )}
                                     <div>
-                                        {/* <h2 className="text-sm font-bold mb-4">Details</h2> */}
-                                        <p>No items to display.</p>
                                     </div>
-                                )}
-                                {tab === "Property Images and Documents" && (
-                                    <div>
-                                        {/* <h2 className="text-sm font-bold mb-4">Details</h2> */}
-                                        <p>No items to display.</p>
-                                    </div>
-                                )}
-                                <div>
-                                    {/* <p className='text-sm'>Have a query regarding this account? <a href="#" className="text-blue-500">Click Here</a></p> */}
                                 </div>
-                            </div>
-                        </Tab.Panel>
-                    ))}
-                </Tab.Panels>
+                            </Tab.Panel>
+                        ))}
+                    </Tab.Panels>
+                </div>
             </Tab.Group>
         </div >
     );

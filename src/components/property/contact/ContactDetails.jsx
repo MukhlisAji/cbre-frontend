@@ -69,7 +69,7 @@ const ContactDetails = () => {
     return (
         <div className="bg-neutral-100">
             {/* Header Section */}
-            <div className="bg-neutral-100 mb-4">
+            <div className="bg-neutral-100 mb-4 p-4">
                 <div className="flex justify-between items-center">
                     <div className='flex items-center space-x-3'>
                         <div className="p-2 rounded-md border-2 border-purple-500 bg-purple-600">

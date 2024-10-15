@@ -95,14 +95,28 @@ export default function ModalSearch({ isVisible, onClose, category, form, onForm
         pageNo: 1,
         pageSize: 10
       });
-    } else if (category === "District" || category === "MRT") {
-      onFormChange([]);
-    } else if (category === "Account/Contacts") {
-      onFormChange();
+    } else if (category === "District" ) {
+      onFormChange({
+        districts: [],
+        pageNo: 1,
+        pageSize: 10
+      });
+    } else if (category === "MRT") {
+      onFormChange({
+        mrts: [],
+        pageNo: 1,
+        pageSize: 10
+      });
+    }else if (category === "Account/Contacts") {
+      onFormChange({
+        keyword: '',
+        type: '',
+        pageNo: 1,
+        pageSize: 10
+      });
     }
 
   };
-
   const handleSearch = (e) => {
     setSearchTerm(e.target.value);
   };
