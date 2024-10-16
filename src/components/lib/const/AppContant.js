@@ -22,30 +22,30 @@ const CONTACTCOLUMN = [
     { "label": "Status", "accessor": "status", "isClickable": false },
     { "label": "Account Name", "accessor": "accountName", "isClickable": false }
 ];
-
 const PROPERTYCATEGORIES = [
     {
         title: "Basic Information",
         items: [
-            { color: "purple-500", label: "Basic Information" },
-            { color: "blue-500", label: "General Information" },
-            { color: "red-500", label: "Property Account and Contacts" },
-            { color: "blue-500", label: "Standards" },
-            { color: "yellow-500", label: "Public Transportation" },
-            { color: "orange-500", label: "Property Management" },
-            { color: "pink-500", label: "Elevators" },
-            { color: "purple-500", label: "Parking" },
-            { color: "green-500", label: "Specifications" },
-            { color: "yellow-500", label: "Ancillary Facilities" },
-            { color: "teal-500", label: "Airconditioning" },
-            { color: "gray-400", label: "Office Information" },
-            { color: "red-500", label: "Industrial Information" },
-            { color: "gray-400", label: "Retail Information" },
-            { color: "blue-500", label: "Agency" },
-            { color: "gray-400", label: "Notification Log" },
+            { color: "purple-500", label: "basicInformation", displayLabel: "Basic Information" },
+            { color: "blue-500", label: "generalInformation", displayLabel: "General Information" },
+            { color: "red-500", label: "propertyAccountAndContacts", displayLabel: "Property Account and Contacts" },
+            { color: "blue-500", label: "standards", displayLabel: "Standards" },
+            { color: "yellow-500", label: "publicTransportation", displayLabel: "Public Transportation" },
+            { color: "orange-500", label: "propertyManagement", displayLabel: "Property Management" },
+            { color: "pink-500", label: "elevators", displayLabel: "Elevators" },
+            { color: "purple-500", label: "parking", displayLabel: "Parking" },
+            { color: "green-500", label: "specifications", displayLabel: "Specifications" },
+            { color: "yellow-500", label: "ancillaryFacilities", displayLabel: "Ancillary Facilities" },
+            { color: "teal-500", label: "airCondition", displayLabel: "Airconditioning" },
+            { color: "gray-400", label: "officeInformation", displayLabel: "Office Information" },
+            { color: "red-500", label: "industrialInformation", displayLabel: "Industrial Information" },
+            { color: "gray-400", label: "retailInformation", displayLabel: "Retail Information" },
+            { color: "blue-500", label: "agency", displayLabel: "Agency" },
+            { color: "gray-400", label: "notificationLog", displayLabel: "Notification Log" },
         ],
     },
 ];
+
 
 const PROPERTYDETAILS = {
     sections: [

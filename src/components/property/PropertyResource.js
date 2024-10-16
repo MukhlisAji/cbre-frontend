@@ -118,7 +118,7 @@ export default function PropertyResource() {
 
   const fetchProperties = async () => {
     try {
-      const response = await fetch(' https://8a644c2d5208.ngrok.app/cbre/properties?pageNo=2&pageSize=10', {
+      const response = await fetch('https://a2edf140b5af.ngrok.app/cbre/properties?pageNo=2&pageSize=10', {
         method: 'GET',
         headers: {
           'transactionId': transactionId,
