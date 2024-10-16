@@ -31,6 +31,8 @@ export default function ClassicSearch({ filter, handleAdvanceSearchFilter, setAd
         setRentType(event.target.value);
     };
     const [formState, setFormState] = useState({
+        region: '',
+        micromarket: ' ',
         buildingName: '',
         streetNumber: '',
         streetName: '',
@@ -166,12 +168,16 @@ export default function ClassicSearch({ filter, handleAdvanceSearchFilter, setAd
                                 <div className="mb-4 space-y-4">
                                     <div className="space-y-2">
                                         <span className='text-sm mt-8 font-semibold text-gray-600'>Region</span>
-                                        <MultipleSelect label="" />
+                                        <MultipleSelect
+                                            value={formState.region}
+                                            onChange={handleInputChange} />
                                     </div>
 
                                     <div className="space-y-2">
                                         <span className='text-sm mt-8 font-semibold text-gray-600'>Micromarket</span>
-                                        <MultipleSelect label="" />
+                                        <MultipleSelect
+                                            value={formState.micromarket}
+                                            onChange={handleInputChange} />
 
                                     </div>
                                 </div>

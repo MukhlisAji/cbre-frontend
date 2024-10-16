@@ -61,9 +61,9 @@ export default function ContactForm({ onClose, isEditing, contactId }) {
             accountName: {
                 accountId: null,
                 salesforceAccountId: '',
-                relationshipTypeId: null,
-                relationshipType: '',
-                isPrimary: 'No'
+                // relationshipTypeId: null,
+                // relationshipType: '',
+                // isPrimary: 'No'
             },
             contactProfile: [],
             influenceLevel: ''
@@ -143,6 +143,7 @@ export default function ContactForm({ onClose, isEditing, contactId }) {
             fetchAccountData();
         }
     }, [isEditing, url]);
+    
     useEffect(() => {
         if (initialData) {
             setFormData({
@@ -163,9 +164,9 @@ export default function ContactForm({ onClose, isEditing, contactId }) {
                     accountName: initialData?.accountContact ? {
                         accountId: initialData?.accountContact?.accountId?.toString() || '',
                         salesforceAccountId: initialData?.accountContact?.accountSalesforceId?.toString() || '',
-                        relationshipTypeId: initialData?.accountContact?.relationshipType?.id?.toString() || '',
-                        relationshipType: initialData?.accountContact?.relationshipType?.name?.toString() || '',
-                        isPrimary: 'Yes' // Assuming it's primary if it's the only one provided
+                        // relationshipTypeId: initialData?.accountContact?.relationshipType?.id?.toString() || '',
+                        // relationshipType: initialData?.accountContact?.relationshipType?.name?.toString() || '',
+                        // isPrimary: 'Yes' // Assuming it's primary if it's the only one provided
                     } : {},
                     contactProfile: initialData?.contactProfile?.map(profile => ({
                         contactProfileId: profile?.contactProfileList?.id?.toString() || '',
@@ -386,7 +387,7 @@ export default function ContactForm({ onClose, isEditing, contactId }) {
                 fax: '',
                 linkedin: '',
                 accountName: '',
-                relationshipType: '',
+                // relationshipType: '',
                 contactProfile: [],
                 influenceLevel: '',
             },

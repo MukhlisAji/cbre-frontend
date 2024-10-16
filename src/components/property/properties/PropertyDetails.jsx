@@ -9,14 +9,16 @@ import { Tab } from '@headlessui/react';
 import classNames from 'classnames';
 import { PROPERTYCATEGORIES, PROPERTYDETAILS } from '../../lib/const/AppContant';
 import PropertyInfo from './property-detail/PropertyInfo';
+import DocumentList from './property-detail/Document-Images/DocumentList';
+import axios from 'axios';
 
 export default function PropertyDetails() {
     const [selectedIndex, setSelectedIndex] = useState(0);
-
     const [contactInformationVisible, setContactInformationVisible] = useState(true);
     const [addressInformationVisible, setAddressInformationVisible] = useState(true);
     const [sectionHeight, setSectionHeight] = useState(0);
     const [contactData, setContactData] = useState(null);
+    const [propertyInfo, setPropertyInfo] = useState(null);
     const { id } = useParams();
 
     const tabs = [
@@ -24,6 +26,24 @@ export default function PropertyDetails() {
         "Stacking Plan",
         "Property Images and Documents",
     ];
+
+    useEffect(() => {
+        const fetchPropertyInfo = async () => {
+            try {
+                const response = await axios.get(`${CONFIG.PROPERTY_SERVICE}/${id}`, {
+                    headers: {
+                        transactionId: '4646765766',
+                    },
+                });
+                setPropertyInfo(response.data.resultSet.propertyInformation);
+              console.log('property info ', response.data.resultSet.propertyInformation);
+            } catch (error) {
+                console.error('Error fetching property info:', error);
+            }
+        };
+
+        fetchPropertyInfo();
+    }, []);
 
     const toggleVisibility = (section) => {
         switch (section) {
@@ -38,10 +58,6 @@ export default function PropertyDetails() {
                 break;
         }
     };
-
-    // if (!contactData) {
-    //     return <div>Loading...</div>;  // Show a loading state while data is fetched
-    // }
 
     return (
         <div className="bg-neutral-100">
@@ -93,11 +109,9 @@ export default function PropertyDetails() {
                                     'focus:outline-none ring-white ring-opacity-60'
                                 )}
                             >
-                                <div className="space-y-4">
+                                <div>
                                     {tab === "Property" && (
-
-                                        <PropertyInfo />
-
+                                        <PropertyInfo propertyInfo={propertyInfo} id={id}/>
                                     )}
                                     {tab === "Stocking Plan" && (
                                         <div>
@@ -108,7 +122,7 @@ export default function PropertyDetails() {
                                     {tab === "Property Images and Documents" && (
                                         <div>
                                             {/* <h2 className="text-sm font-bold mb-4">Details</h2> */}
-                                            <p>No items to display.</p>
+                                            <DocumentList />
                                         </div>
                                     )}
                                     <div>

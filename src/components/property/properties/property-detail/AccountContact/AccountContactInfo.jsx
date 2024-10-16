@@ -7,7 +7,7 @@ import ContactForm from "../../../contact/ContactForm";
 import { CONFIG } from "../../../../../config";
 import AccountContactList from "./AccountContactList";  // Import the advanced table component
 
-export default function AccountContactInfo() {
+export default function AccountContactInfo({propertyId}) {
    const [dropdownOpen, setDropdownOpen] = useState(null);
    const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
    const [isAddAccountModalOpen, setIsAddAccountModalOpen] = useState(false);
@@ -65,11 +65,11 @@ export default function AccountContactInfo() {
        setModalType(null);
    };
 
-   // Fetch data from the API
+   // Fetch data from the API 183933
    useEffect(() => {
        const fetchData = async () => {
            try {
-               const response = await fetch(`${CONFIG.PROPERTY_SERVICE}/183933/accounts-contacts`, {
+               const response = await fetch(`${CONFIG.PROPERTY_SERVICE}/${propertyId}/accounts-contacts`, {
                    method: 'GET',
                    headers: {
                        'transactionId': '4646765766',

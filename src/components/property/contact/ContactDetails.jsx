@@ -90,7 +90,7 @@ const ContactDetails = () => {
                     </div>
                     <div className="flex flex-col p-2 ">
                         <span className="text-xs">Account Name</span>
-                        <p className="text-sm cursor-pointer text-green-700 hover:text-c-teal">{contactData.accountContact.accountName}</p>
+                        <p className="text-sm cursor-pointer text-green-700 hover:text-c-teal">{contactData.accountContact?.accountName}</p>
                     </div>
                     <div className="flex p-2 ">
                         <span className="material-icons text-xs">{contactData.businessPhone}</span>
@@ -141,7 +141,7 @@ const ContactDetails = () => {
                                     <div className="flex justify-between border-b pb-1">
                                         <div className="flex flex-col">
                                             <label className="text-neutral-600 text-sm mb-1">Account Name</label>
-                                            <a href="#" className="text-green-700 hover:text-c-teal text-sm">{contactData.accountContact.accountName}</a>
+                                            <a href="#" className="text-green-700 hover:text-c-teal text-sm">{contactData.accountContact?.accountName}</a>
                                         </div>
                                         <HiPencil className="ml-2 cursor-pointer text-neutral-500 mt-auto" />
                                     </div>
@@ -187,13 +187,13 @@ const ContactDetails = () => {
                                         </div>
                                         <HiPencil className="ml-2 cursor-pointer text-neutral-500 mt-auto" />
                                     </div>
-                                    <div className="flex justify-between border-b pb-1">
+                                    {/* <div className="flex justify-between border-b pb-1">
                                         <div className="flex flex-col mt-auto">
                                             <label className="text-neutral-600 text-sm mb-1">Contact Type</label>
                                             <input type="text" value={contactData.accountContact.relationshipType.name} className="w-full text-sm text-neutral-700" readOnly />
                                         </div>
                                         <HiPencil className="ml-2 cursor-pointer text-neutral-500 mt-auto" />
-                                    </div>
+                                    </div> */}
                                     <div className="flex justify-between border-b pb-1">
                                         <div className="flex flex-col mt-auto">
                                             <label className="text-neutral-600 text-sm mb-1">Main Phone</label>
