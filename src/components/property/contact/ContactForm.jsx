@@ -61,9 +61,9 @@ export default function ContactForm({ onClose, isEditing, contactId }) {
             accountName: {
                 accountId: null,
                 salesforceAccountId: '',
-                relationshipTypeId: null,
-                relationshipType: '',
-                isPrimary: 'No'
+                // relationshipTypeId: null,
+                // relationshipType: '',
+                // isPrimary: 'No'
             },
             contactProfile: [],
             influenceLevel: ''
@@ -143,6 +143,7 @@ export default function ContactForm({ onClose, isEditing, contactId }) {
             fetchAccountData();
         }
     }, [isEditing, url]);
+    
     useEffect(() => {
         if (initialData) {
             setFormData({
@@ -163,9 +164,9 @@ export default function ContactForm({ onClose, isEditing, contactId }) {
                     accountName: initialData?.accountContact ? {
                         accountId: initialData?.accountContact?.accountId?.toString() || '',
                         salesforceAccountId: initialData?.accountContact?.accountSalesforceId?.toString() || '',
-                        relationshipTypeId: initialData?.accountContact?.relationshipType?.id?.toString() || '',
-                        relationshipType: initialData?.accountContact?.relationshipType?.name?.toString() || '',
-                        isPrimary: 'Yes' // Assuming it's primary if it's the only one provided
+                        // relationshipTypeId: initialData?.accountContact?.relationshipType?.id?.toString() || '',
+                        // relationshipType: initialData?.accountContact?.relationshipType?.name?.toString() || '',
+                        // isPrimary: 'Yes' // Assuming it's primary if it's the only one provided
                     } : {},
                     contactProfile: initialData?.contactProfile?.map(profile => ({
                         contactProfileId: profile?.contactProfileList?.id?.toString() || '',
@@ -216,7 +217,7 @@ export default function ContactForm({ onClose, isEditing, contactId }) {
                     userId: '', // Assuming userId is set elsewhere
                 },
             });
-            
+
         }
         console.log("this is the data : ", formData);
     }, [initialData, isEditing]);
@@ -386,7 +387,7 @@ export default function ContactForm({ onClose, isEditing, contactId }) {
                 fax: '',
                 linkedin: '',
                 accountName: '',
-                relationshipType: '',
+                // relationshipType: '',
                 contactProfile: [],
                 influenceLevel: '',
             },
@@ -459,7 +460,7 @@ export default function ContactForm({ onClose, isEditing, contactId }) {
         <div className={`fixed inset-0 flex items-center justify-center z-50 ${onClose ? 'animate-fade-in' : 'animate-fade-out'}`}>
             <div className="absolute inset-0 bg-black opacity-50"></div>
             <div className="relative flex flex-col w-1/2 h-3/4 bg-white shadow-lg rounded-lg">
-                {(isLoading || !initialData) && (
+                {(isLoading || (isEditing && !initialData)) && (
                     <div className="absolute inset-0 bg-white bg-opacity-70 flex justify-center items-center z-50">
                         <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-c-teal"></div>
                     </div>
@@ -471,14 +472,14 @@ export default function ContactForm({ onClose, isEditing, contactId }) {
                         {notification}
                     </div>
                 )}
-                <header className="sticky top-0 shadow-sm py-3 bg-neutral-100 z-10 flex items-center justify-center rounded-t-lg border-b border-neutral-700">
+                <header className="sticky top-0 shadow-sm py-3 bg-c-teal z-10 flex items-center justify-center rounded-t-lg border-b border-neutral-700">
                     <button
                         onClick={onClose}
-                        className="absolute -top-4 -right-4 text-gray-600 hover:text-gray-800"
+                        className="absolute -top-0 -right-4 text-gray-300 hover:text-gray-300/80"
                     >
                         &times;
                     </button>
-                    <h2 className="text-lg font-bold text-c-dark-grayish text-align-center">NEW CONTACT</h2>
+                    <h2 className="text-lg font-bold text-gray-300 text-align-center">NEW CONTACT</h2>
                 </header>
 
                 <main className="flex-1 overflow-y-auto">

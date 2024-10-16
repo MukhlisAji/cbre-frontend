@@ -4,10 +4,10 @@ metadata:
   name: one-app-ingress
   namespace: oneapp-nonprod-ns
 spec:
-  ingressClassName: nginx-private
+  ingressClassName: nginx-public
   rules:
-  - host: oneapp-nonprod.cbre.com
-  # - host: one.cbre.com.sg
+  # - host: oneapp-nonprod.cbre.com
+  - host: one-uat.cbre.com.sg
     http:
       paths:
       - backend:

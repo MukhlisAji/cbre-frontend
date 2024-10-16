@@ -5,6 +5,8 @@ import { CONTACTCOLUMNDUMMY, CONTACTDATADUMMY, PROPERTYCOLUMNDUMMY, PROPERTYDATA
 import PropertyNew from './PropertyNew';
 import DataTable from '../../shared/CustomTableMUI';
 import PropertyForm from './PropertyForm';
+import ListProperty from '../ListProperty';
+import PropertyResource from '../PropertyResource';
 
 
 export default function Properties() {
@@ -14,6 +16,17 @@ export default function Properties() {
     const [isEditing, setIsEditing] = useState(false);
     const [currentAccount, setCurrentAccount] = useState(null);
     const [propertyId, setPropertyId] = useState(null);
+    const { properties, fetchProperties } = PropertyResource();
+
+    useEffect(() => {
+        if (!properties || properties.length === 0) {  // Check if properties is empty
+            setLoading(true);  // Set loading to true before fetching data
+            fetchProperties();  // Call the function to fetch properties
+        } else {
+            setLoading(false);  // Set loading to false if properties already has data
+        }
+    }, [properties]);  // Add properties as a dependency
+
 
     useEffect(() => {
         if (location.state?.openModal) {
@@ -69,7 +82,7 @@ export default function Properties() {
                         </button>
                     </div> */}
                 </div>
-                <DataTable column={PROPERTYCOLUMNDUMMY} dataTable={PROPERTYDATADUMMY} openModal={handleNewProperty} isHeader={true} tableHeight={300} loading={loading} onEdit={handleEditProperty} dataType={"properties"} />
+                <ListProperty column={PROPERTYCOLUMNDUMMY} dataTable={properties} openModal={handleNewProperty} isHeader={true} tableHeight={300} loading={loading} onEdit={handleEditProperty} dataType={"properties"} />
                 {isModalOpen && (
                     <PropertyForm
                         onClose={closeModal}

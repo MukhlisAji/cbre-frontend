@@ -6,10 +6,11 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import ModalSearch from './modal/ModalSearch';
 import ModalFilter from './modal/ModalFilter';
 import { generateTransactionId } from '../../lib/api/Authorization';
-import './SearchArea.css';
+// import './SearchArea.css';
 import homeImage from '../../../../src/assets/home.avif';
 import ClassicSearch from './ClassicSearch';
 import PopoverFilter from './modal/PopoverFilter';
+import PropertySearchForm from './PropertySearchForm';
 
 
 const SearchArea = () => {
@@ -54,20 +55,46 @@ const SearchArea = () => {
     buildingName: '',
     streetNumber: '',
     streetName: '',
-    postalCode: ''
+    postalCode: '',
+    pageNo: 1,
+    pageSize: 10
   });
-  const [formDistrict, setFormDistrict] = useState([]);
-  const [formMrt, setFormMRT] = useState([]);
+  const [formDistrict, setFormDistrict] = useState({
+    districts: [],
+    pageNo: 1,
+    pageSize: 10
+  });
+
+  const [formMrt, setFormMRT] = useState({
+    mrts: [],
+    pageNo: 1,
+    pageSize: 10
+  });
+
+  const [formAccount, setFormAccount] = useState({
+    keyword: '',
+    type: '',
+    pageNo: 1,
+    pageSize: 10
+  })
 
   const handleSetQuery = (form) => {
     let queryString = '';
 
-    if (category === 'District' || category === 'MRT' ) {
+    if (category === 'District') {
       // Include only district-related fields, adjust as per your state
-      queryString = `${form ? form : ''}`.trim();
+      queryString = `${form.districts ? form.districts : ''}`.trim();
     } else if (category === 'Address') {
       // Include address-related fields
       queryString = `${form.buildingName ? form.buildingName : ''},${form.streetNumber ? form.streetNumber : ''},${form.streetName ? form.streetName : ''},${form.postalCode ? form.postalCode : ''}`.trim();
+    } else if (category === "Account/Contacts") {
+      queryString = `${form.keyword ? form.keyword : ''}, ${form.type ? form.type : ''}`;
+    } else if (category === 'Micromarket') {
+      // Include only district-related fields, adjust as per your state
+      queryString = `${form.districts ? form.districts : ''}`.trim();
+    } else if (category === 'MRT') {
+      // Include only district-related fields, adjust as per your state
+      queryString = `${form.mrts ? form.mrts : ''}`.trim();
     }
 
     // Remove any trailing commas or unnecessary spaces
@@ -87,6 +114,12 @@ const SearchArea = () => {
     } else if (category === "MRT") {
       setFormMRT(updatedForm);
       console.log("Updated MRT Form:", updatedForm);
+    } else if (category === "Account/Contacts") {
+      setFormAccount(updatedForm);
+      console.log("Updated Account Form:", updatedForm);
+    } else if (category === 'Micromarket') {
+      setFormDistrict(updatedForm);
+      console.log("Updated Micromarket Form:", updatedForm);
     }
     handleSetQuery(updatedForm);
   };
@@ -98,7 +131,9 @@ const SearchArea = () => {
       return formDistrict;
     } else if (category === "MRT") {
       return formMrt;
-    }else{
+    } else if (category === "Account/Contacts") {
+      return formAccount;
+    } else if (category === 'Micromarket') {
       return formDistrict;
     }
   };
@@ -458,7 +493,7 @@ const SearchArea = () => {
 
         </div>
         :
-        <ClassicSearch filter={false} />}
+        <PropertySearchForm />}
     </div>
   );
 };

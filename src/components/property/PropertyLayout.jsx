@@ -122,7 +122,7 @@ export default function PropertyLayout() {
                         <div className="flex cursor-pointer" onClick={() => handleLabelClick('contacts')}>
                             <Link to="contacts" className=' hover:no-underline'>
                                 <span className="mr-2 flex items-center text-neutral-700 text-sm" >
-                                    Contact
+                                    Contacts
                                 </span>
                             </Link>
                             <span className="flex items-center text-c-dark-grayish" onClick={() => handleArrowClick('contacts')}>
