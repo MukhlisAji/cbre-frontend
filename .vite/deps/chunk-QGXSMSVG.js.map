@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["../../node_modules/@table-library/react-table-library/select-d972db04.js"],
+  "sourcesContent": ["var t,l;!function(t){t[t.RowClick=0]=\"RowClick\",t[t.ButtonClick=1]=\"ButtonClick\"}(t||(t={})),function(t){t[t.SingleSelect=0]=\"SingleSelect\",t[t.MultiSelect=1]=\"MultiSelect\"}(l||(l={}));export{t as S,l as a};\n//# sourceMappingURL=select-d972db04.js.map\n"],
+  "mappings": ";AAAA,IAAI;AAAJ,IAAM;AAAE,CAAC,SAASA,IAAE;AAAC,EAAAA,GAAEA,GAAE,WAAS,CAAC,IAAE,YAAWA,GAAEA,GAAE,cAAY,CAAC,IAAE;AAAa,EAAE,MAAI,IAAE,CAAC,EAAE,GAAE,SAASA,IAAE;AAAC,EAAAA,GAAEA,GAAE,eAAa,CAAC,IAAE,gBAAeA,GAAEA,GAAE,cAAY,CAAC,IAAE;AAAa,EAAE,MAAI,IAAE,CAAC,EAAE;",
+  "names": ["t"]
+}

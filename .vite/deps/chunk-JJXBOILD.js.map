@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["../../node_modules/@table-library/react-table-library/sort-c8713016.js"],
+  "sourcesContent": ["var e,t;!function(e){e[e.Prefix=0]=\"Prefix\",e[e.Suffix=1]=\"Suffix\"}(e||(e={})),function(e){e[e.Alternate=0]=\"Alternate\",e[e.AlternateWithReset=1]=\"AlternateWithReset\"}(t||(t={}));export{e as S,t as a};\n//# sourceMappingURL=sort-c8713016.js.map\n"],
+  "mappings": ";AAAA,IAAI;AAAJ,IAAM;AAAE,CAAC,SAASA,IAAE;AAAC,EAAAA,GAAEA,GAAE,SAAO,CAAC,IAAE,UAASA,GAAEA,GAAE,SAAO,CAAC,IAAE;AAAQ,EAAE,MAAI,IAAE,CAAC,EAAE,GAAE,SAASA,IAAE;AAAC,EAAAA,GAAEA,GAAE,YAAU,CAAC,IAAE,aAAYA,GAAEA,GAAE,qBAAmB,CAAC,IAAE;AAAoB,EAAE,MAAI,IAAE,CAAC,EAAE;",
+  "names": ["e"]
+}
