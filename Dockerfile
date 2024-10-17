@@ -13,8 +13,13 @@ RUN npm run build
 
 FROM nginxinc/nginx-unprivileged:latest
 
+# Switch to root to modify the configuration and permissions
+USER root
+
 COPY nginx/nginx.conf /etc/nginx/nginx.conf
 COPY nginx/default.conf /etc/nginx/conf.d/default.conf
+
+# Set the necessary permissions (as root)
 RUN chmod 666 /etc/nginx/conf.d/default.conf
 RUN chmod 666 /etc/nginx/nginx.conf
 
@@ -28,5 +33,8 @@ RUN mkdir -p /var/cache/nginx/ngx_http_proxy_module
 
 COPY --from=builder /app/dist /usr/share/nginx/html
 EXPOSE 8080
+
+# Switch back to the unprivileged user for running NGINX
+USER 101
 
 CMD ["nginx", "-g", "daemon off;"]

@@ -16,9 +16,9 @@ stages:
       - job: Build
         displayName: "CI Stage Initialize"
         steps:
-          - task: Npm@1
-            inputs:
-              command: 'install'
+          # - task: Npm@1
+          #   inputs:
+          #     command: 'install'
           - script: |
               echo '-------##########-------'
               ls $(System.DefaultWorkingDirectory)
