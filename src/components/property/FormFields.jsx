@@ -94,27 +94,34 @@ export const SelectField = ({
 
     useEffect(() => {
         if (Array.isArray(value) && value.length > 0) {
-            // Only set state if the current selectedValues differs from the new value
+            // Avoid unnecessary state updates by comparing with previous state
             if (JSON.stringify(selectedValues) !== JSON.stringify(value)) {
                 setSelectedValues(value);
             }
         } else if (!multiple && value) {
             const selectedOption = options.find(option => option[valueField] === value);
             const newSearchTerm = selectedOption ? selectedOption[labelField] : '';
-
-            // Only set search term if it actually needs to change
+    
+            // Update search term only if it differs from the current one
             if (searchTerm !== newSearchTerm) {
                 setSearchTerm(newSearchTerm);
             }
-
-            // Only update selected values if needed
-            if (selectedValues && selectedValues[0] !== value) {
+    
+            // Update selected values only if needed
+            if (!selectedValues || selectedValues[0] !== value) {
                 setSelectedValues([value]);
             }
         }
-    }, [value, options, multiple, valueField, labelField, selectedValues, searchTerm]);
-
-
+    }, [
+        value, 
+        options, 
+        multiple, 
+        valueField, 
+        labelField, 
+        searchTerm, // ✅ Should not trigger re-renders unnecessarily
+        selectedValues // ✅ Avoid re-renders from unnecessary state updates
+    ]);
+    
     const handleInputChange = (e) => {
         setSearchTerm(e.target.value);
         setShowDropdown(true);

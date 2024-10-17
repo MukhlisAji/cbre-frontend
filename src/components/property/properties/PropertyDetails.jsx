@@ -11,6 +11,7 @@ import { PROPERTYCATEGORIES, PROPERTYDETAILS } from '../../lib/const/AppContant'
 import PropertyInfo from './property-detail/PropertyInfo';
 import DocumentList from './property-detail/Document-Images/DocumentList';
 import axios from 'axios';
+import StockingPlanInfo from './property-detail/Stocking-Plan/StockingPlanInfo';
 
 export default function PropertyDetails() {
     const [selectedIndex, setSelectedIndex] = useState(0);
@@ -113,10 +114,9 @@ export default function PropertyDetails() {
                                     {tab === "Property" && (
                                         <PropertyInfo propertyInfo={propertyInfo} id={id}/>
                                     )}
-                                    {tab === "Stocking Plan" && (
+                                    {tab === "Stacking Plan" && (
                                         <div>
-                                            {/* <h2 className="text-sm font-bold mb-4">Details</h2> */}
-                                            <p>No items to display.</p>
+                                           <StockingPlanInfo />
                                         </div>
                                     )}
                                     {tab === "Property Images and Documents" && (

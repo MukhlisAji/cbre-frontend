@@ -1,8 +1,10 @@
+import { Box, Button, Card, CardContent, Checkbox, FormControl, FormControlLabel, Grid, InputLabel, MenuItem, Select, TextField, Typography } from "@mui/material";
 import React, { useState } from "react";
 
 export default function AddDocument({ onClose }) {
     const [selectedFiles, setSelectedFiles] = useState([]);
     const [fileDetails, setFileDetails] = useState([]);
+    const [type , setType] = useState('');
 
     const handleBackdropClick = (e) => {
         // Close modal when clicking on the backdrop
@@ -54,19 +56,29 @@ export default function AddDocument({ onClose }) {
                 <main className="flex-1 overflow-y-auto">
                     <div className="relative p-4">
                         <div className="mb-4">
-                            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="fileType">
-                                Choose File Type:
-                            </label>
-                            <select id="fileType" className="w-full p-2 border border-gray-300 rounded">
-                                <option value="Image">Image</option>
-                                <option value="Floor Plan">Floor Plan</option>
-                                <option value="Flyer">Flyer</option>
-                                <option value="Brochure">Brochure</option>
-                                <option value="External Appearance">External Appearance</option>
-                                <option value="Facilities">Facilities</option>
-                                <option value="Layout">Layout</option>
-                                <option value="Other">Other</option>
-                            </select>
+                            <FormControl fullWidth size="small">
+                                <InputLabel id={`fileType-label`}>Choose File Type</InputLabel>
+                                <Select
+                                    label="Choose File Type"
+                                    labelId={`fileType-label`}
+                                    id={`fileType`}
+                                    value={type}
+                                    onChange={(e) => setType(e.target.value)}
+                                // onChange={handleChange}
+                                >
+                                    <MenuItem value="">
+                                        <em>None</em>
+                                    </MenuItem>
+                                    <MenuItem value="Image">Image</MenuItem>
+                                    <MenuItem value="Floor Plan">Floor Plan</MenuItem>
+                                    <MenuItem value="Flyer">Flyer</MenuItem>
+                                    <MenuItem value="Brochure">Brochure</MenuItem>
+                                    <MenuItem value="External Appearance">External Appearance</MenuItem>
+                                    <MenuItem value="Facilities">Facilities</MenuItem>
+                                    <MenuItem value="Layout">Layout</MenuItem>
+                                    <MenuItem value="Other">Other</MenuItem>
+                                </Select>
+                            </FormControl>
                         </div>
                         <div className="mb-4">
                             <input
@@ -83,90 +95,124 @@ export default function AddDocument({ onClose }) {
                             <div className="mb-4">
                                 <h3 className="text-gray-700 text-sm font-bold mb-2">Selected Files:</h3>
                                 <div className="grid grid-cols-1 gap-4 h-[calc(100vh-400px)] overflow-y-auto">
-                                    {selectedFiles.map((file, index) => (
-                                        <div key={index} className="border p-4 rounded-md shadow-md">
-                                            <div className="flex justify-between items-center space-x-4 mb-2">
-                                                <div className="flex items-center space-x-4">
-                                                    <img
-                                                        src={URL.createObjectURL(file)}
-                                                        alt={file.name}
-                                                        className="w-16 h-16 object-cover rounded-md"
-                                                    />
-                                                    {/* <div>
-                                                        <p className="text-sm font-semibold text-gray-800 truncate">
-                                                            {file.name}
-                                                        </p>
-                                                        <p className="text-xs text-gray-600">
-                                                            {Math.round(file.size / 1024)} KB
-                                                        </p>
-                                                    </div> */}
-                                                </div>
+                                    <Box>
+                                        {selectedFiles.map((file, index) => (
+                                            <Card key={index} variant="outlined" sx={{ mb: 2, p: 2 }}>
+                                                <CardContent>
+                                                    <Grid container spacing={2} alignItems="center">
+                                                        {/* Image Section */}
+                                                        <Grid item xs={12} sm={3}>
+                                                            <Box sx={{ border: '1px solid green', borderRadius: '8px', padding: '4px', height: '100%' }}>
+                                                                <img
+                                                                    src={URL.createObjectURL(file)}
+                                                                    alt={file.name}
+                                                                    style={{
+                                                                        width: '100%',
+                                                                        height: '100%',
+                                                                        objectFit: 'contain',  // Ensures the image fits the space
+                                                                        borderRadius: '8px',
+                                                                    }}
+                                                                />
+                                                            </Box>
+                                                            <Typography variant="caption" color="textSecondary">
+                                                                ({file.type})
+                                                            </Typography>
+                                                        </Grid>
 
-                                                <button
-                                                    onClick={() => handleDeleteFile(index)}
-                                                    className="ml-auto text-sm py-1 px-2 rounded rounded-sm bg-gray-100 text-red-500 hover:text-red-700"
-                                                >
-                                                    Delete
-                                                </button>
-                                            </div>
-                                            <div className="mb-2">
-                                                <label className="block text-sm font-semibold text-gray-700 mb-1">
-                                                    Document Name
-                                                </label>
-                                                <input
-                                                    type="text"
-                                                    value={fileDetails[index].name}
-                                                    readOnly
-                                                    className="w-full p-2 border border-gray-300 rounded"
-                                                />
-                                            </div>
-                                            <div className="mb-4">
-                                                <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="fileType">
-                                                    Choose File Type:
-                                                </label>
-                                                <select id="fileType" className="w-full p-2 border border-gray-300 rounded">
-                                                    <option value="Image">Image</option>
-                                                    <option value="Floor Plan">Floor Plan</option>
-                                                    <option value="Flyer">Flyer</option>
-                                                    <option value="Brochure">Brochure</option>
-                                                    <option value="External Appearance">External Appearance</option>
-                                                    <option value="Facilities">Facilities</option>
-                                                    <option value="Layout">Layout</option>
-                                                    <option value="Other">Other</option>
-                                                </select>
-                                            </div>
-                                            <div className="mb-2">
-                                                <label className="block text-sm font-semibold text-gray-700 mb-1">
-                                                    Description
-                                                </label>
-                                                <textarea
-                                                    value={fileDetails[index].description}
-                                                    onChange={(e) => handleDetailChange(index, 'description', e.target.value)}
-                                                    className="w-full p-2 border border-gray-300 rounded"
-                                                />
-                                            </div>
-                                            <div className="flex items-center space-x-4">
-                                                <label className="flex items-center">
-                                                    <input
-                                                        type="checkbox"
-                                                        checked={fileDetails[index].highPriority}
-                                                        onChange={(e) => handleDetailChange(index, 'highPriority', e.target.checked)}
-                                                        className="mr-2 text-sm"
-                                                    />
-                                                    High priority
-                                                </label>
-                                                <label className="flex items-center">
-                                                    <input
-                                                        type="checkbox"
-                                                        checked={fileDetails[index].webPublished}
-                                                        onChange={(e) => handleDetailChange(index, 'webPublished', e.target.checked)}
-                                                        className="mr-2 text-sm"
-                                                    />
-                                                    Web Published
-                                                </label>
-                                            </div>
-                                        </div>
-                                    ))}
+                                                        {/* Form Section */}
+                                                        <Grid item xs={12} sm={9}>
+                                                            <Grid container spacing={2}>
+
+                                                                <Grid item xs={12}>
+                                                                    <TextField
+                                                                        label="Document Name"
+                                                                        size="small"
+                                                                        value={fileDetails[index].name}
+                                                                        fullWidth
+                                                                    />
+
+
+                                                                </Grid>
+                                                                <Grid item xs={12}>
+                                                                    <TextField
+                                                                        label="Description"
+                                                                        value={fileDetails[index].description}
+                                                                        onChange={(e) => handleDetailChange(index, "description", e.target.value)}
+                                                                        multiline
+                                                                        // rows={2}
+                                                                        fullWidth
+                                                                        size="small"
+                                                                    />
+                                                                </Grid>
+                                                                <Grid item xs={12}>
+                                                                    <FormControl fullWidth size="small">
+                                                                        <InputLabel id={`fileType-label-${index}`}>Choose File Type</InputLabel>
+                                                                        <Select
+                                                                            label="Choose File Type"
+                                                                            labelId={`fileType-label-${index}`}
+                                                                            id={`fileType-${index}`}
+                                                                            defaultValue={type}
+                                                                            value={fileDetails[index].fileType || ""}
+                                                                            onChange={(e) => handleDetailChange(index, "fileType", e.target.value)}
+                                                                        // onChange={handleChange}
+                                                                        >
+                                                                            <MenuItem value="">
+                                                                                <em>None</em>
+                                                                            </MenuItem>
+                                                                            <MenuItem value="Image">Image</MenuItem>
+                                                                            <MenuItem value="Floor Plan">Floor Plan</MenuItem>
+                                                                            <MenuItem value="Flyer">Flyer</MenuItem>
+                                                                            <MenuItem value="Brochure">Brochure</MenuItem>
+                                                                            <MenuItem value="External Appearance">External Appearance</MenuItem>
+                                                                            <MenuItem value="Facilities">Facilities</MenuItem>
+                                                                            <MenuItem value="Layout">Layout</MenuItem>
+                                                                            <MenuItem value="Other">Other</MenuItem>
+                                                                        </Select>
+                                                                    </FormControl>
+
+                                                                </Grid>
+
+                                                                <Grid item xs={12} sm={4}>
+                                                                    <FormControlLabel
+                                                                        control={
+                                                                            <Checkbox
+                                                                                checked={fileDetails[index].highPriority}
+                                                                                onChange={(e) => handleDetailChange(index, "highPriority", e.target.checked)}
+                                                                                size="small"
+                                                                            />
+                                                                        }
+                                                                        label="High Priority"
+                                                                    />
+                                                                </Grid>
+                                                                <Grid item xs={12} sm={6}>
+                                                                    <FormControlLabel
+                                                                        control={
+                                                                            <Checkbox
+                                                                                checked={fileDetails[index].webPublished}
+                                                                                onChange={(e) => handleDetailChange(index, "webPublished", e.target.checked)}
+                                                                                size="small"
+                                                                            />
+                                                                        }
+                                                                        label="Web Published"
+                                                                    />
+                                                                </Grid>
+                                                                <Grid item xs={12} sm={2}>
+                                                                    <Button
+                                                                        variant="contained"
+                                                                        color="error"
+                                                                        size="small"
+                                                                        onClick={() => handleDeleteFile(index)}
+                                                                    >
+                                                                        Delete
+                                                                    </Button>
+                                                                </Grid>
+                                                            </Grid>
+                                                        </Grid>
+                                                    </Grid>
+                                                </CardContent>
+                                            </Card>
+                                        ))}
+                                    </Box>
                                 </div>
                             </div>
                         )}

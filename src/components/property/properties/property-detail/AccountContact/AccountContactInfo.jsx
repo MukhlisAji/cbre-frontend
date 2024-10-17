@@ -97,7 +97,7 @@ export default function AccountContactInfo({propertyId}) {
        fetchData();
    }, []);
 
-   const PROPERTYCOLUMNDUMMY = [
+const PROPERTYCOLUMNDUMMY = [
     {
         label: "Action",
         accessor: "action",
