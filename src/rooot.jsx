@@ -48,6 +48,7 @@ import PropertySearchForm from "./components/property/property-search/PropertySe
 import PropertyDetails from "./components/property/properties/PropertyDetails";
 import SearchArea from "./components/property/property-search/SearchArea";
 import PropertyResult from "./components/property/property-search/PropertyResult";
+import ClassicSearch from "./components/property/property-search/ClassicSearch";
 
 Modal.setAppElement("#root");
 

@@ -293,9 +293,9 @@ const CustomTableMUI = ({ dataTable, column, openModal, isHeader, tableHeight, l
 
 
             {isHeader && <div className="flex flex-col h-full">
-                <p className="text-neutral-500 text-xs mt-auto py-2">
+                {/* <p className="text-neutral-500 text-xs mt-auto py-2">
                     1 item • Updated a few seconds ago
-                </p>
+                </p> */}
                 <div className="flex flex-grow items-center space-x-2 justify-between">
                     <div className="flex w-48 text-sm rounded gap-1 px-1 rounded-md bg-gray-200">
                         <button

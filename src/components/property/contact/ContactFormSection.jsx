@@ -71,6 +71,32 @@ export default function ContactFormSection({
     };
 
 
+    // useEffect(() => {
+    //     const fetchAndSetAccountLabel = async () => {
+    //         if (formData.contactInformation.accountName.accountId && !formData.contactInformation.accountName.label) {
+    //             const accountId = formData.contactInformation.accountName.accountId;
+    //             const searchResults = await searchAccountName(''); // Fetch all accounts or use default search
+    //             const matchedAccount = searchResults.find(account => account.id === accountId);
+
+    //             if (matchedAccount) {
+    //                 setFormData(prevData => ({
+    //                     ...prevData,
+    //                     contactInformation: {
+    //                         ...prevData.contactInformation,
+    //                         accountName: {
+    //                             accountId: matchedAccount.id,
+    //                             label: matchedAccount.label, // Set the matched label
+    //                             salesforceAccountId: matchedAccount.salesforceId,
+    //                         },
+    //                     },
+    //                 }));
+    //             }
+    //         }
+    //     };
+
+    //     fetchAndSetAccountLabel();
+    // }, [formData.contactInformation.accountName.accountId]);
+
     const searchAccountName = async (searchTerm) => {
         const response = await fetch(`${CONFIG.ACCOUNT_SERVICE}/find-account?name=${searchTerm}`, {
             method: 'GET',
@@ -85,6 +111,7 @@ export default function ContactFormSection({
             salesforceId: account.salesforceId,
         }));
     };
+
 
 
     const searchContactName = async (searchTerm) => {
@@ -138,21 +165,23 @@ export default function ContactFormSection({
                 { label: 'LinkedIn', type: 'text', value: formData.contactInformation.linkedin, onChange: handleInputChange('contactInformation', 'linkedin') },
                 {
                     label: 'Account Name',
-                    value: formData.contactInformation.accountName.accountId,
+                    value: formData.contactInformation.accountName.accountId
+                        ? { id: formData.contactInformation.accountName.accountId, label: formData.contactInformation.accountName.label || '' }
+                        : null,
                     onChange: (event) => {
                         const value = event.target ? event.target.value : event;
-                        const accountId = value.id || null;
-                        const salesforceAccountId = (value.salesforceId && value.salesforceId !== 'null') ? value.salesforceId : null;
-                        console.log("value ", value);
+                        const accountId = value || null;
+                        console.log('value id ', accountId);
 
+                        const salesforceAccountId = value.salesforceId !== 'null' ? value.salesforceId : null;
 
                         setFormData(prevData => ({
                             ...prevData,
                             contactInformation: {
                                 ...prevData.contactInformation,
                                 accountName: {
-                                    ...prevData.contactInformation.accountName,
                                     accountId: accountId,
+                                    label: value.label,  // Store the selected label
                                     salesforceAccountId: salesforceAccountId,
                                 },
                             },

@@ -8,6 +8,7 @@ import { PiWarningCircleLight } from 'react-icons/pi';
 import { RiContactsBook3Line, RiErrorWarningFill } from 'react-icons/ri';
 import { IoMdArrowDropdown } from 'react-icons/io';
 import { IoCheckmarkCircleOutline } from 'react-icons/io5';
+import { CONFIG } from '../../../config';
 
 function classNames(...classes) {
     return classes.filter(Boolean).join(' ');
@@ -35,7 +36,7 @@ export default function AccountDetails() {
         async function fetchAccountData() {
             try {
                 // Replace with your API call
-                const response = await fetch(`http://localhost:8085/cbre/account/${id}`);
+                const response = await fetch(`${CONFIG.ACCOUNT_SERVICE}/${id}`);
                 const data = await response.json();
                 setAccountData(data.resultSet);
             } catch (error) {
@@ -52,7 +53,7 @@ export default function AccountDetails() {
     return (
         <div className="bg-neutral-100">
             {/* Header Section */}
-            <div className="bg-neutral-100 mb-4">
+            <div className="bg-neutral-100 mb-4 p-4">
                 <div className="flex justify-between items-center">
                     <div className='flex items-center space-x-3'>
                         <div className="p-2 rounded-md border-2 border-purple-500 bg-purple-600">

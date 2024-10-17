@@ -181,7 +181,7 @@ export default function AccountForm({ onClose, isEditing, accountId }) {
                     userId: '', // Assuming this is set elsewhere, keeping it empty
                 },
             });
-            
+
         }
     }, [initialData, isEditing]);
 
@@ -446,20 +446,20 @@ export default function AccountForm({ onClose, isEditing, accountId }) {
         const isPhoneFilled = formData.accountDetails.phone.trim() !== '';
         const isFaxFilled = formData.accountDetails.fax.trim() !== '';
         const isWebsiteFilled = formData.accountDetails.website.trim() !== '';
-        
+
         // Check if clientType array is valid (e.g., at least one item with non-empty fields)
         // const isClientTypeValid = formData.accountDetails.clientType.some(clientType =>
         //     clientType.clientTypeId.trim() !== '' && clientType.clientTypeName.trim() !== ''
         // );
-    
+
         // Combine all checks
         const allFieldsFilled = isAccountNameFilled &&
-                                isParentAccountFilled && isLocalAccountNameFilled &&
-                                isPhoneFilled && isFaxFilled && isWebsiteFilled;
-    
+            isParentAccountFilled && isLocalAccountNameFilled &&
+            isPhoneFilled && isFaxFilled && isWebsiteFilled;
+
         setIsFormValid(allFieldsFilled);
     };
-    
+
     useEffect(() => {
         validateAccountDetails();
     }, [formData]);
@@ -468,7 +468,7 @@ export default function AccountForm({ onClose, isEditing, accountId }) {
         <div className={`fixed inset-0 flex items-center justify-center z-50 ${onClose ? 'animate-fade-in' : 'animate-fade-out'}`}>
             <div className="absolute inset-0 bg-black opacity-50"></div>
             <div className="relative flex flex-col w-1/2 h-3/4 bg-white shadow-lg rounded-lg">
-                {(isLoading || !initialData) && (
+                {(isLoading || (isEditing && !initialData)) && (
                     <div className="absolute inset-0 bg-white bg-opacity-70 flex justify-center items-center z-50">
                         <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-c-teal"></div>
                     </div>
@@ -481,14 +481,14 @@ export default function AccountForm({ onClose, isEditing, accountId }) {
                         {notification}
                     </div>
                 )}
-                <header className="sticky top-0 shadow-sm py-3 bg-neutral-100 z-10 flex items-center justify-center rounded-t-lg border-b border-neutral-700">
+                <header className="sticky top-0 shadow-sm py-3 bg-c-teal z-10 flex items-center justify-center rounded-t-lg border-b border-neutral-700">
                     <button
                         onClick={onClose}
-                        className="absolute -top-4 -right-4 text-gray-600 hover:text-gray-800"
+                        className="absolute -top-0 -right-4 text-gray-300 hover:text-gray-300/80"
                     >
                         &times;
                     </button>
-                    <h2 className="text-lg font-bold text-c-dark-grayish text-align-center">NEW ACCOUNT</h2>
+                    <h2 className="text-lg font-bold text-gray-200 text-align-center">NEW ACCOUNT</h2>
                 </header>
 
                 <main className="flex-1 overflow-y-auto">

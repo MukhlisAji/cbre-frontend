@@ -1,4 +1,5 @@
 import { useAppContext } from '../../../AppContext';
+import { CONFIG } from '../../../config';
 
 // Function to generate transaction ID
 export function generateTransactionId() {
@@ -10,7 +11,7 @@ export async function getAuthorizationToken(transactionId) {
     let token = '';
 
     try {
-        const response = await fetch('http://localhost:8084/cbre/utilities/salesforce/authorize', {
+        const response = await fetch(`${CONFIG.UTILITIES_SERVICE}/salesforce/authorize`, {
             method: 'POST',
             headers: {
                 'transactionId': transactionId,
