@@ -1,32 +1,33 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
 import classnames from 'classnames';
-import { DASHBOARD_SIDEBAR_BOTTOM_LINKS, DASHBOARD_SIDEBAR_LINKS } from '../../lib/const/DataEntryNavigation';
-import { useAppContext } from '../../AppContext';
+import React, { useEffect, useRef, useState } from 'react';
 import { LiaAngleRightSolid } from 'react-icons/lia';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useAppContext } from '../../AppContext';
+import { DASHBOARD_SIDEBAR_BOTTOM_LINKS, DASHBOARD_SIDEBAR_LINKS } from '../../components/lib/const/DataEntryNavigation';
 import WarningModal from './WarningModal';
 
-const linkClasses = 'flex items-center gap-2 px-3 hover:bg-c-weldon-blue hover:no-underline hover:text-white active:bg-c-teal rounded-sm text-sm';
+const linkClasses = 'flex items-center gap-2 px-2.5 hover:bg-c-weldon-blue hover:no-underline hover:text-white active:bg-c-teal rounded-sm text-sm';
 
 export default function DataEntrySidebar() {
-  const [isOpen, setIsOpen] = useState(window.innerWidth >= 680);
+  // State to manage sidebar open/close status
+  const [isOpen, setIsOpen] = useState(window.innerWidth >= 780);
   const [activeMenu, setActiveMenu] = useState('');
   const location = useLocation();
 
+  // Effect to handle window resize and set sidebar state accordingly
   useEffect(() => {
     const handleResize = () => {
       setIsOpen(window.innerWidth >= 780);
     };
 
     window.addEventListener("resize", handleResize);
-
     return () => {
       window.removeEventListener("resize", handleResize);
     };
   }, []);
 
+  // Effect to determine the active menu item based on the current path
   useEffect(() => {
-    // Determine the active menu based on the current path
     const currentPath = location.pathname;
     let activeMenuPath = '';
 
@@ -37,21 +38,20 @@ export default function DataEntrySidebar() {
     });
 
     if (activeMenuPath === '' && currentPath !== '/') {
-      // Fallback if no active menu item found and not on the root path
       const fallbackItem = DASHBOARD_SIDEBAR_LINKS.find(item => item.path === '/');
-      activeMenuPath = fallbackItem ? fallbackItem.path : ''; // Set to empty string if fallbackItem is undefined
+      activeMenuPath = fallbackItem ? fallbackItem.path : '';
     }
-    
 
     setActiveMenu(activeMenuPath);
   }, [location]);
 
+  // Function to handle menu click and set active menu item
   const handleMenuClick = (path) => {
     setActiveMenu(path);
   };
 
   return (
-    <div className={`bg-white p-3 flex flex-col text-neutral-700 shadow-xl z-10 transition-all duration-500 ease-in-out ${isOpen ? 'min-w-64' : 'w-20'}`}>
+    <div className={`bg-white p-3 flex flex-col text-neutral-700 shadow-xl z-10 transition-all duration-500 ease-in-out ${isOpen ? 'min-w-64' : 'w-16'}`}>
       <div className="flex flex-col items-center px-1 py-3 transition-all duration-500 ease-in-out">
         <a href="/data-entry-portal/mass-upload" className="flex flex-col cursor-pointer focus:outline-none hover:no-underline">
           <div className="flex items-center gap-2">
@@ -80,14 +80,15 @@ export default function DataEntrySidebar() {
   );
 };
 
+// Component for individual sidebar links
 function SidebarLink({ item, isOpen, isActive, onClick }) {
   const [isSubMenuOpen, setIsSubMenuOpen] = useState(false);
   const submenuRef = useRef(null);
   const { isDirty, setIsDirty } = useAppContext();
   const [showWarningModal, setShowWarningModal] = useState(false);
-
   const navigate = useNavigate();
 
+  // Handle link click with dirty state check and navigation
   const handleClick = (event) => {
     if (isDirty) {
       event.preventDefault();
@@ -99,6 +100,7 @@ function SidebarLink({ item, isOpen, isActive, onClick }) {
     }
   };
 
+  // Handle leaving page with unsaved changes
   const handleLeavePage = () => {
     setShowWarningModal(false);
     setIsSubMenuOpen(true);
@@ -107,6 +109,7 @@ function SidebarLink({ item, isOpen, isActive, onClick }) {
     navigate(item.path);
   };
 
+  // Handle closing the warning modal
   const handleCloseModal = () => {
     setShowWarningModal(false);
   };

@@ -1,23 +1,21 @@
-# Use an official Node.js image as the base
-FROM node:20-alpine
+# Stage 1: Build the Vite project
+FROM node:16-alpine AS builder
 
-# Set the working directory in the container
 WORKDIR /app
 
-# Copy package.json and package-lock.json to the working directory
 COPY package*.json ./
 
-# Install dependencies
 RUN npm install
 
-# Copy the rest of the application code to the working directory
 COPY . .
 
-# Build the React app
 RUN npm run build
 
-# Expose port 3000 to the outside world
-EXPOSE 3000
+FROM nginxinc/nginx-unprivileged:latest
 
-# Command to run the React app
-CMD ["npm", "start"]
+COPY nginx/default.conf /etc/nginx/conf.d/default.conf
+
+COPY --from=builder /app/dist /usr/share/nginx/html
+EXPOSE 8080
+
+CMD ["nginx", "-g", "daemon off;"]

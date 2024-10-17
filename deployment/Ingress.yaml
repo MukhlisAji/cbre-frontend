@@ -1,0 +1,20 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: one-app-ingress
+  namespace: oneapp-nonprod-ns
+spec:
+  ingressClassName: nginx-public
+  rules:
+  # - host: oneapp-nonprod.cbre.com
+  - host: one-uat.cbre.com.sg
+    http:
+      paths:
+      - backend:
+          service:
+            name: one-app-service
+            port:
+              number: 80
+        path: /
+        pathType: ImplementationSpecific
+ 
