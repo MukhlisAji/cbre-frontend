@@ -41,7 +41,7 @@ stages:
                   echo '-- Check Images List  --'
                   docker images
                   echo '-------************-------'
-                  docker push oneapp-docker-nonprod.us.artifactory.gcso.cbre.com/oneapp-backend-frontend:$(Build.BuildNumber)
+                  docker push oneapp-docker-nonprod.us.artifactory.gcso.cbre.com/oneapp-frontend:$(Build.BuildNumber)
                   echo '-- Hello Jfrog, Success push image--'
                 else
                   echo 'Error: Docker login failed'
