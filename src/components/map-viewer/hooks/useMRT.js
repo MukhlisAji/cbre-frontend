@@ -16,17 +16,23 @@ export function useMRTData(zoom, map) {
     console.log(res)
     const responseData = await res.json();
     responseData?.geojson?.features?.forEach((station) => {
-      if (station.properties.REF) {
-        const values = station.properties.REF.filter((value) => value);
+      if (station.properties.CODES) {
+        const values = station.properties.CODES.filter((value) => value);
         let linesOutput = "";
 
+       
         linesOutput += `<div class="marker-testing">`;
+        let first_code;
         values.forEach((value, index, array) => {
           const prefix = value.match(/^[A-Z]+/)[0];
           const separated = value.replace(/([A-Z]+)(\d+)/, "$1 $2");
+          if(index==0){
+            first_code= prefix
+          }
           
+          //ini warnany
           let color;
-          if(station.properties.STATUS){
+          if(station.properties.ISACTIVE){
             color = colorMap[prefix] || "gray";
           }else{
             color ="#696969";
@@ -43,10 +49,10 @@ export function useMRTData(zoom, map) {
         const element = document.createElement("div");
         element.innerHTML = `
     <div class="container-marker-name-testing">
-      <div class="marker-name-testing">${station?.properties?.NAME}</div>
+      <div class="marker-name-testing">${station?.properties?.STATION}</div>
       <div class="icon-wrapper">
        ${
-         station?.properties?.network === "mrt"
+          first_code !== "BP" && first_code !== "SK" && first_code !== "PG" 
            ? `
            <svg
              width="15px"
@@ -82,19 +88,16 @@ export function useMRTData(zoom, map) {
         let hoverPopup;
 
         element.addEventListener("mouseenter", () => {
-          const backgroundColor = station.properties.STATUS ? 'green' : 'red';
+          const backgroundColor = station.properties.ISACTIVE ? '' : 'grey';
           hoverPopup = new mapboxgl.Popup({ offset: 25 }).setHTML(`
             <div class="popup-container">
                 <div class="info-box">
                     <div class="info-container">
-                      <h3>${station.properties.NAME}</h3>
-                      <p class="status" style="background-color: ${backgroundColor};"> ${station.properties.STATUS ? 'active' : 'inactive'}</p>
+                      <h3>${station.properties.STATION}</h3>
+                      <p class="status" style="background-color: ${backgroundColor}; font-size: 12px; padding: 2px 4px;"> ${station.properties.ISACTIVE ? '' : 'U/C'}</p>
                     </div>
                     <div class="other-info">
-                        <p><strong>Longitude:</strong> ${station.geometry.coordinates[0]}</p>
-                        <p><strong>Latitude:</strong> ${station.geometry.coordinates[1]}</p>
-                        <p><strong>Railway:</strong> ${station.properties.RAILWAY}</p>
-                        <p><strong>Member Role:</strong> ${station.properties.MEMBER_ROLE}</p>
+                      <p style="width: 100%;"><strong>Address:</strong> ${station.properties.ADDRESS}</p>
                     </div>
                 </div>
             </div>`);
@@ -154,14 +157,14 @@ export function useMRTData(zoom, map) {
         item.style.display = "none";
       });
 
-      if (zoom < 15) {
+      if (zoom < 2) {
         const mLabel = document.querySelectorAll(".marker-testing");
         mLabel.forEach((item) => {
           item.style.display = "none";
         });
       }
 
-      if (zoom < 17) {
+      if (zoom < 2) {
         const mName = document.querySelectorAll(
           ".container-marker-name-testing"
         );
