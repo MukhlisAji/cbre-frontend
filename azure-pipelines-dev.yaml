@@ -24,63 +24,63 @@ stages:
               ls $(System.DefaultWorkingDirectory)
               echo '-------##########-------'
             displayName: 'View files after maven build'
-          # - task: Bash@3
-          #   displayName: Build & Push Docker image to JFrog
-          #   condition: and(succeeded(), eq(variables['build.sourceBranch'], 'refs/heads/development'))
-          #   inputs:
-          #     targetType: 'inline'
-          #     script: |
-          #       cd $(System.DefaultWorkingDirectory)
-          #       ls -ltr
-          #       docker login -u $(DOCKER_USERNAME) -p $(DOCKER_PASS) oneapp-docker-nonprod.us.artifactory.gcso.cbre.com
-          #         # Check if Docker login was successful
-          #       if [ $? -eq 0 ]; then
-          #         echo 'Success: Docker login successful'
-          #         docker build --progress=plain --no-cache -t oneapp-docker-nonprod.us.artifactory.gcso.cbre.com/oneapp-frontend:$(Build.BuildNumber) -f Dockerfile .
-          #         echo '-------************-------'
-          #         echo '-- Check Images List  --'
-          #         docker images
-          #         echo '-------************-------'
-          #         docker push oneapp-docker-nonprod.us.artifactory.gcso.cbre.com/oneapp-backend-frontend:$(Build.BuildNumber)
-          #         echo '-- Hello Jfrog, Success push image--'
-          #       else
-          #         echo 'Error: Docker login failed'
-          #         exit 1
-          #       fi
-          # - task: Bash@3
-          #   displayName: 'Build Helm Package'
-          #   inputs:
-          #     targetType: 'inline'
-          #     script: |
-          #       cd $(System.DefaultWorkingDirectory)
-          #       echo '==============***=================='
-          #       helm version
-          #       helm package $(System.DefaultWorkingDirectory)/helm-chart --version $(Build.BuildNumber)
-          #       echo '==============***=================='
-          #       ls -ltr
-          #       echo '==============***=================='  
+          - task: Bash@3
+            displayName: Build & Push Docker image to JFrog
+            condition: and(succeeded(), eq(variables['build.sourceBranch'], 'refs/heads/development'))
+            inputs:
+              targetType: 'inline'
+              script: |
+                cd $(System.DefaultWorkingDirectory)
+                ls -ltr
+                docker login -u $(DOCKER_USERNAME) -p $(DOCKER_PASS) oneapp-docker-nonprod.us.artifactory.gcso.cbre.com
+                  # Check if Docker login was successful
+                if [ $? -eq 0 ]; then
+                  echo 'Success: Docker login successful'
+                  docker build --progress=plain --no-cache -t oneapp-docker-nonprod.us.artifactory.gcso.cbre.com/oneapp-frontend:$(Build.BuildNumber) -f Dockerfile .
+                  echo '-------************-------'
+                  echo '-- Check Images List  --'
+                  docker images
+                  echo '-------************-------'
+                  docker push oneapp-docker-nonprod.us.artifactory.gcso.cbre.com/oneapp-backend-frontend:$(Build.BuildNumber)
+                  echo '-- Hello Jfrog, Success push image--'
+                else
+                  echo 'Error: Docker login failed'
+                  exit 1
+                fi
+          - task: Bash@3
+            displayName: 'Build Helm Package'
+            inputs:
+              targetType: 'inline'
+              script: |
+                cd $(System.DefaultWorkingDirectory)
+                echo '==============***=================='
+                helm version
+                helm package $(System.DefaultWorkingDirectory)/helm-chart --version $(Build.BuildNumber)
+                echo '==============***=================='
+                ls -ltr
+                echo '==============***=================='  
 
-          #       #Rename the helm chart
-          #       mv helm-chart-$(Build.BuildNumber).tgz $(HELM_PACKAGE_NAME)-$(Build.BuildNumber).tgz
-          #       echo '==============***=================='
-          #       ls -ltr
-          #       echo '==============***=================='      
-          #       echo 'Success package helm chart'
-          # - task: JFrogGenericArtifacts@1
-          #   displayName: 'Push Helm Package to JFrog'
-          #   inputs:
-          #     command: 'Upload'
-          #     connection: 'oneapp-jfrog-artifactory-nonprod'
-          #     specSource: 'taskConfiguration'
-          #     fileSpec: |
-          #       {
-          #        "files": [
-          #          {
-          #             "pattern": "*.tgz",
-          #             "target": "oneapp-helm-nonprod"
-          #           }
-          #         ]
-          #       }
-          #     failNoOp: true
+                #Rename the helm chart
+                mv helm-chart-$(Build.BuildNumber).tgz $(HELM_PACKAGE_NAME)-$(Build.BuildNumber).tgz
+                echo '==============***=================='
+                ls -ltr
+                echo '==============***=================='      
+                echo 'Success package helm chart'
+          - task: JFrogGenericArtifacts@1
+            displayName: 'Push Helm Package to JFrog'
+            inputs:
+              command: 'Upload'
+              connection: 'oneapp-jfrog-artifactory-nonprod'
+              specSource: 'taskConfiguration'
+              fileSpec: |
+                {
+                 "files": [
+                   {
+                      "pattern": "*.tgz",
+                      "target": "oneapp-helm-nonprod"
+                    }
+                  ]
+                }
+              failNoOp: true
 
 
