@@ -5,7 +5,7 @@
 replicaCount: 1
 
 image:
-  repository: oneapp-docker-nonprod.us.artifactory.gcso.cbre.com/oneapp-backend-account-api
+  repository: oneapp-docker-nonprod.us.artifactory.gcso.cbre.com/oneapp-frontend
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
   tag: latest

@@ -5,7 +5,7 @@ variables:
   - name: DOCKER_USERNAME
     value: ap_svc_salesmgtsg@cbre.com
   - name: HELM_PACKAGE_NAME
-    value: oneapp-backend-account-api-chart
+    value: oneapp-frontend-chart
 
 pool:
   vmImage: ubuntu-latest
@@ -45,12 +45,12 @@ stages:
                   # Check if Docker login was successful
                 if [ $? -eq 0 ]; then
                   echo 'Success: Docker login successful'
-                  docker build --progress=plain --no-cache -t oneapp-docker-nonprod.us.artifactory.gcso.cbre.com/oneapp-backend-account-api:$(Build.BuildNumber) -f Dockerfile .
+                  docker build --progress=plain --no-cache -t oneapp-docker-nonprod.us.artifactory.gcso.cbre.com/oneapp-frontend:$(Build.BuildNumber) -f Dockerfile .
                   echo '-------************-------'
                   echo '-- Check Images List  --'
                   docker images
                   echo '-------************-------'
-                  docker push oneapp-docker-nonprod.us.artifactory.gcso.cbre.com/oneapp-backend-account-api:$(Build.BuildNumber)
+                  docker push oneapp-docker-nonprod.us.artifactory.gcso.cbre.com/oneapp-backend-frontend:$(Build.BuildNumber)
                   echo '-- Hello Jfrog, Success push image--'
                 else
                   echo 'Error: Docker login failed'
@@ -91,17 +91,5 @@ stages:
                   ]
                 }
               failNoOp: true
-          
-#          - task: PublishPipelineArtifact@1
-#            inputs:
-#              TargetPath: '$(System.DefaultWorkingDirectory)'
-#              ArtifactName: 'cbreenterprise.oneapp-backend-account-api-artifact'
-#          - script: |
-#              echo '-------************-------'
-#              echo "Success Publish Artifact"
-#              echo 'target path : '
-#              ls -ltr
-#              echo '-------************-------'
-#            displayName: 'View After Publish Artifact'
 
 
