@@ -15,7 +15,7 @@ env: dev
 
 imagePullSecrets:
   - name: jfrogreg
-nameOverride: "oneapp-backend-account-api"
+nameOverride: "oneapp-frontend"
 fullnameOverride: ""
 
 serviceAccount:
