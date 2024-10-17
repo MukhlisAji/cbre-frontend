@@ -1,7 +1,7 @@
 # Stage 1: Build the Vite project
 FROM node:16-alpine AS builder
 
-WORKDIR /app
+#WORKDIR /app
 
 COPY package*.json ./
 
@@ -31,7 +31,10 @@ RUN mkdir -p /var/cache/nginx/uwsgi_temp
 RUN mkdir -p /var/cache/nginx/scgi_temp
 RUN mkdir -p /var/cache/nginx/ngx_http_proxy_module
 
-COPY --from=builder /app/dist /usr/share/nginx/html
+
+WORKDIR /usr/share/nginx/html
+
+COPY --from=builder dist /usr/share/nginx/html
 EXPOSE 8080
 
 # Switch back to the unprivileged user for running NGINX
