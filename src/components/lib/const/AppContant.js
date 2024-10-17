@@ -46,6 +46,21 @@ const PROPERTYCATEGORIES = [
     },
 ];
 
+const STOCKINGCATEGORIES = [
+    {
+        title: "Space Status",
+        items: [
+            { color: "teal-500", label: "spaceStatus", displayLabel: "Space Status" },
+            { color: "green-500", label: "businessDevelopment", displayLabel: "Business Development" },
+            { color: "blue-500", label: "spaceManagement", displayLabel: "Space Management" },
+            { color: "orange-500", label: "leaseExpires", displayLabel: "Lease Expires" },
+            { color: "pink-500", label: "industry", displayLabel: "Industry" },
+            { color: "purple-500", label: "tenantList", displayLabel: "Tenant List" },
+        ],
+    },
+];
+
+
 
 const PROPERTYDETAILS = {
     sections: [
@@ -184,4 +199,4 @@ const PROPERTYDETAILS = {
 };
 
 
-export { ACCOUNTCOLUMN, CONTACTCOLUMN, PROPERTYCATEGORIES, PROPERTYDETAILS };
+export { ACCOUNTCOLUMN, CONTACTCOLUMN, PROPERTYCATEGORIES, PROPERTYDETAILS, STOCKINGCATEGORIES };

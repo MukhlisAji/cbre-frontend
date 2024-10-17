@@ -22,6 +22,46 @@ const CONTACTCOLUMNDUMMY = [
   { "label": "Status", "accessor": "status" },
 ]
 
+
+const RELATIONSHIPCLUMN = [
+  { label: "Relationship Type", accessor: "relationshipType" },
+  { label: "Account Name", accessor: "accountName" },
+  { label: "Relationship Start Date", accessor: "relationshipStartDate" },
+  { label: "Relationship End Date", accessor: "relationshipEndDate" },
+  { label: "Primary Account", accessor: "primaryAccount" },
+  {
+      label: "Action",
+      accessor: "action",
+      width: "50px",  // Set a fixed width for the Action column
+      "isClickable": false  
+  }
+];
+
+const RELATIONSHIPDUMMY = [
+  {
+    relationshipType: "Partner",
+    accountName: "Acme Corp",
+    relationshipStartDate: "2022-01-01",
+    relationshipEndDate: "2024-01-01",
+    primaryAccount: "Yes"
+    },
+  {
+    relationshipType: "Customer",
+    accountName: "Global Tech",
+    relationshipStartDate: "2021-05-15",
+    relationshipEndDate: "2023-05-15",
+    primaryAccount: "No"
+  },
+  {
+    relationshipType: "Partner",
+    accountName: "Innovative Solutions",
+    relationshipStartDate: "2020-08-01",
+    relationshipEndDate: "2022-08-01",
+    primaryAccount: "Yes"
+  }
+];
+
+
 const ACCOUNTCOLUMNDUMMY = [
   { "label": "Account Name", "accessor": "accountName", "isClickable": true , "url": "details" },
   { "label": "Phone", "accessor": "phone", "isClickable": false },
@@ -181,4 +221,4 @@ const DISTRICTDATA = [
   { id: "D28", name: "Seletar / Yio Chu Kang", checked: false },
 ];
 
-export { CONTACTDATADUMMY, ACCOUNTDATADUMMY, ACCOUNTCOLUMNDUMMY, BUILDINGDATADUMMY, CONTACTCOLUMNDUMMY, PROPERTYCOLUMNDUMMY, PROPERTYDATADUMMY, DISTRICTDATA};
+export { CONTACTDATADUMMY, ACCOUNTDATADUMMY, ACCOUNTCOLUMNDUMMY, BUILDINGDATADUMMY, CONTACTCOLUMNDUMMY, PROPERTYCOLUMNDUMMY, PROPERTYDATADUMMY, DISTRICTDATA, RELATIONSHIPCLUMN, RELATIONSHIPDUMMY};
