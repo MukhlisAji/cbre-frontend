@@ -46,18 +46,18 @@ service:
   port: 8080
 
 ingress:
-  enabled: false
+  enabled: true
   className: "nginx-public"
   annotations: {}
   hosts:
     - host: one-uat.cbre.com.sg
       paths:
-        - path: /cbre/account
-          pathType: Prefix
+        - path: /
+          pathType: ImplementationSpecific
           backend:
-            service: oneapp-backend-account-api
+            service: oneapp-frontend
             port:
-              number: 8080
+              number: 80
   tls: []
   #  - secretName: chart-example-tls
   #    hosts:
@@ -91,30 +91,12 @@ configmap:
   enable: true
   data:
     camel.servlet.mapping.context-path: /cbre/*
-    spring.main.allow-bean-definition-overriding: true
-    #API Configuration
-    salesforce.account.url: https://cbrecrm--uat2.sandbox.my.salesforce.com/services/data/v61.0/sobjects/Account
-    #Database
-    spring.datasource.driver-class-name: net.snowflake.client.jdbc.SnowflakeDriver
-    spring.jpa.database: default
-    spring.jpa.properties.hibernate.dialect: com.cbre.account_api.dialect.SnowflakeDialect
-    spring.jpa.properties.hibernate.ddl-auto: none
-    spring.jpa.hibernate.ddl-auto: none
-    spring.jpa.open-in-view: false
-    #enable SQL logging
-    #spring.jpa.show-sql=true
-    #Log formatted SQL statements
-    spring.jpa.properties.hibernate.format_sql: true
-    spring.datasource.url: jdbc:snowflake://idb33659.us-east-1.snowflakecomputing.com/?warehouse=DEV_ONEAPP_S_WHS&db=ONEAPP_UAT&schema=DATA
-    spring.datasource.username: AP_SVC_SALESMGTSG@CBRE.COM
-    snowflake.private-key.path: /app/resources/public_privatekey.p8
-    snowflake.key.pass: 123456
-    hikari.minimum.idle: 20
-    hikari.idle.timeout: 60000
-    hikari.maximum.pool.size: 50
-    fetch.max: 10
-    thread.max.pool: 20
-    limit.search-by-name: 10
+    VITE_MAPBOX_KEY: pk.eyJ1IjoicmFqaWZtYWhlbmRyYSIsImEiOiJjbHVjYTI2d2MwcnBzMmxxbndnMnNlNTUyIn0.aaCGYQ2OYIcIsAa4X-ILDA
+    VITE_MAPBOX_API: https://92114d4ab876.ngrok.app
+    VITE_PROPERTY_SERVICE: https://a2edf140b5af.ngrok.app/cbre/property
+    VITE_CONTACT_SERVICE: https://f0f939365c3d.ngrok.app/cbre/contact
+    VITE_UTILITIES_SERVICE: https://97aa9beaed50.ngrok.app/cbre/utilities
+    VITE_ACCOUNT_SERVICE=: http://oneapp-backend-account-api.oneapp-nonprod-ns.svc.cluster.local:8080/cbre/account
 
 # Additional volumes on the output Deployment definition.
 volumes: []
