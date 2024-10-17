@@ -1,4 +1,9 @@
-import { FormControlLabel, Switch, ThemeProvider, createTheme } from "@mui/material";
+import {
+  FormControlLabel,
+  Switch,
+  ThemeProvider,
+  createTheme,
+} from "@mui/material";
 import { DatePicker } from "@mui/x-date-pickers";
 import React, { useEffect, useState } from "react";
 import { BiChevronLeft, BiChevronRight, BiSearch } from "react-icons/bi";
@@ -28,12 +33,10 @@ import { buildAtom } from "../project/store/build";
 import { data } from "autoprefixer";
 
 // search
-export default function TwoDSearch({ mapApi, map }) {
+export default function TwoDSearch({ mapApi, map, buildings, setBuildings, setIsBuildingsActive }) {
   const { isCollapsed2dSearchOpen, setIsCollapsed2dSearchOpen } =
     useAppContext();
   const navigate = useNavigate();
-
-
 
   const [activeTab, setActiveTab] = useState("buildings");
   const [searchQuery, setSearchQuery] = useState("");
@@ -42,9 +45,9 @@ export default function TwoDSearch({ mapApi, map }) {
   const [availableDate, setAvailableDate] = useState(null);
   const [activeButton, setActiveButton] = useState("all");
   const [isTransactionEnabled, setIsTransactionEnabled] = useState(false);
-  const [buildings, setBuildings] = useState([]);
+  // const [buildings, setBuildings] = useState([]);
   // const [dts, setDts] = useState([])
-  const [build] = useAtom(buildAtom)
+  const [build] = useAtom(buildAtom);
   const [minBuildingNLA, setMinBuildingNla] = useState(null);
   const [maxBuildingNLA, setMaxBuildingNla] = useState(null);
   const [minVacantSpace, setMinVacantSpace] = useState(null);
@@ -52,7 +55,6 @@ export default function TwoDSearch({ mapApi, map }) {
   const [askingRent, setAskingRent] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
 
- 
   const {
     options: statusOptions,
     selectedOption: selectedStatus,
@@ -115,20 +117,20 @@ export default function TwoDSearch({ mapApi, map }) {
   };
 
   const handleResetButton = () => {
-    console.log("reset")
-    setSelectedMicromarket('Select')
-    setSelectedPropUsage('Select')
-    setSelectedRegion('Select')
-    setSelectedStatus('Select')
-    setSelectedSubType('Select')
-    setSelectedZoning('Select')
-    setAvailableDate(null)
-    setMinBuildingNla(null)
-    setMaxBuildingNla(null)
-    setMinVacantSpace(null)
-    setMaxVacantSpace(null)
-    setAskingRent(null)
-    removeMarkers()
+    console.log("reset");
+    setSelectedMicromarket("Select");
+    setSelectedPropUsage("Select");
+    setSelectedRegion("Select");
+    setSelectedStatus("Select");
+    setSelectedSubType("Select");
+    setSelectedZoning("Select");
+    setAvailableDate(null);
+    setMinBuildingNla(null);
+    setMaxBuildingNla(null);
+    setMinVacantSpace(null);
+    setMaxVacantSpace(null);
+    setAskingRent(null);
+    removeMarkers();
   };
 
   const handleButtonClick = (button) => {
@@ -166,12 +168,15 @@ export default function TwoDSearch({ mapApi, map }) {
         micromarket:
           selectedMicromarket === "Select" ? null : selectedMicromarket,
         zoning: selectedZoning === "Select" ? null : selectedZoning,
-        property_usage: selectedPropUsage === "Select" ? null : selectedPropUsage,
+        property_usage:
+          selectedPropUsage === "Select" ? null : selectedPropUsage,
         building_nla: minBuildingNLA,
         space_status: selectedStatus === "Select" ? null : selectedStatus,
         vacant_space: minVacantSpace,
         asking_rent: askingRent,
-        available_date: availableDate ? format(availableDate, 'yyyy-MM-dd') : null,
+        available_date: availableDate
+          ? format(availableDate, "yyyy-MM-dd")
+          : null,
       };
 
       console.log("Searching for:", searchQuery);
@@ -202,9 +207,7 @@ export default function TwoDSearch({ mapApi, map }) {
     }
   };
 
-
-
-  const darkGreen = '#5a8184';
+  const darkGreen = "#5a8184";
 
   const newTheme = (theme) =>
     createTheme({
@@ -213,29 +216,29 @@ export default function TwoDSearch({ mapApi, map }) {
         MuiTextField: {
           styleOverrides: {
             root: {
-              '& .MuiInputBase-root': {
-                fontSize: '12px',
-                padding: '2px 8px',
+              "& .MuiInputBase-root": {
+                fontSize: "12px",
+                padding: "2px 8px",
 
-                '& .MuiInputAdornment-root': {
-                  '& .MuiSvgIcon-root': {
-                    fontSize: '16px',
+                "& .MuiInputAdornment-root": {
+                  "& .MuiSvgIcon-root": {
+                    fontSize: "16px",
                   },
                 },
               },
-              '& .MuiInputBase-input': {
-                fontSize: '12px',
-                padding: '3.5px 8px',
+              "& .MuiInputBase-input": {
+                fontSize: "12px",
+                padding: "3.5px 8px",
               },
-              '& .MuiOutlinedInput-root': {
-                '&:hover fieldset': {
+              "& .MuiOutlinedInput-root": {
+                "&:hover fieldset": {
                   borderColor: darkGreen,
                 },
-                '&.Mui-focused fieldset': {
+                "&.Mui-focused fieldset": {
                   borderColor: darkGreen,
                 },
               },
-              '& .MuiInputLabel-root.Mui-focused': {
+              "& .MuiInputLabel-root.Mui-focused": {
                 color: darkGreen,
               },
             },
@@ -248,18 +251,30 @@ export default function TwoDSearch({ mapApi, map }) {
     <div className="flex bg-neutral-150 h-full relative">
       <div className="flex relative">
         <div
-          className={`flex flex-col overflow-hidden bg-neutral-100 shadow-md rounded-md transition-all duration-300 ease-in-out z-10 ${isCollapsed2dSearchOpen ? "w-0.5" : "w-72"
-            }`}
+          className={`flex flex-col overflow-hidden bg-neutral-100 shadow-md rounded-md transition-all duration-300 ease-in-out z-10 ${
+            isCollapsed2dSearchOpen ? "w-0.5" : "w-72"
+          }`}
         >
           <div
-            className={`flex flex-col p-4 transition-opacity duration-300 ease-in-out ${isCollapsed2dSearchOpen ? "opacity-0" : "opacity-100"
-              }`}
+            className={`flex flex-col p-4 transition-opacity duration-300 ease-in-out ${
+              isCollapsed2dSearchOpen ? "opacity-0" : "opacity-100"
+            }`}
           >
-            {isLoading && (
+            {buildings.length === 0 ? (
               <div className="absolute inset-0 bg-white bg-opacity-70 flex justify-center items-center z-50">
                 <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-c-teal"></div>
               </div>
+            ) : (
+              <SearchResult
+                mapApi={mapApi}
+                onBack={handleBackToSearch}
+                buildings={buildings}
+                setBuildings={setBuildings}
+                map={map}
+                setIsBuildingsActive={setIsBuildingsActive}
+              />
             )}
+            {/* 
             {!showResults ? (
               <>
                 <div className="relative mb-4 w-full h-full">
@@ -276,7 +291,7 @@ export default function TwoDSearch({ mapApi, map }) {
                     onClick={handleSearch}
                   />
                 </div>
-                {/* Tabs */}
+                {/* Tabs *}
                 <div className="flex mb-4 w-full text-sm gap-1 px-1 rounded-md bg-neutral-200">
                   <button
                     onClick={() => setActiveTab("buildings")}
@@ -297,7 +312,7 @@ export default function TwoDSearch({ mapApi, map }) {
                     Account
                   </button>
                 </div>
-                {/* Tab Content */}
+                {/* Tab Content *}
                 {activeTab === "buildings" && (
                   <div className="space-y-4 w-full text-sm">
                     <div className="flex mb-4 w-full">
@@ -365,7 +380,7 @@ export default function TwoDSearch({ mapApi, map }) {
                         options={dateOptions}
                         selectedOption={selectedDate}
                         onSelect={setSelectedDate}
-                      /> */}
+                      /> *}
 
                       <div className="w-full">
                         <label className="block mt-2 text-xs font-semibold leading-6 text-neutral-500">
@@ -439,7 +454,7 @@ export default function TwoDSearch({ mapApi, map }) {
                               />
                             </Box>
                           </div> */}
-                          {/* 
+            {/* 
                           <div className="flex flex-col items-center w-full mt-2">
                             <label className="mr-auto text-xs font-semibold leading-6 text-neutral-500">
                               Vacant Space
@@ -476,8 +491,8 @@ export default function TwoDSearch({ mapApi, map }) {
                                   { value: 500, label: "500" },
                                 ]} // Adjust marks as needed
                               />
-                            </Box> */}
-                          {/* </div> */}
+                            </Box> *}
+                          {/* </div> *}
                         </>
                       )}
 
@@ -503,7 +518,7 @@ export default function TwoDSearch({ mapApi, map }) {
                         onClick={handleSearchButton}
                       >
                         SEARCH
-                      </button> */}
+                      </button> *}
                     </div>
                   </div>
                 )}
@@ -550,10 +565,8 @@ export default function TwoDSearch({ mapApi, map }) {
                 )}
               </>
             ) : (
-            
-              <SearchResult mapApi={mapApi} onBack={handleBackToSearch} buildings={buildings} setBuildings={setBuildings} map={map} />
- 
             )}
+            */}
           </div>
         </div>
         <div

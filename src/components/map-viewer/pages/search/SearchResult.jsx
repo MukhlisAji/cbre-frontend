@@ -19,6 +19,7 @@ export default function SearchResult({
   setBuildings,
   map,
   mapApi,
+  setIsBuildingsActive,
 }) {
   const { selectedBuildings, setSelectedBuildings } = useAppContext();
   const [selectedBuilding, setSelectedBuilding] = useState(null);
@@ -87,7 +88,7 @@ export default function SearchResult({
     building.enabled = true;
     if (map.current) {
       map.current.flyTo({
-        center: [parseFloat(building.LONGITUDE), parseFloat(building.LATITUDE)],
+        center: [parseFloat(building.longitude), parseFloat(building.latitude)],
         zoom: 15,
         essential: true, // ensures the animation happens even if the user has enabled prefers-reduced-motion
       });
@@ -206,7 +207,11 @@ export default function SearchResult({
           <div className="flex flex-col w-full">
             <div className="flex items-center gap-2 mb-4">
               <div className="p-1.5 rounded-full hover:bg-neutral-200 cursor-pointer">
-                <IoArrowBackOutline onClick={onBack} className="text-md" />
+                {/* <IoArrowBackOutline onClick={onBack} className="text-md" /> */}
+                <IoArrowBackOutline
+                  onClick={() => setIsBuildingsActive(false)}
+                  className="text-md"
+                />
               </div>
               <span className="text-md text-neutral-700">Search Results</span>
             </div>
@@ -267,7 +272,9 @@ export default function SearchResult({
             onClose={() => {
               setConfirmSave(false);
               setShowCheckedBuildings(true);
-              mapApi({data: buildings.filter((building) => building.enabled)})
+              mapApi({
+                data: buildings.filter((building) => building.enabled),
+              });
               setCheckedBuildings(
                 buildings.filter((building) => building.enabled)
               );
@@ -283,8 +290,8 @@ export default function SearchResult({
               <div className="p-1.5 rounded-full hover:bg-neutral-200 cursor-pointer">
                 <IoArrowBackOutline
                   onClick={() => {
-                    setShowCheckedBuildings(false)
-                    mapApi({data: buildings})
+                    setShowCheckedBuildings(false);
+                    mapApi({ data: buildings });
                   }}
                   className="text-md"
                 />
@@ -312,7 +319,7 @@ export default function SearchResult({
           <div className="absolute bottom-0 left-0 w-full flex justify-center space-x-4 p-2 bg-neutral-200 shadow-md">
             <button
               onClick={() => {
-                generatePPT({building: checkedBuildings});
+                generatePPT({ building: checkedBuildings });
               }}
               className="flex items-center font-thin px-4 py-2 text-white rounded-md bg-c-teal text-xs hover:bg-c-weldon-blue transition-all duration-300"
             >

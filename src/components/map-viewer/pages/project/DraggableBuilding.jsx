@@ -64,11 +64,12 @@ function DraggableBuilding({
         style={{ opacity: isDragging ? 0.5 : 1 }}
       >
         <span className="text-sm text-neutral-500">
-          {index + 1}. {building.BUILDINGNAME}
+          {index + 1}. {building.buildingName}
         </span>
-        <span className="text-sm text-neutral-500">{building.LATITUDE}</span>
+        <span className="text-sm text-neutral-500">{building.latitude}</span>
+        <span className="text-sm text-neutral-500">{building.longitude}</span>
         <span className="text-sm text-neutral-500">
-          No. of Spaces: <strong>{building.POSTCODE}</strong>
+          No. of Spaces: <strong>{building.postalCode}</strong>
         </span>
       </div>
     </>

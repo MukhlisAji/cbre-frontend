@@ -23,11 +23,13 @@ export default function ModalSearch({ isVisible, onClose, category, form, onForm
   const [selectedCategory, setSelectedCategory] = useState('Main'); // Default category
   const [selectedSubcategory, setSelectedSubcategory] = useState('CBD'); // Default subcategory
   // const [districts, setDistricts] = useState(DISTRICTDATA);
-  const { districts, setDistricts, fetchDistricts } = PropertyResource();
+  const [accountType, setAccountType] = useState('');
 
-  // Automatically fetch districts when the component mounts
+  const { districts, setDistricts, fetchDistricts, propertyResources, fetchPropertyResources } = PropertyResource();
+
   useEffect(() => {
-    fetchDistricts(); // This will run only once on component mount
+    fetchDistricts();
+    fetchPropertyResources();
   }, []);
 
   if (!isVisible) return null;
@@ -89,53 +91,85 @@ export default function ModalSearch({ isVisible, onClose, category, form, onForm
         buildingName: '',
         streetNumber: '',
         streetName: '',
-        postalCode: ''
+        postalCode: '',
+        pageNo: 1,
+        pageSize: 10
       });
-    } else if (category === "District") {
-      onFormChange([]);
+    } else if (category === "District" ) {
+      onFormChange({
+        districts: [],
+        pageNo: 1,
+        pageSize: 10
+      });
+    } else if (category === "MRT") {
+      onFormChange({
+        mrts: [],
+        pageNo: 1,
+        pageSize: 10
+      });
+    }else if (category === "Account/Contacts") {
+      onFormChange({
+        keyword: '',
+        type: '',
+        pageNo: 1,
+        pageSize: 10
+      });
     }
 
   };
-
   const handleSearch = (e) => {
     setSearchTerm(e.target.value);
   };
 
 
-  // const toggleDistrict = (id) => {
-  //   setDistricts((prevDistricts) => {
-  //     return prevDistricts.map((district) => {
-  //       if (district.id === id) {
-  //         const newChecked = !district.checked; // Toggle the checked state
-  //         // Update the form in the parent component
-  //         const updatedForm = newChecked
-  //           ? [...form, district.name] // If checked, add to form
-  //           : form.filter((name) => name !== district.name); // If unchecked, remove from form
-
-  //         onFormChange(updatedForm); // Pass the updated form to the parent
-  //         return { ...district, checked: newChecked }; // Update district's checked state
-  //       }
-  //       return district; // Return the unchanged district
-  //     });
-  //   });
-  // };
-
   const toggleDistrict = (districtName) => {
     setDistricts((prevDistricts) => {
-      return prevDistricts.map((district) => {
-        if (district.name === districtName) { // Check using name
-          const newChecked = !district.checked; // Toggle the checked state
+      const updatedDistricts = prevDistricts.map((district) => {
+        if (district.name === districtName) {
+          const newChecked = !district.checked;
 
-          // Update the form in the parent component
-          const updatedForm = newChecked
-            ? [...form, district.name] // If checked, add to form
-            : form.filter((name) => name !== district.name); // If unchecked, remove from form
+          // Update the formDistrict in the parent component
+          const updatedFormDistricts = newChecked
+            ? [...form.districts, district.name]
+            : form.districts.filter((name) => name !== district.name);
 
-          onFormChange(updatedForm); // Pass the updated form to the parent
-          return { ...district, checked: newChecked }; // Update district's checked state
+          // Call onFormChange with the updated formDistrict structure
+          onFormChange({
+            ...form,
+            districts: updatedFormDistricts
+          });
+
+          return { ...district, checked: newChecked };
         }
-        return district; // Return the unchanged district
+        return district;
       });
+
+      return updatedDistricts;
+    });
+  };
+
+  const toggleAllDistricts = () => {
+    const allChecked = districts.every((d) => d.checked);
+    const newCheckedState = !allChecked;
+
+    setDistricts((prevDistricts) => {
+      const updatedDistricts = prevDistricts.map((district) => ({
+        ...district,
+        checked: newCheckedState,
+      }));
+
+      // Update the form.districts in the parent component
+      const updatedFormDistricts = newCheckedState
+        ? updatedDistricts.map((district) => district.name)
+        : [];
+
+      // Call onFormChange with the updated formDistrict structure
+      onFormChange({
+        ...form,
+        districts: updatedFormDistricts
+      });
+
+      return updatedDistricts;
     });
   };
 
@@ -153,51 +187,51 @@ export default function ModalSearch({ isVisible, onClose, category, form, onForm
     };
   };
 
-  const disableConditions = () => {
-    if (form.buildingName) {
-      // When Building Name is filled, disable all other fields
-      return {
-        buildingName: false,
-        streetName: true,
-        streetNumber: true,
-        postalCode: true,
-      };
-    }
-    if (form.postalCode) {
-      // When Postal Code is filled, disable all other fields
-      return {
-        buildingName: true,
-        streetName: true,
-        streetNumber: true,
-        postalCode: false,
-      };
-    }
-    if (form.streetNumber) {
-      // When Street No is filled, disable only Building Name and Postal Code, but leave Street Name enabled
-      return {
-        buildingName: true,
-        streetName: false,
-        streetNumber: false,
-        postalCode: true,
-      };
-    }
-    if (form.streetName) {
-      // When Street Name is filled, disable only Building Name and Postal Code, but leave Street No enabled
-      return {
-        buildingName: true,
-        streetName: false,
-        streetNumber: false,
-        postalCode: true,
-      };
-    }
-    return {
-      buildingName: false,
-      streetName: false,
-      streetNumber: false,
-      postalCode: false,
-    };
-  };
-  const disable = disableConditions();
+  // const disableConditions = () => {
+  //   if (form.buildingName) {
+  //     // When Building Name is filled, disable all other fields
+  //     return {
+  //       buildingName: false,
+  //       streetName: true,
+  //       streetNumber: true,
+  //       postalCode: true,
+  //     };
+  //   }
+  //   if (form.postalCode) {
+  //     // When Postal Code is filled, disable all other fields
+  //     return {
+  //       buildingName: true,
+  //       streetName: true,
+  //       streetNumber: true,
+  //       postalCode: false,
+  //     };
+  //   }
+  //   if (form.streetNumber) {
+  //     // When Street No is filled, disable only Building Name and Postal Code, but leave Street Name enabled
+  //     return {
+  //       buildingName: true,
+  //       streetName: false,
+  //       streetNumber: false,
+  //       postalCode: true,
+  //     };
+  //   }
+  //   if (form.streetName) {
+  //     // When Street Name is filled, disable only Building Name and Postal Code, but leave Street No enabled
+  //     return {
+  //       buildingName: true,
+  //       streetName: false,
+  //       streetNumber: false,
+  //       postalCode: true,
+  //     };
+  //   }
+  //   return {
+  //     buildingName: false,
+  //     streetName: false,
+  //     streetNumber: false,
+  //     postalCode: false,
+  //   };
+  // };
+  // const disable = disableConditions();
 
   let content;
   switch (category) {
@@ -275,81 +309,61 @@ export default function ModalSearch({ isVisible, onClose, category, form, onForm
               <Autocomplete
                 id="size-small-standard"
                 size="small"
-                options={CONTACTDATADUMMY}
-                getOptionLabel={(option) => option.name}
+                value={
+                  form.type
+                    ? propertyResources.propertyContactKind.find(
+                      (option) => option.accountContactType === form.type
+                    ) || null
+                    : null
+                } options={propertyResources && propertyResources.propertyContactKind ? propertyResources.propertyContactKind : []}
+                getOptionLabel={(option) => option.accountContactType}
                 onChange={(event, newValue) => {
                   if (newValue) {
-                    setEmail(newValue.email);
-                    setContactName(newValue.name);
+                    onFormChange({ ...form, type: newValue.accountContactType }); // Set the selected value to form
                   } else {
-                    setEmail('');
-                    setContactName('');
+                    onFormChange({ ...form, type: '' }); // Reset the form value if no selection is made
                   }
                 }}
                 renderInput={(params) => (
                   <TextField
                     {...params}
-                    label="Related Type"
+                    label="Select Contact Type"
                     margin="dense"
-                    // variant="standard"
-                    sx={cusInput}
+                    sx={cusInput} // Custom styles, you can modify as needed
                   />
                 )}
               />
+
             </div>
 
 
             <span>Account/Contact Search</span>
-            <div className="flex items-center space-x-2">
-              <Stack width="100%">
-                <Autocomplete
-                  id="size-small-standard"
+            <div className="my-2">
+              <Box
+                component="form"
+                sx={{
+                  '& .MuiTextField-root': { width: '100%' },
+                }}
+                noValidate
+                autoComplete="off"
+                size="small"
+              >
+                <TextField
+                  type="text"
+                  required
+                  id="Account"
+                  label=""
                   size="small"
-                  options={CONTACTDATADUMMY}
-                  getOptionLabel={(option) => option.name}
-                  onChange={(event, newValue) => {
-                    if (newValue) {
-                      setEmail(newValue.email);
-                      setContactName(newValue.name);
-                    } else {
-                      setEmail('');
-                      setContactName('');
-                    }
-                  }}
-                  renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      label="Account/Contact Search"
-                      margin="dense"
-                      sx={cusInput}
-                    />
-                  )}
+                  value={form.keyword}
+                  margin="dense"
+                  sx={cusInput}
+                  onChange={(e) => onFormChange({ ...form, keyword: e.target.value })}
                 />
-              </Stack>
+              </Box>
 
-              {/* Action Buttons */}
-              <div className="flex gap-2">
-                <span className="flex items-center cursor-pointer justify-center border text-gray-600 gap-2 py-2 px-2 bg-gray-100 hover:bg-gray-200/80 text-xs rounded-sm">
-                  <span>Select</span>
-                </span>
-                <span className="flex items-center cursor-pointer justify-center border text-gray-600 gap-2 py-2 px-2 bg-gray-100 hover:bg-gray-200/80 text-xs rounded-sm">
-                  <span>Clear</span>
-                </span>
-              </div>
+
             </div>
 
-
-
-            <div className="flex gap-2 items-center">
-              <Checkbox {...label} size="small"
-              />
-              <span className="text-sm">Keyword Search</span>
-            </div>
-            <div className="flex gap-2 items-center">
-              <Checkbox {...label} size="small"
-              />
-              <span className="text-sm">Include related account</span>
-            </div>
 
           </div>
 
@@ -404,14 +418,7 @@ export default function ModalSearch({ isVisible, onClose, category, form, onForm
               <input
                 type="checkbox"
                 className="form-checkbox"
-                onChange={() =>
-                  setDistricts((prevDistricts) =>
-                    prevDistricts.map((district) => ({
-                      ...district,
-                      checked: !districts.every((d) => d.checked),
-                    }))
-                  )
-                }
+                onChange={toggleAllDistricts}
                 checked={districts.every((d) => d.checked)}
               />
               <span>All Districts</span>
@@ -421,7 +428,7 @@ export default function ModalSearch({ isVisible, onClose, category, form, onForm
           {/* District list */}
           <ul className="grid grid-cols-2 gap-4">
             {filteredDistricts.map((district) => {
-              const isChecked = form.includes(district.name); // Check if district is in formDistrict
+              const isChecked = form.districts.includes(district.name); // Check if district is in formDistrict
 
               return (
                 <li
@@ -518,7 +525,7 @@ export default function ModalSearch({ isVisible, onClose, category, form, onForm
           {/* District list */}
           <ul className="grid grid-cols-2 gap-4">
             {filteredDistricts.map((district) => {
-              const isChecked = form.includes(district.name); // Check if district is in formDistrict
+              const isChecked = form.districts.includes(district.name); // Check if district is in formDistrict
 
               return (
                 <li
@@ -548,7 +555,7 @@ export default function ModalSearch({ isVisible, onClose, category, form, onForm
       break;
     case 'MRT':
       content = (
-        <MRTStations form={form} onFormChange={onFormChange}/>
+        <MRTStations form={form} onFormChange={onFormChange} />
       )
       break;
     default:
