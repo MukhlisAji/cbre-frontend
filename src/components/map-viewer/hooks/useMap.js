@@ -36,7 +36,7 @@ export function useMap(styleMap, map, zoom, triggerRadius) {
       setFilteringData([]);
     }
   };
-  
+
   useEffect(() => {
     if (!map.current) {
       map.current = new mapboxgl.Map({
@@ -47,50 +47,51 @@ export function useMap(styleMap, map, zoom, triggerRadius) {
       });
     }
 
-    if (!document.querySelector(".mapboxgl-ctrl-geocoder")) {
-      const geocoder = new MapboxGeocoder({
-        accessToken: mapboxgl.accessToken,
-        mapboxgl: mapboxgl,
-        marker: false,
-      });
+    // // Add geocoder
+    // if (!document.querySelector(".mapboxgl-ctrl-geocoder")) {
+    //   const geocoder = new MapboxGeocoder({
+    //     accessToken: mapboxgl.accessToken,
+    //     mapboxgl: mapboxgl,
+    //     marker: false,
+    //   });
 
-      map.current.addControl(geocoder);
+    //   map.current.addControl(geocoder);
 
-      geocoder.on("result", (e) => {
-        const center = e.result.center;
-        map.current.flyTo({
-          center: center,
-          zoom: 14,
-        });
-      });
+    //   geocoder.on("result", (e) => {
+    //     const center = e.result.center;
+    //     map.current.flyTo({
+    //       center: center,
+    //       zoom: 14,
+    //     });
+    //   });
 
-      const filteringDiv = document.querySelector(".filtering");
-      const mapboxglCtrlGeocoder = document.querySelector(
-        ".mapboxgl-ctrl-geocoder.mapboxgl-ctrl"
-      );
+    //   const filteringDiv = document.querySelector(".filtering");
+    //   const mapboxglCtrlGeocoder = document.querySelector(
+    //     ".mapboxgl-ctrl-geocoder.mapboxgl-ctrl"
+    //   );
 
-      // Apply styles to geocoder container
-      Object.assign(mapboxglCtrlGeocoder.style, {
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        width: "100%",
-        margin: "0 auto",
-      });
+    //   // Apply styles to geocoder container
+    //   Object.assign(mapboxglCtrlGeocoder.style, {
+    //     display: "flex",
+    //     justifyContent: "center",
+    //     alignItems: "center",
+    //     width: "100%",
+    //     margin: "0 auto",
+    //   });
 
-      // Apply styles to geocoder input
-      const geocoderInput = mapboxglCtrlGeocoder.querySelector("input");
-      if (geocoderInput) {
-        Object.assign(geocoderInput.style, {
-          height: "2rem",
-          padding: "0.5rem",
-          borderRadius: "4px",
-          width: "100%",
-        });
-      }
+    //   // Apply styles to geocoder input
+    //   const geocoderInput = mapboxglCtrlGeocoder.querySelector("input");
+    //   if (geocoderInput) {
+    //     Object.assign(geocoderInput.style, {
+    //       height: "2rem",
+    //       padding: "0.5rem",
+    //       borderRadius: "4px",
+    //       width: "100%",
+    //     });
+    //   }
 
-      filteringDiv.insertBefore(mapboxglCtrlGeocoder, filteringDiv.firstChild);
-    }
+    //   filteringDiv.insertBefore(mapboxglCtrlGeocoder, filteringDiv.firstChild);
+    // }
 
     const addCircleEvents = () => {
       let circleFeature = null;
@@ -108,7 +109,7 @@ export function useMap(styleMap, map, zoom, triggerRadius) {
       const updateCircle = (center, radius) => {
         const updatedCircle = createCircle(center, radius);
         map.current.getSource("circle").setData(updatedCircle);
-        const extremes= findExtremes()
+        const extremes = findExtremes()
         const new_extremes = {
           type: 'FeatureCollection',
           features: extremes.map(coord => ({
@@ -129,7 +130,7 @@ export function useMap(styleMap, map, zoom, triggerRadius) {
         }
 
         circleFeature = createCircle(center, radius);
-       
+
         map.current.addSource("circle", {
           type: "geojson",
           data: circleFeature,
@@ -140,14 +141,14 @@ export function useMap(styleMap, map, zoom, triggerRadius) {
         map.current.addSource('pointer', {
           type: 'geojson',
           data: {
-              type: 'FeatureCollection',
-              features: coordinates.map(coord => ({
-                  type: 'Feature',
-                  geometry: {
-                      type: 'Point',
-                      coordinates: coord
-                  }
-              }))
+            type: 'FeatureCollection',
+            features: coordinates.map(coord => ({
+              type: 'Feature',
+              geometry: {
+                type: 'Point',
+                coordinates: coord
+              }
+            }))
           }
         });
 
@@ -178,17 +179,18 @@ export function useMap(styleMap, map, zoom, triggerRadius) {
           type: 'circle',
           source: 'pointer',
           paint: {
-              'circle-radius': 5, // Fixed radius of 10 pixels, constant across all zoom levels
-              'circle-color': 'white', // Red color
-              'circle-opacity': 1, // 50% opacity
-              'circle-stroke-width': 2, // Border width of 2 pixels
-              'circle-stroke-color': 'black', // Border color (black)
-              'circle-stroke-opacity': 1 
+            'circle-radius': 5, // Fixed radius of 10 pixels, constant across all zoom levels
+            'circle-color': 'white', // Red color
+            'circle-opacity': 1, // 50% opacity
+            'circle-stroke-width': 2, // Border width of 2 pixels
+            'circle-stroke-color': 'black', // Border color (black)
+            'circle-stroke-opacity': 1
           }
         });
         removeMarkers();
-        document.getElementById("search-buttonradius").style.display = "block";
-        document.getElementById("clear-buttonradius").style.display = "block";
+        // 3
+        // document.getElementById("search-buttonradius").style.display = "block";
+        // document.getElementById("clear-buttonradius").style.display = "block";
       };
 
       handleClick.current = function (e) {
@@ -200,9 +202,9 @@ export function useMap(styleMap, map, zoom, triggerRadius) {
           resizing = false;
           return;
         }
-      
+
         if (circleFeature && !isDragging) {
-         
+
           // const coordinates =
           //   map.current.getSource("circle")._data.geometry.coordinates[0];
           // const point = [e.lngLat.lng, e.lngLat.lat];
@@ -255,39 +257,39 @@ export function useMap(styleMap, map, zoom, triggerRadius) {
             { units: "meters" }
           );
           radius = dragRadius;
-  
+
           updateCircle(centerPoint, radius);
         }
       };
 
       const findExtremes = () => {
-        const coords =  map.current.getSource("circle")._data.geometry.coordinates[0]
+        const coords = map.current.getSource("circle")._data.geometry.coordinates[0]
         const topMost = coords[0];
         const bottomMost = coords[Math.floor(coords.length / 4)]; // Approximate
         const leftMost = coords[Math.floor(coords.length / 2)];
         const rightMost = coords[Math.floor(3 * coords.length / 4)];
-    
+
         return [topMost, bottomMost, leftMost, rightMost];
       };
       const isPointExactMatch = (pointToCheck, coordinates) => {
-        return coordinates.some(coord => 
+        return coordinates.some(coord =>
           parseFloat(coord[0].toFixed(2)) === parseFloat(pointToCheck[0].toFixed(2)) &&
           parseFloat(coord[1].toFixed(2)) === parseFloat(pointToCheck[1].toFixed(2))
         );
       };
-    
+
 
       handleMouseDown.current = function (e) {
-        
+
         if (!triggerRadius || !circleFeature) {
           return;
         }
-        
+
         const extremes = findExtremes()
-       
-        
-        if(isPointExactMatch([e.lngLat.lng, e.lngLat.lat], extremes)){
-      
+
+
+        if (isPointExactMatch([e.lngLat.lng, e.lngLat.lat], extremes)) {
+
           isDragging = true;
           resizing = true;
           map.current.getCanvas().style.cursor = "nwse-resize";
@@ -336,25 +338,26 @@ export function useMap(styleMap, map, zoom, triggerRadius) {
       map.current.on("mouseup", handleMouseUp.current);
       map.current.on("mouseleave", handleMouseLeave.current);
 
-      document
-        .getElementById("search-buttonradius")
-        .addEventListener("click", function () {
-          removeMarkers();
-          fetchApi(centerPoint[0], centerPoint[1], radius);
-        });
+      // 2
+      // document
+      //   .getElementById("search-buttonradius")
+      //   .addEventListener("click", function () {
+      //     removeMarkers();
+      //     fetchApi(centerPoint[0], centerPoint[1], radius);
+      //   });
 
-        document
-        .getElementById("clear-buttonradius")
-        .addEventListener("click", function () {
-          removeMarkers();
-          map.current.removeLayer("circle");
-          map.current.removeLayer("circle-outline");
-          map.current.removeSource("circle")
-          map.current.removeLayer("pointer-layer")
-          map.current.removeSource("pointer")
-          document.getElementById("search-buttonradius").style.display = "none";
-          document.getElementById("clear-buttonradius").style.display = "none";
-        });
+      //   document
+      //   .getElementById("clear-buttonradius")
+      //   .addEventListener("click", function () {
+      //     removeMarkers();
+      //     map.current.removeLayer("circle");
+      //     map.current.removeLayer("circle-outline");
+      //     map.current.removeSource("circle")
+      //     map.current.removeLayer("pointer-layer")
+      //     map.current.removeSource("pointer")
+      //     document.getElementById("search-buttonradius").style.display = "none";
+      //     document.getElementById("clear-buttonradius").style.display = "none";
+      //   });
     };
 
     const removeCircleEvents = () => {
@@ -375,8 +378,9 @@ export function useMap(styleMap, map, zoom, triggerRadius) {
         map.current.removeLayer("circle-outline");
         map.current.removeSource("circle");
       }
-      document.getElementById("search-buttonradius").style.display = "none";
-      document.getElementById("clear-buttonradius").style.display = "none";
+      // 1
+      // document.getElementById("search-buttonradius").style.display = "none";
+      // document.getElementById("clear-buttonradius").style.display = "none";
     }
   }, [map.current, triggerRadius]);
 
@@ -395,7 +399,7 @@ export function useMap(styleMap, map, zoom, triggerRadius) {
     </div>
 
     `
-    spinnerDiv.innerHTML=spinner
+    spinnerDiv.innerHTML = spinner
 
     const res = await fetch(`${CONFIG_APP.MAPBOX_API}/map-radius-circle`, {
       method: "POST",
@@ -408,10 +412,10 @@ export function useMap(styleMap, map, zoom, triggerRadius) {
         meter_radius,
       }),
     });
-    
+
 
     const responseData = await res.json();
-    spinnerDiv.innerHTML=``
+    spinnerDiv.innerHTML = ``
 
     // console.log(responseData);
     removeMarkers();
@@ -476,7 +480,9 @@ export function useMap(styleMap, map, zoom, triggerRadius) {
     });
   };
 
-const mapApi = async (responseData) => {
+  const mapApi = async (responseData) => {
+    console.log("bejir", responseData);
+
     removeMarkers();
     setDataMap(responseData.data);
     responseData.data.forEach((item, index) => {
@@ -486,20 +492,20 @@ const mapApi = async (responseData) => {
       // Create SVG element
       const isSame =
         build &&
-        item.LATITUDE === build.LATITUDE &&
-        item.LONGITUDE === build.LONGITUDE;
+        item.latitude === build.latitude &&
+        item.longitude === build.longitude;
       if (build) {
         console.log(
           isSame,
-          item.LATITUDE,
-          build.LATITUDE,
-          item.LONGITUDE,
-          build.LONGITUDE
+          item.latitude,
+          build.latitude,
+          item.longitude,
+          build.longitude
         );
       }
       const svg = `
       <div class="marker-map">
-      <div class="label-name-map">${item.BUILDINGNAME}</div>
+      <div class="label-name-map">${item.buildingName}</div>
         <div class="label-icon-wrapper">
           <svg display="block" height="41px" width="27px" viewBox="0 0 27 41">
               <defs>
@@ -509,9 +515,8 @@ const mapApi = async (responseData) => {
                   </radialGradient>
               </defs>
               <ellipse cx="13.5" cy="34.8" rx="10.5" ry="5.25" fill="url(#shadowGradient)"></ellipse>
-              <path fill="${
-                isSame ? "#e6051b" : "#1b72e5"
-              }" d="M27,13.5C27,19.07 20.25,27 14.75,34.5C14.02,35.5 12.98,35.5 12.25,34.5C6.75,27 0,19.22 0,13.5C0,6.04 6.04,0 13.5,0C20.96,0 27,6.04 27,13.5Z"></path>
+              <path fill="${isSame ? "#e6051b" : "#1b72e5"
+        }" d="M27,13.5C27,19.07 20.25,27 14.75,34.5C14.02,35.5 12.98,35.5 12.25,34.5C6.75,27 0,19.22 0,13.5C0,6.04 6.04,0 13.5,0C20.96,0 27,6.04 27,13.5Z"></path>
               <path opacity="0.25" d="M13.5,0C6.04,0 0,6.04 0,13.5C0,19.22 6.75,27 12.25,34.5C13,35.52 14.02,35.5 14.75,34.5C20.25,27 27,19.07 27,13.5C27,6.04 20.96,0 13.5,0ZM13.5,1C20.42,1 26,6.58 26,13.5C26,15.9 24.5,19.18 22.22,22.74C19.95,26.3 16.71,30.14 13.94,33.91C13.74,34.18 13.61,34.32 13.5,34.44C13.39,34.32 13.26,34.18 13.06,33.91C10.28,30.13 7.41,26.31 5.02,22.77C2.62,19.23 1,15.95 1,13.5C1,6.58 6.58,1 13.5,1Z"></path>
           </svg>
           <div class="label-address-map">${index + 1}</div>
@@ -527,14 +532,15 @@ const mapApi = async (responseData) => {
       // Add marker to map
       const marker = new mapboxgl.Marker(el);
       console.log(item);
-      marker.setLngLat([item.LONGITUDE, item.LATITUDE]).addTo(map.current);
+      marker.setLngLat([item.longitude, item.latitude]).addTo(map.current);
       const popup = new mapboxgl.Popup({ offset: 25 }).setHTML(`
       <div class="popup-container">
         <div class="info-box">
-      <h3>${item.BUILDINGNAME}</h3>
-      <p><strong>Address:</strong> ${item.BUILDINGNAME}, ${item.POSTCODE}</p>
-      <p><strong>Street No:</strong> ${item.STREETNO}</p>
-      <p><strong>Street Name:</strong> ${item.STREETNAME}</p>
+      <h3>${item.buildingName}</h3>
+      <p><strong>Address:</strong> ${item.buildingName}, ${item.streetNumber}, ${item.streetName}</p>
+      <p><strong>Postal Code:</strong> ${item.postalCode}</p>
+      <p><strong>Latitude:</strong> ${item.latitude}</p>
+      <p><strong>Longitude:</strong> ${item.longitude}</p>
     </div>
     </div>
     `);

@@ -93,11 +93,8 @@ export function useMRTData(zoom, map) {
             <div class="popup-container">
                 <div class="info-box">
                     <div class="info-container">
-                      <h3>${station.properties.STATION}</h3>
+                      <h3><b>Station Name : ${station.properties.STATION}<b></h3>
                       <p class="status" style="background-color: ${backgroundColor}; font-size: 12px; padding: 2px 4px;"> ${station.properties.ISACTIVE ? '' : 'U/C'}</p>
-                    </div>
-                    <div class="other-info">
-                      <p style="width: 100%;"><strong>Address:</strong> ${station.properties.ADDRESS}</p>
                     </div>
                 </div>
             </div>`);
@@ -105,27 +102,6 @@ export function useMRTData(zoom, map) {
          
 
           element.hoverPopup = hoverPopup;
-        
-          
-          // hoverPopup = new mapboxgl.Popup({ offset: 25 }).setHTML(`
-          //   <div class="popup-container">
-          //       <div class="popup-image">
-          //           <img src="${station.properties.wikipedia_image_url}" alt="No Image" />
-          //       </div>
-          //       <div class="info-box">
-          //           <h3>${station.properties.name}</h3>
-          //           <div class="other-info">
-          //               <p><strong>In Hindi:</strong> ${station.properties.name_hi}</p>
-          //               <p><strong>In Chinese:</strong> ${station.properties.name_zh}</p>
-          //               <p><strong>Line:</strong> NS23</p>
-          //               <p><strong>Network:</strong> ${station.properties.network}</p>
-          //           </div>
-          //           <p><strong>Type:</strong> ${station.properties.type}</p>
-          //           <a href="${station.properties.wikipedia_url}" target="_blank">More Info</a>
-          //       </div>
-          //   </div>`);
-          // hoverPopup.setLngLat(station.geometry.coordinates).addTo(map.current);
-          // element.hoverPopup = hoverPopup;
 
           hoverPopup.getElement().addEventListener("mouseleave", () => {
             hoverPopup.remove();

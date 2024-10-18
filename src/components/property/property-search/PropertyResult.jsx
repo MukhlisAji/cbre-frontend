@@ -27,12 +27,13 @@ const PropertyResult = () => {
     const location = useLocation();
     const [isLoading, setIsLoading] = useState(false);
     // const formData = location.state?.formAddress;
+    const [isAnimating, setIsAnimating] = useState(false);
+    
     const searchCategory = location.state?.category;
     const formData = location.state?.form;
     const searchedQuery = location.state?.query;
     const [category, setCategory] = useState(searchCategory ? searchCategory : '');
     const [query, setQuery] = useState(searchedQuery ? searchedQuery : '');
-    const [isAnimating, setIsAnimating] = useState(false);
     const [showPlaceholder, setShowPlaceholder] = useState(!query);
     const placeholders = [
         "by Address",

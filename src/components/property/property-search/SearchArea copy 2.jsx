@@ -15,10 +15,6 @@ import SearchNew from "./SearchNew";
 
 const SearchArea = () => {
   const [isClassic, setIsClassic] = useState(false);
-  const navigate = useNavigate();
-  const handleClickSearch = (getForm, query, category) => {
-    navigate("result", { state: { form: getForm(), category, query } });
-  };
 
   return (
     <div>
@@ -36,7 +32,7 @@ const SearchArea = () => {
 
           <SearchNew
             className="relative flex flex-col left-1/2 transform -translate-x-1/2 -mt-20 pt-2 z-30 flex justify-center items-center px-24"
-            setIsClassic={setIsClassic} handleClickSearch={handleClickSearch}
+            setIsClassic={setIsClassic}
           />
         </div>
       ) : (
