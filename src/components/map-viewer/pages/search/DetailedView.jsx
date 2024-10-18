@@ -17,7 +17,8 @@ export default function DetailedView({ building, onClose, nearByMrt, nearByOther
           const newHeight = screenHeight - 400;
           setHeight(newHeight);
         };
-    
+        console.log("ini")
+        console.log(building)
         handleResize();
         window.addEventListener("resize", handleResize);
 
@@ -41,30 +42,31 @@ export default function DetailedView({ building, onClose, nearByMrt, nearByOther
     const renderTabContent = () => {
         switch (activeTab) {
             case 'Details':
+                
                 return (
                     <div className="p-2 text-sm text-gray-700 space-y-2">
                         <div className="flex justify-between">
-                            <span className="font-semibold">Floor:</span>
-                            <span>01</span>
+                            <span className="font-semibold">Completion</span>
+                            <span> </span>
                         </div>
                         <div className="flex justify-between">
-                            <span className="font-semibold">Space Name:</span>
-                            <span>Entire</span>
+                            <span className="font-semibold">Zoning:</span>
+                            <span>{`${building.zoning}`}</span>
                         </div>
                         <div className="flex justify-between">
-                            <span className="font-semibold">Space Status:</span>
+                            <span className="font-semibold">GPA:</span>
                             <span>For Sale</span>
                         </div>
                         <div className="flex justify-between">
-                            <span className="font-semibold">Possession Status:</span>
+                            <span className="font-semibold">Base Area:</span>
                             <span>Vacant</span>
                         </div>
                         <div className="flex justify-between">
-                            <span className="font-semibold">Space Size:</span>
+                            <span className="font-semibold">No of Floors:</span>
                             <span>28,656 sq ft</span>
                         </div>
                         <div className="flex justify-between">
-                            <span className="font-semibold">Tenant Name:</span>
+                            <span className="font-semibold">Car Park Lists:</span>
                             <span>Rent</span>
                         </div>
                         <div className="flex justify-between">

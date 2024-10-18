@@ -16,7 +16,7 @@ export function useMap(styleMap, map, zoom, triggerRadius) {
   const handleMouseDown = useRef(null);
   const handleMouseUp = useRef(null);
   const handleMouseLeave = useRef(null);
-  const [build] = useAtom(buildAtom);
+  const [build, setBuild] = useAtom(buildAtom);
 
 
   const handleSearch = (searchValue) => {
@@ -482,7 +482,7 @@ export function useMap(styleMap, map, zoom, triggerRadius) {
 
   const mapApi = async (responseData) => {
     console.log("bejir", responseData);
-
+    console.log(build)
     removeMarkers();
     setDataMap(responseData.data);
     responseData.data.forEach((item, index) => {
@@ -492,8 +492,8 @@ export function useMap(styleMap, map, zoom, triggerRadius) {
       // Create SVG element
       const isSame =
         build &&
-        item.latitude === build.latitude &&
-        item.longitude === build.longitude;
+        item.buildingId === build.buildingId
+
       if (build) {
         console.log(
           isSame,
@@ -614,6 +614,8 @@ export function useMap(styleMap, map, zoom, triggerRadius) {
     handleSearch,
     search,
     mapApi,
+    setBuild,
+    build
   };
 }
 

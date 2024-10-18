@@ -45,7 +45,7 @@ function DraggableBuilding({
     <>
       {controlChecked && (
         <Checkbox
-          checked={true}
+          checked={checked}
           onChange={() => handleChangeCheck(building)}
           className={`form-checkbox h-5 w-5 text-c-teal mt-2.5 rounded-md ${
             checked ? "bg-c-teal" : "bg-neutral-300"
@@ -58,7 +58,10 @@ function DraggableBuilding({
         className="flex flex-col w-full p-2"
         onClick={() => {
         //   setBuild(building);
-          if(controlChecked) handleChangeCheck(building);
+          if(controlChecked) {
+            console.log("check")
+        
+          }
         }}
         ref={drag}
         style={{ opacity: isDragging ? 0.5 : 1 }}
@@ -66,10 +69,8 @@ function DraggableBuilding({
         <span className="text-sm text-neutral-500">
           {index + 1}. {building.buildingName}
         </span>
-        <span className="text-sm text-neutral-500">{building.latitude}</span>
-        <span className="text-sm text-neutral-500">{building.longitude}</span>
         <span className="text-sm text-neutral-500">
-          No. of Spaces: <strong>{building.postalCode}</strong>
+          {`${building.streetNumber} ${building.streetName}, Singapore ${building.postalCode}`}
         </span>
       </div>
     </>

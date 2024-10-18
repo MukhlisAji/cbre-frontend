@@ -47,6 +47,7 @@ function Map2D() {
   } = useConfig();
 
   const [isSearch, setIsSearch] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
   const { isSidebarOpen, isCollapsed2dSearchOpen } = useAppContext();
   // const [build] = useAtom(buildAtom)
 
@@ -87,7 +88,7 @@ function Map2D() {
 
   const [triggerRadius, setTriggerRadius] = useState(false);
   // Main map
-  const { filteringData, handleSearch, search, mapApi } = useMap(
+  const { filteringData, handleSearch, search, mapApi, setBuild , build} = useMap(
     styleMap,
     map,
     zoom,
@@ -217,6 +218,7 @@ function Map2D() {
 
     console.log("searchby ", searchBy);
     try {
+      setIsLoading(true)
       const response = await fetch(`${CONFIG.PROPERTY_SERVICE}/${searchBy}`, {
         method: "POST",
         headers: {
@@ -230,6 +232,7 @@ function Map2D() {
         throw new Error("Network response was not ok");
       }
       const result = await response.json();
+      setIsLoading(false)
       console.log("Search results:", result);
       setBuildings(result.resultSet.propertyInformation);
       mapApi({ data: result.resultSet.propertyInformation });
@@ -243,7 +246,7 @@ function Map2D() {
   return (
     <>
       <div className="relative top-0 z-30">
-        {isBuildingsActive && <TwoDSearch mapApi={mapApi} map={map} buildings={buildings} setBuildings={setBuildings} setIsBuildingsActive={setIsBuildingsActive} />}
+        {isBuildingsActive && <TwoDSearch isLoading={isLoading} build = {build}mapApi={mapApi} map={map} buildings={buildings} setBuildings={setBuildings} setIsBuildingsActive={setIsBuildingsActive} setBuild={setBuild} />}
       </div>
       <div className="relative w-full min-h-full overflow-hidden">
         <div className="filtering absolute top-2 left-4 z-40 flex items-center space-x-2 bg-white bg-opacity-75 p-2 rounded-lg shadow-md">

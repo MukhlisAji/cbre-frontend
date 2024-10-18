@@ -20,6 +20,8 @@ export default function SearchResult({
   map,
   mapApi,
   setIsBuildingsActive,
+  setBuild,
+  build
 }) {
   const { selectedBuildings, setSelectedBuildings } = useAppContext();
   const [selectedBuilding, setSelectedBuilding] = useState(null);
@@ -84,8 +86,9 @@ export default function SearchResult({
   }, [selectedBuilding]);
 
   const handleItemClick = (building) => {
-    setSelectedBuilding(building);
-    building.enabled = true;
+    console.log("item click")
+    setBuild(building)
+    setSelectedBuilding(building)
     if (map.current) {
       map.current.flyTo({
         center: [parseFloat(building.longitude), parseFloat(building.latitude)],
@@ -95,6 +98,9 @@ export default function SearchResult({
     }
   };
 
+  useEffect(() => {
+    mapApi({ data: buildings });
+  },[build])
   const handleCloseDetailView = () => {
     setSelectedBuilding(null);
   };
@@ -118,10 +124,12 @@ export default function SearchResult({
   };
 
   const handleChangeCheck = (building) => {
+    console.log("handle check")
     setBuildings((prevBuildings) => {
       // Cari building yang memiliki id yang sama
       const updatedBuildings = prevBuildings.map((b) => {
-        if (b.BUILDINGID === building.BUILDINGID) {
+        if (b.buildingId === building.buildingId) {
+          console.log("msk checked")
           // Ubah status enabled berdasarkan kondisi saat ini
           return {
             ...b,
@@ -156,10 +164,10 @@ export default function SearchResult({
     return (
       <div
         ref={(node) => drag(drop(node))}
-        key={building.BUILDINGID}
+        key={building.buildingId}
         className={`flex w-full p-2 border-b space-x-2.5 cursor-pointer bg-white ${
           selectedBuilding &&
-          selectedBuilding.BUILDINGID === building.BUILDINGID
+          selectedBuilding.buildingId === building.buildingId
             ? "bg-blue-100"
             : "hover:bg-gray-200"
         }`}
@@ -222,7 +230,7 @@ export default function SearchResult({
               <div className="flex-grow space-y-2 w-full">
                 {buildings.map((building, index) => (
                   <DraggableItem
-                    key={building.BUILDINGID}
+                    key={building.buildingId}
                     building={building}
                     index={index}
                     checked={building.enabled || false}
@@ -307,7 +315,7 @@ export default function SearchResult({
               <div className="flex-grow space-y-2 w-full">
                 {checkedBuildings.map((building, index) => (
                   <DraggableItem
-                    key={building.BUILDINGID}
+                    key={building.buildinId}
                     building={building}
                     index={index}
                     checked={building.enabled || false}

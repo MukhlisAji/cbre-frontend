@@ -33,7 +33,7 @@ import { buildAtom } from "../project/store/build";
 import { data } from "autoprefixer";
 
 // search
-export default function TwoDSearch({ mapApi, map, buildings, setBuildings, setIsBuildingsActive }) {
+export default function TwoDSearch({ isLoading, build, mapApi, map, buildings, setBuildings, setIsBuildingsActive, setBuild}) {
   const { isCollapsed2dSearchOpen, setIsCollapsed2dSearchOpen } =
     useAppContext();
   const navigate = useNavigate();
@@ -47,13 +47,13 @@ export default function TwoDSearch({ mapApi, map, buildings, setBuildings, setIs
   const [isTransactionEnabled, setIsTransactionEnabled] = useState(false);
   // const [buildings, setBuildings] = useState([]);
   // const [dts, setDts] = useState([])
-  const [build] = useAtom(buildAtom);
+  // const [build] = useAtom(buildAtom);
   const [minBuildingNLA, setMinBuildingNla] = useState(null);
   const [maxBuildingNLA, setMaxBuildingNla] = useState(null);
   const [minVacantSpace, setMinVacantSpace] = useState(null);
   const [maxVacantSpace, setMaxVacantSpace] = useState(null);
   const [askingRent, setAskingRent] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
+  // const [isLoading, setIsLoading] = useState(false);
 
   const {
     options: statusOptions,
@@ -156,56 +156,56 @@ export default function TwoDSearch({ mapApi, map, buildings, setBuildings, setIs
     setShowResults(false);
   };
 
-  const handleSearchButton = async () => {
-    setIsLoading(true);
-    try {
-      console.log(minBuildingNLA);
-      console.log(minVacantSpace);
-      console.log(askingRent);
-      const body = {
-        sub_type: selectedSubType === "Select" ? null : selectedSubType,
-        region: selectedRegion === "Select" ? null : selectedRegion,
-        micromarket:
-          selectedMicromarket === "Select" ? null : selectedMicromarket,
-        zoning: selectedZoning === "Select" ? null : selectedZoning,
-        property_usage:
-          selectedPropUsage === "Select" ? null : selectedPropUsage,
-        building_nla: minBuildingNLA,
-        space_status: selectedStatus === "Select" ? null : selectedStatus,
-        vacant_space: minVacantSpace,
-        asking_rent: askingRent,
-        available_date: availableDate
-          ? format(availableDate, "yyyy-MM-dd")
-          : null,
-      };
+  // const handleSearchButton = async () => {
+  //   setIsLoading(true);
+  //   try {
+  //     console.log(minBuildingNLA);
+  //     console.log(minVacantSpace);
+  //     console.log(askingRent);
+  //     const body = {
+  //       sub_type: selectedSubType === "Select" ? null : selectedSubType,
+  //       region: selectedRegion === "Select" ? null : selectedRegion,
+  //       micromarket:
+  //         selectedMicromarket === "Select" ? null : selectedMicromarket,
+  //       zoning: selectedZoning === "Select" ? null : selectedZoning,
+  //       property_usage:
+  //         selectedPropUsage === "Select" ? null : selectedPropUsage,
+  //       building_nla: minBuildingNLA,
+  //       space_status: selectedStatus === "Select" ? null : selectedStatus,
+  //       vacant_space: minVacantSpace,
+  //       asking_rent: askingRent,
+  //       available_date: availableDate
+  //         ? format(availableDate, "yyyy-MM-dd")
+  //         : null,
+  //     };
 
-      console.log("Searching for:", searchQuery);
-      // const res = await fetch(`${CONFIG_APP.MAPBOX_API}/master-filter`, {
-      //   method: "POST",
-      //   headers: {
-      //     "Content-Type": "application/json",
-      //   },
-      //   body: JSON.stringify(body),
-      // });
-      const res = await fetch(`https://6b67f953cd39.ngrok.app/map-export`);
+  //     console.log("Searching for:", searchQuery);
+  //     // const res = await fetch(`${CONFIG_APP.MAPBOX_API}/master-filter`, {
+  //     //   method: "POST",
+  //     //   headers: {
+  //     //     "Content-Type": "application/json",
+  //     //   },
+  //     //   body: JSON.stringify(body),
+  //     // });
+  //     const res = await fetch(`https://6b67f953cd39.ngrok.app/map-export`);
 
-      if (!res.ok) {
-        throw new Error(`HTTP error! status: ${res.status}`);
-      }
+  //     if (!res.ok) {
+  //       throw new Error(`HTTP error! status: ${res.status}`);
+  //     }
 
-      const responseData = await res.json();
-      setBuildings(responseData.data);
-      setShowResults(true);
+  //     const responseData = await res.json();
+  //     setBuildings(responseData.data);
+  //     setShowResults(true);
 
-      mapApi(responseData);
-    } catch (error) {
-      console.error("Error during search:", error);
-      // Optionally, you can set an error state here to display to the user
-      // setError(error.message);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  //     mapApi(responseData);
+  //   } catch (error) {
+  //     console.error("Error during search:", error);
+  //     // Optionally, you can set an error state here to display to the user
+  //     // setError(error.message);
+  //   } finally {
+  //     setIsLoading(false);
+  //   }
+  // };
 
   const darkGreen = "#5a8184";
 
@@ -260,18 +260,20 @@ export default function TwoDSearch({ mapApi, map, buildings, setBuildings, setIs
               isCollapsed2dSearchOpen ? "opacity-0" : "opacity-100"
             }`}
           >
-            {buildings.length === 0 ? (
+            {isLoading ? (
               <div className="absolute inset-0 bg-white bg-opacity-70 flex justify-center items-center z-50">
                 <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-c-teal"></div>
               </div>
             ) : (
               <SearchResult
+                build ={build}
                 mapApi={mapApi}
                 onBack={handleBackToSearch}
                 buildings={buildings}
                 setBuildings={setBuildings}
                 map={map}
                 setIsBuildingsActive={setIsBuildingsActive}
+                setBuild = {setBuild}
               />
             )}
             {/* 
