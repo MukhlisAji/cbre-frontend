@@ -57,7 +57,7 @@ ingress:
           backend:
             service: oneapp-frontend
             port:
-              number: 80
+              number: 8080
   tls: []
   #  - secretName: chart-example-tls
   #    hosts:
@@ -95,7 +95,7 @@ configmap:
     VITE_PROPERTY_SERVICE: https://a2edf140b5af.ngrok.app/cbre/property
     VITE_CONTACT_SERVICE: https://f0f939365c3d.ngrok.app/cbre/contact
     VITE_UTILITIES_SERVICE: https://97aa9beaed50.ngrok.app/cbre/utilities
-    VITE_ACCOUNT_SERVICE=: http://oneapp-backend-account-api.oneapp-nonprod-ns.svc.cluster.local:8080/cbre/account
+    VITE_ACCOUNT_SERVICE=: /cbre/account
 
 # Additional volumes on the output Deployment definition.
 volumes: []
