@@ -1,7 +1,7 @@
 # Stage 1: Build the Vite project
 FROM node:16-alpine AS builder
 
-#WORKDIR /app
+WORKDIR /app
 
 COPY package*.json ./
 
@@ -20,8 +20,8 @@ COPY nginx/nginx.conf /etc/nginx/nginx.conf
 COPY nginx/default.conf /etc/nginx/conf.d/default.conf
 
 # Set the necessary permissions (as root)
-RUN chmod 666 /etc/nginx/conf.d/default.conf
-RUN chmod 666 /etc/nginx/nginx.conf
+RUN chown 101:101 /etc/nginx/conf.d/default.conf
+RUN chown 101:101 /etc/nginx/nginx.conf
 
 RUN mkdir -p /var/cache/nginx/client_temp
 RUN chmod 777 /var/cache/nginx/client_temp
@@ -32,12 +32,11 @@ RUN mkdir -p /var/cache/nginx/scgi_temp
 RUN mkdir -p /var/cache/nginx/ngx_http_proxy_module
 
 
-WORKDIR /usr/share/nginx/html
-
-COPY --from=builder dist /usr/share/nginx/html
-EXPOSE 8080
-
 # Switch back to the unprivileged user for running NGINX
 USER 101
+
+COPY --from=builder app/dist /usr/share/nginx/html
+EXPOSE 8080
+
 
 CMD ["nginx", "-g", "daemon off;"]
