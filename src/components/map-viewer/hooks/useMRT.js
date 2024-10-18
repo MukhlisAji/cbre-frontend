@@ -93,7 +93,7 @@ export function useMRTData(zoom, map) {
             <div class="popup-container">
                 <div class="info-box">
                     <div class="info-container">
-                      <h3><b>Station Name : ${station.properties.STATION}<b></h3>
+                      <h3>${station.properties.STATION}</h3>
                       <p class="status" style="background-color: ${backgroundColor}; font-size: 12px; padding: 2px 4px;"> ${station.properties.ISACTIVE ? '' : 'U/C'}</p>
                     </div>
                 </div>
