@@ -2,8 +2,77 @@ import { Box, FormControl, InputLabel, MenuItem, Select, styled, TextField } fro
 import React, { useEffect, useState } from 'react';
 import MultipleSelect from '../../shared/element/MultipleSelect';
 import { DatePicker } from '@mui/x-date-pickers';
+import PropertyResource from '../PropertyResource';
+import { AddAlert } from '@mui/icons-material';
+import axios from 'axios';
+import { generateTransactionId } from '../../lib/api/Authorization';
+import { CONFIG } from '../../../config';
 
 const PropertySearchForm = () => {
+    const { districts, fetchDistricts, useFetchOptions, useFetchResource } = PropertyResource();
+
+    // Define states for each category of options
+    const [propertyUsageOptions, setPropertyUsageOptions] = useState([]);
+    const [possessionStatusOptions, setPossessionStatusOptions] = useState([]);
+    const [zoningOptions, setZoningOptions] = useState([]);
+    const [spaceStatusOptions, setSpaceStatusOptions] = useState([]);
+    const [micromarketOptions, setMicromarketOptions] = useState([]);
+    const [gradeOptions, setGradeOptions] = useState([]);
+    const [buildingOwnerOptions, setBuildingOwnerOptions] = useState([]);
+    const [buildingStatusOptions, setBuildingStatusOptions] = useState([]);
+    const [propertyTypeOptions, setPropertyTypeOptions] = useState([]);
+    const [isLoading, setIsLoading] = useState(false);
+
+    // Helper function to fetch from localStorage or API
+    const getOrFetchData = async (key, fetchFunction, setState) => {
+        const cachedData = localStorage.getItem(key);
+        if (cachedData) {
+            setState(JSON.parse(cachedData)); // Use cached data if available
+        } else {
+            const fetchedData = await fetchFunction(); // Fetch new data
+            localStorage.setItem(key, JSON.stringify(fetchedData)); // Cache the new data in localStorage
+            setState(fetchedData);
+        }
+    };
+
+    useEffect(() => {
+        const fetchAllOptions = async () => {
+            setIsLoading(true); // Start loading
+
+            try {
+                // Fetch or get cached data
+                await getOrFetchData('propertyUsageOptions', () => useFetchOptions('propertyUsage'), setPropertyUsageOptions);
+                await getOrFetchData('possessionStatusOptions', () => useFetchOptions('possessionStatus'), setPossessionStatusOptions);
+                await getOrFetchData('zoningOptions', () => useFetchOptions('zoning'), setZoningOptions);
+                await getOrFetchData('spaceStatusOptions', () => useFetchOptions('spaceStatus'), setSpaceStatusOptions);
+
+                const micromarketFetch = async () => {
+                    const fetchedMicromarket = await useFetchResource('getmicromarkets');
+                    return fetchedMicromarket.microMarkets.map((district) => ({
+                        label: district,
+                        value: district,
+                    }));
+                };
+                await getOrFetchData('micromarketOptions', micromarketFetch, setMicromarketOptions);
+
+                await getOrFetchData('propertyTypeOptions', () => useFetchOptions('sector'), setPropertyTypeOptions);
+                await getOrFetchData('gradeOptions', () => useFetchOptions('grade'), setGradeOptions);
+                await getOrFetchData('buildingOwnerOptions', () => useFetchOptions('buildingOwner'), setBuildingOwnerOptions);
+                await getOrFetchData('buildingStatusOptions', () => useFetchOptions('buildingStatus'), setBuildingStatusOptions);
+
+                fetchDistricts(); // Fetch districts if applicable
+
+            } catch (error) {
+                console.error('Error fetching options:', error);
+            } finally {
+                setIsLoading(false); // Stop loading
+            }
+        };
+
+        // Call the function to fetch all options
+        fetchAllOptions();
+    }, []);
+
     const [sectionVisibility, setSectionVisibility] = useState({
         basicSearchVisible: true,
         advancedSearchVisible: false,
@@ -36,37 +105,219 @@ const PropertySearchForm = () => {
         };
     }, []);
 
-    const [rentType, setRentType] = useState('');
-    const [rentFrom, setRentFrom] = useState('');
-    const [rentTo, setRentTo] = useState('');
-    const [advanceSearch, setInternalAdvanceSearch] = useState(false);
-
-    const handleRentTypeChange = (event) => {
-        setRentType(event.target.value);
-    };
     const [formState, setFormState] = useState({
         buildingName: '',
         streetNumber: '',
         streetName: '',
-        postalCode: '',
-        region: [],
+        possessionType: [], // Initialize as an empty array
+        spaceStatus: [], // Initialize as an empty array
         micromarket: [],
-        sizeType: '',
         sizeFrom: '',
         sizeTo: '',
-        rentType: '',
         rentFrom: '',
         rentTo: '',
-        availableFrom: '',
-        availableTo: '',
-        lastUpdatedFrom: '',
-        lastUpdatedTo: ''
+        availableFrom: null, // DatePickers usually start with null or empty string
+        availableTo: null,
+        lastUpdatedFrom: null,
+        lastUpdatedTo: null,
+        sectorIds: [],
+        districts: [],
+        zoningIds: [],
+        propertyUsageIds: [],
+        grade: '',
+        buildingStatusIds: '',
+        ownerIds: [],
+        mrts: [],
+        proximity: '',
+        floorLoadingFrom: '',
+        floorLoadingTo: '',
+        floorSystem: '',
+        airconSystem: '',
+        greenMark: '',
+        carParkAllocRatio: '',
+        carSpaces: '',
+        seasonalParkingFee: '',
+        nonReservedParkingFee: '',
+        titleIds: [],
     });
 
-    const handleInputChange = (e) => {
-        const { name, value } = e.target;
-        setFormState({ ...formState, [name]: value });
+
+    const handleInputChange = (event) => {
+        const { name, value } = event.target;
+        setFormState((prevState) => ({
+            ...prevState,
+            [name]: value,
+        }));
     };
+
+
+    const handleMultipleSelectChange = (selectedOptions, field, valueField = 'id') => {
+        console.log('Selected options:', selectedOptions); // Debugging
+
+        setFormState((prevState) => ({
+            ...prevState,
+            [field]: selectedOptions.map(option => option[valueField]), // Dynamically use valueField
+        }));
+    };
+
+
+
+    const handleSubmit = async () => {
+        setIsLoading(true);
+        const payload = {
+            pageNo: 1,
+            pageSize: 10,
+            basicSearch: {
+                buildingName: formState.buildingName,
+                street: formState.streetNumber,
+                streetName: formState.streetName,
+                property: {
+                    sectorIds: formState.sectorIds,
+                    space: {
+                        possessionType: formState.possessionType,
+                        spaceStatus: formState.spaceStatus,
+                        sizeFrom: formState.sizeFrom,
+                        sizeTo: formState.sizeTo,
+                        rentFrom: formState.rentFrom,
+                        rentTo: formState.rentTo,
+                        availableFrom: formState.availableFrom,
+                        availableTo: formState.availableTo,
+                        lastUpdatedFrom: formState.lastUpdatedFrom,
+                        lastUpdatedTo: formState.lastUpdatedTo,
+                    }
+                },
+                districts: formState.districts,
+                microMarketIds: formState.micromarket,
+                zoningIds: formState.zoningIds,
+                propertyUsageIds: formState.propertyUsageIds,
+            },
+            advancedSearch: {
+                topDateFrom: formState.topFrom,
+                topDateTo: formState.topTo,
+                grade: formState.grade,
+                buildingStatusIds: formState.buildingStatusIds,
+                ownerIds: formState.ownerIds,
+                titleIds: formState.titleIds,
+                publicTransportation: {
+                    mrts: formState.mrts,
+                    proximity: formState.proximity || 2000,
+                },
+                propertyDescription: {
+                    floorLoadingFrom: formState.floorLoadingFrom,
+                    floorLoadingTo: formState.floorLoadingTo,
+                    floorSystem: formState.floorSystem,
+                    airconSystem: formState.airconSystem,
+                    greenMark: formState.greenMark,
+                    carParkAllocRatio: formState.carParkAllocRatio,
+                    carSpaces: formState.carSpaces,
+                    seasonalParkingFee: formState.seasonalParkingFee,
+                    nonReservedParkingFee: formState.nonReservedParkingFee,
+                }
+            }
+        };
+
+        console.log('Constructed Payload:', JSON.stringify(payload, null, 2));
+        // You can now send this payload to your API using a POST request
+
+        try {
+            const response = await axios.post(`${CONFIG.PROPERTY_SERVICE}/search`, payload, {
+                headers: {
+                    'transactionId': generateTransactionId(),
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            // console.log('dataToSend ', payload);
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(`Error: ${response.statusText} - ${errorData.statusMessage}`);
+            }
+
+            const responseData = await response.json();
+
+            if (responseData.statusCode === '00') {
+                // setIsEdit(false);
+                // setIsSaving(false); // Reset saving flag after successful save
+                // addAlert('Contact information saved successfully!', 'success');
+                navigate('/property/properties', { state: { resultSet: response.data.resultSet } });
+            } else {
+                throw new Error(`Error: ${response.status} - ${response.data.statusMessage}`);
+
+                // setIsSaving(false); // Reset saving flag if there's an error
+                // addAlert(`Error saving contact information: ${responseData.statusMessage}`, 'error');
+            }
+        } catch (error) {
+            console.error('Error saving contact information:', error);
+            // setIsSaving(false); // Reset saving flag if there's an error
+            // addAlert(`An error occurred. Please try again later`, 'error');
+        } finally {
+            setIsLoading(false); // Hide loading overlay
+        }
+    };
+
+    const handleCheckboxChange = (event, field, useName = false) => {
+        const { value, checked } = event.target;
+
+        // Use either the name (string) or parse the value as an ID (integer)
+        const fieldValue = useName ? value : parseInt(value, 10);
+
+        setFormState(prevState => {
+            const fieldArray = prevState[field] || [];
+
+            if (checked) {
+                // If checked, add the value (name or ID) to the array
+                return {
+                    ...prevState,
+                    [field]: [...fieldArray, fieldValue],
+                };
+            } else {
+                // If unchecked, remove the value (name or ID) from the array
+                return {
+                    ...prevState,
+                    [field]: fieldArray.filter(item => item !== fieldValue),
+                };
+            }
+        });
+    };
+
+
+    const handleDateChange = (date, field) => {
+        if (!date) return;
+
+        setFormState(prevState => ({
+            ...prevState,
+            [field]: date.toISOString().split('T')[0], // Convert Date to 'YYYY-MM-DD' format
+        }));
+    };
+
+    const handleInputChangeArray = (event, field, index) => {
+        const { value } = event.target;
+        setFormState(prevState => {
+            const updatedArray = [...prevState[field]];
+            updatedArray[index] = value;
+            return {
+                ...prevState,
+                [field]: updatedArray,
+            };
+        });
+    };
+
+    const handleSelectChange = (event, field) => {
+        const { value } = event.target;
+        setFormState(prevState => ({
+            ...prevState,
+            [field]: value,
+        }));
+    };
+
+    // const handleInputChange = (event) => {
+    //     const { name, value } = event.target;
+    //     setFormState((prevState) => ({
+    //         ...prevState,
+    //         [name]: value,
+    //     }));
+    // };
 
     const darkGreen = '#5a8184';
     const red = "#AD2A2A";
@@ -95,7 +346,7 @@ const PropertySearchForm = () => {
     return (
         <div style={{ height: `${sectionHeight}px` }} className="mx-auto overflow-y-auto">
             <header className="sticky top-0 shadow-sm py-3 bg-neutral-100 z-10 flex items-center justify-center rounded-t-lg border border-neutral-200">
-                <h2 className="text-xl mx-auto font-semibold text-neutral-600 text-center">New Property: Singapore Property</h2>
+                <h2 className="text-xl mx-auto font-semibold text-neutral-600 text-center">Property Search</h2>
             </header>
             <div className="border border-neutral-200 pt-8 rounded-sm bg-white shadow-lg p-2">
 
@@ -122,7 +373,7 @@ const PropertySearchForm = () => {
                     </div>
 
                     {sectionVisibility.basicSearchVisible && (
-                        <div className=" p-8 grid grid-cols-6 gap-10 overflow-y-auto">
+                        <div className="p-8 grid grid-cols-6 gap-10 overflow-y-auto">
                             <div className="col-span-2">
                                 {/* Building, Street, Postal Code */}
                                 <div className="grid grid-cols-4 gap-4">
@@ -138,15 +389,15 @@ const PropertySearchForm = () => {
                                         />
                                     </div>
 
-                                    <div className="col-span-1">
-                                        <label className="block text-sm font-medium mb-1">Street #</label>
+                                    <div className="col-span-2">
+                                        <label className="block text-sm font-medium mb-1">Street</label>
                                         <input
                                             type="text"
                                             name="streetNumber"
                                             value={formState.streetNumber}
                                             onChange={handleInputChange}
                                             className="w-full p-2 border border-gray-300 rounded-md"
-                                            placeholder="Street #"
+                                            placeholder="Street"
                                         />
                                     </div>
 
@@ -161,129 +412,127 @@ const PropertySearchForm = () => {
                                             placeholder="Street Name"
                                         />
                                     </div>
-
-                                    <div className="col-span-1">
-                                        <label className="block text-sm font-medium mb-1">Postal Code</label>
-                                        <input
-                                            type="text"
-                                            name="postalCode"
-                                            value={formState.postalCode}
-                                            onChange={handleInputChange}
-                                            className="w-full p-2 border border-gray-300 rounded-md"
-                                            placeholder="Postal Code"
-                                        />
-                                    </div>
                                 </div>
 
                                 {/* Region and Micromarket */}
                                 <div className="mb-4 space-y-4">
                                     <div className="space-y-2">
+                                        <span className='text-sm mt-8 font-semibold text-gray-600'>Property Type</span>
+                                        <MultipleSelect
+                                            label="Select Property Type"
+                                            options={propertyTypeOptions}
+                                            isMulti={true}
+                                            labelKey="sector"  // Should match the label field in the options array
+                                            valueKey="sectorId"  // Should match the value field in the options array
+                                            onChange={(selectedOptions) => handleMultipleSelectChange(selectedOptions, 'sectorIds', 'sectorId')}
+                                        />
+
+                                    </div>
+
+                                    <div className="space-y-2">
                                         <span className='text-sm mt-8 font-semibold text-gray-600'>Region</span>
-                                        <MultipleSelect label="" />
+                                        <MultipleSelect
+                                            label="Select Region"
+                                            options={districts}
+                                            isMulti={true}
+                                            labelKey="name"
+                                            valueKey="name"
+                                            onChange={(selectedOptions) => handleMultipleSelectChange(selectedOptions, 'districts', 'name')}
+                                        />
                                     </div>
 
                                     <div className="space-y-2">
                                         <span className='text-sm mt-8 font-semibold text-gray-600'>Micromarket</span>
-                                        <MultipleSelect label="" />
-
+                                        <MultipleSelect
+                                            label="Select Micromarket"
+                                            options={micromarketOptions}
+                                            isMulti={true}
+                                            labelKey="value"
+                                            valueKey="value"
+                                            onChange={(selectedOptions) => handleMultipleSelectChange(selectedOptions, 'micromarket', 'value')}
+                                        />
                                     </div>
                                 </div>
 
                                 {/* Size Section */}
                                 <div className="space-y-2">
-
                                     <span className='text-sm font-semibold text-gray-600'>Size</span>
-                                    <div className="mt- grid grid-cols- gap-4">
-                                        <div className="col-span-">
-                                            {/* <span className='text-sm font-semibold text-gray-600'>Size</span> */}
-                                            <Box sx={{ display: 'flex', justifyContent: 'space-between', width: '100%', gap: '8px' }}>
-                                                <FormControl sx={cusInput} widthfull>
-                                                    <InputLabel sx={cusInput} size="small" id="sizeType">Size Type</InputLabel>
-                                                    {/* <SmallSelect */}
-                                                    <Select
-                                                        size="small"
-                                                        labelId="sizeType"
-                                                        id="sizeType"
-                                                        value={rentType}
-                                                        label="Size Type"
-                                                        onChange={handleRentTypeChange}
-                                                    // sx={cusInput}
-
-                                                    >
-                                                        <MenuItem value={10} sx={{ fontSize: '0.9rem' }}>Option</MenuItem>
-                                                        <MenuItem value={20} sx={{ fontSize: '0.9rem' }}>Option</MenuItem>
-                                                        <MenuItem value={30} sx={{ fontSize: '0.9rem' }}>Option</MenuItem>
-                                                    </Select>
-                                                    {/* </SmallSelect> */}
-                                                </FormControl>
-                                                <TextField
-                                                    label="From"
-                                                    type="number"
-                                                    size="small"
-                                                    sx={cusInput} />
-
-                                                <TextField
-                                                    label="To"
-                                                    type="number"
-                                                    size="small"
-                                                    sx={cusInput} />
-                                            </Box>
-                                        </div>
-                                    </div>
+                                    <Box sx={{ display: 'flex', justifyContent: 'space-between', width: '100%', gap: '8px' }}>
+                                        <TextField
+                                            label="From"
+                                            type="number"
+                                            size="small"
+                                            sx={cusInput}
+                                            name="sizeFrom"
+                                            value={formState.sizeFrom}
+                                            onChange={handleInputChange}
+                                        />
+                                        <TextField
+                                            label="To"
+                                            type="number"
+                                            size="small"
+                                            sx={cusInput}
+                                            name="sizeTo"
+                                            value={formState.sizeTo}
+                                            onChange={handleInputChange}
+                                        />
+                                    </Box>
                                 </div>
+
                                 {/* Possession Status */}
                                 <div className="grid grid-cols-2 gap-4 mt-4">
                                     <div className="space-y-2">
                                         <label className='text-sm font-semibold text-gray-600'>Possession Status</label>
                                         <div className="flex text-sm text-gray-600 flex-col space-y-2">
-                                            <label><input type="checkbox" /> Field Name</label>
-                                            <label><input type="checkbox" /> Field Name</label>
-                                            <label><input type="checkbox" /> Field Name</label>
-                                            <label><input type="checkbox" /> Field Name</label>
-                                            <label><input type="checkbox" /> Field Name</label>
+                                            {possessionStatusOptions.map(option => (
+                                                <label key={option.possessionStatus}>
+                                                    <input
+                                                        type="checkbox"
+                                                        value={option.possessionStatus} // Use the name as the value
+                                                        checked={formState.possessionType.includes(option.possessionStatus)} // Check against the name
+                                                        onChange={(e) => handleCheckboxChange(e, 'possessionType', true)} // Update the correct field in formState
+                                                    /> {option.possessionStatus} {/* Display the name */}
+                                                </label>
+                                            ))}
                                         </div>
                                     </div>
-                                    {/* Space Status */}
+
                                     <div className="space-y-2">
                                         <label className='text-sm font-semibold text-gray-600'>Space Status</label>
                                         <div className="flex text-sm text-gray-600 flex-col space-y-2">
-                                            <label><input type="checkbox" /> Field Name</label>
-                                            <label><input type="checkbox" /> Field Name</label>
-                                            <label><input type="checkbox" /> Field Name</label>
-                                            <label><input type="checkbox" /> Field Name</label>
-                                            <label><input type="checkbox" /> Field Name</label>
-                                            <label><input type="checkbox" /> Field Name</label>
-                                            <label><input type="checkbox" /> Field Name</label>
+                                            {spaceStatusOptions.map(option => (
+                                                <label key={option.spaceStatus}>
+                                                    <input
+                                                        type="checkbox"
+                                                        value={option.spaceStatus} // Use the name as the value
+                                                        checked={formState.spaceStatus.includes(option.spaceStatus)} // Check against the name
+                                                        onChange={(e) => handleCheckboxChange(e, 'spaceStatus', true)} // Update the correct field in formState
+                                                    /> {option.spaceStatus} {/* Display the name */}
+                                                </label>
+                                            ))}
                                         </div>
                                     </div>
                                 </div>
-
 
 
                             </div>
 
                             <div className="col-span-4">
                                 <div className="mt-4 grid gap-4 mb-4">
-
                                     {/* Zoning */}
                                     <div className="space-y-2">
                                         <label className='text-sm font-semibold text-gray-600'>Zoning</label>
                                         <div className="grid text-sm text-gray-600 grid-cols-4 gap-2">
-                                            <label><input type="checkbox" /> Field Name</label>
-                                            <label><input type="checkbox" /> Field Name</label>
-                                            <label><input type="checkbox" /> Field Name</label>
-                                            <label><input type="checkbox" /> Field Name</label>
-                                            <label><input type="checkbox" /> Field Name</label>
-                                            <label><input type="checkbox" /> Field Name</label>
-                                            <label><input type="checkbox" /> Field Name</label>
-                                            <label><input type="checkbox" /> Field Name</label>
-                                            <label><input type="checkbox" /> Field Name</label>
-                                            <label><input type="checkbox" /> Field Name</label>
-                                            <label><input type="checkbox" /> Field Name</label>
-                                            <label><input type="checkbox" /> Field Name</label>
-                                            <label><input type="checkbox" /> Field Name</label>
-                                            <label><input type="checkbox" /> Field Name</label>
-                                            <label><input type="checkbox" /> Field Name</label>
+                                            {Array.isArray(zoningOptions) && zoningOptions.map(option => (
+                                                <label key={option.zoningId}>
+                                                    <input
+                                                        type="checkbox"
+                                                        value={option.zoningId}
+                                                        checked={formState.zoningIds.includes(option.zoningId)}
+                                                        onChange={(e) => handleCheckboxChange(e, 'zoningIds')}
+                                                    /> {option.zoning}
+                                                </label>
+                                            ))}
                                         </div>
                                     </div>
 
@@ -291,67 +540,43 @@ const PropertySearchForm = () => {
                                     <div className="space-y-2">
                                         <label className='text-sm font-semibold text-gray-600'>Property Usage</label>
                                         <div className="grid text-sm text-gray-600 grid-cols-4 gap-2">
-                                            <label><input type="checkbox" /> Field Name</label>
-                                            <label><input type="checkbox" /> Field Name</label>
-                                            <label><input type="checkbox" /> Field Name</label>
-                                            <label><input type="checkbox" /> Field Name</label>
-                                            <label><input type="checkbox" /> Field Name</label>
-                                            <label><input type="checkbox" /> Field Name</label>
-                                            <label><input type="checkbox" /> Field Name</label>
-                                            <label><input type="checkbox" /> Field Name</label>
-                                            <label><input type="checkbox" /> Field Name</label>
-                                            <label><input type="checkbox" /> Field Name</label>
-                                            <label><input type="checkbox" /> Field Name</label>
-                                            <label><input type="checkbox" /> Field Name</label>
-                                            <label><input type="checkbox" /> Field Name</label>
-                                            <label><input type="checkbox" /> Field Name</label>
-                                            <label><input type="checkbox" /> Field Name</label>
+                                            {Array.isArray(propertyUsageOptions) && propertyUsageOptions.map(option => (
+                                                <label key={option.propertyUsageId}>
+                                                    <input
+                                                        type="checkbox"
+                                                        value={option.propertyUsageId}
+                                                        checked={formState.propertyUsageIds.includes(option.propertyUsageId)}
+                                                        onChange={(e) => handleCheckboxChange(e, 'propertyUsageIds')}
+                                                    /> {option.propertyUsage}
+                                                </label>
+                                            ))}
                                         </div>
                                     </div>
                                 </div>
-                                {/* Rent and Other Inputs */}
+                                {/* Rent */}
                                 <div className="space-y-1">
                                     <span className='text-sm font-semibold text-gray-600'>Rent</span>
-
-                                    <div className="mt-4 grid grid-cols-4 gap-2">
-                                        <div className="col-span-3">
-                                            <Box sx={{ display: 'flex', justifyContent: 'space-between', width: '100%', gap: '8px' }}>
-                                                <FormControl sx={cusInput} widthfull>
-                                                    <InputLabel sx={cusInput} size="small" id="sizeType">Rent Type</InputLabel>
-                                                    <Select
-                                                        size="small"
-                                                        labelId="sizeType"
-                                                        id="sizeType"
-                                                        // value={age}
-                                                        label="Size Type"
-                                                    // onChange={handleChange}
-                                                    // sx={cusInput}
-
-                                                    >
-                                                        <MenuItem value={10}>Option</MenuItem>
-                                                        <MenuItem value={20}>Option</MenuItem>
-                                                        <MenuItem value={30}>Option</MenuItem>
-                                                    </Select>
-                                                </FormControl>
-                                                <TextField
-                                                    label="From"
-                                                    type="number"
-                                                    size="small"
-                                                    sx={cusInput} />
-
-                                                <TextField
-                                                    label="To"
-                                                    type="number"
-                                                    size="small"
-                                                    sx={cusInput} />
-                                            </Box>
-                                        </div>
-                                        <div className="col-span-1 flex items-center space-x-1 text-sm text-gray-600">
-                                            <label><input type="checkbox" /> View to Offer</label>
-                                        </div>
-                                    </div>
+                                    <Box sx={{ display: 'flex', justifyContent: 'space-between', width: '100%', gap: '8px' }}>
+                                        <TextField
+                                            label="From"
+                                            type="number"
+                                            size="small"
+                                            sx={cusInput}
+                                            name="rentFrom"
+                                            value={formState.rentFrom}
+                                            onChange={handleInputChange}
+                                        />
+                                        <TextField
+                                            label="To"
+                                            type="number"
+                                            size="small"
+                                            sx={cusInput}
+                                            name="rentTo"
+                                            value={formState.rentTo}
+                                            onChange={handleInputChange}
+                                        />
+                                    </Box>
                                 </div>
-
 
                                 {/* Date Fields */}
                                 <div className="mt-4 grid grid-cols-2 gap-2">
@@ -372,48 +597,46 @@ const PropertySearchForm = () => {
                                         >
                                             <DatePicker
                                                 label="From"
-                                                slotProps={{ textField: { size: 'small' } }}
+                                                slotProps={{ textField: { size: 'small', shrink: true } }}
+                                                value={formState.availableFrom ? new Date(formState.availableFrom) : null}
+                                                onChange={(date) => handleDateChange(date, 'availableFrom')}
                                                 sx={cusInput}
                                             />
+
                                             <DatePicker
                                                 label="To"
-                                                slotProps={{ textField: { size: 'small' } }}
+                                                slotProps={{ textField: { size: 'small', shrink: true } }}
+                                                value={formState.availableTo ? new Date(formState.availableTo) : null}
+                                                onChange={(date) => handleDateChange(date, 'availableTo')}
                                                 sx={cusInput}
                                             />
                                         </Box>
                                     </div>
                                     <div className="space-y-2">
                                         <span className='text-sm font-semibold text-gray-600'>Last Update</span>
-                                        <Box
-                                            component="form"
-                                            sx={{
-                                                display: 'flex', // Set Box to flex layout
-                                                flexDirection: 'row',
-                                                gap: '8px',
-                                                alignItems: 'center',
-                                                '& .MuiTextField-root': { width: '100%' },
-                                            }}
-                                            noValidate
-                                            autoComplete="off"
-                                            size="small"
-                                        >
+                                        <Box sx={{ display: 'flex', flexDirection: 'row', gap: '8px' }}>
                                             <DatePicker
                                                 label="From"
                                                 slotProps={{ textField: { size: 'small', shrink: true } }}
+                                                value={formState.lastUpdatedFrom ? new Date(formState.lastUpdatedFrom) : null}
+                                                onChange={(date) => handleDateChange(date, 'lastUpdatedFrom')}
                                                 sx={cusInput}
                                             />
+
                                             <DatePicker
                                                 label="To"
                                                 slotProps={{ textField: { size: 'small', shrink: true } }}
+                                                value={formState.lastUpdatedTo ? new Date(formState.lastUpdatedTo) : null}
+                                                onChange={(date) => handleDateChange(date, 'lastUpdatedTo')}
                                                 sx={cusInput}
                                             />
                                         </Box>
                                     </div>
-
                                 </div>
                             </div>
                         </div>
                     )}
+
                 </div>
 
                 {/* Advanced Search */}
@@ -429,264 +652,296 @@ const PropertySearchForm = () => {
                     </div>
 
                     {sectionVisibility.advancedSearchVisible && (
-                        <div className="p-8">
-                            <h2 className="px-6 py-2 text-lg font-bold mb-4">Advance Search Criteria</h2>
 
-                            <div style={{ height: `${sectionHeight}px` }} className="p-6 grid grid-cols-6 gap-10 overflow-y-auto">
-                                {/* First Column */}
-                                <div className="col-span-3 space-y-4">
-                                    {/* TOP (From-To) */}
-                                    <div className="flex flex-col gap-2">
-                                        <label className="block text-sm font-medium">TOP</label>
-                                        <Box sx={{ display: 'flex', gap: '8px' }}>
-                                            <TextField
-                                                label="From"
-                                                type="text"
-                                                size="small"
-                                                sx={cusInput}
-                                                value={formState.topFrom}
-                                                onChange={handleInputChange}
-                                                name="topFrom"
-                                            />
-                                            <TextField
-                                                label="To"
-                                                type="text"
-                                                size="small"
-                                                sx={cusInput}
-                                                value={formState.topTo}
-                                                onChange={handleInputChange}
-                                                name="topTo"
-                                            />
-                                        </Box>
-                                    </div>
-
-                                    {/* Grade */}
-                                    <div className="flex flex-col gap-2">
-                                        <label className="block text-sm font-medium">Grade</label>
-                                        <FormControl fullWidth size="small" sx={cusInput}>
-                                            <InputLabel id="sizeType">Grade</InputLabel>
-                                            <Select
-                                                value={formState.grade}
-                                                labelId="sizeType"
-                                                id="sizeType"
-                                                onChange={handleInputChange}
-                                                name="grade"
-                                                label="Grade"
-
-                                            >
-                                                <MenuItem value="A">A</MenuItem>
-                                                <MenuItem value="B">B</MenuItem>
-                                                <MenuItem value="C">C</MenuItem>
-                                            </Select>
-                                        </FormControl>
-                                    </div>
-
-                                    {/* Property Status */}
-                                    <div className="flex flex-col gap-2">
-                                        <label className="block text-sm font-medium">Property Status</label>
-                                        <FormControl fullWidth size="small" sx={cusInput}>
-                                            <InputLabel>Property Status</InputLabel>
-                                            <Select
-                                                value={formState.propertyStatus}
-                                                label="Property Status"
-                                                onChange={handleInputChange}
-                                                name="propertyStatus"
-                                            >
-                                                <MenuItem value="Available">Available</MenuItem>
-                                                <MenuItem value="Unavailable">Unavailable</MenuItem>
-                                                <MenuItem value="Under Maintenance">Under Maintenance</MenuItem>
-                                            </Select>
-                                        </FormControl>
-                                    </div>
-
-                                    {/* Ownership Structure */}
-                                    <div className="flex flex-col gap-2">
-                                        <label className="block text-sm font-medium">Ownership Structure</label>
-                                        <div className="flex flex-col space-y-1">
-                                            <label><input type="checkbox" className="mr-2" /> Freehold</label>
-                                            <label><input type="checkbox" className="mr-2" /> Leasehold</label>
-                                            <label><input type="checkbox" className="mr-2" /> Single</label>
-                                            <label><input type="checkbox" className="mr-2" /> Strata</label>
-                                        </div>
-                                    </div>
-
-                                    {/* MRT Fields */}
-                                    {['MRT1', 'MRT2', 'MRT3'].map((mrt, index) => (
-                                        <div className="flex flex-col gap-2" key={index}>
-                                            <label className="block text-sm font-medium">{mrt}</label>
-                                            <Box sx={{ display: 'flex', gap: '8px' }}>
-                                                <TextField
-                                                    label="Station"
-                                                    size="small"
-                                                    sx={cusInput}
-                                                    value={formState[mrt.toLowerCase()]}
-                                                    onChange={handleInputChange}
-                                                    name={mrt.toLowerCase()}
-                                                />
-                                                <TextField
-                                                    label="Distance"
-                                                    type="number"
-                                                    size="small"
-                                                    sx={cusInput}
-                                                    value={formState[`${mrt.toLowerCase()}Distance`]}
-                                                    onChange={handleInputChange}
-                                                    name={`${mrt.toLowerCase()}Distance`}
-                                                />
-                                            </Box>
-                                        </div>
-                                    ))}
+                        <div className="p-8 grid grid-cols-6 gap-10 overflow-y-auto">
+                            {/* First Column */}
+                            <div className="col-span-3 space-y-4">
+                                {/* TOP (From-To) */}
+                                <div className="flex flex-col gap-2">
+                                    <label className="block text-sm font-medium">TOP</label>
+                                    <Box sx={{ display: 'flex', gap: '8px' }}>
+                                        <TextField
+                                            label="From"
+                                            type="text"
+                                            size="small"
+                                            sx={cusInput}
+                                            value={formState.topFrom}
+                                            onChange={handleInputChange}
+                                            name="topFrom"
+                                        />
+                                        <TextField
+                                            label="To"
+                                            type="text"
+                                            size="small"
+                                            sx={cusInput}
+                                            value={formState.topTo}
+                                            onChange={handleInputChange}
+                                            name="topTo"
+                                        />
+                                    </Box>
                                 </div>
 
-                                {/* Second Column */}
-                                <div className="col-span-3 space-y-4">
-                                    {/* Floor To Ceiling Height */}
-                                    <div className="flex flex-col gap-2">
-                                        <label className="block text-sm font-medium">Floor To Ceiling Height</label>
-                                        <Box sx={{ display: 'flex', gap: '8px' }}>
-                                            <TextField
-                                                label="From"
-                                                type="text"
-                                                size="small"
-                                                sx={cusInput}
-                                                value={formState.floorHeightFrom}
-                                                onChange={handleInputChange}
-                                                name="floorHeightFrom"
-                                            />
-                                            <TextField
-                                                label="To"
-                                                type="text"
-                                                size="small"
-                                                sx={cusInput}
-                                                value={formState.floorHeightTo}
-                                                onChange={handleInputChange}
-                                                name="floorHeightTo"
-                                            />
-                                        </Box>
-                                    </div>
+                                {/* Grade */}
+                                <div className="flex flex-col gap-2">
+                                    <label className="block text-sm font-medium">Grade</label>
+                                    <FormControl fullWidth size="small" sx={cusInput}>
+                                        <InputLabel id="grade-label">Grade</InputLabel>
+                                        <Select
+                                            labelId="grade-label"
+                                            id="grade-select"
+                                            label="Grade"
+                                            value={formState.grade}
+                                            onChange={(event) => handleSelectChange(event, 'grade')}
+                                        >
+                                            {gradeOptions.map((option) => (
+                                                <MenuItem key={option.gradeId} value={option.grade}>
+                                                    {option.grade}
+                                                </MenuItem>
+                                            ))}
+                                        </Select>
+                                    </FormControl>
+                                </div>
 
-                                    {/* Floor Loading */}
-                                    <div className="flex flex-col gap-2">
-                                        <label className="block text-sm font-medium">Floor Loading</label>
-                                        <Box sx={{ display: 'flex', gap: '8px' }}>
-                                            <TextField
-                                                label="From"
-                                                type="text"
-                                                size="small"
-                                                sx={cusInput}
-                                                value={formState.floorLoadingFrom}
-                                                onChange={handleInputChange}
-                                                name="floorLoadingFrom"
-                                            />
-                                            <TextField
-                                                label="To"
-                                                type="text"
-                                                size="small"
-                                                sx={cusInput}
-                                                value={formState.floorLoadingTo}
-                                                onChange={handleInputChange}
-                                                name="floorLoadingTo"
-                                            />
-                                            <span className="self-center">KN/Sqm</span>
-                                        </Box>
-                                    </div>
 
-                                    {/* Floor System */}
-                                    <div className="flex flex-col gap-2">
-                                        <label className="block text-sm font-medium">Floor System</label>
-                                        <FormControl fullWidth size="small" sx={cusInput}>
-                                            <InputLabel>Floor System</InputLabel>
-                                            <Select
-                                                value={formState.floorSystem}
-                                                onChange={handleInputChange}
-                                                name="floorSystem"
-                                            >
-                                                <MenuItem value="Concrete">Concrete</MenuItem>
-                                                <MenuItem value="Raised">Raised</MenuItem>
-                                            </Select>
-                                        </FormControl>
-                                    </div>
+                                {/* Property Status */}
+                                <div className="flex flex-col gap-2">
+                                    <label className="block text-sm font-medium">Property Status</label>
+                                    <FormControl fullWidth size="small" sx={cusInput}>
+                                        <InputLabel>Property Status</InputLabel>
+                                        <Select
+                                            label="Property Status"
+                                            value={formState.buildingStatusIds} // Bind the selected value to formState
+                                            onChange={(event) => handleSelectChange(event, 'buildingStatusIds')} // Handle selection changes
+                                        >
+                                            {buildingStatusOptions.map((option) => (
+                                                <MenuItem key={option.buildingStatusId} value={option.buildingStatusId}> {/* Store the ID */}
+                                                    {option.buildingStatus} {/* Display the label */}
+                                                </MenuItem>
+                                            ))}
+                                        </Select>
+                                    </FormControl>
+                                </div>
 
-                                    {/* Allocation Ratio */}
-                                    <div className="flex flex-col gap-2">
-                                        <label className="block text-sm font-medium">Allocation Ratio</label>
-                                        <Box sx={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                                            <span>1:</span>
-                                            <TextField
-                                                size="small"
-                                                sx={cusInput}
-                                                value={formState.allocationRatio}
-                                                onChange={handleInputChange}
-                                                name="allocationRatio"
-                                            />
-                                            <span className="self-center whitespace-nowrap">Sq Ft leased</span>
-                                        </Box>
-                                    </div>
 
-                                    {/* Parking Fee */}
-                                    <div className="flex flex-col gap-2">
-                                        <label className="block text-sm font-medium">Parking Fee (Subject to GST)</label>
-                                        <div className="flex flex-col space-y-4">
-                                            <Box sx={{ display: 'flex', gap: '8px' }}>
-                                                <TextField
-                                                    label="Seasonal"
-                                                    size="small"
-                                                    sx={cusInput}
-                                                    value={formState.seasonalParkingFee}
-                                                    onChange={handleInputChange}
-                                                    name="seasonalParkingFee"
-                                                />
-                                                <span className="self-center">S$/lot/mth</span>
-                                            </Box>
-                                            <Box sx={{ display: 'flex', gap: '8px' }}>
-                                                <TextField
-                                                    label="Non-Reserved"
-                                                    size="small"
-                                                    sx={cusInput}
-                                                    value={formState.nonReservedParkingFee}
-                                                    onChange={handleInputChange}
-                                                    name="nonReservedParkingFee"
-                                                />
-                                                <span className="self-center">S$/lot/mth</span>
-                                            </Box>
-                                        </div>
+                                {/* Ownership Structure */}
+                                <div className="flex flex-col gap-2">
+                                    <label className="block text-sm font-medium">Ownership Structure</label>
+                                    <div className="flex text-sm text-gray-600 flex-col space-y-2">
+                                        {buildingOwnerOptions.map(option => (
+                                            <label key={option.buildingOwnerId}>
+                                                <input
+                                                    type="checkbox"
+                                                    value={option.buildingOwnerId}
+                                                    checked={formState.ownerIds?.includes(option.buildingOwnerId)} // Check if it's selected
+                                                    onChange={(e) => handleCheckboxChange(e, 'ownerIds')} // Handle checkbox change
+                                                /> {option.buildingOwner}
+                                            </label>
+                                        ))}
                                     </div>
+                                </div>
 
-                                    {/* Car Spaces */}
-                                    <div className="flex flex-col gap-2">
-                                        <label className="block text-sm font-medium">Car Spaces</label>
-                                        <Box sx={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                                            <TextField
-                                                size="small"
-                                                sx={cusInput}
-                                                value={formState.carSpaces}
-                                                onChange={handleInputChange}
-                                                name="carSpaces"
-                                            />
-                                            <span className="self-center whitespace-nowrap">and over</span>
-                                        </Box>
-                                    </div>
+
+                                {/* MRT Fields */}
+                                <div className="flex flex-col gap-2">
+                                    <label className="block text-sm font-medium">MRT</label>
+                                    <Box sx={{ display: 'flex', gap: '8px' }}>
+                                        <TextField
+                                            label="Station"
+                                            size="small"
+                                            sx={cusInput}
+                                            value={formState.mrts[0] || ''}
+                                            onChange={(e) => handleInputChangeArray(e, 'mrts', 0)} // Assume you're handling an array of MRTs
+                                        />
+                                        <TextField
+                                            label="Distance"
+                                            type="number"
+                                            size="small"
+                                            sx={{
+                                                ...cusInput,
+                                                // Hide the arrows (spinner) for number input
+                                                '& input[type=number]': {
+                                                    MozAppearance: 'textfield', // For Firefox
+                                                },
+                                                '& input[type=number]::-webkit-outer-spin-button, & input[type=number]::-webkit-inner-spin-button': {
+                                                    WebkitAppearance: 'none', // For Chrome and Safari
+                                                    margin: 0,
+                                                },
+                                            }}
+                                            value={formState.proximity || ''}
+                                            onChange={(e) => handleInputChange(e)}  // Ensure onChange function is called correctly
+                                            name="proximity"
+                                        />
+
+
+                                    </Box>
+                                </div>
+
+                                {/* Floor To Ceiling Height */}
+                                <div className="flex flex-col gap-2">
+                                    <label className="block text-sm font-medium">Floor To Ceiling Height</label>
+                                    <Box sx={{ display: 'flex', gap: '8px' }}>
+                                        <TextField
+                                            label="From"
+                                            type="text"
+                                            size="small"
+                                            sx={cusInput}
+                                            value={formState.floorHeightFrom}
+                                            onChange={handleInputChange}
+                                            name="floorHeightFrom"
+                                        />
+                                        <TextField
+                                            label="To"
+                                            type="text"
+                                            size="small"
+                                            sx={cusInput}
+                                            value={formState.floorHeightTo}
+                                            onChange={handleInputChange}
+                                            name="floorHeightTo"
+                                        />
+                                    </Box>
                                 </div>
                             </div>
+
+                            {/* Second Column */}
+                            <div className="col-span-3 space-y-4">
+
+
+                                {/* Floor Loading */}
+                                <div className="flex flex-col gap-2">
+                                    <label className="block text-sm font-medium">Floor Loading</label>
+                                    <Box sx={{ display: 'flex', gap: '8px' }}>
+                                        <TextField
+                                            label="From"
+                                            type="text"
+                                            size="small"
+                                            sx={cusInput}
+                                            value={formState.floorLoadingFrom}
+                                            onChange={handleInputChange}
+                                            name="floorLoadingFrom"
+                                        />
+                                        <TextField
+                                            label="To"
+                                            type="text"
+                                            size="small"
+                                            sx={cusInput}
+                                            value={formState.floorLoadingTo}
+                                            onChange={handleInputChange}
+                                            name="floorLoadingTo"
+                                        />
+                                        <span className="self-center">KN/Sqm</span>
+                                    </Box>
+                                </div>
+
+                                {/* Floor System */}
+                                <div className="flex flex-col gap-2">
+                                    <label className="block text-sm font-medium">Floor System</label>
+                                    <FormControl fullWidth size="small" sx={cusInput}>
+                                        <InputLabel>Floor System</InputLabel>
+                                        <Select
+                                            label="Floor System"
+                                            value={formState.floorSystem}
+                                            onChange={handleInputChange}
+                                            name="floorSystem"
+                                        >
+                                            <MenuItem value="Concrete">Concrete</MenuItem>
+                                            <MenuItem value="Raised">Raised</MenuItem>
+                                        </Select>
+                                    </FormControl>
+                                </div>
+
+                                {/* Allocation Ratio */}
+                                <div className="flex flex-col gap-2">
+                                    <label className="block text-sm font-medium">Allocation Ratio</label>
+                                    <Box sx={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                                        <span>1:</span>
+                                        <TextField
+                                            size="small"
+                                            sx={cusInput}
+                                            value={formState.allocationRatio}
+                                            onChange={handleInputChange}
+                                            name="allocationRatio"
+                                        />
+                                        <span className="self-center whitespace-nowrap">Sq Ft leased</span>
+                                    </Box>
+                                </div>
+
+                                {/* Parking Fee */}
+                                <div className="flex flex-col gap-2">
+                                    <label className="block text-sm font-medium">Parking Fee (Subject to GST)</label>
+                                    <div className="flex flex-col space-y-4">
+                                        <Box sx={{ display: 'flex', gap: '8px' }}>
+                                            <TextField
+                                                label="Seasonal"
+                                                size="small"
+                                                sx={cusInput}
+                                                value={formState.seasonalParkingFee}
+                                                onChange={handleInputChange}
+                                                name="seasonalParkingFee"
+                                            />
+                                            <span className="self-center">S$/lot/mth</span>
+                                        </Box>
+                                        <Box sx={{ display: 'flex', gap: '8px' }}>
+                                            <TextField
+                                                label="Non-Reserved"
+                                                size="small"
+                                                sx={cusInput}
+                                                value={formState.nonReservedParkingFee}
+                                                onChange={handleInputChange}
+                                                name="nonReservedParkingFee"
+                                            />
+                                            <span className="self-center">S$/lot/mth</span>
+                                        </Box>
+                                    </div>
+                                </div>
+
+                                {/* Car Spaces */}
+                                <div className="flex flex-col gap-2">
+                                    <label className="block text-sm font-medium">Car Spaces</label>
+                                    <Box sx={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                                        <TextField
+                                            size="small"
+                                            sx={cusInput}
+                                            value={formState.carSpaces}
+                                            onChange={handleInputChange}
+                                            name="carSpaces"
+                                        />
+                                        <span className="self-center whitespace-nowrap">and over</span>
+                                    </Box>
+                                </div>
+                            </div>
+                            {/* <div className='px-'>
+                                <button
+                                    // onClick={handleSave}
+                                    className="px-4 py-2 text-white rounded-lg bg-c-teal text-xs text-white hover:text-white hover:bg-c-weldon-blue"
+                                >
+                                    Search
+                                </button>
+                            </div> */}
                         </div>
                     )}
-
                 </div>
             </div>
             <footer className="sticky bottom-0 bg-neutral-100 py-3 px-10 flex items-center gap-2 justify-start border border-neutral-200 shadow-md z-10 rounded-b-lg">
-                <button
+                {/* <button
                     // onClick={handleSaveNew}
                     type="submit"
                     className="px-8 py-3 rounded-lg bg-white text-blue-600 border border-neutral-500 text-xs hover:text-neutral-700 hover:bg-neutral-100"
                 >
                     Cancel
-                </button>
+                </button> */}
                 <button
-                    // onClick={handleSave}
-                    className="px-8 py-3 text-white rounded-lg bg-c-teal text-xs text-white hover:text-white hover:bg-c-weldon-blue"
+                    disabled={isLoading}
+                    onClick={handleSubmit}
+                    className="px-6 py-2 text-white rounded-lg bg-c-teal text-xs text-white hover:text-white hover:bg-c-weldon-blue"
                 >
                     Search
                 </button>
             </footer>
+            {isLoading && (
+                <div className="absolute inset-0 bg-gray-100 bg-opacity-75 flex items-center justify-center z-50">
+                    <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-c-teal"></div>
+                </div>
+            )}
         </div>
     );
 };

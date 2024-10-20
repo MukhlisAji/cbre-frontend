@@ -74,6 +74,13 @@ const SearchNew = ({ setIsClassic = () => {}, className, handleClickSearch=()=>{
     pageSize: 10,
   });
 
+  const [formMicromarket, setFormMicromarket] = useState({
+    sectorId: "",
+    regionId: "",
+    pageNo: 1,
+    pageSize: 10
+  });
+
   const handleSetQuery = (form) => {
     let queryString = "";
 
@@ -93,7 +100,7 @@ const SearchNew = ({ setIsClassic = () => {}, className, handleClickSearch=()=>{
       }`;
     } else if (category === "Micromarket") {
       // Include only district-related fields, adjust as per your state
-      queryString = `${form.districts ? form.districts : ""}`.trim();
+      queryString = `${form.sectorId ? form.sectorId : ""},${form.sectorId ? form.regionId : ""}`.trim();
     } else if (category === "MRT") {
       // Include only district-related fields, adjust as per your state
       queryString = `${form.mrts ? form.mrts : ""}`.trim();
@@ -120,7 +127,7 @@ const SearchNew = ({ setIsClassic = () => {}, className, handleClickSearch=()=>{
       setFormAccount(updatedForm);
       console.log("Updated Account Form:", updatedForm);
     } else if (category === "Micromarket") {
-      setFormDistrict(updatedForm);
+      setFormMicromarket(updatedForm);
       console.log("Updated Micromarket Form:", updatedForm);
     }
     handleSetQuery(updatedForm);
@@ -136,7 +143,7 @@ const SearchNew = ({ setIsClassic = () => {}, className, handleClickSearch=()=>{
     } else if (category === "Account/Contacts") {
       return formAccount;
     } else if (category === "Micromarket") {
-      return formDistrict;
+      return formMicromarket;
     }
   };
 

@@ -9,6 +9,9 @@ import { generateTransactionId } from '../../lib/api/Authorization';
 import { CONFIG } from '../../../config';
 import './SearchArea.css';
 import PopoverFilter from './modal/PopoverFilter';
+import { Alert } from '@mui/material';
+import CheckIcon from '@mui/icons-material/Check';
+import ErrorIcon from '@mui/icons-material/Error';
 
 
 const PropertyResult = () => {
@@ -28,12 +31,28 @@ const PropertyResult = () => {
     const [isLoading, setIsLoading] = useState(false);
     // const formData = location.state?.formAddress;
     const [isAnimating, setIsAnimating] = useState(false);
-    
+
     const searchCategory = location.state?.category;
     const formData = location.state?.form;
     const searchedQuery = location.state?.query;
     const [category, setCategory] = useState(searchCategory ? searchCategory : '');
     const [query, setQuery] = useState(searchedQuery ? searchedQuery : '');
+    const [alerts, setAlerts] = useState([]);
+
+    const addAlert = (message, severity) => {
+        const newAlert = { id: Date.now(), message, severity };
+        setAlerts(prevAlerts => [...prevAlerts, newAlert]);
+    };
+
+    useEffect(() => {
+        if (alerts.length > 0) {
+            const timer = setTimeout(() => {
+                setAlerts(prevAlerts => prevAlerts.slice(1));
+            }, 5000); // Remove the oldest alert after 5 seconds
+
+            return () => clearTimeout(timer);
+        }
+    }, [alerts]);
     const [showPlaceholder, setShowPlaceholder] = useState(!query);
     const placeholders = [
         "by Address",
@@ -62,87 +81,96 @@ const PropertyResult = () => {
         postalCode: '',
         pageNo: 1,
         pageSize: 10
-      });
-      const [formDistrict, setFormDistrict] = useState({
+    });
+    const [formDistrict, setFormDistrict] = useState({
         districts: [],
         pageNo: 1,
         pageSize: 10
-      });
-    
-      const [formMrt, setFormMRT] = useState({
+    });
+
+    const [formMrt, setFormMRT] = useState({
         mrts: [],
         pageNo: 1,
         pageSize: 10
-      });
-    
-      const [formAccount, setFormAccount] = useState({
+    });
+
+    const [formAccount, setFormAccount] = useState({
         keyword: '',
         type: '',
         pageNo: 1,
         pageSize: 10
-      })
-    
-      const handleSetQuery = (form) => {
-        let queryString = '';
-    
-        if (category === 'District') {
-          // Include only district-related fields, adjust as per your state
-          queryString = `${form.districts ? form.districts : ''}`.trim();
-        } else if (category === 'Address') {
-          // Include address-related fields
-          queryString = `${form.buildingName ? form.buildingName : ''},${form.streetNumber ? form.streetNumber : ''},${form.streetName ? form.streetName : ''},${form.postalCode ? form.postalCode : ''}`.trim();
+    })
+
+    const [formMicromarket, setFormMicromarket] = useState({
+        sectorId: "",
+        regionId: "",
+        pageNo: 1,
+        pageSize: 10
+    });
+
+    const handleSetQuery = (form) => {
+        let queryString = "";
+
+        if (category === "District") {
+            // Include only district-related fields, adjust as per your state
+            queryString = `${form.districts ? form.districts : ""}`.trim();
+        } else if (category === "Address") {
+            // Include address-related fields
+            queryString = `${form.buildingName ? form.buildingName : ""},${form.streetNumber ? form.streetNumber : ""
+                },${form.streetName ? form.streetName : ""},${form.postalCode ? form.postalCode : ""
+                }`.trim();
         } else if (category === "Account/Contacts") {
-          queryString = `${form.keyword ? form.keyword : ''}, ${form.type ? form.type : ''}, ${form.pageNo ? form.pageNo : ''}}`;
-        } else if (category === 'Micromarket') {
-          // Include only district-related fields, adjust as per your state
-          queryString = `${form.districts ? form.districts : ''}`.trim();
-        } else if (category === 'MRT') {
-          // Include only district-related fields, adjust as per your state
-          queryString = `${form.mrts ? form.mrts : ''}`.trim();
+            queryString = `${form.keyword ? form.keyword : ""}, ${form.type ? form.type : ""
+                }`;
+        } else if (category === "Micromarket") {
+            // Include only district-related fields, adjust as per your state
+            queryString = `${form.sectorId ? form.sectorId : ""},${form.sectorId ? form.regionId : ""}`.trim();
+        } else if (category === "MRT") {
+            // Include only district-related fields, adjust as per your state
+            queryString = `${form.mrts ? form.mrts : ""}`.trim();
         }
-    
+
         // Remove any trailing commas or unnecessary spaces
         // queryString = queryString.replace(/,\s*$/, '').replace(/\s*,/g, '');
-        console.log('Constructed Query: ', queryString);
-    
+        console.log("Constructed Query: ", queryString);
+
         setQuery(queryString); // Update the query with the constructed string
-      };
-    
-      const handleFormChange = (updatedForm) => {
-        if (category === 'Address') {
-          setFormAddress(updatedForm);
-          console.log("Updated Address Form:", updatedForm);
-        } else if (category === 'District') {
-          setFormDistrict(updatedForm);
-          console.log("Updated District Form:", updatedForm);
+    };
+
+    const handleFormChange = (updatedForm) => {
+        if (category === "Address") {
+            setFormAddress(updatedForm);
+            console.log("Updated Address Form:", updatedForm);
+        } else if (category === "District") {
+            setFormDistrict(updatedForm);
+            console.log("Updated District Form:", updatedForm);
         } else if (category === "MRT") {
-          setFormMRT(updatedForm);
-          console.log("Updated MRT Form:", updatedForm);
+            setFormMRT(updatedForm);
+            console.log("Updated MRT Form:", updatedForm);
         } else if (category === "Account/Contacts") {
-          setFormAccount(updatedForm);
-          console.log("Updated Account Form:", updatedForm);
-        } else if (category === 'Micromarket') {
-          setFormDistrict(updatedForm);
-          console.log("Updated Micromarket Form:", updatedForm);
+            setFormAccount(updatedForm);
+            console.log("Updated Account Form:", updatedForm);
+        } else if (category === "Micromarket") {
+            setFormMicromarket(updatedForm);
+            console.log("Updated Micromarket Form:", updatedForm);
         }
         handleSetQuery(updatedForm);
-      };
-    
-      const getForm = () => {
-        if (category === 'Address') {
-          return formAddress;
-        } else if (category === 'District') {
-          return formDistrict;
+    };
+
+    const getForm = () => {
+        if (category === "Address") {
+            return formAddress;
+        } else if (category === "District") {
+            return formDistrict;
         } else if (category === "MRT") {
-          return formMrt;
+            return formMrt;
         } else if (category === "Account/Contacts") {
-          return formAccount;
-        } else if (category === 'Micromarket') {
-          return formDistrict;
+            return formAccount;
+        } else if (category === "Micromarket") {
+            return formMicromarket;
         }
-      };
-    
-    
+    };
+
 
     useEffect(() => {
         const interval = setInterval(changePlaceholder, 3000);
@@ -239,6 +267,7 @@ const PropertyResult = () => {
 
     const handleSearch = async (data) => {
         console.log('Search initiated with formData:', data); // Debugging log
+        console.log("category ; ", category);
         const transactionId = generateTransactionId();
         const searchBy = category === "Address"
             ? "searchbyaddress"
@@ -246,7 +275,11 @@ const PropertyResult = () => {
                 ? "searchbymrts"
                 : category === "Account/Contacts"
                     ? "searchbyaccountscontacts"
-                    : "searchbydistrict";
+                    : category === "District"
+                        ? "searchbydistrict"
+                        : category == "Micromarket"
+                            ? "searchbymicromarkets"
+                            : "";
 
         console.log('searchby ', searchBy);
         try {
@@ -285,7 +318,7 @@ const PropertyResult = () => {
                 }
             } catch (error) {
                 console.error('Error during submission:', error);
-                alert(`Failed to search. Please try again.`);
+                addAlert(`An error occurred. Please try again later`, 'error');
             } finally {
                 setIsLoading(false);
             }
@@ -508,7 +541,22 @@ const PropertyResult = () => {
                 </div>
             </div>
 
-
+            <div className="fixed top-5 right-5 z-50 space-y-2">
+                {alerts.map((alert) => (
+                    <Alert
+                        key={alert.id}
+                        icon={alert.severity === 'success' ? <CheckIcon fontSize="inherit" /> : <ErrorIcon fontSize="inherit" />}
+                        severity={alert.severity}
+                        onClose={() => {
+                            setAlerts(prevAlerts =>
+                                prevAlerts.filter(a => a.id !== alert.id)
+                            );
+                        }}
+                    >
+                        {alert.message}
+                    </Alert>
+                ))}
+            </div>
             {/* Modal search component */}
             <ModalSearch
                 isVisible={isModalVisible}
