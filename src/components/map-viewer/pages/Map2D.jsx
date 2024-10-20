@@ -10,12 +10,25 @@ import { StyleList, filterdata } from "../constant";
 import { useConfig, useMap, useMRTData, useRegion } from "../hooks";
 import { useMicromarket } from "../hooks/useMicromarket";
 import { useZoning } from "../hooks/useZoning";
-import { AllRegion, NortWest, SouthEast, StyleSatelliteStreet, StyleStreet } from "../utils";
+import {
+  AllRegion,
+  NortWest,
+  SouthEast,
+  StyleSatelliteStreet,
+  StyleStreet,
+} from "../utils";
 import { buildAtom } from "./project/store/build";
 import TwoDSearch from "./search/2dSearch";
-import { FormControlLabel, Switch, ThemeProvider, createTheme } from "@mui/material";
-import ReactDOM from 'react-dom';
-
+import {
+  FormControlLabel,
+  Switch,
+  ThemeProvider,
+  createTheme,
+} from "@mui/material";
+import ReactDOM from "react-dom";
+import SearchNew from "../../property/property-search/SearchNew";
+import { generateTransactionId } from "../../lib/api/Authorization";
+import { CONFIG } from "../../../config";
 
 function Map2D() {
   const {
@@ -30,14 +43,14 @@ function Map2D() {
     styleMap,
     handleChangeStyleMap,
     isMap3D,
-    setIsMap3D
+    setIsMap3D,
   } = useConfig();
 
-  const[isSearch, setIsSearch]= useState(null)
+  const [isSearch, setIsSearch] = useState(null);
   const { isSidebarOpen, isCollapsed2dSearchOpen } = useAppContext();
-  const [build] = useAtom(buildAtom)
-  
-  console.log({ build })
+  // const [build] = useAtom(buildAtom)
+
+  // console.log({ build })
 
   useEffect(() => {
     if (!map.current || !mapContainer.current) return;
@@ -101,14 +114,13 @@ function Map2D() {
     //   icon: SouthEast,
     //   onClick: () => showRegion("SG04"),
     // },
-  {
-
-    name: "Style Street",
-    icon: StyleStreet,
-    onClick: () => {
-      handleChangeStyleMap("mapbox://styles/mapbox/streets-v12");
+    {
+      name: "Style Street",
+      icon: StyleStreet,
+      onClick: () => {
+        handleChangeStyleMap("mapbox://styles/mapbox/streets-v12");
+      },
     },
-  },
     {
       name: "Style Satellite Street",
       icon: StyleSatelliteStreet,
@@ -118,7 +130,6 @@ function Map2D() {
     },
   ];
 
-  
   const expandedMenu = [
     // {
     //   label: "Region Map",
@@ -157,45 +168,87 @@ function Map2D() {
       setLat(map.current.getCenter().lat.toFixed(4));
       setZoom(map.current.getZoom().toFixed(2));
     });
-    addCustomControl()
+    addCustomControl();
   }, []);
-  
+
   const addCustomControl = () => {
     const customControl = {
       onAdd() {
-         // Create a container for the control
-        const container = document.createElement('div');
-        container.id = 'control-layer';
-        container.className = 'mapboxgl-ctrl';
+        // Create a container for the control
+        const container = document.createElement("div");
+        container.id = "control-layer";
+        container.className = "mapboxgl-ctrl";
 
         // Render the React component into the container
         ReactDOM.render(
-            <FilterLine subMenu={subMenu} expandedMenu={expandedMenu} />, 
-            container
+          <FilterLine subMenu={subMenu} expandedMenu={expandedMenu} />,
+          container
         );
 
-    return container;
+        return container;
       },
 
       onRemove() {
-        document.getElementById("control-layer").remove()
-      }
+        document.getElementById("control-layer").remove();
+      },
     };
 
     // Add the custom control to the map
-    map.current.addControl(customControl, 'top-right');
-  }
+    map.current.addControl(customControl, "top-right");
+  };
   const handleToggleChange = (event) => {
     setIsMap3D(event.target.checked);
   };
+
+  const [isBuildingsActive, setIsBuildingsActive] = useState(false);
+  const [buildings, setBuildings] = useState([]);
+  const handleClickSearch = async (form, category) => {
+    setIsBuildingsActive(true);
+    console.log("Search initiated with formData:", form()); // Debugging log
+    const transactionId = generateTransactionId();
+    const searchBy =
+      category === "Address"
+        ? "searchbyaddress"
+        : category === "MRT"
+        ? "searchbymrts"
+        : category === "Account/Contacts"
+        ? "searchbyaccountscontacts"
+        : "searchbydistrict";
+
+    console.log("searchby ", searchBy);
+    try {
+      const response = await fetch(`${CONFIG.PROPERTY_SERVICE}/${searchBy}`, {
+        method: "POST",
+        headers: {
+          transactionId: transactionId,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(form()),
+      });
+
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+      const result = await response.json();
+      console.log("Search results:", result);
+      setBuildings(result.resultSet.propertyInformation);
+      mapApi({ data: result.resultSet.propertyInformation });
+      // return result;
+    } catch (error) {
+      console.error("Error during search:", error);
+      throw error;
+    }
+  };
+
   return (
     <>
       <div className="relative top-0 z-30">
-        <TwoDSearch mapApi={mapApi} map={map} />
+        {isBuildingsActive && <TwoDSearch mapApi={mapApi} map={map} buildings={buildings} setBuildings={setBuildings} setIsBuildingsActive={setIsBuildingsActive} />}
       </div>
       <div className="relative w-full min-h-full overflow-hidden">
         <div className="filtering absolute top-2 left-4 z-40 flex items-center space-x-2 bg-white bg-opacity-75 p-2 rounded-lg shadow-md">
-          <button
+          <SearchNew handleClickSearch={handleClickSearch} />
+          {/* <button
             onClick={() => setTriggerRadius((prev) => !prev)}
             className={`px-2 py-1.5 shadow-md text-sm rounded-lg font-bold flex justify-center items-center border ${triggerRadius
                 ? "bg-c-teal text-white border-c-teal"
@@ -216,12 +269,9 @@ function Map2D() {
             id="clear-buttonradius"
           >
             Clear
-          </button>
-          
-
+          </button> */}
         </div>
 
-       
         {/* Map Container */}
         <div
           ref={mapContainer}
@@ -230,7 +280,12 @@ function Map2D() {
           <div id="spinner"></div>
         </div>
         <div className="absolute top-2 right-7  flex items-center gap-1.5">
-        <img id="control-building-map" src="3d.svg" alt="3D" className="w-[30px] h-[30px]"/>
+          <img
+            id="control-building-map"
+            src="3d.svg"
+            alt="3D"
+            className="w-[30px] h-[30px]"
+          />
           <FormControlLabel
             control={
               <Switch
@@ -240,13 +295,10 @@ function Map2D() {
               />
             }
           />
-         
         </div>
-
       </div>
     </>
   );
-
 }
 
 export default Map2D;

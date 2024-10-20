@@ -69,9 +69,10 @@ export default function AddProject({ onClose }) {
                             />
                         </Box>
                     </div>
-                    <div className="border-t py-2 px-4 flex justify-center space-x-2 w-full justify-center">
+                    <div className="border-t py-2 px-4 flex justify-center space-x-2 w-full">
                         <div className='itemx-center flex gap-2'>
                             <button
+                                onClick={onClose}
                                 className="px-4 py-1.5 rounded-lg bg-white text-blue-600 border border-neutral-500 text-xs hover:text-neutral-700 hover:bg-neutral-100"
                             >
                                 Save

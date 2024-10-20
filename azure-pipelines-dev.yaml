@@ -16,14 +16,11 @@ stages:
       - job: Build
         displayName: "CI Stage Initialize"
         steps:
-          # - task: Npm@1
-          #   inputs:
-          #     command: 'install'
           - script: |
               echo '-------##########-------'
               ls $(System.DefaultWorkingDirectory)
               echo '-------##########-------'
-            displayName: 'View files after npm build'
+            displayName: 'Check Working Directory'
           - task: Bash@3
             displayName: Build & Push Docker image to JFrog
             condition: and(succeeded(), eq(variables['build.sourceBranch'], 'refs/heads/development'))
