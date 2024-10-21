@@ -26,15 +26,15 @@ RUN chown -R 101:101 /etc/nginx/nginx.conf
 RUN mkdir -p /var/cache/nginx/client_temp
 RUN chown -R 101:101 /var/cache/nginx/client_temp
 RUN mkdir -p /var/cache/nginx/proxy_temp
-RUN RUN chown -R 101:101 /var/cache/nginx/proxy_temp
+RUN chown -R 101:101 /var/cache/nginx/proxy_temp
 RUN mkdir -p /var/cache/nginx/fastcgi_temp
-RUN RUN chown -R 101:101 /var/cache/nginx/fastcgi_temp
+RUN chown -R 101:101 /var/cache/nginx/fastcgi_temp
 RUN mkdir -p /var/cache/nginx/uwsgi_temp
-RUN RUN chown -R 101:101 /var/cache/nginx/uwsgi_temp
+RUN chown -R 101:101 /var/cache/nginx/uwsgi_temp
 RUN mkdir -p /var/cache/nginx/scgi_temp
-RUN RUN chown -R 101:101 /var/cache/nginx/scgi_temp
+RUN chown -R 101:101 /var/cache/nginx/scgi_temp
 RUN mkdir -p /var/cache/nginx/ngx_http_proxy_module
-RUN RUN chown -R 101:101 /var/cache/nginx/ngx_http_proxy_module
+RUN chown -R 101:101 /var/cache/nginx/ngx_http_proxy_module
 
 
 # Switch back to the unprivileged user for running NGINX
