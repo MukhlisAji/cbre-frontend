@@ -47,9 +47,9 @@ export default function AccountForm({ onClose, isEditing, accountId }) {
             website: '',
         },
         addressInformation: {
-            billingCountryCode: '',
-            billingCountry: '',
-            billingState: '',
+            billingCountryCode: 'SG',
+            billingCountry: 'Singapore',
+            billingState: 'Singapore',
             billingCity: '',
             billingStreet: '',
             billingPostCode: '',
@@ -64,7 +64,7 @@ export default function AccountForm({ onClose, isEditing, accountId }) {
             industrialType: '',
             subIndustrialId: '',
             subIndustrial: '',
-            headquarterCountryId: '',
+            headquarterCountryCode: '',
             headquarterCountry: '',
             commercialNumber: '',
         },
@@ -95,6 +95,13 @@ export default function AccountForm({ onClose, isEditing, accountId }) {
         //     topParentAccountId: '',
         // },
     });
+
+    const [formLabel, setFormLabel] = useState({
+        parentAccountName: "",
+        accountOwner: [],
+        clientType: []
+    });
+
     const url = `${CONFIG.ACCOUNT_SERVICE}/${accountId}`;
     // const headers = {
     //     'transactionId': ,
@@ -137,10 +144,10 @@ export default function AccountForm({ onClose, isEditing, accountId }) {
                 accountDetails: {
                     accountId: initialData?.id?.toString() || '',
                     accountName: initialData?.accountName?.toString() || '',
-                    parentAccount: initialData?.parentAccount?.id?.toString() || '',
+                    parentAccount: initialData?.parentAccount?.id || '',
                     localAccountName: initialData?.localAccountName?.toString() || '',
                     clientType: initialData?.clientType?.map(type => ({
-                        clientTypeId: type?.id?.toString() || '',
+                        clientTypeId: type?.id || null,
                         clientTypeName: type?.name?.toString() || '',
                     })) || [],
                     phone: initialData?.phone?.toString() || '',
@@ -165,6 +172,7 @@ export default function AccountForm({ onClose, isEditing, accountId }) {
                     industrialType: initialData?.industrialType?.name?.toString() || '',
                     subIndustrialId: initialData?.subIndustrial?.id?.toString() || '',
                     subIndustrial: initialData?.subIndustrial?.name?.toString() || '',
+                    headquarterCountryCode: initialData?.headQuarter?.countryCode?.toString() || '',
                     headquarterCountry: initialData?.headQuarter?.countryName?.toString() || '',
                     commercialNumber: initialData?.commercialNumber?.toString() || '',
                 },
@@ -174,12 +182,26 @@ export default function AccountForm({ onClose, isEditing, accountId }) {
                     description: initialData?.description?.toString() || '',
                 },
                 systemInformation: {
-                    accountOwner: initialData?.accountOwner?.map(owner => owner?.employee?.id?.toString()) || [],
+                    accountOwner: initialData?.accountOwner?.map(owner => owner?.employee?.id) || [],
                     status: initialData?.status?.toString() || '',
                     inactivationDate: initialData?.inactivationDate?.toString() || '',
                     reasonForInactivating: initialData?.reasonForInactivating?.toString() || '',
                     userId: '', // Assuming this is set elsewhere, keeping it empty
                 },
+            });
+
+
+            setFormLabel({
+                parentAccountName: initialData.parentAccount?.name || "", // Set parent account name
+                parentAccountId: initialData.parentAccount?.id || "",
+                accountOwner: initialData.accountOwner.map(owner => ({
+                    id: owner.employee.id, // Set employee id
+                    name: `${owner.employee.surName} ${owner.employee.givenName}`.trim() // Set employee name
+                })) || [],
+                clientType: initialData.clientType.map(client => ({
+                    id: client.id,
+                    name: client.name
+                })) || []
             });
 
         }
@@ -371,6 +393,7 @@ export default function AccountForm({ onClose, isEditing, accountId }) {
             segmentation: {
                 industryType: '',
                 subIndustry: '',
+                headquarterCountryId: '',
                 headquarterCountry: '',
                 commercialNumber: '',
             },
@@ -381,16 +404,16 @@ export default function AccountForm({ onClose, isEditing, accountId }) {
             },
             systemInformation: {
                 accountOwner: [],
-                createdBy: systemValues.createdBy,
-                createdDate: systemValues.createdDate,
-                lastModifiedBy: '',
-                lastModifiedDate: '',
+                // createdBy: systemValues.createdBy,
+                // createdDate: systemValues.createdDate,
+                // lastModifiedBy: '',
+                // lastModifiedDate: '',
                 status: '',
                 inactivationDate: '',
                 reasonForInactivating: '',
                 userId: '',
                 saveToSFDC: true,
-                salesforceId: '',
+                // salesforceId: '',
             },
             // associateInformation: {
             //     accountSource: 'One App',
@@ -441,7 +464,7 @@ export default function AccountForm({ onClose, isEditing, accountId }) {
     const validateAccountDetails = () => {
         // Check if each field in accountDetails is filled
         const isAccountNameFilled = formData.accountDetails.accountName.trim() !== '';
-        const isParentAccountFilled = formData.accountDetails.parentAccount.trim() !== '';
+        const isParentAccountFilled = formData.accountDetails.parentAccount !== '';
         const isLocalAccountNameFilled = formData.accountDetails.localAccountName.trim() !== '';
         const isPhoneFilled = formData.accountDetails.phone.trim() !== '';
         const isFaxFilled = formData.accountDetails.fax.trim() !== '';
@@ -500,6 +523,8 @@ export default function AccountForm({ onClose, isEditing, accountId }) {
                             sectionVisibility={sectionVisibility}
                             copyBillingToShipping={copyBillingToShipping}
                             isEditing={isEditing}
+                            formLabel={formLabel}
+                            setFormLabel={setFormLabel}
                         />
                     </div>
                 </main>

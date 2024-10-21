@@ -156,9 +156,10 @@ const CustomTableMUI = ({ dataTable, column, openModal, isHeader, tableHeight, l
     // Filter data based on search input
     const filteredData = data.filter((item) =>
         Object.values(item).some(value =>
-            value.toString().toLowerCase().includes(search.toLowerCase())
+            value != null && value.toString().toLowerCase().includes(search.toLowerCase()) // Check for null or undefined
         )
     );
+    
 
     const theme = useTheme({
         Table: `
