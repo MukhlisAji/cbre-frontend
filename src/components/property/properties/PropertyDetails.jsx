@@ -37,7 +37,7 @@ export default function PropertyDetails() {
                     },
                 });
                 setPropertyInfo(response.data.resultSet.propertyInformation);
-              console.log('property info ', response.data.resultSet.propertyInformation);
+                console.log('property info ', response.data.resultSet.propertyInformation);
             } catch (error) {
                 console.error('Error fetching property info:', error);
             }
@@ -60,23 +60,74 @@ export default function PropertyDetails() {
         }
     };
 
+    if (!propertyInfo || !propertyInfo.basicInformation || !propertyInfo.generalInformation) {
+        return <div>Loading...</div>; // You can display a loading indicator or a message
+    }
+
     return (
         <div className="bg-neutral-100">
             {/* Header Section */}
-            <div className="bg-neutral-100 mb-4">
-                <div className="flex justify-between items-center">
-                    <div className='flex items-center space-x-3'>
-                        <div className="p-2 rounded-md border-2 border-purple-500 bg-purple-600">
-                            <RiContactsBook3Line className="text-white text-xl font-bold" />
+            <div className="bg-white shadow-md rounded-lg p-6 mb-4">
+                <div className="grid grid-cols-12 gap-6 items-start">
+
+                    {/* Left Section - Property Image */}
+                    <div className="col-span-2 h-40 bg-gray-200 flex items-center justify-center rounded-md overflow-hidden">
+                        <span className="text-gray-500">Property Image</span>
+                    </div>
+
+                    {/* Middle Section - Property Details */}
+                    <div className="col-span-4 space-y-2">
+                        <h1 className="text-xl font-semibold text-gray-800">{propertyInfo.basicInformation.buildingName}</h1>
+                        <p className="text-sm text-gray-600">
+                            {`${propertyInfo.basicInformation.streetNumber} ${propertyInfo.basicInformation.streetName}, Singapore ${propertyInfo.basicInformation.postalCode}`}
+                        </p>
+                        <p className="text-sm text-gray-600">{propertyInfo.basicInformation.micromarket}</p>
+                        <p className="text-sm text-gray-600">{propertyInfo.basicInformation.zoning}</p>
+                        <p className="text-sm text-gray-600">
+                            Typical Floor Area: {propertyInfo.generalInformation.areaBreakdown || "N/A"}
+                        </p>
+                    </div>
+
+                    {/* Right Section - Additional Info */}
+                    <div className="col-span-3 space-y-2">
+                        <p className="text-sm font-bold text-gray-600">
+                            TOP Date: <span className="font-normal">{propertyInfo.generalInformation.termsTopDate}</span>
+                        </p>
+
+                        <p className="text-sm font-bold text-gray-600">
+                            No. of Floors: <span className="font-normal">{propertyInfo.generalInformation.noOfFloorAboveGround || "N/A"}</span>
+                        </p>
+
+                        <p className="text-sm font-bold text-gray-600">Public Transportation:</p>
+                        <p className="font-normal text-sm text-gray-600">-</p>
+
+                        <p className="text-sm font-bold text-gray-600">Property Description:</p>
+                        <p className="font-normal text-sm text-gray-600">-</p>
+                    </div>
+
+                    {/* NLA, Vacancy, Occupancy Section */}
+                    <div className="col-span-3 space-y-2">
+                        <div className="space-y-2">
+                            <p className="text-sm font-bold text-gray-600">NLA</p>
+                            <p className="text-sm text-gray-600">Office: {propertyInfo.generalInformation.netLettableArea || "N/A"} SF</p>
                         </div>
-                        <div>
-                            <h1 className="text-xs font-normal">Building Name</h1>
-                            <h1 className="text-lg font-bold text-neutral-700">Building Address</h1>
+
+                        <div className="space-y-2">
+                            <p className="text-sm font-bold text-gray-600">Vacancy</p>
+                            <p className="text-sm text-gray-600">Office: XX.XX% | XXXXX.XX SF</p>
+                        </div>
+
+                        <div className="space-y-2">
+                            <p className="text-sm font-bold text-gray-600">Occupancy</p>
+                            <p className="text-sm text-gray-600">Office: XX.XX% | XXXXX.XX SF</p>
                         </div>
                     </div>
 
                 </div>
             </div>
+
+
+
 
             {/* Details Section */}
             <Tab.Group selectedIndex={selectedIndex} onChange={setSelectedIndex}>
@@ -99,7 +150,7 @@ export default function PropertyDetails() {
                         </Tab>
                     ))}
                 </Tab.List>
-                <div className="overflow-y-auto h-[calc(100vh-230px)]">
+                <div className="overflow-y-auto h-[calc(100vh-400px)]">
 
                     <Tab.Panels className="">
                         {tabs.map((tab, idx) => (
@@ -112,11 +163,11 @@ export default function PropertyDetails() {
                             >
                                 <div>
                                     {tab === "Property" && (
-                                        <PropertyInfo propertyInfo={propertyInfo} id={id}/>
+                                        <PropertyInfo propertyInfo={propertyInfo} id={id} />
                                     )}
                                     {tab === "Stacking Plan" && (
                                         <div>
-                                           <StockingPlanInfo />
+                                            <StockingPlanInfo />
                                         </div>
                                     )}
                                     {tab === "Property Images and Documents" && (

@@ -22,15 +22,111 @@ export default function ModalSearch({ isVisible, onClose, category, form, onForm
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('Main'); // Default category
   const [selectedSubcategory, setSelectedSubcategory] = useState('CBD'); // Default subcategory
-  // const [districts, setDistricts] = useState(DISTRICTDATA);
+  const [propertyTypeOptions, setPropertyTypeOptions] = useState([]);
   const [accountType, setAccountType] = useState('');
+  const [micromarketOptions, setMicromarketOptions] = useState([]);
 
-  const { districts, setDistricts, fetchDistricts, propertyResources, fetchPropertyResources } = PropertyResource();
+
+  const { districts, setDistricts, fetchDistricts, propertyResources, fetchPropertyResources, useFetchResource, useFetchOptions } = PropertyResource();
 
   useEffect(() => {
-    fetchDistricts();
-    fetchPropertyResources();
+    const fetchData = async () => {
+      try {
+        // Fetch districts and property resources
+        fetchDistricts();
+        fetchPropertyResources();
+
+        const fetchedPropertyType = await useFetchOptions('sector');
+        setPropertyTypeOptions(fetchedPropertyType);
+
+        // Fetch micromarkets
+        const fetchedMicromarket = await useFetchResource('getmicromarkets');
+
+        // If 'fetchedMicromarket' has a 'microMarkets' array
+        if (fetchedMicromarket && fetchedMicromarket.microMarkets) {
+          const micromarketOptionsData = fetchedMicromarket.microMarkets.map((micromarket, index) => ({
+            id: `M${index + 1}`,
+            name: micromarket,
+            checked: false,
+          }));
+
+          setMicromarketOptions(micromarketOptionsData);
+          console.error('micromarketOptionsData data.', micromarketOptionsData);
+
+        } else {
+          console.error('No micromarkets found in fetched data.');
+        }
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+
+    fetchData();
   }, []);
+
+  // const handleMicromarketSearch = (e) => {
+  //   const searchTerm = e.target.value;
+  //   setSearchTerm(searchTerm);
+  //   const filtered = micromarketOptions.filter((micromarket) =>
+  //     micromarket.name.toLowerCase().includes(searchTerm.toLowerCase())
+  //   );
+  //   setFilteredMicromarkets(filtered);
+  // };
+
+  const toggleMicromarket = (micromarketId) => {
+    setMicromarketOptions((prevMicromarkets) => {
+      const updatedMicromarkets = prevMicromarkets.map((micromarket) => {
+        if (micromarket.id === micromarketId) {
+          const newChecked = !micromarket.checked;
+
+          // Update the formDistrict in the parent component
+          const updatedFormMicromarket = newChecked
+            ? [...form.regionId, micromarket.id] // Add selected micromarket ID
+            : form.regionId.filter((id) => id !== micromarket.id);
+
+          // Call onFormChange with the updated formDistrict structure
+          onFormChange({
+            ...form,
+            regionId: updatedFormMicromarket,
+          });
+
+          return { ...micromarket, checked: newChecked };
+        }
+        return micromarket;
+      });
+
+      return updatedMicromarkets;
+    });
+  };
+
+  const toggleAllMicromarkets = () => {
+    const allChecked = micromarketOptions.every((m) => m.checked);
+    const newCheckedState = !allChecked;
+
+    setMicromarketOptions((prevMicromarkets) => {
+      const updatedMicromarkets = prevMicromarkets.map((micromarket) => ({
+        ...micromarket,
+        checked: newCheckedState,
+      }));
+
+      // Update the regionId in formMicromarket in the parent component
+      const updatedFormMicromarketRegionId = newCheckedState
+        ? updatedMicromarkets.map((micromarket) => micromarket.id)
+        : [];
+
+      // Update formMicromarket state
+      onFormChange({
+        ...form,
+        regionId: updatedFormMicromarketRegionId,
+      });
+
+      return updatedMicromarkets;
+    });
+  };
+
+  const filteredMicromarkets = micromarketOptions.filter((micromarket) =>
+    micromarket.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   if (!isVisible) return null;
 
@@ -51,24 +147,6 @@ export default function ModalSearch({ isVisible, onClose, category, form, onForm
 
   const label = { inputProps: { 'aria-label': 'Checkbox demo' } };
 
-
-  const handleSetQuery = () => {
-    let queryString = '';
-
-    if (category === 'District') {
-      // Include only district-related fields, adjust as per your state
-      queryString = `${form ? form : ''}`.trim();
-    } else if (category === 'Address') {
-      // Include address-related fields
-      queryString = `${form.buildingName ? form.buildingName : ''},${form.streetNumber ? form.streetNumber : ''},${form.streetName ? form.streetName : ''},${form.postalCode ? form.postalCode : ''}`.trim();
-    }
-
-    // Remove any trailing commas or unnecessary spaces
-    // queryString = queryString.replace(/,\s*$/, '').replace(/\s*,/g, '');
-    console.log('Constructed Query: ', queryString);
-
-    setQuery(queryString); // Update the query with the constructed string
-  };
 
   const handleActionClick = () => {
 
@@ -95,7 +173,7 @@ export default function ModalSearch({ isVisible, onClose, category, form, onForm
         pageNo: 1,
         pageSize: 10
       });
-    } else if (category === "District" ) {
+    } else if (category === "District") {
       onFormChange({
         districts: [],
         pageNo: 1,
@@ -107,7 +185,7 @@ export default function ModalSearch({ isVisible, onClose, category, form, onForm
         pageNo: 1,
         pageSize: 10
       });
-    }else if (category === "Account/Contacts") {
+    } else if (category === "Account/Contacts") {
       onFormChange({
         keyword: '',
         type: '',
@@ -462,22 +540,30 @@ export default function ModalSearch({ isVisible, onClose, category, form, onForm
 
           {/* Category Tabs */}
           <div className="mb-4 flex space-x-2">
-            {['Main', 'Office', 'Industrial', 'Retail'].map((categoryTab) => (
+            {propertyTypeOptions.map((categoryTab) => (
               <button
-                key={categoryTab}
-                onClick={() => setSelectedCategory(categoryTab)}
-                className={`px- py-1 text-sm rounded-md border ${selectedCategory === categoryTab
+                key={categoryTab.sectorId} // Use sectorId as key for better uniqueness
+                onClick={() => {
+                  setSelectedCategory(categoryTab.sectorId); // Store sectorId in selectedCategory
+                  onFormChange({
+                    ...form,
+                    sectorId: categoryTab.sectorId, // Update form with the selected sectorId
+                  });
+                }}
+                className={`px- py-1 text-sm rounded-md border ${selectedCategory === categoryTab.sectorId
                   ? 'bg-gray-300 text-black'
                   : 'bg-white text-gray-500 hover:bg-gray-200'
                   }`}
               >
-                {categoryTab}
+                {categoryTab.sector} {/* Display sector name */}
               </button>
             ))}
           </div>
 
+
+
           {/* Subcategory Tabs */}
-          <div className="mb-4 flex space-x-2">
+          {/* <div className="mb-4 flex space-x-2">
             {['CBD', 'Central', 'East', 'North', 'North-East', 'West'].map((subcategory) => (
               <button
                 key={subcategory}
@@ -490,60 +576,54 @@ export default function ModalSearch({ isVisible, onClose, category, form, onForm
                 {subcategory}
               </button>
             ))}
-          </div>
+          </div> */}
 
+          {/* Search Box */}
           <div className="mb-4">
             <input
               type="text"
-              placeholder="Search District"
+              placeholder="Search Micromarket"
               value={searchTerm}
-              onChange={handleSearch}
+              onChange={(e) => setSearchTerm(e.target.value)}
               className="w-1/2 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-200"
             />
           </div>
 
-          {/* All Districts Select */}
+          {/* All Micromarkets Select */}
           <div className="mb-4 border-b-2 pb-2">
             <label className="flex items-center space-x-3 ml-1">
               <input
                 type="checkbox"
                 className="form-checkbox"
-                onChange={() =>
-                  setDistricts((prevDistricts) =>
-                    prevDistricts.map((district) => ({
-                      ...district,
-                      checked: !districts.every((d) => d.checked),
-                    }))
-                  )
-                }
-                checked={districts.every((d) => d.checked)}
+                onChange={toggleAllMicromarkets}
+                checked={micromarketOptions.every((m) => m.checked)}
               />
-              <span>All Districts</span>
+              <span>All Micromarkets</span>
             </label>
           </div>
 
-          {/* District list */}
+          {/* Micromarket List */}
           <ul className="grid grid-cols-2 gap-4">
-            {filteredDistricts.map((district) => {
-              const isChecked = form.districts.includes(district.name); // Check if district is in formDistrict
+            {filteredMicromarkets.map((micromarket) => {
+              const isChecked = form.regionId.includes(micromarket.id);
 
               return (
                 <li
-                  key={district.id}
+                  key={micromarket.id}
                   className="flex items-center p-1 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300"
                 >
                   <input
                     type="checkbox"
                     className="form-checkbox text-blue-600 border-gray-300 rounded focus:ring-blue-500 focus:ring-offset-2"
-                    id={`district-${district.id}`}
-                    checked={isChecked} // Set checked based on whether district is in formDistrict
-                    onChange={() => toggleDistrict(district.name)} // Use district.name for toggle
+                    id={`micromarket-${micromarket.id}`}
+                    checked={isChecked}
+                    onChange={() => toggleMicromarket(micromarket.id)} // Toggle individual micromarket
                   />
                   <label
-                    htmlFor={`district-${district.id}`}
+                    htmlFor={`micromarket-${micromarket.id}`}
                     className="w-full ml-3 text-gray-800 text-md whitespace-nowrap"
                   >
-                    {district.name}
+                    {micromarket.name}
                   </label>
                 </li>
               );

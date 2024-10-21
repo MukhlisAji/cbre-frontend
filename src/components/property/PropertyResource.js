@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { CONFIG } from '../../config';
+import axios from 'axios';
 
 export default function PropertyResource() {
   const [districts, setDistricts] = useState([]);
@@ -75,13 +76,25 @@ export default function PropertyResource() {
 
       const data = await response.json();
       if (data.statusCode === '00') {
-        const mrtWithColor = data.resultSet.mrtInformation.map((station) => ({
-          label: station.lineName ? `${station.stationName} - ${station.lineName}` : station.stationName,
-          value: station.stationName,
-          color: getColorForLine(station.lineName),
-        }));
-        setMrtStations(mrtWithColor);
-        console.log('mrtWithColor ', mrtWithColor);
+        // Categorize stations by lineName
+        const categorizedStations = data.resultSet.mrtInformation.reduce((acc, station) => {
+          const { lineName, stationName } = station;
+          const color = getColorForLine(lineName);
+
+          if (!acc[lineName]) {
+            acc[lineName] = { lineName, color, stations: [] };
+          }
+
+          acc[lineName].stations.push({
+            label: stationName,
+            value: stationName,
+          });
+
+          return acc;
+        }, {});
+
+        setMrtStations(categorizedStations); // Set categorized stations
+        console.log('Categorized Stations: ', categorizedStations);
       } else {
         console.error('Failed to fetch MRT stations:', data.statusMessage);
       }
@@ -95,7 +108,7 @@ export default function PropertyResource() {
   const fetchPropertyResources = async () => {
     try {
       const response = await fetch(
-        `${CONFIG.PROPERTY_SERVICE}/resources?includes=propertyContactKind`, 
+        `${CONFIG.PROPERTY_SERVICE}/resources?includes=propertyContactKind`,
         {
           method: 'GET',
           headers: {
@@ -132,14 +145,52 @@ export default function PropertyResource() {
 
       const data = await response.json();
       if (data.statusCode === '00') {
-        setProperties(data.resultSet.propertyInformation); 
+        setProperties(data.resultSet.propertyInformation);
         console.log('List Property:', data.resultSet.propertyInformation);
       } else {
         console.error('Failed to fetch list properties:', data.statusMessage);
       }
     } catch (error) {
       console.error('Error fetching List property :', error);
-    } 
+    }
+  };
+
+  const useFetchOptions = async (endpoint) => {
+    try {
+      const response = await axios.get(`${CONFIG.PROPERTY_SERVICE}/search/${endpoint}`, {
+        headers: {
+          'transactionId': transactionId,
+        },
+      });
+      if (response.data.statusCode === '00') {
+        return response.data.resultSet.resources; // Return fetched options
+      } else {
+        console.error(`Failed to fetch ${endpoint} options:`, response.data.statusMessage);
+        return [];
+      }
+    } catch (error) {
+      console.error(`Error fetching ${endpoint} options:`, error);
+      return [];
+    }
+  };
+
+  const useFetchResource = async (endpoint) => {
+    try {
+      const response = await axios.get(`${CONFIG.PROPERTY_SERVICE}/${endpoint}`, {
+        headers: {
+          'transactionId': transactionId,
+        },
+      });
+      if (response.data.statusCode === '00') {
+        return response.data.resultSet; // Return fetched options
+      } else {
+        console.error(`Failed to fetch ${endpoint} resource:`, response.data.statusMessage);
+        return [];
+      }
+    } catch (error) {
+      console.error(`Error fetching ${endpoint} resource:`, error);
+      return [];
+    }
   };
 
   // Return the state and the functions
@@ -151,9 +202,10 @@ export default function PropertyResource() {
     setMrtStations,
     fetchMRTStations,
     propertyResources, // Expose the resultSet
-    fetchPropertyResources, 
+    fetchPropertyResources,
     properties,
     fetchProperties,
-    // Expose the function to fetch property resources
+    useFetchOptions,
+    useFetchResource
   };
 }

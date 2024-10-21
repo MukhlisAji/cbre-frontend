@@ -16,7 +16,7 @@ import SearchNew from "./SearchNew";
 const SearchArea = () => {
   const [isClassic, setIsClassic] = useState(false);
   const navigate = useNavigate();
-  const handleClickSearch = (getForm, query, category) => {
+  const handleClickSearch = (getForm, category, query) => {
     navigate("result", { state: { form: getForm(), category, query } });
   };
 
