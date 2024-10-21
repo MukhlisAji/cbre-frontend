@@ -170,7 +170,7 @@ export default function ContactFormSection({
                         : null,
                     onChange: (event) => {
                         const value = event.target ? event.target.value : event;
-                        const accountId = value || null;
+                        const accountId = value.id || null;
                         console.log('value id ', accountId);
 
                         const salesforceAccountId = value.salesforceId !== 'null' ? value.salesforceId : null;

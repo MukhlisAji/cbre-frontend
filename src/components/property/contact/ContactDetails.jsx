@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { HiPencil } from 'react-icons/hi2';
 import { IoMdArrowDropdown } from 'react-icons/io';
 import { IoCheckmarkCircleOutline } from 'react-icons/io5';
@@ -9,6 +9,7 @@ import CustomTableMUI from '../../shared/CustomTableMUI';
 import { ACCOUNTCOLUMNDUMMY, ACCOUNTDATADUMMY, RELATIONSHIPCLUMN, RELATIONSHIPDUMMY } from '../../lib/const/DummyData';
 import BasicTable from '../../shared/element/BasicTable';
 import { FaEdit, FaTrash } from 'react-icons/fa';
+import { AutocompleteField, SelectField } from '../FormFields';
 
 const ContactDetails = () => {
 
@@ -19,6 +20,18 @@ const ContactDetails = () => {
     const [contactData, setContactData] = useState(null);
     const { id } = useParams();
 
+    // All hooks at the top level
+    const [formData, setFormData] = useState({
+        contactId: id,
+        contactSalesforceId: '',
+        accountId: '',
+        accountSalesforceId: '',
+        relationshipType: '',
+        isPrimary: 'No',
+        userId: 'James',
+        startDate: '',
+        endDate: '',
+    });
     useEffect(() => {
         const handleResize = () => {
             const screenHeight = window.innerHeight;
@@ -54,36 +67,10 @@ const ContactDetails = () => {
         }
     };
 
-    const firstFiveAccounts = RELATIONSHIPDUMMY.slice(0, 5);
-
-    const formattedRelationshipData = RELATIONSHIPDUMMY.map((row, index) => ({
-        relationshipType: row.relationshipType || 'N/A',
-        accountName: row.accountName || 'N/A',
-        relationshipStartDate: row.relationshipStartDate || 'N/A',
-        relationshipEndDate: row.relationshipEndDate || 'N/A',
-        primaryAccount: row.primaryAccount || 'N/A',
-        action: (
-            <div>
-                <FaEdit
-                    // onClick={() => handleEditClick(row)}
-                    className="inline-block cursor-pointer text-c-teal/80 mr-2"
-                    aria-label="Edit"
-                />
-                <FaTrash
-                    // onClick={() => handleDeleteClick(row)}
-                    className="inline-block cursor-pointer text-red-500"
-                    aria-label="Delete"
-                />
-            </div>
-        )
-    }));
-
-
+    // Fetch account data
     useEffect(() => {
-        // Fetch account data based on the id parameter
         async function fetchAccountData() {
             try {
-                // Replace with your API call
                 const response = await fetch(`${CONFIG.CONTACT_SERVICE}/${id}`);
                 const data = await response.json();
                 setContactData(data.resultSet);
@@ -94,9 +81,111 @@ const ContactDetails = () => {
         fetchAccountData();
     }, [id]);
 
+
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setFormData((prevState) => ({
+            ...prevState,
+            [name]: value,
+        }));
+    };
+
+    
+    const searchAccountName = async (searchTerm) => {
+        const response = await fetch(`${CONFIG.ACCOUNT_SERVICE}/find-account?name=${searchTerm}`, {
+            method: 'GET',
+            headers: {
+                'Cookie': 'CookieConsentPolicy=0:1; LSKey-c$CookieConsentPolicy=0:1',
+            },
+        });
+        const data = await response.json();
+        return data.resultSet.map((account) => ({
+            id: account.id,
+            label: `${account.accountName}`,
+            salesforceId: account.salesforceId,
+        }));
+    };
+
+    const [selectedAccount, setSelectedAccount] = useState(null); // Store the selected account info for display
+
+    const handleAccountChange = (selectedAccount) => {
+        setSelectedAccount(selectedAccount);
+        console.log("selectedAccount ", selectedAccount); // Save the selected account info to display the label
+
+        setFormData((prevState) => ({
+            ...prevState,
+            accountId: selectedAccount.id, // Store only the accountId in formData
+            accountSalesforceId: selectedAccount.salesforceId, // Store Salesforce ID
+        }));
+    };
+    
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        console.log("data ", formData);
+
+        try {
+            const response = await fetch('https://f0f939365c3d.ngrok.app/cbre/contact/relationship', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'SFDC-token': '00DDS000001IFYI!AQEAQLNCn_0GFLIR6stCdKwiSDsQaDNIRg0NAH7ee6CbGA5UhldxKvfwW8thFjLqxJ0zT4qR0dP8MLWkN4MH9bwR3zrsdmG4',
+                    'transactionId': '4646765766',
+                },
+                body: JSON.stringify(formData),
+            });
+
+            if (response.ok) {
+                const result = await response.json();
+                console.log('Success:', result);
+            } else {
+                console.error('Failed to submit form');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    };
+
+    // Derive formatted relationship data
+    const formattedRelationshipData = useMemo(() => {
+        if (Array.isArray(contactData?.accountContact)) {
+            return contactData.accountContact.map((row) => ({
+                relationshipType: row.relationshipType?.name || 'N/A',
+                accountName: row.accountName || 'N/A',
+                relationshipStartDate: row.startDate || 'N/A',
+                relationshipEndDate: row.endDate || 'N/A',
+                primaryAccount: row.primaryAccount || 'N/A',
+                action: (
+                    <div>
+                        <FaEdit className="inline-block cursor-pointer text-c-teal/80 mr-2" aria-label="Edit" />
+                        <FaTrash className="inline-block cursor-pointer text-red-500" aria-label="Delete" />
+                    </div>
+                ),
+            }));
+        } else if (contactData?.accountContact) {
+            return [
+                {
+                    relationshipType: contactData.accountContact.relationshipType?.name || 'N/A',
+                    accountName: contactData.accountContact.accountName || 'N/A',
+                    relationshipStartDate: contactData.accountContact.startDate || 'N/A',
+                    relationshipEndDate: contactData.accountContact.endDate || 'N/A',
+                    primaryAccount: contactData.accountContact.primaryAccount || 'N/A',
+                    action: (
+                        <div>
+                            <FaEdit className="inline-block cursor-pointer text-c-teal/80 mr-2" aria-label="Edit" />
+                            <FaTrash className="inline-block cursor-pointer text-red-500" aria-label="Delete" />
+                        </div>
+                    ),
+                },
+            ];
+        }
+        return [];
+    }, [contactData]);
+
     if (!contactData) {
-        return <div>Loading...</div>;  // Show a loading state while data is fetched
+        return <div>Loading...</div>;
     }
+
 
     return (
         <div className="bg-neutral-100">
@@ -296,44 +385,89 @@ const ContactDetails = () => {
                         </div>
                         {relationshipInformationVisible && (
                             <div className="ml-3 mb-6 mr-4 w-full pr-10">
-                                <div className="grid grid-cols-2 gap-y-2 w-full gap-4 md:gap-x-12">
+                                <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-y-2 w-full gap-4 md:gap-x-12">
                                     {/* Relationship Type Field */}
-                                    <div className="flex items-center justify-between gap-2">
-                                        <label className="w-1/4 text-neutral-600 text-sm">Relationship Type *</label>
-                                        <select className="w-3/4 text-sm text-neutral-700 border border-gray-300 p-2 rounded">
+                                    <div className="flex flex-col w-full">
+                                        <label className="text-neutral-600 text-sm mb-1">Relationship Type *</label>
+                                        <select
+                                            name="relationshipType"
+                                            value={formData.relationshipType}
+                                            onChange={handleChange}
+                                            className="w-full text-sm text-neutral-700 border border-gray-300 p-2 rounded"
+                                            required
+                                        >
                                             <option value="">- Select -</option>
-                                            <option value="partner">Partner</option>
-                                            <option value="customer">Customer</option>
-                                            {/* Add more options as needed */}
+                                            <option value="Partner">Partner</option>
+                                            <option value="Customer">Customer</option>
+                                            <option value="Employee">Employee</option>
                                         </select>
                                     </div>
 
-                                    {/* Account Name Field */}
-                                    <div className="flex items-center justify-between gap-2">
-                                        <label className="w-1/4 text-neutral-600 text-sm">Account Name *</label>
+                                    {/* Account Name Field using AutocompleteField */}
+                                    <div className="flex flex-col w-full">
+                                        <AutocompleteField
+                                            label="Account Name"
+                                            value={
+                                                formData.accountId
+                                                    ? { id: formData.accountId, label: selectedAccount?.label || '' }
+                                                    : null
+                                            }
+                                            onChange={handleAccountChange} // Ensure this updates accountId and accountSalesforceId
+                                            searchApi={searchAccountName}
+                                            required={true}
+                                        />
+
+                                    </div>
+
+                                    {/* Start Date Field */}
+                                    <div className="flex flex-col w-full">
+                                        <label className="text-neutral-600 text-sm mb-1">Start Date *</label>
                                         <input
-                                            type="text"
-                                            placeholder="Enter Account Name"
-                                            className="w-3/4 text-sm text-neutral-700 border border-gray-300 p-2 rounded"
+                                            type="date"
+                                            name="startDate"
+                                            value={formData.startDate}
+                                            onChange={handleChange}
+                                            className="w-full text-sm text-neutral-700 border border-gray-300 p-2 rounded"
+                                            required
+                                        />
+                                    </div>
+
+                                    {/* End Date Field */}
+                                    <div className="flex flex-col w-full">
+                                        <label className="text-neutral-600 text-sm mb-1">End Date *</label>
+                                        <input
+                                            type="date"
+                                            name="endDate"
+                                            value={formData.endDate}
+                                            onChange={handleChange}
+                                            className="w-full text-sm text-neutral-700 border border-gray-300 p-2 rounded"
+                                            required
                                         />
                                     </div>
 
                                     {/* Primary Account Field */}
-                                    <div className="flex items-center justify-between gap-2">
-                                        <label className="w-1/4 text-neutral-600 text-sm">Primary Account</label>
-                                        <select className="w-3/4 text-sm text-neutral-700 border border-gray-300 p-2 rounded">
-                                            <option value="no">No</option>
-                                            <option value="yes">Yes</option>
+                                    <div className="flex flex-col w-full">
+                                        <label className="text-neutral-600 text-sm mb-1">Primary Account</label>
+                                        <select
+                                            name="isPrimary"
+                                            value={formData.isPrimary}
+                                            onChange={handleChange}
+                                            className="w-full text-sm text-neutral-700 border border-gray-300 p-2 rounded"
+                                        >
+                                            <option value="No">No</option>
+                                            <option value="Yes">Yes</option>
                                         </select>
                                     </div>
 
                                     {/* Add Relationship Button */}
-                                    <div className="flex justify-end">
-                                        <button className="bg-c-teal text-sm text-white px-4 py-2 rounded">
+                                    <div className="col-span-2 flex justify-end">
+                                        <button type="submit" className="bg-c-teal text-sm text-white px-4 py-2 rounded">
                                             Add Relationship
                                         </button>
                                     </div>
-                                </div>
+                                </form>
+
+
 
                                 <BasicTable column={RELATIONSHIPCLUMN} dataTable={formattedRelationshipData} isHeader={false} tableHeight={549} />
 

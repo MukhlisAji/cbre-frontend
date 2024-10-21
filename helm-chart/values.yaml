@@ -1,0 +1,117 @@
+# Default values for helm-chart.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+
+image:
+  repository: oneapp-docker-nonprod.us.artifactory.gcso.cbre.com/oneapp-frontend
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: latest
+
+namespace: ""
+env: dev
+
+imagePullSecrets:
+  - name: jfrogreg
+nameOverride: "oneapp-frontend"
+fullnameOverride: ""
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: false
+  name: "default"
+  # Automatically mount a ServiceAccount's API credentials?
+  automount: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+
+podAnnotations: {}
+podLabels: {}
+
+podSecurityContext:
+  fsGroup: 1000
+
+securityContext:
+  runAsNonRoot: true
+  runAsUser: 1000
+  runAsGroup: 1000
+  allowPrivilegeEscalation: false
+
+service:
+  type: ClusterIP
+  port: 8080
+
+ingress:
+  enabled: true
+  className: "nginx-public"
+  annotations: {}
+  hosts:
+    - host: one-uat.cbre.com.sg
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+          backend:
+            service: oneapp-frontend
+            port:
+              number: 8080
+  tls: []
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
+
+resources:
+  limits:
+    cpu: "500m"
+    memory: "512Mi"
+  requests:
+    cpu: "250m"
+    memory: "256Mi"
+
+# livenessProbe:
+#   httpGet:
+#     path: /
+#     port: http
+# readinessProbe:
+#   httpGet:
+#     path: /
+#     port: http
+
+autoscaling:
+  enabled: true
+  minReplicas: 1
+  maxReplicas: 2
+  targetCPUUtilizationPercentage: 80
+  targetMemoryUtilizationPercentage: 80
+
+configmap:
+  enable: true
+  data:
+    VITE_MAPBOX_KEY: pk.eyJ1IjoicmFqaWZtYWhlbmRyYSIsImEiOiJjbHVjYTI2d2MwcnBzMmxxbndnMnNlNTUyIn0.aaCGYQ2OYIcIsAa4X-ILDA
+    VITE_MAPBOX_API: https://92114d4ab876.ngrok.app
+    VITE_PROPERTY_SERVICE: https://one-uat.cbre.com.sg/cbre/property
+    VITE_CONTACT_SERVICE: https://one-uat.cbre.com.sg/cbre/contact
+    VITE_UTILITIES_SERVICE: https://one-uat.cbre.com.sg/cbre/contact
+    VITE_ACCOUNT_SERVICE=: https://one-uat.cbre.com.sg/cbre/account
+
+# Additional volumes on the output Deployment definition.
+volumes: []
+# - name: foo
+#   secret:
+#     secretName: mysecret
+#     optional: false
+
+# Additional volumeMounts on the output Deployment definition.
+volumeMounts: []
+# - name: foo
+#   mountPath: "/etc/foo"
+#   readOnly: true
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}

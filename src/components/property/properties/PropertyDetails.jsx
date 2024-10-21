@@ -61,13 +61,13 @@ export default function PropertyDetails() {
     };
 
     if (!propertyInfo || !propertyInfo.basicInformation || !propertyInfo.generalInformation) {
-        return <div>Loading...</div>; // You can display a loading indicator or a message
+        return <div className='p-4'>Loading...</div>; // You can display a loading indicator or a message
     }
 
     return (
         <div className="bg-neutral-100">
             {/* Header Section */}
-            <div className="bg-white shadow-md rounded-lg p-6 mb-4">
+            <div className="bg-white shadow-md rounded-lg p-4 mb-4">
                 <div className="grid grid-cols-12 gap-6 items-start">
 
                     {/* Left Section - Property Image */}
