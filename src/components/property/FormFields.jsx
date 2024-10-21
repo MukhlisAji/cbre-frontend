@@ -341,7 +341,7 @@ export const AutocompleteField = ({
             } else {
                 setShowDropdown(false);
             }
-        }, 300); // Reduced debounce time to 300ms for a snappier experience
+        }, 200); // Reduced debounce time to 300ms for a snappier experience
 
         debouncedSearch();
 
@@ -368,7 +368,7 @@ export const AutocompleteField = ({
         if (multiple) {
             onChange(newSelectedOptions.map(opt => opt.id));
         } else {
-            onChange(option.id);
+            onChange(option);
         }
     };
 
