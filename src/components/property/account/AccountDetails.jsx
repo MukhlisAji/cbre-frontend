@@ -9,6 +9,7 @@ import { RiContactsBook3Line, RiErrorWarningFill } from 'react-icons/ri';
 import { IoMdArrowDropdown } from 'react-icons/io';
 import { IoCheckmarkCircleOutline } from 'react-icons/io5';
 import { CONFIG } from '../../../config';
+import { generateTransactionId } from '../../lib/api/Authorization';
 
 function classNames(...classes) {
     return classes.filter(Boolean).join(' ');
@@ -22,6 +23,47 @@ export default function AccountDetails() {
     const [billingAddressVisible, setBillingAddressVisible] = useState(true);
     const [shippingAddressVisible, setShippingAddressVisible] = useState(true);
     const [otherInformationVisible, setOtherInformationVisible] = useState(true);
+    const [segmentationVisible, setSegmentationVisible] = useState(true);
+    const [additionalInformationVisible, setAdditionalInformationVisible] = useState(true);
+    const [systemInformationVisible, setSystemInformationVisible] = useState(false);
+    const [tooltipVisible, setTooltipVisible] = useState(false);
+    const [parentAccountInfo, setParentAccountInfo] = useState('');
+
+    const fetchParentAccountInfo = async (parentId) => {
+        try {
+            const response = await fetch(`${CONFIG.ACCOUNT_SERVICE}/${parentId}`);
+            const data = await response.json();
+            setParentAccountInfo(data.resultSet);
+            setTooltipVisible(true);
+            console.log(" tooltip ");
+        } catch (error) {
+            console.error('Error fetching account data:', error);
+        }
+    };
+
+
+    const handleParentAccountClick = () => {
+        const parentId = accountData.parentAccount?.id;
+        if (parentId) {
+            fetchParentAccountInfo(parentId);
+            // setTooltipVisible(true);
+        }
+    };
+
+    // Optional: Hide the tooltip when clicked outside
+    const handleClickOutside = (e) => {
+        if (tooltipVisible && !e.target.closest('.tooltip')) {
+            setTooltipVisible(false);
+        }
+    };
+
+    useEffect(() => {
+        document.addEventListener('click', handleClickOutside);
+        return () => {
+            document.removeEventListener('click', handleClickOutside);
+        };
+    }, [tooltipVisible]);
+
 
 
 
@@ -57,6 +99,15 @@ export default function AccountDetails() {
                 break;
             case 'otherInformation':
                 setOtherInformationVisible((prev) => !prev);
+                break;
+            case 'segmentation':
+                setSegmentationVisible((prev) => !prev);
+                break;
+            case 'additionalInformation':
+                setAdditionalInformationVisible((prev) => !prev);
+                break;
+            case 'systemInformation':
+                setSystemInformationVisible((prev) => !prev);
                 break;
             default:
                 console.log(`Section '${section}' not handled`);
@@ -145,29 +196,73 @@ export default function AccountDetails() {
                             <div className='ml-3 mb-6'>
                                 <div className="grid grid-cols-2 gap-y-2 md:gap-x-12 mb-4 mr-4">
                                     {[
-                                        { label: 'Account Name', value: accountData.accountName },
-                                        { label: 'Local Account Name', value: accountData.localAccountName },
-                                        { label: 'Phone', value: accountData.phone },
-                                        { label: 'Fax', value: accountData.fax },
-                                        { label: 'Website', value: accountData.website, isLink: true },
-                                        { label: 'Status', value: accountData.status }
+                                        { label: 'Account Name', value: accountData.accountName || '-' },
+                                        { label: 'Local Account Name', value: accountData.localAccountName || '-' },
+                                        { label: 'Phone', value: accountData.phone || '-' },
+                                        { label: 'Fax', value: accountData.fax || '-' },
+                                        { label: 'Website', value: accountData.website || '-', isLink: true },
+                                        { label: 'Status', value: accountData.status || '-' },
+                                        {
+                                            label: 'Parent Account',
+                                            value: accountData.parentAccount?.name || '-',
+                                            isLink: true,
+                                            onClick: handleParentAccountClick
+                                        },
+                                        { label: 'Client Type', value: (accountData.clientType.length > 0 ? accountData.clientType.map(type => type.name).join(', ') : '-') || '-' }
                                     ].map((item, index) => (
-                                        item.value && (
-                                            <div key={index} className="flex justify-between border-b pb-1">
-                                                <div className="flex flex-col mt-auto">
-                                                    <label className="text-neutral-600 text-sm mb-1">{item.label}</label>
-                                                    {item.isLink ? (
-                                                        <a href={`http://${item.value}`} className="text-green-700 hover:text-c-teal" target="_blank" rel="noopener noreferrer">{item.value}</a>
-                                                    ) : (
-                                                        <input type="text" value={item.value} className="text-green-700 w-full hover:text-c-teal text-sm" readOnly />
-                                                    )}
-                                                </div>
+                                        <div key={index} className="flex justify-between border-b pb-1">
+                                            <div className="flex w-full flex-col mt-auto">
+                                                <label className="text-neutral-600 text-sm mb-1">{item.label}</label>
+                                                {item.isLink ? (
+                                                    <input
+                                                        onClick={item.onClick} // Call the click handler
+                                                        type="text"
+                                                        value={item.value}
+                                                        className="text-green-700 w-full cursor-pointer focus:outline-none border-none hover:text-c-teal text-sm"
+                                                        readOnly
+                                                    />
+                                                ) : (
+                                                    <input
+                                                        type="text"
+                                                        value={item.value}
+                                                        className="text-green-700 w-full hover:text-c-teal text-sm"
+                                                        readOnly
+                                                    />
+                                                )}
+
                                             </div>
-                                        )
+                                        </div>
+
                                     ))}
+                                    {tooltipVisible &&  (
+                                        <div className="absolute h-72 bg-white border border-gray-300 rounded-md shadow-lg p-4 z-10">
+                                            {parentAccountInfo? (
+                                            <div className="flex flex-col">
+                                                <h3 className="font-bold text-lg mb-2">{parentAccountInfo.accountName || '-'}</h3>
+                                                <p className="text-sm text-gray-600"><strong>ID:</strong> {parentAccountInfo.id || '-'}</p>
+                                                <p className="text-sm text-gray-600"><strong>Phone:</strong> {parentAccountInfo.phone || '-'}</p>
+                                                <p className="text-sm text-gray-600"><strong>Status:</strong> {parentAccountInfo.status || '-'}</p>
+                                                <p className="text-sm text-gray-600"><strong>Billing Address:</strong></p>
+                                                <p className="text-sm text-gray-600">
+                                                    {parentAccountInfo.billingStreet || '-'},
+                                                    {parentAccountInfo.billingCity || '-'},
+                                                    {parentAccountInfo.billingState || '-'},
+                                                    {parentAccountInfo.billingPostCode || '-'}
+                                                </p>
+                                                <p className="text-sm text-gray-600"><strong>Created By:</strong> {parentAccountInfo.createdBy || '-'}</p>
+                                                <p className="text-sm text-gray-600"><strong>Created Date:</strong> {parentAccountInfo.createdDate || '-'}</p>
+                                                <p className="text-sm text-gray-600"><strong>Last Modified By:</strong> {parentAccountInfo.modifiedBy || '-'}</p>
+                                                <p className="text-sm text-gray-600"><strong>Last Modified Date:</strong> {parentAccountInfo.modifiedDate || '-'}</p>
+                                            </div>) : (
+                                                <div className='p-4'>Loading...</div>
+                                            )}
+                                        </div>
+                                    )}
+
                                 </div>
                             </div>
                         )}
+
                     </div>
 
                     {/* Address Section */}
@@ -184,25 +279,24 @@ export default function AccountDetails() {
                                 <div className='ml-3 mb-6'>
                                     <div className="flex flex-col gap-4">
                                         {[
-                                            { label: 'Street', value: accountData.billingStreet },
-                                            { label: 'City', value: accountData.billingCity },
-                                            { label: 'State', value: accountData.billingState },
-                                            { label: 'Post Code', value: accountData.billingPostCode },
-                                            { label: 'Country', value: accountData.billingCountry?.countryName }
+                                            { label: 'Street', value: accountData.billingStreet || '-' },
+                                            { label: 'City', value: accountData.billingCity || '-' },
+                                            { label: 'State', value: accountData.billingState || '-' },
+                                            { label: 'Post Code', value: accountData.billingPostCode || '-' },
+                                            { label: 'Country', value: accountData.billingCountry?.countryName || '-' }
                                         ].map((item, index) => (
-                                            item.value && (
-                                                <div key={index} className="flex justify-between border-b pb-1">
-                                                    <div className="flex flex-col mt-auto">
-                                                        <label className="text-neutral-600 text-sm mb-1">{item.label}</label>
-                                                        <input type="text" value={item.value} className="w-full text-sm text-neutral-700" readOnly />
-                                                    </div>
+                                            <div key={index} className="flex justify-between border-b pb-1">
+                                                <div className="flex flex-col mt-auto">
+                                                    <label className="text-neutral-600 text-sm mb-1">{item.label}</label>
+                                                    <input type="text" value={item.value} className="w-full text-sm text-neutral-700" readOnly />
                                                 </div>
-                                            )
+                                            </div>
                                         ))}
                                     </div>
                                 </div>
                             )}
                         </div>
+
 
                         {/* Shipping Address */}
                         <div className="flex-1">
@@ -216,73 +310,119 @@ export default function AccountDetails() {
                                 <div className='ml-3 mb-6'>
                                     <div className="flex flex-col gap-4">
                                         {[
-                                            { label: 'Street', value: accountData.shippingStreet },
-                                            { label: 'City', value: accountData.shippingCity },
-                                            { label: 'State', value: accountData.shippingState },
-                                            { label: 'Post Code', value: accountData.shippingPostCode },
-                                            { label: 'Country', value: accountData.shippingCountry?.countryName }
+                                            { label: 'Street', value: accountData.shippingStreet || '-' },
+                                            { label: 'City', value: accountData.shippingCity || '-' },
+                                            { label: 'State', value: accountData.shippingState || '-' },
+                                            { label: 'Post Code', value: accountData.shippingPostCode || '-' },
+                                            { label: 'Country', value: accountData.shippingCountry?.countryName || '-' }
                                         ].map((item, index) => (
-                                            item.value && (
-                                                <div key={index} className="flex justify-between border-b pb-1">
-                                                    <div className="flex flex-col mt-auto">
-                                                        <label className="text-neutral-600 text-sm mb-1">{item.label}</label>
-                                                        <input type="text" value={item.value} className="w-full text-sm text-neutral-700" readOnly />
-                                                    </div>
+                                            <div key={index} className="flex justify-between border-b pb-1">
+                                                <div className="flex flex-col mt-auto">
+                                                    <label className="text-neutral-600 text-sm mb-1">{item.label}</label>
+                                                    <input type="text" value={item.value} className="w-full text-sm text-neutral-700" readOnly />
                                                 </div>
-                                            )
+                                            </div>
                                         ))}
                                     </div>
                                 </div>
                             )}
                         </div>
+
                     </div>
 
-                    {/* Other Information */}
+                    {/* Segmentation Section */}
                     <div className="mb-4">
-                        <div className="flex bg-neutral-100 mb-2 justify-between items-center cursor-pointer" onClick={() => toggleVisibility('otherInformation')}>
+                        <div className="flex bg-neutral-100 mb-2 justify-between items-center cursor-pointer" onClick={() => toggleVisibility('segmentation')}>
                             <h2 className="text-md font-semibold text-neutral-700">
-                                <span className='text-sm'>{otherInformationVisible ? '▼' : '►'}</span> Other Information
+                                <span className='text-sm'>{segmentationVisible ? '▼' : '►'}</span> Segmentation
                             </h2>
-                            <span>{otherInformationVisible ? '-' : '+'}</span>
+                            <span>{segmentationVisible ? '-' : '+'}</span>
                         </div>
-                        {otherInformationVisible && (
+                        {segmentationVisible && (
                             <div className='ml-3 mb-6'>
                                 <div className="flex flex-col gap-4">
                                     {[
-                                        { label: 'Industry', value: accountData.industry },
-                                        { label: 'Account Type', value: accountData.accountType },
-                                        { label: 'Relationship Start Date', value: accountData.relationshipStartDate },
-                                        { label: 'Relationship End Date', value: accountData.relationshipEndDate }
-                                    ].some(item => item.value) ? ( // Check if at least one value is not empty
-                                        // Render the details if at least one value exists
-                                        <>
-                                            {[
-                                                { label: 'Industry', value: accountData.industry },
-                                                { label: 'Account Type', value: accountData.accountType },
-                                                { label: 'Relationship Start Date', value: accountData.relationshipStartDate },
-                                                { label: 'Relationship End Date', value: accountData.relationshipEndDate }
-                                            ].map((item, index) => (
-                                                item.value && ( // Only render items with values
-                                                    <div key={index} className="flex justify-between border-b pb-1">
-                                                        <div className="flex flex-col mt-auto">
-                                                            <label className="text-neutral-600 text-sm mb-1">{item.label}</label>
-                                                            <input type="text" value={item.value} className="w-full text-sm text-neutral-700" readOnly />
-                                                        </div>
-                                                    </div>
-                                                )
-                                            ))}
-                                        </>
-                                    ) : (
-                                        // Render "No Information Available" if all values are empty
-                                        <div className="text-neutral-500 text-sm">No Information Available</div>
-                                    )}
+                                        { label: 'Industrial Type', value: accountData.industrialType?.name || '-' },
+                                        { label: 'Sub Industry', value: accountData.subIndustrial?.name || '-' },
+                                        { label: 'Headquarter Country', value: accountData.headQuarter?.countryName || '-' },
+                                        { label: 'Commercial Number', value: accountData.commercialNumber || '-' }
+                                    ].map((item, index) => (
+                                        <div key={index} className="flex justify-between border-b pb-1">
+                                            <div className="flex flex-col mt-auto">
+                                                <label className="text-neutral-600 text-sm mb-1">{item.label}</label>
+                                                <input type="text" value={item.value} className="w-full text-sm text-neutral-700" readOnly />
+                                            </div>
+                                        </div>
+                                    ))}
                                 </div>
+
                             </div>
                         )}
+                    </div>
 
+                    {/* Additional Information Section */}
+                    <div className="mb-4">
+                        <div className="flex bg-neutral-100 mb-2 justify-between items-center cursor-pointer" onClick={() => toggleVisibility('additionalInformation')}>
+                            <h2 className="text-md font-semibold text-neutral-700">
+                                <span className='text-sm'>{additionalInformationVisible ? '▼' : '►'}</span> Additional Information
+                            </h2>
+                            <span>{additionalInformationVisible ? '-' : '+'}</span>
+                        </div>
+                        {additionalInformationVisible && (
+                            <div className='ml-3 mb-6'>
+                                <div className="flex flex-col gap-4">
+                                    {[
+                                        { label: 'Tax Type', value: accountData.taxType || '-' },
+                                        { label: 'Tax ID', value: accountData.taxId || '-' },
+                                        { label: 'Description', value: accountData.description || '-' }
+                                    ].map((item, index) => (
+                                        <div key={index} className="flex justify-between border-b pb-1">
+                                            <div className="flex flex-col mt-auto">
+                                                <label className="text-neutral-600 text-sm mb-1">{item.label}</label>
+                                                <input type="text" value={item.value} className="w-full text-sm text-neutral-700" readOnly />
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+
+                            </div>
+                        )}
+                    </div>
+                    {/* System Information Section */}
+                    <div className="mb-4">
+                        <div className="flex bg-neutral-100 mb-2 justify-between items-center cursor-pointer" onClick={() => toggleVisibility('systemInformation')}>
+                            <h2 className="text-md font-semibold text-neutral-700">
+                                <span className='text-sm'>{systemInformationVisible ? '▼' : '►'}</span> System Information
+                            </h2>
+                            <span>{systemInformationVisible ? '-' : '+'}</span>
+                        </div>
+                        {systemInformationVisible && (
+                            <div className='ml-3 mb-6'>
+                                <div className="flex flex-col gap-4">
+                                    {[
+                                        { label: 'Account Owner', value: accountData.accountOwner.length > 0 ? accountData.accountOwner[0].employee?.givenName + ' ' + accountData.accountOwner[0].employee?.surName : '-' },
+                                        { label: 'Created By', value: accountData.createdBy || '-' },
+                                        { label: 'Created Date', value: accountData.createdDate || '-' },
+                                        { label: 'Last Modified By', value: accountData.modifiedBy || '-' },
+                                        { label: 'Last Modified Date', value: accountData.modifiedDate || '-' },
+                                        { label: 'Status', value: accountData.status || '-' },
+                                        { label: 'Inactivation Date', value: accountData.inactivationDate || '-' },
+                                        { label: 'Reason for Inactivating', value: accountData.reasonForInactivating || '-' }
+                                    ].map((item, index) => (
+                                        <div key={index} className="flex justify-between border-b pb-1">
+                                            <div className="flex flex-col mt-auto">
+                                                <label className="text-neutral-600 text-sm mb-1">{item.label}</label>
+                                                <input type="text" value={item.value} className="w-full text-sm text-neutral-700" readOnly />
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+
+                            </div>
+                        )}
                     </div>
                 </div>
-            </div>
+            </div >
 
         </div >
     );
