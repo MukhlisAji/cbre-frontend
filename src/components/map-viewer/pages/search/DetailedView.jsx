@@ -30,7 +30,7 @@ export default function DetailedView({ building, onClose}) {
             console.log("halo")
             //CHANGE THIS INTO BUILDING.BUILDINGID LATER
             console.log(`${CONFIG.MAPBOX_API}`)
-            const res = await fetch(`https://f02bd3e019b7.ngrok.app/cbre/map/near-aminities/163`, {
+            const res = await fetch(`http://localhost:3000/cbre/map/near-aminities/163`, {
             method: "GET",
             });
             const others = await res.json();
