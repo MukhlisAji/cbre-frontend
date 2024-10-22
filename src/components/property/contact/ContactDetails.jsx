@@ -125,7 +125,7 @@ const ContactDetails = () => {
         console.log("data ", formData);
 
         try {
-            const response = await fetch('https://f0f939365c3d.ngrok.app/cbre/contact/relationship', {
+            const response = await fetch(`${CONFIG.CONTACT_SERVICE}/relationship`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
