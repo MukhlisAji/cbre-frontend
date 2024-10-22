@@ -35,6 +35,7 @@ import SpaceTemplate from "./components/data-entry/SpaceTemplate";
 import DataEntryLayout from "./components/shared/DataEntryLayout";
 import Layout from "./components/shared/Layout";
 import MapViewer from "./components/map-viewer/pages/MapViewer";
+import PowerBI from "./components/analytics/pages/PowerBI";
 import PropertyLayout from "./components/property/PropertyLayout";
 import Account from "./components/property/account/Account";
 import Contact from "./components/property/contact/Contact";
@@ -84,6 +85,7 @@ function App() {
 
               </Route>
               <Route path="map" element={<MapViewer />} />
+              <Route path="analytics-and-visualization" element={<PowerBI />} />
               <Route path="search/result" element={<GlobalSearchResult />} />
 
               <Route path="*" element={<NotFound />} />
