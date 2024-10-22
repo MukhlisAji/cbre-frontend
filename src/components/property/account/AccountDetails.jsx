@@ -18,10 +18,10 @@ export default function AccountDetails() {
     const [selectedIndex, setSelectedIndex] = useState(0);
     const { id } = useParams();
     const [accountData, setAccountData] = useState(null);
-    const [accountInformationVisible, setAccountInformationVisible] = useState(false);
-    const [billingAddressVisible, setBillingAddressVisible] = useState(false);
-    const [shippingAddressVisible, setShippingAddressVisible] = useState(false);
-    const [otherInformationVisible, setOtherInformationVisible] = useState(false);
+    const [accountInformationVisible, setAccountInformationVisible] = useState(true);
+    const [billingAddressVisible, setBillingAddressVisible] = useState(true);
+    const [shippingAddressVisible, setShippingAddressVisible] = useState(true);
+    const [otherInformationVisible, setOtherInformationVisible] = useState(true);
 
 
 
@@ -66,7 +66,9 @@ export default function AccountDetails() {
 
 
     if (!accountData) {
-        return <div>Loading...</div>;  // Show a loading state while data is fetched
+        return <div style={{ height: `calc(100vh - 200px)` }} className="flex items-center justify-center">
+            <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-c-teal"></div>
+        </div>
     }
 
     return (
@@ -126,12 +128,11 @@ export default function AccountDetails() {
 
 
             {/* Details Section */}
-            {/* Details Section */}
             <div className="bg-white shadow-md p-4 rounded-md overflow-y-auto">
                 <div className='border-b border-b-neutral-300 mb-4'>
                     <div className="w-14 text-md font-bold border-b-2 border-c-dark-grayish">Details</div>
                 </div>
-                <div className='overflow-y-auto h-[calc(100vh-380px)]' >
+                <div className='overflow-y-auto h-[calc(100vh-380px)]'>
                     {/* Account Information */}
                     <div className="mb-4">
                         <div className="flex bg-neutral-100 mb-2 justify-between items-center cursor-pointer" onClick={() => toggleVisibility('accountInformation')}>
@@ -143,137 +144,97 @@ export default function AccountDetails() {
                         {accountInformationVisible && (
                             <div className='ml-3 mb-6'>
                                 <div className="grid grid-cols-2 gap-y-2 md:gap-x-12 mb-4 mr-4">
-                                    <div className="flex justify-between border-b pb-1">
-                                        <div className="flex flex-col mt-auto">
-                                            <label className="text-neutral-600 text-sm mb-1">Account Name</label>
-                                            <a href="#" className="text-green-700 hover:text-c-teal text-sm">{accountData.accountName}</a>
-                                        </div>
-                                    </div>
-                                    <div className="flex justify-between border-b pb-1">
-                                        <div className="flex flex-col">
-                                            <label className="text-neutral-600 text-sm mb-1">Local Account Name</label>
-                                            <input type="text" value={accountData.localAccountName} className="w-full text-sm text-neutral-700" readOnly />
-                                        </div>
-                                    </div>
-                                    <div className="flex justify-between border-b pb-1">
-                                        <div className="flex flex-col mt-auto">
-                                            <label className="text-neutral-600 text-sm mb-1">Phone</label>
-                                            <input type="text" value={accountData.phone} className="w-full text-sm text-neutral-700" readOnly />
-                                        </div>
-                                    </div>
-                                    <div className="flex justify-between border-b pb-1">
-                                        <div className="flex flex-col mt-auto">
-                                            <label className="text-neutral-600 text-sm mb-1">Fax</label>
-                                            <input type="text" value={accountData.fax} className="w-full text-sm text-neutral-700" readOnly />
-                                        </div>
-                                    </div>
-                                    <div className="flex justify-between border-b pb-1">
-                                        <div className="flex flex-col mt-auto">
-                                            <label className="text-neutral-600 text-sm mb-1">Website</label>
-                                            <a href={`http://${accountData.website}`} className="text-green-700 hover:text-c-teal" target="_blank" rel="noopener noreferrer">{accountData.website}</a>
-                                        </div>
-                                    </div>
-                                    <div className="flex justify-between border-b pb-1">
-                                        <div className="flex flex-col mt-auto">
-                                            <label className="text-neutral-600 text-sm mb-1">Status</label>
-                                            <input type="text" value={accountData.status} className="w-full text-sm text-neutral-700" readOnly />
-                                        </div>
-                                    </div>
+                                    {[
+                                        { label: 'Account Name', value: accountData.accountName },
+                                        { label: 'Local Account Name', value: accountData.localAccountName },
+                                        { label: 'Phone', value: accountData.phone },
+                                        { label: 'Fax', value: accountData.fax },
+                                        { label: 'Website', value: accountData.website, isLink: true },
+                                        { label: 'Status', value: accountData.status }
+                                    ].map((item, index) => (
+                                        item.value && (
+                                            <div key={index} className="flex justify-between border-b pb-1">
+                                                <div className="flex flex-col mt-auto">
+                                                    <label className="text-neutral-600 text-sm mb-1">{item.label}</label>
+                                                    {item.isLink ? (
+                                                        <a href={`http://${item.value}`} className="text-green-700 hover:text-c-teal" target="_blank" rel="noopener noreferrer">{item.value}</a>
+                                                    ) : (
+                                                        <input type="text" value={item.value} className="text-green-700 w-full hover:text-c-teal text-sm" readOnly />
+                                                    )}
+                                                </div>
+                                            </div>
+                                        )
+                                    ))}
                                 </div>
                             </div>
                         )}
                     </div>
 
-                    {/* Billing Address */}
-                    <div className="mb-4">
-                        <div className="flex bg-neutral-100 mb-2 justify-between items-center cursor-pointer" onClick={() => toggleVisibility('billingAddress')}>
-                            <h2 className="text-md font-semibold text-neutral-700">
-                                <span className='text-sm'>{billingAddressVisible ? '▼' : '►'}</span> Billing Address
-                            </h2>
-                            <span>{billingAddressVisible ? '-' : '+'}</span>
-                        </div>
-                        {billingAddressVisible && (
-                            <div className='ml-3 mb-6'>
-                                <div className="flex flex-col gap-4">
-                                    <div className="flex justify-between border-b pb-1">
-                                        <div className="flex flex-col mt-auto">
-                                            <label className="text-neutral-600 text-sm mb-1">Street</label>
-                                            <input type="text" value={accountData.billingStreet} className="w-full text-sm text-neutral-700" readOnly />
-                                        </div>
-                                    </div>
-                                    <div className="flex justify-between border-b pb-1">
-                                        <div className="flex flex-col mt-auto">
-                                            <label className="text-neutral-600 text-sm mb-1">City</label>
-                                            <input type="text" value={accountData.billingCity} className="w-full text-sm text-neutral-700" readOnly />
-                                        </div>
-                                    </div>
-                                    <div className="flex justify-between border-b pb-1">
-                                        <div className="flex flex-col mt-auto">
-                                            <label className="text-neutral-600 text-sm mb-1">State</label>
-                                            <input type="text" value={accountData.billingState} className="w-full text-sm text-neutral-700" readOnly />
-                                        </div>
-                                    </div>
-                                    <div className="flex justify-between border-b pb-1">
-                                        <div className="flex flex-col mt-auto">
-                                            <label className="text-neutral-600 text-sm mb-1">Post Code</label>
-                                            <input type="text" value={accountData.billingPostCode} className="w-full text-sm text-neutral-700" readOnly />
-                                        </div>
-                                    </div>
-                                    <div className="flex justify-between border-b pb-1">
-                                        <div className="flex flex-col mt-auto">
-                                            <label className="text-neutral-600 text-sm mb-1">Country</label>
-                                            <input type="text" value={accountData.billingCountry.countryName} className="w-full text-sm text-neutral-700" readOnly />
-                                        </div>
+                    {/* Address Section */}
+                    <div className="flex space-x-4 mb-4">
+                        {/* Billing Address */}
+                        <div className="flex-1">
+                            <div className="flex bg-neutral-100 mb-2 justify-between items-center cursor-pointer" onClick={() => toggleVisibility('billingAddress')}>
+                                <h2 className="text-md font-semibold text-neutral-700">
+                                    <span className='text-sm'>{billingAddressVisible ? '▼' : '►'}</span> Billing Address
+                                </h2>
+                                <span>{billingAddressVisible ? '-' : '+'}</span>
+                            </div>
+                            {billingAddressVisible && (
+                                <div className='ml-3 mb-6'>
+                                    <div className="flex flex-col gap-4">
+                                        {[
+                                            { label: 'Street', value: accountData.billingStreet },
+                                            { label: 'City', value: accountData.billingCity },
+                                            { label: 'State', value: accountData.billingState },
+                                            { label: 'Post Code', value: accountData.billingPostCode },
+                                            { label: 'Country', value: accountData.billingCountry?.countryName }
+                                        ].map((item, index) => (
+                                            item.value && (
+                                                <div key={index} className="flex justify-between border-b pb-1">
+                                                    <div className="flex flex-col mt-auto">
+                                                        <label className="text-neutral-600 text-sm mb-1">{item.label}</label>
+                                                        <input type="text" value={item.value} className="w-full text-sm text-neutral-700" readOnly />
+                                                    </div>
+                                                </div>
+                                            )
+                                        ))}
                                     </div>
                                 </div>
-                            </div>
-                        )}
-                    </div>
+                            )}
+                        </div>
 
-                    {/* Shipping Address */}
-                    <div className="mb-4">
-                        <div className="flex bg-neutral-100 mb-2 justify-between items-center cursor-pointer" onClick={() => toggleVisibility('shippingAddress')}>
-                            <h2 className="text-md font-semibold text-neutral-700">
-                                <span className='text-sm'>{shippingAddressVisible ? '▼' : '►'}</span> Shipping Address
-                            </h2>
-                            <span>{shippingAddressVisible ? '-' : '+'}</span>
-                        </div>
-                        {shippingAddressVisible && (
-                            <div className='ml-3 mb-6'>
-                                <div className="flex flex-col gap-4">
-                                    <div className="flex justify-between border-b pb-1">
-                                        <div className="flex flex-col mt-auto">
-                                            <label className="text-neutral-600 text-sm mb-1">Street</label>
-                                            <input type="text" value={accountData.shippingStreet} className="w-full text-sm text-neutral-700" readOnly />
-                                        </div>
-                                    </div>
-                                    <div className="flex justify-between border-b pb-1">
-                                        <div className="flex flex-col mt-auto">
-                                            <label className="text-neutral-600 text-sm mb-1">City</label>
-                                            <input type="text" value={accountData.shippingCity} className="w-full text-sm text-neutral-700" readOnly />
-                                        </div>
-                                    </div>
-                                    <div className="flex justify-between border-b pb-1">
-                                        <div className="flex flex-col mt-auto">
-                                            <label className="text-neutral-600 text-sm mb-1">State</label>
-                                            <input type="text" value={accountData.shippingState} className="w-full text-sm text-neutral-700" readOnly />
-                                        </div>
-                                    </div>
-                                    <div className="flex justify-between border-b pb-1">
-                                        <div className="flex flex-col mt-auto">
-                                            <label className="text-neutral-600 text-sm mb-1">Post Code</label>
-                                            <input type="text" value={accountData.shippingPostCode} className="w-full text-sm text-neutral-700" readOnly />
-                                        </div>
-                                    </div>
-                                    <div className="flex justify-between border-b pb-1">
-                                        <div className="flex flex-col mt-auto">
-                                            <label className="text-neutral-600 text-sm mb-1">Country</label>
-                                            <input type="text" value={accountData.shippingCountry.countryName} className="w-full text-sm text-neutral-700" readOnly />
-                                        </div>
+                        {/* Shipping Address */}
+                        <div className="flex-1">
+                            <div className="flex bg-neutral-100 mb-2 justify-between items-center cursor-pointer" onClick={() => toggleVisibility('shippingAddress')}>
+                                <h2 className="text-md font-semibold text-neutral-700">
+                                    <span className='text-sm'>{shippingAddressVisible ? '▼' : '►'}</span> Shipping Address
+                                </h2>
+                                <span>{shippingAddressVisible ? '-' : '+'}</span>
+                            </div>
+                            {shippingAddressVisible && (
+                                <div className='ml-3 mb-6'>
+                                    <div className="flex flex-col gap-4">
+                                        {[
+                                            { label: 'Street', value: accountData.shippingStreet },
+                                            { label: 'City', value: accountData.shippingCity },
+                                            { label: 'State', value: accountData.shippingState },
+                                            { label: 'Post Code', value: accountData.shippingPostCode },
+                                            { label: 'Country', value: accountData.shippingCountry?.countryName }
+                                        ].map((item, index) => (
+                                            item.value && (
+                                                <div key={index} className="flex justify-between border-b pb-1">
+                                                    <div className="flex flex-col mt-auto">
+                                                        <label className="text-neutral-600 text-sm mb-1">{item.label}</label>
+                                                        <input type="text" value={item.value} className="w-full text-sm text-neutral-700" readOnly />
+                                                    </div>
+                                                </div>
+                                            )
+                                        ))}
                                     </div>
                                 </div>
-                            </div>
-                        )}
+                            )}
+                        </div>
                     </div>
 
                     {/* Other Information */}
@@ -287,33 +248,38 @@ export default function AccountDetails() {
                         {otherInformationVisible && (
                             <div className='ml-3 mb-6'>
                                 <div className="flex flex-col gap-4">
-                                    <div className="flex justify-between border-b pb-1">
-                                        <div className="flex flex-col mt-auto">
-                                            <label className="text-neutral-600 text-sm mb-1">Industry</label>
-                                            <input type="text" value={accountData.industry} className="w-full text-sm text-neutral-700" readOnly />
-                                        </div>
-                                    </div>
-                                    <div className="flex justify-between border-b pb-1">
-                                        <div className="flex flex-col mt-auto">
-                                            <label className="text-neutral-600 text-sm mb-1">Account Type</label>
-                                            <input type="text" value={accountData.accountType} className="w-full text-sm text-neutral-700" readOnly />
-                                        </div>
-                                    </div>
-                                    <div className="flex justify-between border-b pb-1">
-                                        <div className="flex flex-col mt-auto">
-                                            <label className="text-neutral-600 text-sm mb-1">Relationship Start Date</label>
-                                            <input type="text" value={accountData.relationshipStartDate} className="w-full text-sm text-neutral-700" readOnly />
-                                        </div>
-                                    </div>
-                                    <div className="flex justify-between border-b pb-1">
-                                        <div className="flex flex-col mt-auto">
-                                            <label className="text-neutral-600 text-sm mb-1">Relationship End Date</label>
-                                            <input type="text" value={accountData.relationshipEndDate} className="w-full text-sm text-neutral-700" readOnly />
-                                        </div>
-                                    </div>
+                                    {[
+                                        { label: 'Industry', value: accountData.industry },
+                                        { label: 'Account Type', value: accountData.accountType },
+                                        { label: 'Relationship Start Date', value: accountData.relationshipStartDate },
+                                        { label: 'Relationship End Date', value: accountData.relationshipEndDate }
+                                    ].some(item => item.value) ? ( // Check if at least one value is not empty
+                                        // Render the details if at least one value exists
+                                        <>
+                                            {[
+                                                { label: 'Industry', value: accountData.industry },
+                                                { label: 'Account Type', value: accountData.accountType },
+                                                { label: 'Relationship Start Date', value: accountData.relationshipStartDate },
+                                                { label: 'Relationship End Date', value: accountData.relationshipEndDate }
+                                            ].map((item, index) => (
+                                                item.value && ( // Only render items with values
+                                                    <div key={index} className="flex justify-between border-b pb-1">
+                                                        <div className="flex flex-col mt-auto">
+                                                            <label className="text-neutral-600 text-sm mb-1">{item.label}</label>
+                                                            <input type="text" value={item.value} className="w-full text-sm text-neutral-700" readOnly />
+                                                        </div>
+                                                    </div>
+                                                )
+                                            ))}
+                                        </>
+                                    ) : (
+                                        // Render "No Information Available" if all values are empty
+                                        <div className="text-neutral-500 text-sm">No Information Available</div>
+                                    )}
                                 </div>
                             </div>
                         )}
+
                     </div>
                 </div>
             </div>
