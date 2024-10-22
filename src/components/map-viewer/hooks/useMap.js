@@ -526,6 +526,9 @@ export function useMap(styleMap, map, zoom, triggerRadius) {
 
       // Append SVG and custom circle to marker element
       el.innerHTML = svg;
+      el.addEventListener('click', () => {
+        setBuild(item)
+      });
 
 
 
@@ -533,19 +536,19 @@ export function useMap(styleMap, map, zoom, triggerRadius) {
       const marker = new mapboxgl.Marker(el);
       console.log(item);
       marker.setLngLat([item.longitude, item.latitude]).addTo(map.current);
-      const popup = new mapboxgl.Popup({ offset: 25 }).setHTML(`
-      <div class="popup-container">
-        <div class="info-box">
-      <h3>${item.buildingName}</h3>
-      <p><strong>Address:</strong> ${item.buildingName}, ${item.streetNumber}, ${item.streetName}</p>
-      <p><strong>Postal Code:</strong> ${item.postalCode}</p>
-      <p><strong>Latitude:</strong> ${item.latitude}</p>
-      <p><strong>Longitude:</strong> ${item.longitude}</p>
-    </div>
-    </div>
-    `);
+    //   const popup = new mapboxgl.Popup({ offset: 25 }).setHTML(`
+    //   <div class="popup-container">
+    //     <div class="info-box">
+    //   <h3>${item.buildingName}</h3>
+    //   <p><strong>Address:</strong> ${item.buildingName}, ${item.streetNumber}, ${item.streetName}</p>
+    //   <p><strong>Postal Code:</strong> ${item.postalCode}</p>
+    //   <p><strong>Latitude:</strong> ${item.latitude}</p>
+    //   <p><strong>Longitude:</strong> ${item.longitude}</p>
+    // </div>
+    // </div>
+    // `);
 
-      marker.setPopup(popup);
+    //   marker.setPopup(popup);
       const mName = document.querySelectorAll(".label-name-map");
       mName.forEach((item) => {
         item.style.display = "none";
