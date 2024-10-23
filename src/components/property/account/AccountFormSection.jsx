@@ -2,402 +2,405 @@ import { debounce } from 'lodash';
 import React, { useEffect, useRef, useState } from 'react';
 import { MdClear } from 'react-icons/md';
 import { CONFIG } from '../../../config';
+import { InputField, AutocompleteField, SingleSelectField, MultipleSelectField } from '../FormFields';
+import { generateTransactionId } from '../../lib/api/Authorization';
 
 
-const InputField = ({
-    label,
-    type = 'text',
-    value,
-    onChange,
-    required = false,
-    disabled = false
-}) => {
-    const handleClear = () => {
-        onChange({ target: { value: '' } });
-    };
 
-    return (
-        <div className="relative">
-            <label className="block text-sm font-medium text-gray-700">
-                {label}{required && <span className="text-red-500">*</span>}
-            </label>
-            <div className="relative">
-                <input
-                    type={type}
-                    value={value}
-                    onChange={onChange}
-                    required={required}
-                    disabled={disabled}
-                    className={`mt-1 block w-full p-1.5 pr-8 border border-gray-300 rounded-md shadow-sm focus:outline-none
-                    focus:ring-1 focus:ring-c-teal hover:ring-1 hover:ring-c-teal ${disabled ? 'bg-gray-100 text-gray-500 cursor-not-allowed' : ''}`}
-                />
-                {value && !disabled && (
-                    <span className="absolute inset-y-0 right-0 pr-3 flex items-center">
-                        <MdClear
-                            onClick={handleClear}
-                            className='text-gray-400 hover:text-gray-600 cursor-pointer'
-                        />
-                    </span>
-                )}
-            </div>
-        </div>
-    );
-};
+// const InputField = ({
+//     label,
+//     type = 'text',
+//     value,
+//     onChange,
+//     required = false,
+//     disabled = false
+// }) => {
+//     const handleClear = () => {
+//         onChange({ target: { value: '' } });
+//     };
 
-const SelectField = ({
-    label,
-    value = [],
-    onChange,
-    options = [],
-    valueField = 'id',
-    labelField = 'label',
-    required = false,
-    disabled = false,
-    initialSearchTerm = '',
-    multiple = false,
-}) => {
-    const [searchTerm, setSearchTerm] = useState(initialSearchTerm);
-    const [showDropdown, setShowDropdown] = useState(false);
-    const [selectedValues, setSelectedValues] = useState(value);
-    const dropdownRef = useRef(null);
+//     return (
+//         <div className="relative">
+//             <label className="block text-sm font-medium text-gray-700">
+//                 {label}{required && <span className="text-red-500">*</span>}
+//             </label>
+//             <div className="relative">
+//                 <input
+//                     type={type}
+//                     value={value}
+//                     onChange={onChange}
+//                     required={required}
+//                     disabled={disabled}
+//                     className={`mt-1 block w-full p-1.5 pr-8 border border-gray-300 rounded-md shadow-sm focus:outline-none
+//                     focus:ring-1 focus:ring-c-teal hover:ring-1 hover:ring-c-teal ${disabled ? 'bg-gray-100 text-gray-500 cursor-not-allowed' : ''}`}
+//                 />
+//                 {value && !disabled && (
+//                     <span className="absolute inset-y-0 right-0 pr-3 flex items-center">
+//                         <MdClear
+//                             onClick={handleClear}
+//                             className='text-gray-400 hover:text-gray-600 cursor-pointer'
+//                         />
+//                     </span>
+//                 )}
+//             </div>
+//         </div>
+//     );
+// };
 
-    // Handle outside click to close dropdown
-    useEffect(() => {
-        const handleClickOutside = (event) => {
-            if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-                setShowDropdown(false);
-            }
-        };
-        document.addEventListener('mousedown', handleClickOutside);
-        return () => {
-            document.removeEventListener('mousedown', handleClickOutside);
-        };
-    }, []);
+// const SelectField = ({
+//     label,
+//     value = [],
+//     onChange,
+//     options = [],
+//     valueField = 'id',
+//     labelField = 'label',
+//     required = false,
+//     disabled = false,
+//     initialSearchTerm = '',
+//     multiple = false,
+// }) => {
+//     const [searchTerm, setSearchTerm] = useState(initialSearchTerm);
+//     const [showDropdown, setShowDropdown] = useState(false);
+//     const [selectedValues, setSelectedValues] = useState(value);
+//     const dropdownRef = useRef(null);
 
-    // Synchronize value with internal state
-    useEffect(() => {
-        if (Array.isArray(value) && value.length > 0) {
-            setSelectedValues(value);
-        } else if (!multiple && value) {
-            const selectedOption = options.find(option => option[valueField] === value);
-            setSearchTerm(selectedOption ? selectedOption[labelField] : '');
-            setSelectedValues([value]);
-        }
-    }, [value, options, multiple, valueField, labelField]);
+//     // Handle outside click to close dropdown
+//     useEffect(() => {
+//         const handleClickOutside = (event) => {
+//             if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+//                 setShowDropdown(false);
+//             }
+//         };
+//         document.addEventListener('mousedown', handleClickOutside);
+//         return () => {
+//             document.removeEventListener('mousedown', handleClickOutside);
+//         };
+//     }, []);
 
-    const handleInputChange = (e) => {
-        setSearchTerm(e.target.value);
-        setShowDropdown(true);
-    };
+//     // Synchronize value with internal state
+//     useEffect(() => {
+//         if (Array.isArray(value) && value.length > 0) {
+//             setSelectedValues(value);
+//         } else if (!multiple && value) {
+//             const selectedOption = options.find(option => option[valueField] === value);
+//             setSearchTerm(selectedOption ? selectedOption[labelField] : '');
+//             setSelectedValues([value]);
+//         }
+//     }, [value, options, multiple, valueField, labelField]);
 
-    const handleOptionClick = (option) => {
-        if (multiple) {
-            const newSelectedValues = selectedValues.includes(option[valueField])
-                ? selectedValues.filter(val => val !== option[valueField])
-                : [...selectedValues, option[valueField]];
+//     const handleInputChange = (e) => {
+//         setSearchTerm(e.target.value);
+//         setShowDropdown(true);
+//     };
 
-            setSelectedValues(newSelectedValues);
-            onChange({ target: { value: newSelectedValues } });
-            setSearchTerm(''); // Reset the search term to an empty string
-            setShowDropdown(true); // Keep the dropdown open for further selections
-        } else {
-            onChange({ target: { value: option[valueField] } });
-            setSearchTerm(option[labelField]);
-            setShowDropdown(false);
-        }
-    };
+//     const handleOptionClick = (option) => {
+//         if (multiple) {
+//             const newSelectedValues = selectedValues.includes(option[valueField])
+//                 ? selectedValues.filter(val => val !== option[valueField])
+//                 : [...selectedValues, option[valueField]];
 
-    const handleInputFocus = () => {
-        setShowDropdown(true);
-    };
+//             setSelectedValues(newSelectedValues);
+//             onChange({ target: { value: newSelectedValues } });
+//             setSearchTerm(''); // Reset the search term to an empty string
+//             setShowDropdown(true); // Keep the dropdown open for further selections
+//         } else {
+//             onChange({ target: { value: option[valueField] } });
+//             setSearchTerm(option[labelField]);
+//             setShowDropdown(false);
+//         }
+//     };
 
-    const removeOption = (optionToRemove) => {
-        const newSelectedValues = selectedValues.filter(val => val !== optionToRemove);
-        setSelectedValues(newSelectedValues);
-        onChange({ target: { value: newSelectedValues } });
-    };
+//     const handleInputFocus = () => {
+//         setShowDropdown(true);
+//     };
 
-    const clearSelection = (e) => {
-        e.stopPropagation(); // Prevent the dropdown from opening
-        setSearchTerm('');
-        setShowDropdown(true);
-        setSelectedValues([]);
-        onChange({ target: { value: null } });
-    };
+//     const removeOption = (optionToRemove) => {
+//         const newSelectedValues = selectedValues.filter(val => val !== optionToRemove);
+//         setSelectedValues(newSelectedValues);
+//         onChange({ target: { value: newSelectedValues } });
+//     };
 
-    const filteredOptions = options.filter(option => {
-        const optionLabel = option[labelField];
-        return typeof optionLabel === 'string' &&
-            typeof searchTerm === 'string' &&
-            optionLabel.toLowerCase().includes(searchTerm.toLowerCase());
-    });
+//     const clearSelection = (e) => {
+//         e.stopPropagation(); // Prevent the dropdown from opening
+//         setSearchTerm('');
+//         setShowDropdown(true);
+//         setSelectedValues([]);
+//         onChange({ target: { value: null } });
+//     };
 
-    return (
-        <div className="relative" ref={dropdownRef}>
-            <label className="block text-sm font-medium text-gray-700">
-                {label}{required && <span className="text-red-500">*</span>}
-            </label>
+//     const filteredOptions = options.filter(option => {
+//         const optionLabel = option[labelField];
+//         return typeof optionLabel === 'string' &&
+//             typeof searchTerm === 'string' &&
+//             optionLabel.toLowerCase().includes(searchTerm.toLowerCase());
+//     });
 
-            {multiple && (
-                <div className="flex flex-wrap gap-2 mb-2">
-                    {selectedValues.map(selectedId => {
-                        const selectedOption = options.find(option => option[valueField] === selectedId);
-                        return selectedOption ? (
-                            <div key={selectedId} className="bg-gray-200 px-2 h-8 py-1 rounded-full flex items-center">
-                                <span>{selectedOption[labelField]}</span>
-                                <span
-                                    onClick={() => removeOption(selectedId)}
-                                    className="ml-2 text-md text-gray-600 hover:text-gray-800 cursor-pointer"
-                                >
-                                    <MdClear />
-                                </span>
-                            </div>
-                        ) : null;
-                    })}
-                </div>
-            )}
+//     return (
+//         <div className="relative" ref={dropdownRef}>
+//             <label className="block text-sm font-medium text-gray-700">
+//                 {label}{required && <span className="text-red-500">*</span>}
+//             </label>
 
-            <div className="relative">
-                <input
-                    type="text"
-                    value={searchTerm}
-                    onChange={handleInputChange}
-                    onFocus={handleInputFocus}
-                    required={required && selectedValues.length === 0}
-                    disabled={disabled}
-                    className={`mt-1 block w-full p-1.5 pr-8 border border-gray-300 rounded-md shadow-sm focus:outline-none
-                    focus:ring-1 focus:ring-c-teal hover:ring-1 hover:ring-c-teal ${disabled ? 'bg-gray-100 text-gray-500 cursor-not-allowed' : ''}`}
-                    placeholder={multiple ? "Search..." : "--Select--"}
-                />
-                {!multiple && searchTerm && (
+//             {multiple && (
+//                 <div className="flex flex-wrap gap-2 mb-2">
+//                     {selectedValues.map(selectedId => {
+//                         const selectedOption = options.find(option => option[valueField] === selectedId);
+//                         return selectedOption ? (
+//                             <div key={selectedId} className="bg-gray-200 px-2 h-8 py-1 rounded-full flex items-center">
+//                                 <span>{selectedOption[labelField]}</span>
+//                                 <span
+//                                     onClick={() => removeOption(selectedId)}
+//                                     className="ml-2 text-md text-gray-600 hover:text-gray-800 cursor-pointer"
+//                                 >
+//                                     <MdClear />
+//                                 </span>
+//                             </div>
+//                         ) : null;
+//                     })}
+//                 </div>
+//             )}
 
-                    <span className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600">
-                        <MdClear onClick={clearSelection} className='text-md cursor-pointer' />
-                    </span>
+//             <div className="relative">
+//                 <input
+//                     type="text"
+//                     value={searchTerm}
+//                     onChange={handleInputChange}
+//                     onFocus={handleInputFocus}
+//                     required={required && selectedValues.length === 0}
+//                     disabled={disabled}
+//                     className={`mt-1 block w-full p-1.5 pr-8 border border-gray-300 rounded-md shadow-sm focus:outline-none
+//                     focus:ring-1 focus:ring-c-teal hover:ring-1 hover:ring-c-teal ${disabled ? 'bg-gray-100 text-gray-500 cursor-not-allowed' : ''}`}
+//                     placeholder={multiple ? "Search..." : "--Select--"}
+//                 />
+//                 {!multiple && searchTerm && (
 
-
-                )}
-            </div>
-            {
-                showDropdown && filteredOptions.length > 0 && (
-                    <ul className="absolute z-10 mt-1 w-full bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-y-auto">
-                        {filteredOptions.map((option) => (
-                            <li
-                                key={option[valueField]}
-                                className="px-4 py-2 cursor-pointer hover:bg-gray-200"
-                                onClick={() => handleOptionClick(option)}
-                            >
-                                {option[labelField]}
-                            </li>
-                        ))}
-                    </ul>
-                )
-            }
-        </div >
-    );
-};
-const AutocompleteField = ({
-    label,
-    value,
-    onChange,
-    searchApi,
-    required = false,
-    disabled = false,
-    multiple = false,
-}) => {
-    const [filteredOptions, setFilteredOptions] = useState([]);
-    const [showDropdown, setShowDropdown] = useState(false);
-    const [searchTerm, setSearchTerm] = useState('');
-    const [selectedOptions, setSelectedOptions] = useState([]);
-    const dropdownRef = useRef(null);
-
-    const fetchAccountDetails = async (accountId) => {
-        try {
-            const response = await fetch(`${CONFIG.ACCOUNT_SERVICE}/${accountId}`, {
-                method: 'GET',
-                headers: {
-                    'transactionId': '4646765766', // You might want to generate this dynamically
-                    'Cookie': 'CookieConsentPolicy=0:1; LSKey-c$CookieConsentPolicy=0:1',
-                },
-            });
-            const data = await response.json();
-            return data.resultSet.accountName;
-        } catch (error) {
-            console.error("Error fetching account details:", error);
-            return null;
-        }
-    };
-
-    // Fetch account details when value (ID) changes
-    useEffect(() => {
-        const fetchAccountName = async () => {
-            if (value && !multiple) {
-                const accountName = await fetchAccountDetails(value);
-                if (accountName) {
-                    setSearchTerm(accountName);
-                    setSelectedOptions([{ id: value, label: accountName }]);
-                }
-            } else if (multiple && Array.isArray(value)) {
-                // Ensure value is a flat array of IDs
-                const ids = value.flat();
-                const accountPromises = ids.map(id => fetchAccountDetails(id));
-                const accountNames = await Promise.all(accountPromises);
-                const newSelectedOptions = accountNames.map((name, index) => ({
-                    id: ids[index],
-                    label: name
-                })).filter(option => option.label !== null);
-                setSelectedOptions(newSelectedOptions);
-            } else {
-                setSearchTerm('');
-                setSelectedOptions([]);
-            }
-        };
-
-        fetchAccountName();
-    }, [value, multiple]);
+//                     <span className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600">
+//                         <MdClear onClick={clearSelection} className='text-md cursor-pointer' />
+//                     </span>
 
 
-    const handleInputChange = (e) => {
-        const newValue = e.target.value;
-        setSearchTerm(newValue);
+//                 )}
+//             </div>
+//             {
+//                 showDropdown && filteredOptions.length > 0 && (
+//                     <ul className="absolute z-10 mt-1 w-full bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-y-auto">
+//                         {filteredOptions.map((option) => (
+//                             <li
+//                                 key={option[valueField]}
+//                                 className="px-4 py-2 cursor-pointer hover:bg-gray-200"
+//                                 onClick={() => handleOptionClick(option)}
+//                             >
+//                                 {option[labelField]}
+//                             </li>
+//                         ))}
+//                     </ul>
+//                 )
+//             }
+//         </div >
+//     );
+// };
+// const AutocompleteField = ({
+//     label,
+//     value,
+//     onChange,
+//     searchApi,
+//     required = false,
+//     disabled = false,
+//     multiple = false,
+// }) => {
+//     const [filteredOptions, setFilteredOptions] = useState([]);
+//     const [showDropdown, setShowDropdown] = useState(false);
+//     const [searchTerm, setSearchTerm] = useState('');
+//     const [selectedOptions, setSelectedOptions] = useState([]);
+//     const dropdownRef = useRef(null);
+
+//     const fetchAccountDetails = async (accountId) => {
+//         try {
+//             const response = await fetch(`${CONFIG.ACCOUNT_SERVICE}/${accountId}`, {
+//                 method: 'GET',
+//                 headers: {
+//                     'transactionId': '4646765766', // You might want to generate this dynamically
+//                     'Cookie': 'CookieConsentPolicy=0:1; LSKey-c$CookieConsentPolicy=0:1',
+//                 },
+//             });
+//             const data = await response.json();
+//             return data.resultSet.accountName;
+//         } catch (error) {
+//             console.error("Error fetching account details:", error);
+//             return null;
+//         }
+//     };
+
+//     // Fetch account details when value (ID) changes
+//     useEffect(() => {
+//         const fetchAccountName = async () => {
+//             if (value && !multiple) {
+//                 const accountName = await fetchAccountDetails(value);
+//                 if (accountName) {
+//                     setSearchTerm(accountName);
+//                     setSelectedOptions([{ id: value, label: accountName }]);
+//                 }
+//             } else if (multiple && Array.isArray(value)) {
+//                 // Ensure value is a flat array of IDs
+//                 const ids = value.flat();
+//                 const accountPromises = ids.map(id => fetchAccountDetails(id));
+//                 const accountNames = await Promise.all(accountPromises);
+//                 const newSelectedOptions = accountNames.map((name, index) => ({
+//                     id: ids[index],
+//                     label: name
+//                 })).filter(option => option.label !== null);
+//                 setSelectedOptions(newSelectedOptions);
+//             } else {
+//                 setSearchTerm('');
+//                 setSelectedOptions([]);
+//             }
+//         };
+
+//         fetchAccountName();
+//     }, [value, multiple]);
 
 
-        const debouncedSearch = debounce(async () => {
-            if (newValue.length >= 2) {
-                try {
-                    const searchResults = await searchApi(newValue);
-                    setFilteredOptions(searchResults);
-                    setShowDropdown(true);
-                } catch (error) {
-                    console.error("Error fetching search results:", error);
-                }
-            } else {
-                setShowDropdown(false);
-            }
-        }, 2000);
+//     const handleInputChange = (e) => {
+//         const newValue = e.target.value;
+//         setSearchTerm(newValue);
 
 
-        debouncedSearch();
+//         const debouncedSearch = debounce(async () => {
+//             if (newValue.length >= 2) {
+//                 try {
+//                     const searchResults = await searchApi(newValue);
+//                     setFilteredOptions(searchResults);
+//                     setShowDropdown(true);
+//                 } catch (error) {
+//                     console.error("Error fetching search results:", error);
+//                 }
+//             } else {
+//                 setShowDropdown(false);
+//             }
+//         }, 2000);
 
 
-        return () => {
-            debouncedSearch.cancel();
-        };
-    };
+//         debouncedSearch();
 
 
-    const handleOptionClick = (option) => {
-        let newSelectedOptions;
-        if (multiple) {
-            newSelectedOptions = selectedOptions.some(item => item.id === option.id)
-                ? selectedOptions.filter(item => item.id !== option.id)
-                : [...selectedOptions, option];
-            setSearchTerm('');
-        } else {
-            newSelectedOptions = [option];
-            setSearchTerm(option.label);
-        }
-
-        setSelectedOptions(newSelectedOptions);
-        setShowDropdown(false);
-
-        if (multiple) {
-            // Change this line
-            onChange(newSelectedOptions.map(opt => opt.id));
-        } else {
-            onChange(option.id); // Change this to only pass the ID
-        }
-    };
+//         return () => {
+//             debouncedSearch.cancel();
+//         };
+//     };
 
 
-    const handleClickOutside = (event) => {
-        if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-            setShowDropdown(false);
-        }
-    };
+//     const handleOptionClick = (option) => {
+//         let newSelectedOptions;
+//         if (multiple) {
+//             newSelectedOptions = selectedOptions.some(item => item.id === option.id)
+//                 ? selectedOptions.filter(item => item.id !== option.id)
+//                 : [...selectedOptions, option];
+//             setSearchTerm('');
+//         } else {
+//             newSelectedOptions = [option];
+//             setSearchTerm(option.label);
+//         }
+
+//         setSelectedOptions(newSelectedOptions);
+//         setShowDropdown(false);
+
+//         if (multiple) {
+//             // Change this line
+//             onChange(newSelectedOptions.map(opt => opt.id));
+//         } else {
+//             onChange(option.id); // Change this to only pass the ID
+//         }
+//     };
 
 
-    useEffect(() => {
-        document.addEventListener('mousedown', handleClickOutside);
-        return () => {
-            document.removeEventListener('mousedown', handleClickOutside);
-        };
-    }, []);
+//     const handleClickOutside = (event) => {
+//         if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+//             setShowDropdown(false);
+//         }
+//     };
 
 
-    const removeOption = (optionToRemove) => {
-        const newSelectedOptions = selectedOptions.filter(option => option.id !== optionToRemove.id);
-        setSelectedOptions(newSelectedOptions);
-        if (multiple) {
-            // Change this line
-            onChange(newSelectedOptions.map(opt => opt.id));
-        } else {
-            onChange(null);
-            setSearchTerm('');
-        }
-    };
-
-    const clearSelection = (e) => {
-        e.stopPropagation(); // Prevent the dropdown from opening
-        setSearchTerm('');
-        setShowDropdown(true);
-        setSelectedValues([]);
-        onChange({ target: { value: null } });
-    };
-
-    return (
-        <div className="relative" ref={dropdownRef}>
-            <label className="block text-sm font-medium text-gray-700">
-                {label}{required && <span className="text-red-500">*</span>}
-            </label>
-            {multiple && (
-                <div className="flex flex-wrap gap-2 mb-2">
-                    {selectedOptions.map(option => (
-                        <div key={option.id} className="bg-gray-200 px-2 h-8 py-1 rounded-full flex items-center">
-                            <span>{option.label}</span>
-                            <span onClick={() => removeOption(option)} className="ml-2 cursor-pointer text-md text-gray-600 hover:text-gray-800">
-                                <MdClear />
-                            </span>
-                        </div>
-                    ))}
-                </div>
-            )}
-            <div className="relative">
-
-                <input
-                    type="text"
-                    value={searchTerm}
-                    onChange={handleInputChange}
-                    required={required && selectedOptions.length === 0}
-                    disabled={disabled}
-                    className="mt-1 block w-full p-1.5 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-c-teal hover:ring-1 hover:ring-c-teal"
-                    placeholder={multiple ? (selectedOptions.length > 0 ? "Add more..." : "--Select--") : "--Select--"}
-                />
-                {!multiple && searchTerm && (
-
-                    <span className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600">
-                        <MdClear onClick={clearSelection} className='text-md cursor-pointer' />
-                    </span>
+//     useEffect(() => {
+//         document.addEventListener('mousedown', handleClickOutside);
+//         return () => {
+//             document.removeEventListener('mousedown', handleClickOutside);
+//         };
+//     }, []);
 
 
-                )}
-            </div>
-            {showDropdown && filteredOptions.length > 0 && (
-                <ul className="absolute z-10 mt-1 w-full bg-white border border-gray-300 rounded-md shadow-lg max-h-48 overflow-y-auto">
-                    {filteredOptions.map((option) => (
-                        <li
-                            key={option.id}
-                            className="px-2 py-2 cursor-pointer hover:bg-gray-200"
-                            onClick={() => handleOptionClick(option)}
-                        >
-                            {option.label}
-                        </li>
-                    ))}
-                </ul>
-            )}
-        </div>
-    );
-};
+//     const removeOption = (optionToRemove) => {
+//         const newSelectedOptions = selectedOptions.filter(option => option.id !== optionToRemove.id);
+//         setSelectedOptions(newSelectedOptions);
+//         if (multiple) {
+//             // Change this line
+//             onChange(newSelectedOptions.map(opt => opt.id));
+//         } else {
+//             onChange(null);
+//             setSearchTerm('');
+//         }
+//     };
+
+//     const clearSelection = (e) => {
+//         e.stopPropagation(); // Prevent the dropdown from opening
+//         setSearchTerm('');
+//         setShowDropdown(true);
+//         setSelectedValues([]);
+//         onChange({ target: { value: null } });
+//     };
+
+//     return (
+//         <div className="relative" ref={dropdownRef}>
+//             <label className="block text-sm font-medium text-gray-700">
+//                 {label}{required && <span className="text-red-500">*</span>}
+//             </label>
+//             {multiple && (
+//                 <div className="flex flex-wrap gap-2 mb-2">
+//                     {selectedOptions.map(option => (
+//                         <div key={option.id} className="bg-gray-200 px-2 h-8 py-1 rounded-full flex items-center">
+//                             <span>{option.label}</span>
+//                             <span onClick={() => removeOption(option)} className="ml-2 cursor-pointer text-md text-gray-600 hover:text-gray-800">
+//                                 <MdClear />
+//                             </span>
+//                         </div>
+//                     ))}
+//                 </div>
+//             )}
+//             <div className="relative">
+
+//                 <input
+//                     type="text"
+//                     value={searchTerm}
+//                     onChange={handleInputChange}
+//                     required={required && selectedOptions.length === 0}
+//                     disabled={disabled}
+//                     className="mt-1 block w-full p-1.5 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-c-teal hover:ring-1 hover:ring-c-teal"
+//                     placeholder={multiple ? (selectedOptions.length > 0 ? "Add more..." : "--Select--") : "--Select--"}
+//                 />
+//                 {!multiple && searchTerm && (
+
+//                     <span className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600">
+//                         <MdClear onClick={clearSelection} className='text-md cursor-pointer' />
+//                     </span>
+
+
+//                 )}
+//             </div>
+//             {showDropdown && filteredOptions.length > 0 && (
+//                 <ul className="absolute z-10 mt-1 w-full bg-white border border-gray-300 rounded-md shadow-lg max-h-48 overflow-y-auto">
+//                     {filteredOptions.map((option) => (
+//                         <li
+//                             key={option.id}
+//                             className="px-2 py-2 cursor-pointer hover:bg-gray-200"
+//                             onClick={() => handleOptionClick(option)}
+//                         >
+//                             {option.label}
+//                         </li>
+//                     ))}
+//                 </ul>
+//             )}
+//         </div>
+//     );
+// };
 
 export default function AccountFormSection({
     formData,
@@ -406,10 +409,13 @@ export default function AccountFormSection({
     sectionVisibility,
     copyBillingToShipping,
     isEditing,
+    formLabel,
+    setFormLabel,
 }) {
     const [resourceData, setResourceData] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
     const [accountOwnerOptions, setAccountOwnerOptions] = useState([]);
+    const [selectedParentAccount, setSelectedParentAccount] = useState('');
 
     useEffect(() => {
         const fetchResourceData = async () => {
@@ -421,7 +427,7 @@ export default function AccountFormSection({
                     const response = await fetch(`${CONFIG.ACCOUNT_SERVICE}/resources`, {
                         method: 'GET',
                         headers: {
-                            'transactionId': '46467657665',
+                            'transactionId': generateTransactionId(),
                             'Cookie': 'CookieConsentPolicy=0:1; LSKey-c$CookieConsentPolicy=0:1'
                         }
                     });
@@ -436,6 +442,11 @@ export default function AccountFormSection({
         };
         fetchResourceData();
     }, []);
+
+    useEffect(() => {
+        console.log("formLabel ", formLabel);
+
+    }, [formLabel]);
 
     const handleInputChange = (field, subField = null) => (e) => {
         const newValue = e.target.value;
@@ -500,36 +511,95 @@ export default function AccountFormSection({
         }));
     };
 
+    const searchAccountName = async (searchTerm) => {
+        const response = await fetch(`${CONFIG.ACCOUNT_SERVICE}/find-account?name=${searchTerm}`, {
+            method: 'GET',
+            headers: {
+                'Cookie': 'CookieConsentPolicy=0:1; LSKey-c$CookieConsentPolicy=0:1',
+            },
+        });
+        const data = await response.json();
+        return data.resultSet.map((account) => ({
+            id: account.id,
+            label: `${account.accountName}`,
+            salesforceId: account.salesforceId,
+        }));
+    };
+
     const sections = [
         {
             title: 'Account Information',
             visibilityKey: 'accountInformationVisible',
             fields: [
                 { label: 'Account Name', type: 'text', value: formData.accountDetails.accountName, onChange: handleInputChange('accountDetails', 'accountName'), required: true },
-                { label: 'Parent Account', type: 'text', value: formData.accountDetails.parentAccount, onChange: handleInputChange('accountDetails', 'parentAccount') },
+                // { label: 'Parent Account', type: 'text', value: formData.accountDetails.parentAccount, onChange: handleInputChange('accountDetails', 'parentAccount') },
+                {
+                    label: 'Parent Name',
+                    value: formLabel.parentAccountName
+                        ? { id: formLabel.parentAccountId, label: formLabel.parentAccountName }
+                        : null,
+                    onChange: (selectedAccount) => {
+                        // Check if the selectedAccount is an array and use the first item if so
+                        const account = Array.isArray(selectedAccount) ? selectedAccount[0] : selectedAccount;
+
+                        console.log("Selected Account: ", account); // Ensure the correct account object is logged
+
+                        if (account && account.id) {
+                            // Save the selected account info to display the label
+                            setSelectedParentAccount(account);
+
+                            // Update the primary form data with the selected parent account ID
+                            setFormData((prevData) => ({
+                                ...prevData,
+                                accountDetails: {
+                                    ...prevData.accountDetails,
+                                    parentAccount: account.id, // Only update parentAccount field
+                                },
+                            }));
+
+                            // Update the formLabel to store the new selected account's name
+                            setFormLabel((prevLabels) => ({
+                                ...prevLabels,
+                                parentAccountName: account.label, // Update label with new name
+                                parentAccountId: account.id
+                            }));
+                        } else {
+                            console.error("No valid account selected:", account);
+                        }
+                    },
+                    searchApi: searchAccountName,
+                    required: true,
+                },
                 { label: 'Local Account Name', type: 'text', value: formData.accountDetails.localAccountName, onChange: handleInputChange('accountDetails', 'localAccountName') },
                 {
                     label: 'Client Type',
-                    value: formData.accountDetails.clientType.map(client => client.clientTypeId),
-                    // initialSearchTerm: formData.accountDetails.clientType.length > 0 ? formData.accountDetails.clientType[0].clientTypeName : '',
-                    onChange: (e) => {
-                        const selectedIds = e.target.value;
-                        setFormData(prevData => ({
+                    value: formData.accountDetails.clientType.map((client) => ({
+                        id: client.clientTypeId, // ID from formData
+                        label: client.clientTypeName, // Name from formData
+                    })),
+                    onChange: (newSelectedValues) => {
+                        // Update formData with new clientType information based on selected values
+                        setFormData((prevData) => ({
                             ...prevData,
                             accountDetails: {
                                 ...prevData.accountDetails,
-                                clientType: selectedIds.map(id => ({
-                                    clientTypeId: id,
-                                    clientTypeName: resourceData?.clientType.find(client => client.id === id)?.clientTypeName || '',
-                                }))
+                                clientType: newSelectedValues.map((selected) => ({
+                                    clientTypeId: selected.id, // Keep the ID
+                                    clientTypeName: selected.label, // Keep the name
+                                })),
                             },
                         }));
+                        console.log('Updated client types:', newSelectedValues);
                     },
-                    options: resourceData?.clientType.map(client => ({ id: client.id, label: client.clientTypeName })) || [],
-                    valueField: 'id', labelField: 'label', multiple: true,
-
+                    options: resourceData?.clientType.map(client => ({
+                        id: client.id,
+                        label: client.clientTypeName,
+                    })) || [],
+                    valueField: 'id',
+                    labelField: 'label',
+                    multiple: true,
                 },
-                { label: 'Phone', type: 'number', value: formData.accountDetails.phone, onChange: handleInputChange('accountDetails', 'phone') },
+                { label: 'Phone', type: 'text', value: formData.accountDetails.phone, onChange: handleInputChange('accountDetails', 'phone') },
                 { label: 'Fax', type: 'text', value: formData.accountDetails.fax, onChange: handleInputChange('accountDetails', 'fax') },
                 { label: 'Website', type: 'text', value: formData.accountDetails.website, onChange: handleInputChange('accountDetails', 'website') },
             ],
@@ -538,10 +608,46 @@ export default function AccountFormSection({
             title: 'Address Information',
             visibilityKey: 'addressInformationVisible',
             fields: [
-                { label: 'Billing Country', value: formData.addressInformation.billingCountry, initialSearchTerm: formData.addressInformation.billingCountry, onChange: handleCountryChange('addressInformation', 'billingCountry', 'billingState', 'billingCountryCode'), options: resourceData?.country || [], valueField: 'countryName', labelField: 'countryName', required: true },
-                { label: 'Shipping Country', value: formData.addressInformation.shippingCountry, initialSearchTerm: formData.addressInformation.shippingCountry, onChange: handleCountryChange('addressInformation', 'shippingCountry', 'shippingState', 'shippingCountryCode'), options: resourceData?.country || [], valueField: 'countryName', labelField: 'countryName' },
-                { label: 'Billing State/Province', value: formData.addressInformation.billingState, initialSearchTerm: formData.addressInformation.shippingCountry, onChange: handleInputChange('addressInformation', 'billingState'), options: resourceData?.country.find(c => c.countryCode === formData.addressInformation.billingCountryCode)?.state || [], valueField: 'stateName', labelField: 'stateName', disabled: !formData.addressInformation.billingCountryCode },
-                { label: 'Shipping State/Province', value: formData.addressInformation.shippingState, initialSearchTerm: formData.addressInformation.shippingCountry, onChange: handleInputChange('addressInformation', 'shippingState'), options: resourceData?.country.find(c => c.countryCode === formData.addressInformation.shippingCountryCode)?.state || [], valueField: 'stateName', labelField: 'stateName', required: true, disabled: !formData.addressInformation.shippingCountryCode },
+                {
+                    label: 'Billing Country',
+                    value: formData.addressInformation.billingCountry,
+                    initialSearchTerm: formData.addressInformation.billingCountry,
+                    onChange: handleCountryChange('addressInformation', 'billingCountry', 'billingState', 'billingCountryCode'),
+                    options: resourceData?.country || [],
+                    valueField: 'countryName',
+                    labelField: 'countryName',
+                    required: true
+                },
+                {
+                    label: 'Shipping Country',
+                    value: formData.addressInformation.shippingCountry,
+                    initialSearchTerm: formData.addressInformation.shippingCountry,
+                    onChange: handleCountryChange('addressInformation', 'shippingCountry', 'shippingState', 'shippingCountryCode'),
+                    options: resourceData?.country || [],
+                    valueField: 'countryName',
+                    labelField: 'countryName'
+                },
+                {
+                    label: 'Billing State/Province',
+                    value: formData.addressInformation.billingState,
+                    initialSearchTerm: formData.addressInformation.billingState,
+                    onChange: handleInputChange('addressInformation', 'billingState'),
+                    options: resourceData?.country.find(c => c.countryCode === formData.addressInformation.billingCountryCode)?.state || [],
+                    valueField: 'stateName',
+                    labelField: 'stateName',
+                    disabled: !formData.addressInformation.billingCountryCode
+                },
+                {
+                    label: 'Shipping State/Province',
+                    value: formData.addressInformation.shippingState,
+                    initialSearchTerm: formData.addressInformation.shippingState,
+                    onChange: handleInputChange('addressInformation', 'shippingState'),
+                    options: resourceData?.country.find(c => c.countryCode === formData.addressInformation.shippingCountryCode)?.state || [],
+                    valueField: 'stateName',
+                    labelField: 'stateName',
+                    required: true,
+                    disabled: !formData.addressInformation.shippingCountryCode
+                },
                 { label: 'Billing City', type: 'text', value: formData.addressInformation.billingCity, onChange: handleInputChange('addressInformation', 'billingCity'), required: true },
                 { label: 'Shipping City', type: 'text', value: formData.addressInformation.shippingCity, onChange: handleInputChange('addressInformation', 'shippingCity') },
                 { label: 'Billing Street', type: 'text', value: formData.addressInformation.billingStreet, onChange: handleInputChange('addressInformation', 'billingStreet'), required: true },
@@ -581,8 +687,34 @@ export default function AccountFormSection({
                         });
                     }, options: resourceData?.industrialType.find(c => c.industryTypeName === formData.segmentation.industrialType)?.subIndustry || [], valueField: 'subIndustryName', labelField: 'subIndustryName', disabled: !formData.segmentation.industrialType
                 },
-                { label: 'Headquarter Country', value: formData.segmentation.headquarterCountry, initialSearchTerm: formData.segmentation.headquarterCountry, onChange: handleInputChange('segmentation', 'headquarterCountry'), options: resourceData?.country || [], valueField: 'countryName', labelField: 'countryName' },
-                { label: 'Commercial Number', type: 'number', value: formData.segmentation.commercialNumber, onChange: handleInputChange('segmentation', 'commercialNumber') },
+                {
+                    label: 'Headquarter Country',
+                    value: formData.segmentation.headquarterCountry, // Display selected country name
+                    initialSearchTerm: formData.segmentation.headquarterCountry, // For initial data display
+                    onChange: (event) => {
+                        const selectedCountryName = event.target.value; // Get the selected country name
+                
+                        // Find the selected country object from your options
+                        const selectedCountry = resourceData.country.find(country => country.countryName === selectedCountryName);
+                
+                        const countryName = selectedCountry?.countryName || '';
+                        const countryCode = selectedCountry?.countryCode || '';
+                
+                        // Update form data with the selected country name and code
+                        setFormData((prevData) => ({
+                            ...prevData,
+                            segmentation: {
+                                ...prevData.segmentation,
+                                headquarterCountry: countryName, // Set the country name
+                                headquarterCountryCode: countryCode, // Set the country code
+                            },
+                        }));
+                    },
+                    options: resourceData?.country || [], // List of countries
+                    valueField: 'countryName', // Field to display in the dropdown
+                    labelField: 'countryName', // Field to display in the dropdown
+                },                
+                { label: 'Commercial Number', type: 'text', value: formData.segmentation.commercialNumber, onChange: handleInputChange('segmentation', 'commercialNumber') },
             ],
         },
         {
@@ -615,19 +747,55 @@ export default function AccountFormSection({
             fields: [
                 {
                     label: 'Account Owner',
-                    value: formData.systemInformation.accountOwner,
-                    onChange: (value) => {
-                        setFormData(prevData => ({
+                    value: formData.systemInformation.accountOwner.map((ownerId) => {
+                        // Get the label from formLabel
+                        const ownerInfo = formLabel.accountOwner.find((item) => item.id === ownerId);
+
+                        if (ownerInfo) {
+                            // Return if label exists
+                            return {
+                                id: ownerInfo.id,
+                                label: ownerInfo.name, // Using 'name' as the label from formLabel
+                            };
+                        } else {
+                            // Fallback if the label is not found
+                            return {
+                                id: ownerId,
+                                label: `Unknown (${ownerId})`, // Provide a fallback label
+                            };
+                        }
+                    }),
+                    onChange: (newSelectedValues) => {
+                        // Extract the IDs from the selected values
+                        const newIds = newSelectedValues.map((selected) => selected.id);
+
+                        // Update formData with new IDs
+                        setFormData((prevData) => ({
                             ...prevData,
                             systemInformation: {
                                 ...prevData.systemInformation,
-                                accountOwner: value,
+                                accountOwner: newIds, // Update accountOwner IDs only
                             },
                         }));
+
+                        // Update formLabel to ensure it has all selected values
+                        setFormLabel((prevLabels) => ({
+                            ...prevLabels,
+                            accountOwner: [
+                                ...prevLabels.accountOwner,
+                                ...newSelectedValues.filter(
+                                    (selected) => !prevLabels.accountOwner.some((existing) => existing.id === selected.id)
+                                ).map(selected => ({ id: selected.id, name: selected.label })),
+                            ],
+                        }));
+
+                        console.log('Updated account owner IDs and labels:', newSelectedValues);
                     },
-                    searchApi: searchAccountOwners,
-                    required: true, multiple: true,
+                    searchApi: searchAccountOwners, // Ensure this API returns { id, label } consistently
+                    required: true,
+                    multiple: true,
                 },
+
                 // isEditing && { label: 'Modified By', type: 'text', value: formData.systemInformation.createdBy, onChange: handleInputChange('systemInformation', 'modifiedBy'), disabled: true },
                 // isEditing && { label: 'Modified Date', type: 'text', value: formData.systemInformation.createdDate, onChange: handleInputChange('systemInformation', 'modifiedDate'), disabled: true },
                 // isEditing && { label: 'Created By', type: 'text', value: formData.systemInformation.createdBy, onChange: handleInputChange('systemInformation', 'createdBy'), disabled: true },
@@ -690,12 +858,15 @@ export default function AccountFormSection({
                                         </React.Fragment>
                                     ) : field.searchApi ? (
                                         <AutocompleteField key={idx} {...field} />
+                                    ) : field.options && field.multiple ? (
+                                        <MultipleSelectField key={idx} {...field} />
                                     ) : field.options ? (
-                                        <SelectField key={idx} {...field} />
+                                        <SingleSelectField key={idx} {...field} />
                                     ) : (
                                         <InputField key={idx} {...field} />
                                     )
                                 ))}
+
                             </div>
                         </div>
                     )}

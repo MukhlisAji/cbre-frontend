@@ -21,19 +21,18 @@ export default function SearchResult({
   mapApi,
   setIsBuildingsActive,
   setBuild,
-  build
+  build,
+  amenitiesMarker
 }) {
   const { selectedBuildings, setSelectedBuildings } = useAppContext();
-  const [selectedBuilding, setSelectedBuilding] = useState(null);
+  //CHANGE SELECTEDBUILDING TO USE ONLY BUILD
+  // const [selectedBuilding, setSelectedBuilding] = useState(null);
   const [sectionHeight, setSectionHeight] = useState(0);
   const { confirmSave, setConfirmSave } = useAppContext();
-  const [nearByMrt, setNearByMrt] = useState(null);
-  const [nearByOthers, setNearByOthers] = useState(null);
-
+  
   const [checkedBuildings, setCheckedBuildings] = useState([]);
   const [showCheckedBuildings, setShowCheckedBuildings] = useState(false);
 
-  const [isLoading, setIsLoading] = useState(false);
 
   const [saveNew, setSaveNew] = useState();
   const { toggleDrawer } = useAppContext();
@@ -49,60 +48,41 @@ export default function SearchResult({
     setSelectedBuildings(updatedSelectedBuildings);
   };
 
-  useEffect(() => {
-    const fetchMrt = async () => {
-      const res = await fetch(`${CONFIG_APP.MAPBOX_API}/near-by-mrt`, {
-        method: "GET",
-      });
-      const mrt = await res.json();
 
-      setNearByMrt(mrt.data);
-    };
-
-    const fetchOther = async () => {
-      const res = await fetch(`${CONFIG_APP.MAPBOX_API}/near-by-others`, {
-        method: "GET",
-      });
-      const others = await res.json();
-
-      setNearByOthers(others.data);
-    };
-
-    const fetchBoth = async () => {
-      fetchMrt();
-      fetchOther();
-    };
-    const setLoading = async () => {
-      console.log("trueee");
-      setIsLoading(true);
-      await fetchBoth();
-      setIsLoading(false);
-      console.log("falsee");
-    };
-
-    setLoading();
-    console.log(nearByOthers);
-    console.log("inii");
-  }, [selectedBuilding]);
 
   const handleItemClick = (building) => {
     console.log("item click")
     setBuild(building)
-    setSelectedBuilding(building)
-    if (map.current) {
-      map.current.flyTo({
-        center: [parseFloat(building.longitude), parseFloat(building.latitude)],
-        zoom: 15,
-        essential: true, // ensures the animation happens even if the user has enabled prefers-reduced-motion
-      });
-    }
+    console.log(building)
+    // setSelectedBuilding(building)
+    // if (map.current) {
+    //   map.current.flyTo({
+    //     center: [parseFloat(building.longitude), parseFloat(building.latitude)],
+    //     zoom: 15,
+    //     essential: true, // ensures the animation happens even if the user has enabled prefers-reduced-motion
+    //   });
+    // }
   };
 
   useEffect(() => {
-    mapApi({ data: buildings });
+    if(build){
+      mapApi({ data: buildings });
+      console.log(build)
+      if (map.current) {
+        map.current.flyTo({
+          center: [parseFloat(build.longitude), parseFloat(build.latitude)],
+          zoom: 15,
+          essential: true, // ensures the animation happens even if the user has enabled prefers-reduced-motion
+        });
+      }
+      // setSelectedBuilding(build)
+    }
+   
   },[build])
+
+
   const handleCloseDetailView = () => {
-    setSelectedBuilding(null);
+    setBuild(null);
   };
 
   const onClose = () => {
@@ -166,8 +146,8 @@ export default function SearchResult({
         ref={(node) => drag(drop(node))}
         key={building.buildingId}
         className={`flex w-full p-2 border-b space-x-2.5 cursor-pointer bg-white ${
-          selectedBuilding &&
-          selectedBuilding.buildingId === building.buildingId
+          build &&
+          build.buildingId === building.buildingId
             ? "bg-blue-100"
             : "hover:bg-gray-200"
         }`}
@@ -263,13 +243,11 @@ export default function SearchResult({
         </>
       )}
 
-      {selectedBuilding && (
+      {build && (
         <DetailedView
-          building={selectedBuilding}
+          amenitiesMarker={amenitiesMarker}
+          building={build}
           onClose={handleCloseDetailView}
-          nearByMrt={nearByMrt}
-          nearByOthers={nearByOthers}
-          isLoading={isLoading}
         />
       )}
 

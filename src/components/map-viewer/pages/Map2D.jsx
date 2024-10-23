@@ -88,7 +88,7 @@ function Map2D() {
   const { triggerZoning, resetZoning } = useZoning(map);
 
   // Main map
-  const { filteringData, handleSearch, search, mapApi, setBuild , build} = useMap(
+  const { filteringData, handleSearch, search, mapApi, setBuild , build, amenitiesMarker} = useMap(
     styleMap,
     map,
     zoom,
@@ -201,6 +201,17 @@ function Map2D() {
     setIsMap3D(event.target.checked);
   };
 
+  const countNumberOfSpaces =(result)=>{
+    result.forEach(building => {
+      building.numberOfSpaces = building.numberOfSpaces || 0;
+      building.floorInformation?.forEach(element => {
+        building.numberOfSpaces += element.spaceInformation?.length || 0; // Use optional chaining and fallback to 0 if spaceInformation is undefined
+      });
+    });
+
+    
+  }
+
   const [isBuildingsActive, setIsBuildingsActive] = useState(false);
   const [buildings, setBuildings] = useState([]);
   const handleClickSearch = async (form, category) => {
@@ -234,6 +245,10 @@ function Map2D() {
       const result = await response.json();
       setIsLoading(false)
       console.log("Search results:", result);
+
+      countNumberOfSpaces(result.resultSet.propertyInformation)
+      console.log("number spaces")
+      console.log(result.resultSet.propertyInformation)
       setBuildings(result.resultSet.propertyInformation);
       mapApi({ data: result.resultSet.propertyInformation });
       // return result;
@@ -246,7 +261,7 @@ function Map2D() {
   return (
     <>
       <div className="relative top-0 z-30">
-        {isBuildingsActive && <TwoDSearch isLoading={isLoading} build = {build}mapApi={mapApi} map={map} buildings={buildings} setBuildings={setBuildings} setIsBuildingsActive={setIsBuildingsActive} setBuild={setBuild} />}
+        {isBuildingsActive && <TwoDSearch amenitiesMarker={amenitiesMarker} isLoading={isLoading} build = {build}mapApi={mapApi} map={map} buildings={buildings} setBuildings={setBuildings} setIsBuildingsActive={setIsBuildingsActive} setBuild={setBuild} />}
       </div>
       <div className="relative w-full min-h-full overflow-hidden">
         <div className="filtering absolute top-2 left-4 z-40 flex items-center space-x-2 bg-white bg-opacity-75 p-2 rounded-lg shadow-md">

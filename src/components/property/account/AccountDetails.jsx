@@ -16,19 +16,17 @@ function classNames(...classes) {
 
 export default function AccountDetails() {
     const [selectedIndex, setSelectedIndex] = useState(0);
-    const { id } = useParams(); 
+    const { id } = useParams();
     const [accountData, setAccountData] = useState(null);
+    const [accountInformationVisible, setAccountInformationVisible] = useState(false);
+    const [billingAddressVisible, setBillingAddressVisible] = useState(false);
+    const [shippingAddressVisible, setShippingAddressVisible] = useState(false);
+    const [otherInformationVisible, setOtherInformationVisible] = useState(false);
+
 
 
     const tabs = [
-        "Summary",
         "Details",
-        "Locations & Hierarchy",
-        "Contacts",
-        "Opportunities & Comps",
-        "Enquiry & Offers",
-        "Other Related",
-        "Portfolio",
     ];
 
     useEffect(() => {
@@ -45,6 +43,27 @@ export default function AccountDetails() {
         }
         fetchAccountData();
     }, [id]);
+
+    const toggleVisibility = (section) => {
+        switch (section) {
+            case 'accountInformation':
+                setAccountInformationVisible((prev) => !prev);
+                break;
+            case 'billingAddress':
+                setBillingAddressVisible((prev) => !prev);
+                break;
+            case 'shippingAddress':
+                setShippingAddressVisible((prev) => !prev);
+                break;
+            case 'otherInformation':
+                setOtherInformationVisible((prev) => !prev);
+                break;
+            default:
+                console.log(`Section '${section}' not handled`);
+                break;
+        }
+    };
+
 
     if (!accountData) {
         return <div>Loading...</div>;  // Show a loading state while data is fetched
@@ -106,57 +125,199 @@ export default function AccountDetails() {
             </div>
 
 
-            <Tab.Group selectedIndex={selectedIndex} onChange={setSelectedIndex}>
-                <Tab.List className="flex space-x-1 bg-white rounded-md border-b border-neutral-300">
-                    {tabs.map((tab) => (
-                        <Tab
-                            key={tab}
-                            className={({ selected }) =>
-                                classNames(
-                                    'w-full  text-sm font-normal text-neutral-700 ',
-                                    'focus:outline-none border-b-2',
-                                    selected
-                                        ? 'font-semibold border-b-2 border-c-teal'
-                                        : 'text-blue-100 hover:bg-white/[0.12] border-white',
-                                    'pb-1 pt-3 px-0'
-                                )
-                            }
-                        >
-                            {tab}
-                        </Tab>
-                    ))}
-                </Tab.List>
-                <Tab.Panels className="">
-                    {tabs.map((tab, idx) => (
-                        <Tab.Panel
-                            key={idx}
-                            className={classNames(
-                                'bg-white rounded-b-lg p-3 shadow-md',
-                                'focus:outline-none focus:ring-2 ring-offset-2 ring-offset-blue-400 ring-white ring-opacity-60'
-                            )}
-                        >
-                            <div className="space-y-4">
-                                {tab === "Summary" && (
-                                    <div className='font-sm'>
-                                        {/* <h2 className="text-sm mb-4">Summary</h2> */}
-                                        <p className='text-sm'>Business Lines All Time</p>
+            {/* Details Section */}
+            {/* Details Section */}
+            <div className="bg-white shadow-md p-4 rounded-md overflow-y-auto">
+                <div className='border-b border-b-neutral-300 mb-4'>
+                    <div className="w-14 text-md font-bold border-b-2 border-c-dark-grayish">Details</div>
+                </div>
+                <div className='overflow-y-auto h-[calc(100vh-380px)]' >
+                    {/* Account Information */}
+                    <div className="mb-4">
+                        <div className="flex bg-neutral-100 mb-2 justify-between items-center cursor-pointer" onClick={() => toggleVisibility('accountInformation')}>
+                            <h2 className="text-md font-semibold text-neutral-700">
+                                <span className='text-sm'>{accountInformationVisible ? '▼' : '►'}</span> Account Information
+                            </h2>
+                            <span>{accountInformationVisible ? '-' : '+'}</span>
+                        </div>
+                        {accountInformationVisible && (
+                            <div className='ml-3 mb-6'>
+                                <div className="grid grid-cols-2 gap-y-2 md:gap-x-12 mb-4 mr-4">
+                                    <div className="flex justify-between border-b pb-1">
+                                        <div className="flex flex-col mt-auto">
+                                            <label className="text-neutral-600 text-sm mb-1">Account Name</label>
+                                            <a href="#" className="text-green-700 hover:text-c-teal text-sm">{accountData.accountName}</a>
+                                        </div>
                                     </div>
-                                )}
-                                {tab === "Details" && (
-                                    <div>
-                                        {/* <h2 className="text-sm font-bold mb-4">Details</h2> */}
-                                        <p>No items to display.</p>
+                                    <div className="flex justify-between border-b pb-1">
+                                        <div className="flex flex-col">
+                                            <label className="text-neutral-600 text-sm mb-1">Local Account Name</label>
+                                            <input type="text" value={accountData.localAccountName} className="w-full text-sm text-neutral-700" readOnly />
+                                        </div>
                                     </div>
-                                )}
-                                {/* Add more content for other tabs here */}
-                                <div>
-                                    <p className='text-sm'>Have a query regarding this account? <a href="#" className="text-blue-500">Click Here</a></p>
+                                    <div className="flex justify-between border-b pb-1">
+                                        <div className="flex flex-col mt-auto">
+                                            <label className="text-neutral-600 text-sm mb-1">Phone</label>
+                                            <input type="text" value={accountData.phone} className="w-full text-sm text-neutral-700" readOnly />
+                                        </div>
+                                    </div>
+                                    <div className="flex justify-between border-b pb-1">
+                                        <div className="flex flex-col mt-auto">
+                                            <label className="text-neutral-600 text-sm mb-1">Fax</label>
+                                            <input type="text" value={accountData.fax} className="w-full text-sm text-neutral-700" readOnly />
+                                        </div>
+                                    </div>
+                                    <div className="flex justify-between border-b pb-1">
+                                        <div className="flex flex-col mt-auto">
+                                            <label className="text-neutral-600 text-sm mb-1">Website</label>
+                                            <a href={`http://${accountData.website}`} className="text-green-700 hover:text-c-teal" target="_blank" rel="noopener noreferrer">{accountData.website}</a>
+                                        </div>
+                                    </div>
+                                    <div className="flex justify-between border-b pb-1">
+                                        <div className="flex flex-col mt-auto">
+                                            <label className="text-neutral-600 text-sm mb-1">Status</label>
+                                            <input type="text" value={accountData.status} className="w-full text-sm text-neutral-700" readOnly />
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                        </Tab.Panel>
-                    ))}
-                </Tab.Panels>
-            </Tab.Group>
-        </div>
+                        )}
+                    </div>
+
+                    {/* Billing Address */}
+                    <div className="mb-4">
+                        <div className="flex bg-neutral-100 mb-2 justify-between items-center cursor-pointer" onClick={() => toggleVisibility('billingAddress')}>
+                            <h2 className="text-md font-semibold text-neutral-700">
+                                <span className='text-sm'>{billingAddressVisible ? '▼' : '►'}</span> Billing Address
+                            </h2>
+                            <span>{billingAddressVisible ? '-' : '+'}</span>
+                        </div>
+                        {billingAddressVisible && (
+                            <div className='ml-3 mb-6'>
+                                <div className="flex flex-col gap-4">
+                                    <div className="flex justify-between border-b pb-1">
+                                        <div className="flex flex-col mt-auto">
+                                            <label className="text-neutral-600 text-sm mb-1">Street</label>
+                                            <input type="text" value={accountData.billingStreet} className="w-full text-sm text-neutral-700" readOnly />
+                                        </div>
+                                    </div>
+                                    <div className="flex justify-between border-b pb-1">
+                                        <div className="flex flex-col mt-auto">
+                                            <label className="text-neutral-600 text-sm mb-1">City</label>
+                                            <input type="text" value={accountData.billingCity} className="w-full text-sm text-neutral-700" readOnly />
+                                        </div>
+                                    </div>
+                                    <div className="flex justify-between border-b pb-1">
+                                        <div className="flex flex-col mt-auto">
+                                            <label className="text-neutral-600 text-sm mb-1">State</label>
+                                            <input type="text" value={accountData.billingState} className="w-full text-sm text-neutral-700" readOnly />
+                                        </div>
+                                    </div>
+                                    <div className="flex justify-between border-b pb-1">
+                                        <div className="flex flex-col mt-auto">
+                                            <label className="text-neutral-600 text-sm mb-1">Post Code</label>
+                                            <input type="text" value={accountData.billingPostCode} className="w-full text-sm text-neutral-700" readOnly />
+                                        </div>
+                                    </div>
+                                    <div className="flex justify-between border-b pb-1">
+                                        <div className="flex flex-col mt-auto">
+                                            <label className="text-neutral-600 text-sm mb-1">Country</label>
+                                            <input type="text" value={accountData.billingCountry.countryName} className="w-full text-sm text-neutral-700" readOnly />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Shipping Address */}
+                    <div className="mb-4">
+                        <div className="flex bg-neutral-100 mb-2 justify-between items-center cursor-pointer" onClick={() => toggleVisibility('shippingAddress')}>
+                            <h2 className="text-md font-semibold text-neutral-700">
+                                <span className='text-sm'>{shippingAddressVisible ? '▼' : '►'}</span> Shipping Address
+                            </h2>
+                            <span>{shippingAddressVisible ? '-' : '+'}</span>
+                        </div>
+                        {shippingAddressVisible && (
+                            <div className='ml-3 mb-6'>
+                                <div className="flex flex-col gap-4">
+                                    <div className="flex justify-between border-b pb-1">
+                                        <div className="flex flex-col mt-auto">
+                                            <label className="text-neutral-600 text-sm mb-1">Street</label>
+                                            <input type="text" value={accountData.shippingStreet} className="w-full text-sm text-neutral-700" readOnly />
+                                        </div>
+                                    </div>
+                                    <div className="flex justify-between border-b pb-1">
+                                        <div className="flex flex-col mt-auto">
+                                            <label className="text-neutral-600 text-sm mb-1">City</label>
+                                            <input type="text" value={accountData.shippingCity} className="w-full text-sm text-neutral-700" readOnly />
+                                        </div>
+                                    </div>
+                                    <div className="flex justify-between border-b pb-1">
+                                        <div className="flex flex-col mt-auto">
+                                            <label className="text-neutral-600 text-sm mb-1">State</label>
+                                            <input type="text" value={accountData.shippingState} className="w-full text-sm text-neutral-700" readOnly />
+                                        </div>
+                                    </div>
+                                    <div className="flex justify-between border-b pb-1">
+                                        <div className="flex flex-col mt-auto">
+                                            <label className="text-neutral-600 text-sm mb-1">Post Code</label>
+                                            <input type="text" value={accountData.shippingPostCode} className="w-full text-sm text-neutral-700" readOnly />
+                                        </div>
+                                    </div>
+                                    <div className="flex justify-between border-b pb-1">
+                                        <div className="flex flex-col mt-auto">
+                                            <label className="text-neutral-600 text-sm mb-1">Country</label>
+                                            <input type="text" value={accountData.shippingCountry.countryName} className="w-full text-sm text-neutral-700" readOnly />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Other Information */}
+                    <div className="mb-4">
+                        <div className="flex bg-neutral-100 mb-2 justify-between items-center cursor-pointer" onClick={() => toggleVisibility('otherInformation')}>
+                            <h2 className="text-md font-semibold text-neutral-700">
+                                <span className='text-sm'>{otherInformationVisible ? '▼' : '►'}</span> Other Information
+                            </h2>
+                            <span>{otherInformationVisible ? '-' : '+'}</span>
+                        </div>
+                        {otherInformationVisible && (
+                            <div className='ml-3 mb-6'>
+                                <div className="flex flex-col gap-4">
+                                    <div className="flex justify-between border-b pb-1">
+                                        <div className="flex flex-col mt-auto">
+                                            <label className="text-neutral-600 text-sm mb-1">Industry</label>
+                                            <input type="text" value={accountData.industry} className="w-full text-sm text-neutral-700" readOnly />
+                                        </div>
+                                    </div>
+                                    <div className="flex justify-between border-b pb-1">
+                                        <div className="flex flex-col mt-auto">
+                                            <label className="text-neutral-600 text-sm mb-1">Account Type</label>
+                                            <input type="text" value={accountData.accountType} className="w-full text-sm text-neutral-700" readOnly />
+                                        </div>
+                                    </div>
+                                    <div className="flex justify-between border-b pb-1">
+                                        <div className="flex flex-col mt-auto">
+                                            <label className="text-neutral-600 text-sm mb-1">Relationship Start Date</label>
+                                            <input type="text" value={accountData.relationshipStartDate} className="w-full text-sm text-neutral-700" readOnly />
+                                        </div>
+                                    </div>
+                                    <div className="flex justify-between border-b pb-1">
+                                        <div className="flex flex-col mt-auto">
+                                            <label className="text-neutral-600 text-sm mb-1">Relationship End Date</label>
+                                            <input type="text" value={accountData.relationshipEndDate} className="w-full text-sm text-neutral-700" readOnly />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            </div>
+
+        </div >
     );
 }

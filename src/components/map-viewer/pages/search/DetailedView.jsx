@@ -1,15 +1,96 @@
 import React, { useEffect, useState } from 'react';
 import { RiCloseLine } from 'react-icons/ri';
-import AmenitiesButton from '../../../shared/AmenitiesButton';
-
+import AmenitiesButton from './AmenitiesButton';
+import { CONFIG } from '../../../../config';
 import { useRef } from 'react';
 import { Spinner } from 'flowbite-react';
-export default function DetailedView({ building, onClose, nearByMrt, nearByOthers, isLoading }) {
-
+import AmenitiesDetails from './AmenitiedDetails';
+import { CONFIG_APP } from '../../config/app';
+import { useAppContext } from '../../../../AppContext';
+export default function DetailedView({ building, onClose ,amenitiesMarker}) {
+    const{currentAmenitiesBuilding}= useAppContext()
     const [activeTab, setActiveTab] = useState('Details');
-    const [currentAmenities, setCurrentAmenities] = useState('MRts')
+    const [currentAmenities, setCurrentAmenities] = useState(null)
+    const [currentAmenitiesData, setCurrentAmenitiesData] = useState(null)
     const[height, setHeight]= useState(0)
+    const [nearByMrt, setNearByMrt] = useState(null);
+    const [isDetailsLoading, setIsDetailsLoading] = useState(true);
+    const [isAmenitiesLoading, setIsAmenitiesLoading] = useState(true);
+    const [nearByOthers, setNearByOthers] = useState(null);
+    const [buildingDetails, setBuildingDetails] = useState(null);
     const targetRef = useRef(null);
+
+    useEffect(() => {
+        const fetchMrt = async () => {
+            const res = await fetch(`${CONFIG.MAPBOX_API}/near-by-mrt`, {
+            method: "GET",
+            });
+            const mrt = await res.json();
+
+            setNearByMrt(mrt.data);
+        };
+
+        const fetchOther = async () => {
+            console.log("halo")
+            //CHANGE THIS INTO BUILDING.BUILDINGID LATER
+            console.log(`${CONFIG_APP.MAPBOX_API}`)
+            const res = await fetch(`${CONFIG_APP.MAPBOX_API}/near-aminities/163`, {
+            method: "GET",
+            });
+            const others = await res.json();
+            console.log(others)
+            setNearByOthers(others.data);
+            console.log("after set")
+            console.log(nearByOthers)
+        };
+
+       
+        const fetchBoth = async () => {
+            // fetchMrt();
+            fetchOther();
+
+        };
+        const setLoading = async () => {
+            console.log("trueee");
+            setIsAmenitiesLoading(true);
+            await fetchBoth();
+            setIsAmenitiesLoading(false);
+            console.log("falsee");
+   
+        };
+
+        setLoading();
+        console.log("others");
+        console.log(nearByOthers)
+        console.log("inii");
+      }, [building]);
+
+      useEffect(()=>{
+        console.log("msk sini")
+        const fetchDetails = async () => {
+            console.log(building.buildingId)
+            const res = await fetch(`${CONFIG.PROPERTY_SERVICE}/${building.buildingId}`, {
+            method: "GET",
+            });
+            const building_detail = await res.json();
+            console.log("yesh");
+            console.log(building_detail)
+            setBuildingDetails(building_detail.resultSet.propertyInformation);
+        };
+        const setLoading = async () => {
+            console.log("trueee");
+            setIsDetailsLoading(true);
+            await fetchDetails();
+            setIsDetailsLoading(false);
+            console.log("falsee");
+            console.log(buildingDetails)
+        };
+
+        setLoading()
+        console.log("iniiiii details")
+        console.log(buildingDetails)
+      },[building])
+
 
     useEffect(() => {
         const handleResize = () => {
@@ -29,13 +110,32 @@ export default function DetailedView({ building, onClose, nearByMrt, nearByOther
       }, []);
 
       useEffect(() => {
-      targetRef.current = document.getElementById(currentAmenities)
+        if (!currentAmenitiesBuilding) {
+            return
+          }
+      targetRef.current = document.getElementById(`building-${currentAmenitiesBuilding.name}`)
       if (targetRef.current) {
           targetRef.current.scrollIntoView({ behavior: 'auto' });
           targetRef.current.focus(); 
         }
     
-      }, [currentAmenities]);
+      }, [currentAmenitiesBuilding]);
+
+      useEffect(() => {
+        targetRef.current = document.getElementById(currentAmenities)
+        if (targetRef.current) {
+            targetRef.current.scrollIntoView({ behavior: 'auto' });
+            targetRef.current.focus(); 
+          }
+      
+        }, [currentAmenities]);
+
+      useEffect(() => {
+        if (!currentAmenitiesData) {
+            return 
+          }
+       amenitiesMarker(currentAmenitiesData, currentAmenities)
+        }, [currentAmenitiesData]);
 
       
 
@@ -44,44 +144,44 @@ export default function DetailedView({ building, onClose, nearByMrt, nearByOther
             case 'Details':
                 
                 return (
-                    <div className="p-2 text-sm text-gray-700 space-y-2">
-                        <div className="flex justify-between">
-                            <span className="font-semibold">Completion</span>
-                            <span> </span>
+                    <>
+                        {isDetailsLoading ? (
+                            <div className="absolute inset-0 bg-white bg-opacity-70 flex justify-center items-center z-50">
+                                <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-c-teal"></div>
+                            </div>
+                        ) : (
+                        <div className="p-2 text-sm text-gray-700 space-y-2">
+                            <div className="flex justify-between">
+                                <span className="font-semibold">Completion</span>
+                                <span>{`${buildingDetails.generalInformation.termsCscDate}`} </span>
+                            </div>
+                            <div className="flex justify-between">
+                                <span className="font-semibold">Zoning:</span>
+                                <span>{`${buildingDetails.basicInformation.zoning}`}</span>
+                            </div>
+                            <div className="flex justify-between">
+                                <span className="font-semibold">NLA:</span>
+                                <span>{`${buildingDetails.generalInformation.netLettableArea}`}</span>
+                            </div>
+                            <div className="flex justify-between">
+                                <span className="font-semibold">GFA:</span>
+                                <span>{`${buildingDetails.generalInformation.grossFloorArea}`}</span>
+                            </div>
+                            <div className="flex justify-between">
+                                <span className="font-semibold">Land Area:</span>
+                                <span>{`${buildingDetails.generalInformation.landArea}`}</span>
+                            </div>
+                            <div className="flex justify-between">
+                                <span className="font-semibold">No of Floors:</span>
+                                <span>{`${buildingDetails.generalInformation.totalNoOfFloor}`}</span>
+                            </div>
+                            <div className="flex justify-between">
+                                <span className="font-semibold">Car Park Lots:</span>
+                                <span>{`${buildingDetails.parking.carParkLotsIncEV}`}</span>
+                            </div>
                         </div>
-                        <div className="flex justify-between">
-                            <span className="font-semibold">Zoning:</span>
-                            <span>{`${building.zoning}`}</span>
-                        </div>
-                        <div className="flex justify-between">
-                            <span className="font-semibold">GPA:</span>
-                            <span>For Sale</span>
-                        </div>
-                        <div className="flex justify-between">
-                            <span className="font-semibold">Base Area:</span>
-                            <span>Vacant</span>
-                        </div>
-                        <div className="flex justify-between">
-                            <span className="font-semibold">No of Floors:</span>
-                            <span>28,656 sq ft</span>
-                        </div>
-                        <div className="flex justify-between">
-                            <span className="font-semibold">Car Park Lists:</span>
-                            <span>Rent</span>
-                        </div>
-                        <div className="flex justify-between">
-                            <span className="font-semibold">Lease Type:</span>
-                            <span>Negotiator</span>
-                        </div>
-                        <div className="flex justify-between">
-                            <span className="font-semibold">Commencement:</span>
-                            <span>Immediate</span>
-                        </div>
-                        <div className="flex justify-between">
-                            <span className="font-semibold">Expiry:</span>
-                            <span>Landlord</span>
-                        </div>
-                    </div>
+                        )}
+                    </>
                 );
             case 'Availability':
                 return (
@@ -149,14 +249,14 @@ export default function DetailedView({ building, onClose, nearByMrt, nearByOther
                             })} */}
                            
                        
-                           {isLoading ? (
+                           {isAmenitiesLoading || !nearByOthers? (
                                 <div className="absolute inset-0 bg-white bg-opacity-70 flex justify-center items-center z-50">
                                     <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-c-teal"></div>
                                 </div>
                             ) : (
                                 <>
                             
-                                    <div  className="space-y-2">
+                                    {/* <div  className="space-y-2">
                                         <div id="MRT" className="text-sm text-neutral-900 font-bold">
                                             MRT
                                         </div>
@@ -173,27 +273,16 @@ export default function DetailedView({ building, onClose, nearByMrt, nearByOther
                                                 </div>
                                             </div>
                                         ))}
-                                    </div>
+                                    </div> */}
 
                                 
                                     {nearByOthers.map((obj, objIndex) => (
-                                        <div key={`category-${objIndex}`} className="space-y-2">
+                                        <div key={`category-${objIndex}`}>
                                             <div id={obj.category} className="text-sm text-neutral-900 font-bold">
                                                 {obj.category}
                                             </div>
-                                            {obj.places_result.map((building, buildingIndex) => (
-                                                <div key={`building-${buildingIndex}`}>
-                                                    <div className="text-sm text-neutral-700">
-                                                        {building.name}
-                                                    </div>
-                                                    <div className="text-sm text-neutral-500">
-                                                        Walking: {building.distance_duration.walking.duration} ({building.distance_duration.walking.distance})
-                                                    </div>
-                                                    <div className="text-sm text-neutral-500">
-                                                        Driving: {building.distance_duration.driving.duration} ({building.distance_duration.driving.distance})
-                                                    </div>
-                                                </div>
-                                            ))}
+                                            <p>hassss</p>
+                                            <AmenitiesDetails obj={obj} currentAmenities={currentAmenities} setCurrentAmenitiesData={setCurrentAmenitiesData} amenitiesMarker={amenitiesMarker} category={obj.category}/>
                                         </div>
                                     ))}
                                 </>
