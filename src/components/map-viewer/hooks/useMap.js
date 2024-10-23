@@ -6,6 +6,8 @@ import { useEffect, useRef, useState } from "react";
 import { CONFIG_APP } from "../config/app";
 import { buildAtom } from "../pages/project/store/build";
 import "./mapboxGeocoder.css";
+import { Category } from "@mui/icons-material";
+import { useAppContext } from "../../../AppContext";
 
 export function useMap(styleMap, map, zoom, triggerRadius) {
   const [dataMap, setDataMap] = useState();
@@ -17,7 +19,7 @@ export function useMap(styleMap, map, zoom, triggerRadius) {
   const handleMouseUp = useRef(null);
   const handleMouseLeave = useRef(null);
   const [build, setBuild] = useAtom(buildAtom);
-
+  const{setCurrentAmenitiesBuilding}= useAppContext()
 
   const handleSearch = (searchValue) => {
     setSearch(searchValue);
@@ -563,6 +565,58 @@ export function useMap(styleMap, map, zoom, triggerRadius) {
     });
   };
 
+  const amenitiesMarker = async (responseData,category) => {
+    removeMarkersAmenites();
+   
+    responseData?.forEach((item, index) => {
+      // Create HTML element for the marker
+      const el = document.createElement("div");
+    
+      const svg = `
+       <div class="marker-map-amenities">
+       <img
+          src="hospital.svg"
+          alt="hospital"
+          style="width: 30px; height: 30px;"
+        />
+        </div>
+      `;
+
+      // Append SVG and custom circle to marker element
+      el.innerHTML = svg;
+
+      el.addEventListener('click', () => {
+        setCurrentAmenitiesBuilding(item)
+      });
+     
+
+      // Add marker to map
+      const marker = new mapboxgl.Marker(el);
+      console.log(item);
+      marker.setLngLat([item.location.lng, item.location.lat]).addTo(map.current);
+      const popup = new mapboxgl.Popup({ offset: 25 }).setHTML(`
+      <div class="popup-container">
+        <div class="info-box">
+        
+            <h3>${item.name}</h3>
+            <div class="amenities-info">
+              <span> ${category} </span>
+              <span style="display: inline-flex; align-items: center;">
+              <img
+                src="wal.svg"
+                alt="walking"
+                style="width: 30px; height: 30px; margin-right: 5px;"
+              /> 
+              ${item.distance_duration.walking.duration} (${item.distance_duration.walking.distance}) 
+              </span>
+            </div>
+        </div>
+      </div>
+    `);
+
+      marker.setPopup(popup);    
+    });
+  };
 
   // useEffect(() => {
   //   mapApi({
@@ -618,11 +672,18 @@ export function useMap(styleMap, map, zoom, triggerRadius) {
     search,
     mapApi,
     setBuild,
-    build
+    build,
+    amenitiesMarker,
+    
   };
 }
 
 export function removeMarkers() {
   const markers = document.querySelectorAll(".marker-map");
+  markers.forEach((marker) => marker.remove());
+}
+
+export function removeMarkersAmenites() {
+  const markers = document.querySelectorAll(".marker-map-amenities");
   markers.forEach((marker) => marker.remove());
 }

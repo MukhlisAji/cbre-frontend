@@ -21,7 +21,8 @@ export default function SearchResult({
   mapApi,
   setIsBuildingsActive,
   setBuild,
-  build
+  build,
+  amenitiesMarker
 }) {
   const { selectedBuildings, setSelectedBuildings } = useAppContext();
   //CHANGE SELECTEDBUILDING TO USE ONLY BUILD
@@ -244,6 +245,7 @@ export default function SearchResult({
 
       {build && (
         <DetailedView
+          amenitiesMarker={amenitiesMarker}
           building={build}
           onClose={handleCloseDetailView}
         />

@@ -1,13 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import { RiCloseLine } from 'react-icons/ri';
-import AmenitiesButton from '../../../shared/AmenitiesButton';
+import AmenitiesButton from './AmenitiesButton';
 import { CONFIG } from '../../../../config';
 import { useRef } from 'react';
 import { Spinner } from 'flowbite-react';
-export default function DetailedView({ building, onClose}) {
-
+import AmenitiesDetails from './AmenitiedDetails';
+import { CONFIG_APP } from '../../config/app';
+import { useAppContext } from '../../../../AppContext';
+export default function DetailedView({ building, onClose ,amenitiesMarker}) {
+    const{currentAmenitiesBuilding}= useAppContext()
     const [activeTab, setActiveTab] = useState('Details');
-    const [currentAmenities, setCurrentAmenities] = useState('MRts')
+    const [currentAmenities, setCurrentAmenities] = useState(null)
+    const [currentAmenitiesData, setCurrentAmenitiesData] = useState(null)
     const[height, setHeight]= useState(0)
     const [nearByMrt, setNearByMrt] = useState(null);
     const [isDetailsLoading, setIsDetailsLoading] = useState(true);
@@ -29,8 +33,8 @@ export default function DetailedView({ building, onClose}) {
         const fetchOther = async () => {
             console.log("halo")
             //CHANGE THIS INTO BUILDING.BUILDINGID LATER
-            console.log(`${CONFIG.MAPBOX_API}`)
-            const res = await fetch(`http://localhost:3000/cbre/map/near-aminities/163`, {
+            console.log(`${CONFIG_APP.MAPBOX_API}`)
+            const res = await fetch(`${CONFIG_APP.MAPBOX_API}/near-aminities/163`, {
             method: "GET",
             });
             const others = await res.json();
@@ -106,13 +110,32 @@ export default function DetailedView({ building, onClose}) {
       }, []);
 
       useEffect(() => {
-      targetRef.current = document.getElementById(currentAmenities)
+        if (!currentAmenitiesBuilding) {
+            return
+          }
+      targetRef.current = document.getElementById(`building-${currentAmenitiesBuilding.name}`)
       if (targetRef.current) {
           targetRef.current.scrollIntoView({ behavior: 'auto' });
           targetRef.current.focus(); 
         }
     
-      }, [currentAmenities]);
+      }, [currentAmenitiesBuilding]);
+
+      useEffect(() => {
+        targetRef.current = document.getElementById(currentAmenities)
+        if (targetRef.current) {
+            targetRef.current.scrollIntoView({ behavior: 'auto' });
+            targetRef.current.focus(); 
+          }
+      
+        }, [currentAmenities]);
+
+      useEffect(() => {
+        if (!currentAmenitiesData) {
+            return 
+          }
+       amenitiesMarker(currentAmenitiesData, currentAmenities)
+        }, [currentAmenitiesData]);
 
       
 
@@ -254,23 +277,12 @@ export default function DetailedView({ building, onClose}) {
 
                                 
                                     {nearByOthers.map((obj, objIndex) => (
-                                        <div key={`category-${objIndex}`} className="space-y-2">
+                                        <div key={`category-${objIndex}`}>
                                             <div id={obj.category} className="text-sm text-neutral-900 font-bold">
                                                 {obj.category}
                                             </div>
-                                            {obj.places_result.map((building, buildingIndex) => (
-                                                <div key={`building-${buildingIndex}`}>
-                                                    <div className="text-sm text-neutral-700">
-                                                        {building.name}
-                                                    </div>
-                                                    <div className="text-sm text-neutral-500">
-                                                        Walking: {building.distance_duration.walking.duration} ({building.distance_duration.walking.distance})
-                                                    </div>
-                                                    <div className="text-sm text-neutral-500">
-                                                        Driving: {building.distance_duration.driving.duration} ({building.distance_duration.driving.distance})
-                                                    </div>
-                                                </div>
-                                            ))}
+                                            <p>hassss</p>
+                                            <AmenitiesDetails obj={obj} currentAmenities={currentAmenities} setCurrentAmenitiesData={setCurrentAmenitiesData} amenitiesMarker={amenitiesMarker} category={obj.category}/>
                                         </div>
                                     ))}
                                 </>
