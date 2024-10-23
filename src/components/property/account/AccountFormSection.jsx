@@ -17,7 +17,7 @@ export default function AccountFormSection({
 }) {
     const [resourceData, setResourceData] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
-    const [accountOwnerOptions, setAccountOwnerOptions] = useState([]);
+    const [isSingapore, setIsSingapore] = useState([]);
     const [selectedParentAccount, setSelectedParentAccount] = useState('');
 
     useEffect(() => {
@@ -65,6 +65,16 @@ export default function AccountFormSection({
                     inactivationDate: currentDate, // Auto-fill inactivationDate with current date
                 },
             }));
+        } if (field === 'systemInformation' && subField === 'status' && newValue === 'Inactive') {
+            const currentDate = new Date().toISOString().split('T')[0]; // Get the current date in YYYY-MM-DD format
+            setFormData((prevData) => ({
+                ...prevData,
+                [field]: {
+                    ...prevData[field],
+                    [subField]: newValue, // Set status to 'Inactive'
+                    inactivationDate: currentDate, // Auto-fill inactivationDate with current date
+                },
+            }));
         } else {
             // Normal handling for other fields
             setFormData((prevData) => ({
@@ -79,17 +89,29 @@ export default function AccountFormSection({
     const handleCountryChange = (field, countryField, stateField, countryCodeField) => (e) => {
         const selectedCountry = resourceData.country.find(c => c.countryName === e.target.value);
         const countryCode = selectedCountry ? selectedCountry.countryCode : '';
-
+    
+        // Check if the selected country is Singapore
+        const isSingapore = selectedCountry && selectedCountry.countryName === 'Singapore';
+        const singaporeState = isSingapore ? 'Singapore' : ''; // Set Singapore state
+        const singaporeCity = isSingapore ? 'Singapore' : ''; // Set Singapore city
+    
         setFormData((prevData) => ({
             ...prevData,
             [field]: {
                 ...prevData[field],
                 [countryField]: e.target.value,
                 [countryCodeField]: countryCode,
-                [stateField]: '', // Reset the state when a new country is selected
+                [stateField]: singaporeState, // Populate state if Singapore
+                billingCity: field === 'addressInformation' && countryField === 'billingCountry' ? singaporeCity : prevData[field].billingCity, // Populate city if billing country is Singapore
+                shippingCity: field === 'addressInformation' && countryField === 'shippingCountry' ? singaporeCity : prevData[field].shippingCity, // Populate city if shipping country is Singapore
             },
         }));
     };
+    
+
+
+    const isBillingSingapore = formData.addressInformation.billingCountry === 'Singapore';
+    const isShippingSingapore = formData.addressInformation.shippingCountry === 'Singapore';
 
     // const fetchAccountOwnerOptions = debounce(async (name) => {
     //     try {
@@ -271,34 +293,42 @@ export default function AccountFormSection({
                 { label: 'Shipping City', type: 'text', value: formData.addressInformation.shippingCity, onChange: handleInputChange('addressInformation', 'shippingCity') },
                 { label: 'Billing Street', type: 'text', value: formData.addressInformation.billingStreet, onChange: handleInputChange('addressInformation', 'billingStreet'), required: true },
                 { label: 'Shipping Street', type: 'text', value: formData.addressInformation.shippingStreet, onChange: handleInputChange('addressInformation', 'shippingStreet') },
-                {
-                    label: 'Billing Zip/Postal Code',
-                    value: formData.addressInformation.billingPostCode,
-                    onChange: handleInputChange('addressInformation', 'billingPostCode'),
-                    options: resourceData?.country.find(c => c.countryName === formData.addressInformation.billingCountry)
-                        ?.state.find(s => s.stateName === formData.addressInformation.billingState)
-                        ?.division.flatMap(d => d.suburb.map(sub => ({
-                            label: sub.postCode,
-                            value: sub.postCode,
-                        }))) || [],
-                    valueField: 'value',
-                    labelField: 'label',
-                    disabled: !formData.addressInformation.billingState
-                },
-                {
-                    label: 'Shipping Zip/Postal Code',
-                    value: formData.addressInformation.shippingPostCode,
-                    onChange: handleInputChange('addressInformation', 'shippingPostCode'),
-                    options: resourceData?.country.find(c => c.countryName === formData.addressInformation.shippingCountry)
-                        ?.state.find(s => s.stateName === formData.addressInformation.shippingState)
-                        ?.division.flatMap(d => d.suburb.map(sub => ({
-                            label: sub.postCode,
-                            value: sub.postCode,
-                        }))) || [],
-                    valueField: 'value',
-                    labelField: 'label',
-                    disabled: !formData.addressInformation.shippingState
-                }
+                isBillingSingapore ? (
+                    {
+                        label: 'Billing Zip/Postal Code',
+                        value: formData.addressInformation.billingPostCode,
+                        onChange: handleInputChange('addressInformation', 'billingPostCode'),
+                        options: resourceData?.country.find(c => c.countryName === formData.addressInformation.billingCountry)
+                            ?.state.find(s => s.stateName === formData.addressInformation.billingState)
+                            ?.division.flatMap(d => d.suburb.map(sub => ({
+                                label: sub.postCode,
+                                value: sub.postCode,
+                            }))) || [],
+                        valueField: 'value',
+                        labelField: 'label',
+                        disabled: !formData.addressInformation.billingState
+                    }
+                ) : (
+                    { label: 'Billing Zip/Postal Code', type: 'text', value: formData.addressInformation.billingPostCode, onChange: handleInputChange('addressInformation', 'billingPostCode'), required: false }
+                ),
+                isShippingSingapore ? (
+                    {
+                        label: 'Shipping Zip/Postal Code',
+                        value: formData.addressInformation.shippingPostCode,
+                        onChange: handleInputChange('addressInformation', 'shippingPostCode'),
+                        options: resourceData?.country.find(c => c.countryName === formData.addressInformation.shippingCountry)
+                            ?.state.find(s => s.stateName === formData.addressInformation.shippingState)
+                            ?.division.flatMap(d => d.suburb.map(sub => ({
+                                label: sub.postCode,
+                                value: sub.postCode,
+                            }))) || [],
+                        valueField: 'value',
+                        labelField: 'label',
+                        disabled: !formData.addressInformation.shippingState
+                    }
+                ) : (
+                    { label: 'Shipping Zip/Postal Code', type: 'text', value: formData.addressInformation.shippingPostCode, onChange: handleInputChange('addressInformation', 'shippingPostCode'), required: false }
+                ),
             ],
         },
         {
