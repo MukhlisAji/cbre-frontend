@@ -6,8 +6,9 @@ import { useRef } from 'react';
 import { Spinner } from 'flowbite-react';
 import AmenitiesDetails from './AmenitiedDetails';
 import { CONFIG_APP } from '../../config/app';
-export default function DetailedView({ building, onClose}) {
-
+import { useAppContext } from '../../../../AppContext';
+export default function DetailedView({ building, onClose ,amenitiesMarker}) {
+    const{currentAmenitiesBuilding}= useAppContext()
     const [activeTab, setActiveTab] = useState('Details');
     const [currentAmenities, setCurrentAmenities] = useState(null)
     const [currentAmenitiesData, setCurrentAmenitiesData] = useState(null)
@@ -109,17 +110,31 @@ export default function DetailedView({ building, onClose}) {
       }, []);
 
       useEffect(() => {
-      targetRef.current = document.getElementById(currentAmenities)
+        if (!currentAmenitiesBuilding) {
+            return
+          }
+      targetRef.current = document.getElementById(`building-${currentAmenitiesBuilding.name}`)
       if (targetRef.current) {
           targetRef.current.scrollIntoView({ behavior: 'auto' });
           targetRef.current.focus(); 
         }
     
-      }, [currentAmenities]);
+      }, [currentAmenitiesBuilding]);
 
       useEffect(() => {
-       //MALE FUNCTON FOR MARER N USEMAP
+        targetRef.current = document.getElementById(currentAmenities)
+        if (targetRef.current) {
+            targetRef.current.scrollIntoView({ behavior: 'auto' });
+            targetRef.current.focus(); 
+          }
       
+        }, [currentAmenities]);
+
+      useEffect(() => {
+        if (!currentAmenitiesData) {
+            return 
+          }
+       amenitiesMarker(currentAmenitiesData, currentAmenities)
         }, [currentAmenitiesData]);
 
       
@@ -266,7 +281,8 @@ export default function DetailedView({ building, onClose}) {
                                             <div id={obj.category} className="text-sm text-neutral-900 font-bold">
                                                 {obj.category}
                                             </div>
-                                            <AmenitiesDetails obj={obj} currentAmenities={currentAmenities} setCurrentAmenitiesData={setCurrentAmenitiesData}/>
+                                            <p>hassss</p>
+                                            <AmenitiesDetails obj={obj} currentAmenities={currentAmenities} setCurrentAmenitiesData={setCurrentAmenitiesData} amenitiesMarker={amenitiesMarker} category={obj.category}/>
                                         </div>
                                     ))}
                                 </>

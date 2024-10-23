@@ -102,6 +102,13 @@ button {
   white-space: nowrap;
   border: 1px solid #fff;
 }
+
+.amenities-info {
+  display: flex;        
+  justify-content: space-between; 
+  align-items: center;    
+}
+
 .pill.mini {
   line-height: 0;
 }

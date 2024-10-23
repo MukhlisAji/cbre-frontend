@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 export default function AmenitiesButton({label, currentAmenities, setCurrentAmenities, img, category}){
     const handleButtonOnClick= () => {
         setCurrentAmenities(category);
-      };
+    };
 
     return(
         <div className="flex justify-between w-1/3 h-[30px] space-x-2">
