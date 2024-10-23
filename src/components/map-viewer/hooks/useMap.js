@@ -345,7 +345,10 @@ export function useMap(styleMap, map, zoom, triggerRadius) {
       //   .getElementById("search-buttonradius")
       //   .addEventListener("click", function () {
       //     removeMarkers();
-      //     fetchApi(centerPoint[0], centerPoint[1], radius);
+      //     if (!map.current.getSource("circle")) {
+
+      //       fetchApi(centerPoint[0], centerPoint[1], radius);
+      //     }
       //   });
 
       //   document
@@ -379,6 +382,8 @@ export function useMap(styleMap, map, zoom, triggerRadius) {
         map.current.removeLayer("circle");
         map.current.removeLayer("circle-outline");
         map.current.removeSource("circle");
+        map.current.removeLayer("pointer-layer");
+        map.current.removeSource("pointer");
       }
       // 1
       // document.getElementById("search-buttonradius").style.display = "none";
