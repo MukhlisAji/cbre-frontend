@@ -13,9 +13,10 @@ export function useConfig() {
   const [isMap3D, setIsMap3D] = useState(false);
   const [zoom, setZoom] = useState(10);
   const { showMRT, setShowMRT } = useMRTLine(map)
+  const [triggerRadius, setTriggerRadius] = useState(false);
 
   const [styleMap, setStyleMap] = useState("mapbox://styles/mapbox/streets-v12");
-    
+
 
   const handleChangeStyleMap = (value) => {
     setStyleMap(value);
@@ -91,7 +92,7 @@ export function useConfig() {
       });
     }
 
-    
+
   }
 
   function addMapControls() {
@@ -216,13 +217,13 @@ export function useConfig() {
         const container = document.createElement('div');
         container.id = 'control';
         container.className = 'mapboxgl-ctrl';
-  //       <div class="control-img-wrapper">
-  //       ${isMap3D ?
-  //   `<img id="control-building-map" src="2d.svg" alt="2D"/>`
-  //   :
-  //   `<img id="control-building-map" src="3d.svg" alt="3D"/>`
-  // }
-  //   </div>
+        //       <div class="control-img-wrapper">
+        //       ${isMap3D ?
+        //   `<img id="control-building-map" src="2d.svg" alt="2D"/>`
+        //   :
+        //   `<img id="control-building-map" src="3d.svg" alt="3D"/>`
+        // }
+        //   </div>
         const svg = `
            
             <div class="control-img-wrapper">
@@ -230,6 +231,9 @@ export function useConfig() {
             </div>
             <div class="control-img-wrapper">
                 <img id="house" src="house.svg" alt="House"/>
+            </div>
+            <div class="control-img-wrapper">
+                <img id="radius" src="radius.svg" alt="Radius"/>
             </div>
         `;
 
@@ -331,6 +335,22 @@ export function useConfig() {
     updateMarkerVisibility();
   }, [zoom]);
 
+  useEffect(() => {
+    const radiusElement = document.getElementById("radius");
+
+    if (radiusElement) {
+      // color blue active yaitu #005ec4
+      radiusElement.parentNode.style.backgroundColor = triggerRadius ? "#005ec4" : "white";
+      const handleClick = () => {
+        setTriggerRadius((prev) => !prev);
+      };
+      radiusElement.addEventListener("click", handleClick);
+      return () => {
+        radiusElement.removeEventListener("click", handleClick);
+      };
+    }
+  }, [triggerRadius]);
+
 
   return {
     map,
@@ -346,6 +366,7 @@ export function useConfig() {
     handleChangeStyleMap,
     toggle3D,
     isMap3D,
-    setIsMap3D
+    setIsMap3D,
+    triggerRadius
   };
 }

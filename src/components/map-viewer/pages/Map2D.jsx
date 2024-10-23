@@ -44,6 +44,7 @@ function Map2D() {
     handleChangeStyleMap,
     isMap3D,
     setIsMap3D,
+    triggerRadius,
   } = useConfig();
 
   const [isSearch, setIsSearch] = useState(null);
@@ -86,7 +87,6 @@ function Map2D() {
   // Zoning
   const { triggerZoning, resetZoning } = useZoning(map);
 
-  const [triggerRadius, setTriggerRadius] = useState(false);
   // Main map
   const { filteringData, handleSearch, search, mapApi, setBuild , build} = useMap(
     styleMap,
