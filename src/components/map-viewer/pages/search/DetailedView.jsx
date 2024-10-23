@@ -281,7 +281,6 @@ export default function DetailedView({ building, onClose ,amenitiesMarker}) {
                                             <div id={obj.category} className="text-sm text-neutral-900 font-bold">
                                                 {obj.category}
                                             </div>
-                                            <p>hassss</p>
                                             <AmenitiesDetails obj={obj} currentAmenities={currentAmenities} setCurrentAmenitiesData={setCurrentAmenitiesData} amenitiesMarker={amenitiesMarker} category={obj.category}/>
                                         </div>
                                     ))}
