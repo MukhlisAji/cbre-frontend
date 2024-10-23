@@ -1,10 +1,8 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 
 export default function AmenitiesButton({label, currentAmenities, setCurrentAmenities, img, category}){
-    useEffect
     const handleButtonOnClick= () => {
         setCurrentAmenities(category);
-       
       };
 
     return(

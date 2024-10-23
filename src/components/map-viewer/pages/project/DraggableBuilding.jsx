@@ -1,6 +1,6 @@
 import { Checkbox } from "@headlessui/react";
 import { useAtom } from "jotai";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useDrag } from "react-dnd";
 import { BsCheckLg } from "react-icons/bs";
 import { useAppContext } from "../../../../AppContext";
@@ -19,6 +19,7 @@ function DraggableBuilding({
 }) {
   const { selectedBuildings, setDroppedBuildings } = useAppContext();
 //   const [build, setBuild] = useAtom(buildAtom);
+
   const [{ isDragging }, drag] = useDrag({
     type: ItemTypes.BUILDING,
     item: { building },
@@ -41,6 +42,7 @@ function DraggableBuilding({
     }),
   });
 
+  
   return (
     <>
       {controlChecked && (
@@ -71,6 +73,9 @@ function DraggableBuilding({
         </span>
         <span className="text-sm text-neutral-500">
           {`${building.streetNumber} ${building.streetName}, Singapore ${building.postalCode}`}
+        </span>
+        <span className="text-sm text-neutral-500">
+          <span>No. of Spaces: {`${building.numberOfSpaces}`} </span>
         </span>
       </div>
     </>

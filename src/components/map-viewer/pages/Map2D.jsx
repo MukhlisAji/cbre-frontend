@@ -201,6 +201,17 @@ function Map2D() {
     setIsMap3D(event.target.checked);
   };
 
+  const countNumberOfSpaces =(result)=>{
+    result.forEach(building => {
+      building.numberOfSpaces = building.numberOfSpaces || 0;
+      building.floorInformation?.forEach(element => {
+        building.numberOfSpaces += element.spaceInformation?.length || 0; // Use optional chaining and fallback to 0 if spaceInformation is undefined
+      });
+    });
+
+    
+  }
+
   const [isBuildingsActive, setIsBuildingsActive] = useState(false);
   const [buildings, setBuildings] = useState([]);
   const handleClickSearch = async (form, category) => {
@@ -234,6 +245,10 @@ function Map2D() {
       const result = await response.json();
       setIsLoading(false)
       console.log("Search results:", result);
+
+      countNumberOfSpaces(result.resultSet.propertyInformation)
+      console.log("number spaces")
+      console.log(result.resultSet.propertyInformation)
       setBuildings(result.resultSet.propertyInformation);
       mapApi({ data: result.resultSet.propertyInformation });
       // return result;
