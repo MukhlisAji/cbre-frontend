@@ -33,7 +33,7 @@ import { buildAtom } from "../project/store/build";
 import { data } from "autoprefixer";
 
 // search
-export default function TwoDSearch({ isLoading, build, mapApi, map, buildings, setBuildings, setIsBuildingsActive, setBuild}) {
+export default function TwoDSearch({amenitiesMarker, isLoading, build, mapApi, map, buildings, setBuildings, setIsBuildingsActive, setBuild }) {
   const { isCollapsed2dSearchOpen, setIsCollapsed2dSearchOpen } =
     useAppContext();
   const navigate = useNavigate();
@@ -266,6 +266,7 @@ export default function TwoDSearch({ isLoading, build, mapApi, map, buildings, s
               </div>
             ) : (
               <SearchResult
+                amenitiesMarker={amenitiesMarker}
                 build ={build}
                 mapApi={mapApi}
                 onBack={handleBackToSearch}

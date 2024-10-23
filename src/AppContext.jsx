@@ -14,6 +14,8 @@ export const AppProvider = ({ children }) => {
     const [openProject, setOpenProject] = useState(false);
     const [confirmSave, setConfirmSave] = useState(false);
     const [token, setToken] = useState("");
+    const [currentAmenitiesBuilding, setCurrentAmenitiesBuilding] = useState(null);
+
 
 
     const toggleDrawer = (content = 'default') => {
@@ -39,7 +41,8 @@ export const AppProvider = ({ children }) => {
             droppedBuildings, setDroppedBuildings,
             openProject, toggleDrawer, drawerContent,
             confirmSave, setConfirmSave,
-            token, setToken
+            token, setToken,
+            currentAmenitiesBuilding, setCurrentAmenitiesBuilding,
         }}>
             {children}
         </AppContext.Provider>

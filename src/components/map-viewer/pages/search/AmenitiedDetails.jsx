@@ -1,18 +1,26 @@
 import React, { useEffect, useState } from 'react';
+import { useAppContext } from '../../../../AppContext';
 
 export default function AmenitiesDetails({obj,category, currentAmenities,  setCurrentAmenitiesData}){
+  const{currentAmenitiesBuilding}= useAppContext()
   useEffect(()=>{
+    console.log("ppppppp")
+    console.log(currentAmenities)
+    console.log(category)
     if (currentAmenities === category){
-      setCurrentAmenitiesData(obj)
+      console.log("msssss")
+      setCurrentAmenitiesData(obj.places_result)
     }
    
   },[currentAmenities])
 
-
+  const handleClick =(building)=>{
+    console.log(building)
+  }
   return (
       <div>
         {obj.places_result.map((building, buildingIndex) => (
-          <div key={`building-${buildingIndex}`} className='pt-2'>
+          <div key={`building-${building.name}`} id={`building-${building.name}`} className={`pt-2 ${currentAmenitiesBuilding === building ? 'bg-slate-200' : 'bg-inherit'}`} onClick={() => handleClick(building)}>
             <div className="text-sm text-neutral-700">
               {building.name}
             </div>
