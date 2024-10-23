@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Tab } from '@headlessui/react';
 import { FaRegCheckCircle } from "react-icons/fa";
 import { useParams } from 'react-router-dom';
@@ -10,6 +10,7 @@ import { IoMdArrowDropdown } from 'react-icons/io';
 import { IoCheckmarkCircleOutline } from 'react-icons/io5';
 import { CONFIG } from '../../../config';
 import { generateTransactionId } from '../../lib/api/Authorization';
+import { MdContactPhone } from 'react-icons/md';
 
 function classNames(...classes) {
     return classes.filter(Boolean).join(' ');
@@ -28,44 +29,64 @@ export default function AccountDetails() {
     const [systemInformationVisible, setSystemInformationVisible] = useState(false);
     const [tooltipVisible, setTooltipVisible] = useState(false);
     const [parentAccountInfo, setParentAccountInfo] = useState('');
-
-    const fetchParentAccountInfo = async (parentId) => {
-        try {
-            const response = await fetch(`${CONFIG.ACCOUNT_SERVICE}/${parentId}`);
-            const data = await response.json();
-            setParentAccountInfo(data.resultSet);
-            setTooltipVisible(true);
-            console.log(" tooltip ");
-        } catch (error) {
-            console.error('Error fetching account data:', error);
-        }
-    };
-
-
-    const handleParentAccountClick = () => {
+    const tooltipRef = useRef(null); // Create a ref for the tooltip
+    const buttonRef = useRef(null);
+    // useEffect(() => {
+    const fetchParentAccountInfo = async () => {
         const parentId = accountData.parentAccount?.id;
         if (parentId) {
-            fetchParentAccountInfo(parentId);
-            // setTooltipVisible(true);
+            try {
+                const response = await fetch(`${CONFIG.ACCOUNT_SERVICE}/${parentId}`);
+                const data = await response.json();
+                console.log('Fetched account data:', data.resultSet); // Changed console.error to console.log for successful fetch
+                setParentAccountInfo(data.resultSet);
+            } catch (error) {
+                console.error('Error fetching account data:', error);
+            }
         }
     };
 
-    // Optional: Hide the tooltip when clicked outside
+    // Call the function to fetch data
+    //     fetchParentAccountInfo();
+    // }, [accountData]); // Empty dependency array to run only on component mount
+
+    const handleParentAccountClick = () => {
+        setTooltipVisible(true);
+        fetchParentAccountInfo();
+    };
+
+
     const handleClickOutside = (e) => {
-        if (tooltipVisible && !e.target.closest('.tooltip')) {
+        if (
+            tooltipVisible &&
+            tooltipRef.current &&
+            !tooltipRef.current.contains(e.target) &&
+            buttonRef.current &&
+            !buttonRef.current.contains(e.target)
+        ) {
             setTooltipVisible(false);
         }
     };
 
     useEffect(() => {
-        document.addEventListener('click', handleClickOutside);
+        document.addEventListener('mousedown', handleClickOutside);
+
         return () => {
-            document.removeEventListener('click', handleClickOutside);
+            document.removeEventListener('mousedown', handleClickOutside);
         };
     }, [tooltipVisible]);
 
-
-
+    // Tooltip positioning style
+    const tooltipStyle = {};
+    if (tooltipVisible && buttonRef.current) {
+        const buttonRect = buttonRef.current.getBoundingClientRect();
+        
+        // Only calculate tooltip position if tooltipRef is available
+        if (tooltipRef.current) {
+            tooltipStyle.top = `${buttonRect.top - tooltipRef.current.offsetHeight}px`; // Position above
+            tooltipStyle.left = `${buttonRect.left + buttonRect.width / 2 - tooltipRef.current.offsetWidth / 2}px`; // Center above the button
+        }
+    }
 
     const tabs = [
         "Details",
@@ -143,7 +164,7 @@ export default function AccountDetails() {
                 <div className="flex space-x-12">
                     <div className="flex flex-col p-2 ">
                         <span className="text-xs">Account Site</span>
-                        <p className="text-sm font-semibold text-neutral-600">{accountData.billingCity}</p>
+                        <p className="text-sm font-semibold text-neutral-600">{accountData.accountSite || "-"}</p>
                     </div>
                     <div className="flex flex-col p-2 ">
                         <span className="material-icons text-xs">Phone</span>
@@ -206,15 +227,17 @@ export default function AccountDetails() {
                                             label: 'Parent Account',
                                             value: accountData.parentAccount?.name || '-',
                                             isLink: true,
-                                            onClick: handleParentAccountClick
+                                            onClick: handleParentAccountClick,
+                                            ref: buttonRef
                                         },
                                         { label: 'Client Type', value: (accountData.clientType.length > 0 ? accountData.clientType.map(type => type.name).join(', ') : '-') || '-' }
                                     ].map((item, index) => (
                                         <div key={index} className="flex justify-between border-b pb-1">
-                                            <div className="flex w-full flex-col mt-auto">
+                                            <div ref={item.label === 'Parent Account' ? buttonRef : null} className="flex w-full flex-col mt-auto">
                                                 <label className="text-neutral-600 text-sm mb-1">{item.label}</label>
                                                 {item.isLink ? (
                                                     <input
+                                                        // ref={item.ref}
                                                         onClick={item.onClick} // Call the click handler
                                                         type="text"
                                                         value={item.value}
@@ -234,30 +257,85 @@ export default function AccountDetails() {
                                         </div>
 
                                     ))}
-                                    {tooltipVisible &&  (
-                                        <div className="absolute h-72 bg-white border border-gray-300 rounded-md shadow-lg p-4 z-10">
-                                            {parentAccountInfo? (
-                                            <div className="flex flex-col">
-                                                <h3 className="font-bold text-lg mb-2">{parentAccountInfo.accountName || '-'}</h3>
-                                                <p className="text-sm text-gray-600"><strong>ID:</strong> {parentAccountInfo.id || '-'}</p>
-                                                <p className="text-sm text-gray-600"><strong>Phone:</strong> {parentAccountInfo.phone || '-'}</p>
-                                                <p className="text-sm text-gray-600"><strong>Status:</strong> {parentAccountInfo.status || '-'}</p>
-                                                <p className="text-sm text-gray-600"><strong>Billing Address:</strong></p>
-                                                <p className="text-sm text-gray-600">
-                                                    {parentAccountInfo.billingStreet || '-'},
-                                                    {parentAccountInfo.billingCity || '-'},
-                                                    {parentAccountInfo.billingState || '-'},
-                                                    {parentAccountInfo.billingPostCode || '-'}
-                                                </p>
-                                                <p className="text-sm text-gray-600"><strong>Created By:</strong> {parentAccountInfo.createdBy || '-'}</p>
-                                                <p className="text-sm text-gray-600"><strong>Created Date:</strong> {parentAccountInfo.createdDate || '-'}</p>
-                                                <p className="text-sm text-gray-600"><strong>Last Modified By:</strong> {parentAccountInfo.modifiedBy || '-'}</p>
-                                                <p className="text-sm text-gray-600"><strong>Last Modified Date:</strong> {parentAccountInfo.modifiedDate || '-'}</p>
-                                            </div>) : (
-                                                <div className='p-4'>Loading...</div>
-                                            )}
+                                    {tooltipVisible && (
+                                        <div
+                                            ref={tooltipRef}
+                                            role="tooltip"
+                                            aria-live="polite"
+                                            style={tooltipStyle} // Apply dynamic styles
+                                            className="tooltip absolute h-auto w-auto bg-white border border-gray-300 rounded-md shadow-lg z-10"
+                                        >                                            
+                                        {!parentAccountInfo ? (
+                                            <div className="p-4 h-52 w-96 flex items-center justify-center">
+                                                <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-c-teal"></div>
+
+                                            </div>
+                                        ) : (
+                                            <div className='h-52 w-96'>
+                                                <div className='px-4 py-2 flex bg-neutral-100 items-center space-x-3'>
+                                                    <div className="p-2 rounded-md border-2 border-purple-500 bg-purple-600">
+                                                        <RiContactsBook3Line className="text-white text-lg font-bold" />
+                                                    </div>
+                                                    <div>
+                                                        <h1 className="text-lg font-semibold text-neutral-600">
+                                                            {parentAccountInfo.accountName || '-'}
+                                                        </h1>
+                                                    </div>
+                                                </div>
+
+                                                <div className="p-4 grid grid-cols-2 gap-4">
+                                                    <div className="space-y-2">
+                                                        <div className="rounded-md">
+                                                            <p className="text-xs text-gray-600"><strong>Account Site:</strong></p>
+                                                            <p className="text-xs text-gray-600">{parentAccountInfo.accountSite || '-'}</p>
+                                                        </div>
+                                                        <div className="rounded-md">
+                                                            <p className="text-xs text-gray-600"><strong>Phone:</strong></p>
+                                                            <p className="text-xs text-gray-600">{parentAccountInfo.phone || '-'}</p>
+                                                        </div>
+                                                        <div className="rounded-md">
+                                                            <p className="text-xs text-gray-600"><strong>APAC Industry Type:</strong></p>
+                                                            <p className="text-xs text-gray-600">{parentAccountInfo.industrialType?.name || '-'}</p>
+                                                        </div>
+                                                    </div>
+
+                                                    <div className="space-y-2">
+                                                        <div className="rounded-md">
+                                                            <p className="text-xs text-gray-600"><strong>Website:</strong></p>
+                                                            {parentAccountInfo.website ? (
+                                                                <p className="text-xs text-gray-600">
+                                                                    <a
+                                                                        href={parentAccountInfo.website}
+                                                                        target="_blank"
+                                                                        rel="noopener noreferrer"
+                                                                        className="text-c-teal hover:underline"
+                                                                    >
+                                                                        {parentAccountInfo.website}
+                                                                    </a>
+                                                                </p>
+                                                            ) : (
+                                                                <p className="text-xs text-gray-600">-</p>
+                                                            )}
+                                                        </div>
+                                                        <div className="rounded-md">
+                                                            <p className="text-xs text-gray-600"><strong>Address:</strong></p>
+                                                            <p className="text-xs text-gray-600">
+                                                                {parentAccountInfo.billingStreet || '-'}, {parentAccountInfo.billingCity || '-'},
+                                                                {parentAccountInfo.billingState || '-'}, {parentAccountInfo.billingPostCode || '-'}
+                                                            </p>
+                                                        </div>
+                                                        <div className="rounded-md">
+                                                            <p className="text-xs text-gray-600"><strong>Status:</strong></p>
+                                                            <p className="text-xs text-gray-600">{parentAccountInfo.status || '-'}</p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        )}
                                         </div>
                                     )}
+
+
 
                                 </div>
                             </div>
