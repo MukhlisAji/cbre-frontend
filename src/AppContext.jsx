@@ -14,6 +14,8 @@ export const AppProvider = ({ children }) => {
     const [openProject, setOpenProject] = useState(false);
     const [confirmSave, setConfirmSave] = useState(false);
     const [token, setToken] = useState("");
+    const [currentAmenitiesBuilding, setCurrentAmenitiesBuilding] = useState(null);
+
     const [contactResource, setContactResource] = useState([]);
 
 
@@ -41,6 +43,8 @@ export const AppProvider = ({ children }) => {
             droppedBuildings, setDroppedBuildings,
             openProject, toggleDrawer, drawerContent,
             confirmSave, setConfirmSave,
+            token, setToken,
+            currentAmenitiesBuilding, setCurrentAmenitiesBuilding,
             token, setToken,
             contactResource, setContactResource
         }}>

@@ -254,7 +254,7 @@ const ContactDetails = () => {
         setSendingRelation(true);
 
         try {
-            const response = await handleSubmitOrDelete(e, "submit");
+            let response = await handleSubmitOrDelete(e, "submit");
 
             if (response.statusCode === "02" || response.statusDescription.message === "Session expired or invalid") {
                 console.log("Session invalid, regenerating token...");
