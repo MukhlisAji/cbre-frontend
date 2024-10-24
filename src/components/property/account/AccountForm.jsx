@@ -237,7 +237,7 @@ export default function AccountForm({ onClose, isEditing, accountId }) {
                 result = await handleSubmit(event);
             }
 
-            if (result.statusCode === "401" || result.statusDescription.message === "Session expired or invalid") {
+            if (result.statusCode === "02" || result.statusDescription.message === "Session expired or invalid") {
                 console.log("Session invalid, regenerating token...");
                 await generateAndSetToken();
 
@@ -288,7 +288,7 @@ export default function AccountForm({ onClose, isEditing, accountId }) {
 
     const handleSubmitAction = (event) => {
         event.preventDefault();
-        
+
         if (saveAction === 'saveAndNew') {
             handleSave(event); // Call handleSave
         } else if (saveAction === 'save') {

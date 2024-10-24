@@ -131,7 +131,7 @@ export default function PropertyResource() {
 
   const fetchProperties = async () => {
     try {
-      const response = await fetch(`${CONFIG.PROPERTY_SERVICE}?pageNo=1&pageSize=10`, {
+      const response = await fetch(`https://c1359fba82b5.ngrok.app/cbre/properties?pageNo=1&pageSize=10`, {
         method: 'GET',
         headers: {
           'transactionId': transactionId,
@@ -163,6 +163,7 @@ export default function PropertyResource() {
         },
       });
       if (response.data.statusCode === '00') {
+        console.log('respose ', response.data);
         return response.data.resultSet.resources; // Return fetched options
       } else {
         console.error(`Failed to fetch ${endpoint} options:`, response.data.statusMessage);

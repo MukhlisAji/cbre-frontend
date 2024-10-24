@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { HiPencil } from 'react-icons/hi2';
 import { IoMdArrowDropdown } from 'react-icons/io';
 import { IoCheckmarkCircleOutline } from 'react-icons/io5';
@@ -9,7 +9,9 @@ import CustomTableMUI from '../../shared/CustomTableMUI';
 import { ACCOUNTCOLUMNDUMMY, ACCOUNTDATADUMMY, RELATIONSHIPCLUMN, RELATIONSHIPDUMMY } from '../../lib/const/DummyData';
 import BasicTable from '../../shared/element/BasicTable';
 import { FaEdit, FaTrash } from 'react-icons/fa';
-import { AutocompleteField, SelectField } from '../FormFields';
+import { AutocompleteField, InputField, SelectField, SingleSelectField } from '../FormFields';
+import { useAppContext } from '../../../AppContext';
+import { generateTransactionId, useUtils } from '../../lib/api/Authorization';
 
 const ContactDetails = () => {
 
@@ -19,12 +21,28 @@ const ContactDetails = () => {
     const [sectionHeight, setSectionHeight] = useState(0);
     const [contactData, setContactData] = useState(null);
     const { id } = useParams();
+    const { contactSalesforceId, setContactSalesforceId } = useState("");
+    const { generateAndSetToken } = useUtils();
+    const { contactResource, setContactResource } = useAppContext();
+    const { token } = useAppContext();
+    const [notification, setNotification] = useState(null);
+    const [notificationType, setNotificationType] = useState('success');
+    const [sendingRelation, setSendingRelation] = useState(false);
+    const [isDelete, setIsDelete] = useState(false);
+    const [reload, setReload] = useState(false);
+    const [accountName, setAccountName] = useState("");
+    const [isEditRelation, setIsEditRelation] = useState(false);
+    const [showConfirmation, setShowConfirmation] = useState(false);
+    const [selectedRow, setSelectedRow] = useState(null); // Store the row to delete
+    const confirmationRef = useRef();
+    const [confirmationPosition, setConfirmationPosition] = useState({ x: 0, y: 0 }); // For dynamic positioning
+
 
     // All hooks at the top level
     const [formData, setFormData] = useState({
         contactId: id,
-        contactSalesforceId: '',
-        accountId: '',
+        contactSalesforceId: contactSalesforceId,
+        accountId: null,
         accountSalesforceId: '',
         relationshipType: '',
         isPrimary: 'No',
@@ -32,6 +50,7 @@ const ContactDetails = () => {
         startDate: '',
         endDate: '',
     });
+
     useEffect(() => {
         const handleResize = () => {
             const screenHeight = window.innerHeight;
@@ -74,23 +93,47 @@ const ContactDetails = () => {
                 const response = await fetch(`${CONFIG.CONTACT_SERVICE}/${id}`);
                 const data = await response.json();
                 setContactData(data.resultSet);
+                setFormData((prevFormData) => ({
+                    ...prevFormData,
+                    contactSalesforceId: data.resultSet.salesforceId,
+                }));
+                setContactSalesforceId(data.resultSet.salesforceId);
             } catch (error) {
                 console.error('Error fetching contact data:', error);
             }
         }
         fetchAccountData();
-    }, [id]);
+    }, [id, reload]); // Add `reload` to the dependency array
 
 
-    const handleChange = (e) => {
-        const { name, value } = e.target;
+
+    // const handleChange = (e) => {
+    //     const { name, value } = e.target;
+
+    //     setFormData((prevState) => ({
+    //         ...prevState,
+    //         [name]: value,
+    //     }));
+    // };
+
+    // const handleChange = (e) => {
+    //     setFormData((prevData) => ({
+    //         ...prevData,
+    //         startDate: e.target.value, // Update the correct field
+    //     }));
+    // };
+
+    const handleChange = (field) => (event) => {
+        const value = event.target ? event.target.value : event.id; // Get the value for text input or select field
+
         setFormData((prevState) => ({
             ...prevState,
-            [name]: value,
+            [field]: value, // Dynamically update the field in formData
         }));
     };
 
-    
+
+
     const searchAccountName = async (searchTerm) => {
         const response = await fetch(`${CONFIG.ACCOUNT_SERVICE}/find-account?name=${searchTerm}`, {
             method: 'GET',
@@ -106,44 +149,190 @@ const ContactDetails = () => {
         }));
     };
 
-    const [selectedAccount, setSelectedAccount] = useState(null); // Store the selected account info for display
+    const handleEdit = (row) => {
+        setIsEditRelation(true);
+        setFormData({
+            contactId: id || '',
+            contactSalesforceId: contactData.salesforceId || '',
+            accountId: row.accountId || null,
+            accountSalesforceId: row.accountSalesforceId || '',
+            relationshipType: row.relationshipType?.name || '',
+            isPrimary: row.primary ? "Yes" : "No",
+            userId: row.userId || 'James',
+            startDate: row.startDate || '',
+            endDate: row.endDate || '',
+        });
 
-    const handleAccountChange = (selectedAccount) => {
-        setSelectedAccount(selectedAccount);
-        console.log("selectedAccount ", selectedAccount); // Save the selected account info to display the label
-
-        setFormData((prevState) => ({
-            ...prevState,
-            accountId: selectedAccount.id, // Store only the accountId in formData
-            accountSalesforceId: selectedAccount.salesforceId, // Store Salesforce ID
-        }));
+        setAccountName(row.accountName);
     };
-    
+
+
+    const [selectedAccount, setSelectedAccount] = useState(null);
+
+    const handleAccountChange = (selectedAccountArray) => {
+        const selectedAccount = selectedAccountArray[0];
+        if (selectedAccount) {
+            setSelectedAccount(selectedAccount);
+            setFormData((prevState) => {
+                return {
+                    ...prevState,
+                    accountId: selectedAccount.id !== undefined ? selectedAccount.id : "", // Update accountId if it exists
+                    accountSalesforceId: selectedAccount.salesforceId || "", // Update accountSalesforceId or set to empty string
+                };
+            });
+        } else {
+            console.warn("No account selected or selectedAccount is undefined");
+        }
+    };
+
+
+
+
+    useEffect(() => {
+        console.log("asc ", formData);
+    }, [formData])
+
+    const showNotification = (message, type = 'success') => {
+        setNotification(message);
+        setNotificationType(type);
+        setTimeout(() => {
+            setNotification(null);
+            setNotificationType('success');
+        }, 5000);
+    };
+
+    const handleSubmitOrDelete = async (event, actionType, deleteData) => {
+        const transactionId = generateTransactionId();
+        event.preventDefault();
+
+        try {
+            let method;
+            let bodyData;
+
+            if (actionType === 'submit') {
+                method = 'POST';
+                bodyData = JSON.stringify(formData);  // Use the formData for submission
+            } else if (actionType === 'delete') {
+                method = 'DELETE';
+                bodyData = JSON.stringify(deleteData); // Use deleteData for deletion
+            }
+
+            const response = await fetch(`${CONFIG.CONTACT_SERVICE}/relationship`, {
+                method: method,
+                headers: {
+                    'Content-Type': 'application/json',
+                    'SFDC-token': token,
+                    'transactionId': transactionId,
+                },
+                body: bodyData,
+            });
+
+            const result = await response.json();
+
+            if (!response.ok) {
+                console.error("Error response: ", result);
+                return result; // Return the error response to be handled outside
+            }
+
+            console.log("response ", result);
+            return result;
+        } catch (error) {
+            console.error('Error:', error);
+            showNotification("An error occurred!", 'error');
+            return {
+                statusCode: "99",
+                statusMessage: "ERROR",
+                statusDescription: error.message
+            };
+        }
+    };
+
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         console.log("data ", formData);
+        setSendingRelation(true);
 
         try {
-            const response = await fetch(`${CONFIG.CONTACT_SERVICE}/relationship`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'SFDC-token': '00DDS000001IFYI!AQEAQLNCn_0GFLIR6stCdKwiSDsQaDNIRg0NAH7ee6CbGA5UhldxKvfwW8thFjLqxJ0zT4qR0dP8MLWkN4MH9bwR3zrsdmG4',
-                    'transactionId': '4646765766',
-                },
-                body: JSON.stringify(formData),
-            });
+            const response = await handleSubmitOrDelete(e, "submit");
 
-            if (response.ok) {
-                const result = await response.json();
-                console.log('Success:', result);
+            if (response.statusCode === "02" || response.statusDescription.message === "Session expired or invalid") {
+                console.log("Session invalid, regenerating token...");
+                await generateAndSetToken();
+                response = await handleSubmitOrDelete(e, "submit");
+            }
+
+            if (response.statusCode === "00") {
+                showNotification("Relationship added successfully!", 'success');
+                setSendingRelation(false);
+                setReload((prev) => !prev);
+
             } else {
-                console.error('Failed to submit form');
+                console.error('Unexpected response format:', response.statusDescription);
+                showNotification(`Failed to add relationship. ${response.statusDescription}.`, 'error');
+                setSendingRelation(false);
             }
         } catch (error) {
             console.error('Error:', error);
+            setSendingRelation(false);
         }
+    };
+
+    const handleDeleteClick = (row, event) => {
+        // Store the row and the position of the click event
+        setSelectedRow(row);
+
+        // Adjust position: move the dialog to the left and slightly down
+        const adjustedX = event.clientX - 300; // Adjust for left alignment
+        const adjustedY = event.clientY + 10;  // Move the dialog slightly down by 10 pixels
+
+        setConfirmationPosition({ x: adjustedX, y: adjustedY });
+        setShowConfirmation(true); // Show confirmation dialog
+    };
+
+
+
+    const handleDelete = async () => {
+        if (!selectedRow) return;
+        setIsDelete(true);
+        const deleteData = {
+            accountContactId: selectedRow.id,
+            contactSalesforceId: contactData.salesforceId || "",
+            userId: "AP_SVC_SALESMGTSG"
+        };
+
+        try {
+            let response = await handleSubmitOrDelete(event, 'delete', deleteData);
+
+            if (response.statusCode === "02" || (response.statusDescription && response.statusDescription.message === "Session expired or invalid")) {
+                console.log("Session invalid, regenerating token...");
+                await generateAndSetToken();
+                response = await handleSubmitOrDelete(event, 'delete', deleteData);
+            }
+
+            if (response.statusCode === "00") {
+                showNotification("Relationship removed successfully!", 'success');
+                setIsDelete(false);
+                setReload((prev) => !prev);
+            } else {
+                console.error('Unexpected response format:', response.statusDescription);
+                showNotification(`Failed to remove relationship. ${response.statusDescription}.`, 'error');
+                setIsDelete(false);
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            setIsDelete(false);
+        }
+
+        setShowConfirmation(false); // Hide the confirmation dialog after deletion
+        setSelectedRow(null);
+    };
+
+
+    const handleCancelDelete = () => {
+        // Hide the confirmation dialog and clear the selected row
+        setShowConfirmation(false);
+        setSelectedRow(null);
     };
 
     // Derive formatted relationship data
@@ -154,30 +343,24 @@ const ContactDetails = () => {
                 accountName: row.accountName || 'N/A',
                 relationshipStartDate: row.startDate || 'N/A',
                 relationshipEndDate: row.endDate || 'N/A',
-                primaryAccount: row.primaryAccount || 'N/A',
+                primary: row.primary === true ? "Yes" : "No" || 'N/A',
                 action: (
-                    <div>
-                        <FaEdit className="inline-block cursor-pointer text-c-teal/80 mr-2" aria-label="Edit" />
-                        <FaTrash className="inline-block cursor-pointer text-red-500" aria-label="Delete" />
+                    <div className='relative inline-block'>
+                        <FaEdit
+                            className="inline-block cursor-pointer text-c-teal/80 mr-2"
+                            aria-label="Edit"
+                            onClick={() => handleEdit(row)}
+                        />
+                        {row.primary !== true && (
+                            <FaTrash
+                                className="inline-block cursor-pointer text-red-500"
+                                aria-label="Delete"
+                                onClick={(event) => handleDeleteClick(row, event)}
+                            />
+                        )}
                     </div>
                 ),
             }));
-        } else if (contactData?.accountContact) {
-            return [
-                {
-                    relationshipType: contactData.accountContact.relationshipType?.name || 'N/A',
-                    accountName: contactData.accountContact.accountName || 'N/A',
-                    relationshipStartDate: contactData.accountContact.startDate || 'N/A',
-                    relationshipEndDate: contactData.accountContact.endDate || 'N/A',
-                    primaryAccount: contactData.accountContact.primaryAccount || 'N/A',
-                    action: (
-                        <div>
-                            <FaEdit className="inline-block cursor-pointer text-c-teal/80 mr-2" aria-label="Edit" />
-                            <FaTrash className="inline-block cursor-pointer text-red-500" aria-label="Delete" />
-                        </div>
-                    ),
-                },
-            ];
         }
         return [];
     }, [contactData]);
@@ -388,19 +571,14 @@ const ContactDetails = () => {
                                 <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-y-2 w-full gap-4 md:gap-x-12">
                                     {/* Relationship Type Field */}
                                     <div className="flex flex-col w-full">
-                                        <label className="text-neutral-600 text-sm mb-1">Relationship Type *</label>
-                                        <select
-                                            name="relationshipType"
+                                        <SingleSelectField
+                                            label='Relationship Type'
                                             value={formData.relationshipType}
-                                            onChange={handleChange}
-                                            className="w-full text-sm text-neutral-700 border border-gray-300 p-2 rounded"
-                                            required
-                                        >
-                                            <option value="">- Select -</option>
-                                            <option value="Partner">Partner</option>
-                                            <option value="Customer">Customer</option>
-                                            <option value="Employee">Employee</option>
-                                        </select>
+                                            onChange={handleChange('relationshipType')}
+                                            options={[{ id: 'Board of Directors', label: 'Board of Directors' }, { id: 'Consultant', label: 'Consultant' }, { id: 'Employee', label: 'Employee' }, { id: 'Ex-Employee', label: 'Ex-Employee' }, { id: 'Owner of Company', label: 'Owner of Company' }]}
+                                            required='true'
+                                        />
+
                                     </div>
 
                                     {/* Account Name Field using AutocompleteField */}
@@ -409,10 +587,10 @@ const ContactDetails = () => {
                                             label="Account Name"
                                             value={
                                                 formData.accountId
-                                                    ? { id: formData.accountId, label: selectedAccount?.label || '' }
+                                                    ? { id: formData.accountId, label: selectedAccount?.label || accountName || '' }
                                                     : null
                                             }
-                                            onChange={handleAccountChange} // Ensure this updates accountId and accountSalesforceId
+                                            onChange={(selectedAccount) => handleAccountChange(selectedAccount)}// Ensure this updates accountId and accountSalesforceId
                                             searchApi={searchAccountName}
                                             required={true}
                                         />
@@ -421,7 +599,15 @@ const ContactDetails = () => {
 
                                     {/* Start Date Field */}
                                     <div className="flex flex-col w-full">
-                                        <label className="text-neutral-600 text-sm mb-1">Start Date *</label>
+                                        <InputField
+                                            label="Start Date"
+                                            type="date"
+                                            value={formData.startDate}
+                                            onChange={handleChange('startDate')}
+                                            required={true}
+                                        />
+
+                                        {/* <label className="text-neutral-600 text-sm mb-1">Start Date *</label>
                                         <input
                                             type="date"
                                             name="startDate"
@@ -429,48 +615,82 @@ const ContactDetails = () => {
                                             onChange={handleChange}
                                             className="w-full text-sm text-neutral-700 border border-gray-300 p-2 rounded"
                                             required
-                                        />
+                                        /> */}
                                     </div>
 
                                     {/* End Date Field */}
                                     <div className="flex flex-col w-full">
-                                        <label className="text-neutral-600 text-sm mb-1">End Date *</label>
-                                        <input
+                                        <InputField
+                                            label="End Date"
                                             type="date"
-                                            name="endDate"
                                             value={formData.endDate}
-                                            onChange={handleChange}
-                                            className="w-full text-sm text-neutral-700 border border-gray-300 p-2 rounded"
-                                            required
+                                            onChange={handleChange('endDate')}
+                                            required={true}
                                         />
+
                                     </div>
 
                                     {/* Primary Account Field */}
                                     <div className="flex flex-col w-full">
-                                        <label className="text-neutral-600 text-sm mb-1">Primary Account</label>
-                                        <select
-                                            name="isPrimary"
+                                        <SingleSelectField
+                                            label='Primary Account'
                                             value={formData.isPrimary}
-                                            onChange={handleChange}
-                                            className="w-full text-sm text-neutral-700 border border-gray-300 p-2 rounded"
-                                        >
-                                            <option value="No">No</option>
-                                            <option value="Yes">Yes</option>
-                                        </select>
+                                            onChange={handleChange('isPrimary')}
+                                            options={[{ id: 'No', label: 'No' }, { id: 'Yes', label: 'Yes' }]}
+                                        />
+
+
                                     </div>
 
                                     {/* Add Relationship Button */}
                                     <div className="col-span-2 flex justify-end">
-                                        <button type="submit" className="bg-c-teal text-sm text-white px-4 py-2 rounded">
-                                            Add Relationship
+                                        <button disabled={sendingRelation} type="submit" className="bg-c-teal text-sm text-white px-4 py-2 rounded">
+                                            {sendingRelation ? "Sending..." : isEditRelation ? "Update Relationship" : "Add Relationship"}
                                         </button>
                                     </div>
                                 </form>
 
-
+                                {notification && (
+                                    <div className={`absolute top-5 right-5 text-white px-4 py-2 rounded shadow-lg z-50 animate-fade-in-out 
+                ${notificationType === 'success' ? 'bg-green-500' : 'bg-red-500'}
+                text-white`}>
+                                        {notification}
+                                    </div>
+                                )}
 
                                 <BasicTable column={RELATIONSHIPCLUMN} dataTable={formattedRelationshipData} isHeader={false} tableHeight={549} />
 
+                                {showConfirmation && (
+                                    <div
+                                        style={{
+                                            position: 'absolute',
+                                            left: confirmationPosition.x,
+                                            top: confirmationPosition.y,
+                                            zIndex: 1000,
+                                            backgroundColor: 'white',
+                                            border: '1px solid gray',
+                                            padding: '10px',
+                                            borderRadius: '8px',
+                                            boxShadow: '0px 4px 8px rgba(0,0,0,0.2)',
+                                        }}
+                                    >
+                                        <p className="text-sm text-gray-700">Are you sure you want to delete this relationship?</p>
+                                        <div className="flex justify-end space-x-2 mt-2">
+                                            <button
+                                                onClick={handleDelete}
+                                                className="bg-red-500 text-white text-xs px-2 py-1 rounded-md"
+                                            >
+                                                {isDelete ? "Deleting..."  : "Delete"}
+                                            </button>
+                                            <button
+                                                onClick={handleCancelDelete}
+                                                className="bg-gray-300 text-black text-xs px-2 py-1 rounded-md"
+                                            >
+                                                Cancel
+                                            </button>
+                                        </div>
+                                    </div>
+                                )}
 
                             </div>
                         )}

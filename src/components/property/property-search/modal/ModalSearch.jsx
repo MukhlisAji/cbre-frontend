@@ -25,6 +25,8 @@ export default function ModalSearch({ isVisible, onClose, category, form, onForm
   const [propertyTypeOptions, setPropertyTypeOptions] = useState([]);
   const [accountType, setAccountType] = useState('');
   const [micromarketOptions, setMicromarketOptions] = useState([]);
+  const [selectedRegion, setSelectedRegion] = useState(''); // Default to the first region
+  const [selectedSector, setSelectedSector] = useState("");
 
 
   const { districts, setDistricts, fetchDistricts, propertyResources, fetchPropertyResources, useFetchResource, useFetchOptions } = PropertyResource();
@@ -43,15 +45,18 @@ export default function ModalSearch({ isVisible, onClose, category, form, onForm
         const fetchedMicromarket = await useFetchResource('getmicromarkets');
 
         // If 'fetchedMicromarket' has a 'microMarkets' array
-        if (fetchedMicromarket && fetchedMicromarket.microMarkets) {
-          const micromarketOptionsData = fetchedMicromarket.microMarkets.map((micromarket, index) => ({
-            id: `M${index + 1}`,
-            name: micromarket,
-            checked: false,
-          }));
+        if (fetchedMicromarket && fetchedMicromarket.jsonString) {
+          const micromarketOptionsData = fetchedMicromarket.jsonString?.flatMap((regionData) =>
+            regionData.microMarkets.map((market) => ({
+              id: market.microMarketId,           // Use the microMarketId for the id
+              label: market.microMarket,          // Use the microMarket name for the label
+              value: market.microMarketId,          // Option value can also be the microMarket name
+              region: regionData.region,          // Include the region from the parent object
+            })))
 
           setMicromarketOptions(micromarketOptionsData);
-          console.error('micromarketOptionsData data.', micromarketOptionsData);
+
+          console.log('micromarketOptionsData data.', fetchedMicromarket.jsonString);
 
         } else {
           console.error('No micromarkets found in fetched data.');
@@ -63,6 +68,23 @@ export default function ModalSearch({ isVisible, onClose, category, form, onForm
 
     fetchData();
   }, []);
+
+  const getUniqueRegions = (options) => {
+    const uniqueRegions = [];
+    return options
+      .filter((option) => {
+        // If the region is not already in the uniqueRegions array, add it
+        if (!uniqueRegions.includes(option.region)) {
+          uniqueRegions.push(option.region);
+          return true; // Keep this option in the filtered array
+        }
+        return false; // Skip if region is already added
+      })
+      .map((option) => ({
+        id: option.region,   // Both id and label are set to the region value
+        label: option.region
+      }));
+  };
 
   // const handleMicromarketSearch = (e) => {
   //   const searchTerm = e.target.value;
@@ -124,9 +146,9 @@ export default function ModalSearch({ isVisible, onClose, category, form, onForm
     });
   };
 
-  const filteredMicromarkets = micromarketOptions.filter((micromarket) =>
-    micromarket.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // const filteredMicromarkets = micromarketOptions.filter((micromarket) =>
+  //   micromarket.name.toLowerCase().includes(searchTerm.toLowerCase())
+  // );
 
   if (!isVisible) return null;
 
@@ -250,7 +272,6 @@ export default function ModalSearch({ isVisible, onClose, category, form, onForm
       return updatedDistricts;
     });
   };
-
 
   const filteredDistricts = districts.filter((district) =>
     district.name.toLowerCase().includes(searchTerm.toLowerCase())
@@ -537,46 +558,35 @@ export default function ModalSearch({ isVisible, onClose, category, form, onForm
     case 'Micromarket':
       content = (
         <div className="w-full p-4">
-
-          {/* Category Tabs */}
           <div className="mb-4 flex space-x-2">
-            {propertyTypeOptions.map((categoryTab) => (
+            {propertyTypeOptions.map((sectorTab) => (
               <button
-                key={categoryTab.sectorId} // Use sectorId as key for better uniqueness
-                onClick={() => {
-                  setSelectedCategory(categoryTab.sectorId); // Store sectorId in selectedCategory
-                  onFormChange({
-                    ...form,
-                    sectorId: categoryTab.sectorId, // Update form with the selected sectorId
-                  });
-                }}
-                className={`px- py-1 text-sm rounded-md border ${selectedCategory === categoryTab.sectorId
-                  ? 'bg-gray-300 text-black'
+                key={sectorTab.sectorId}
+                onClick={() => setSelectedSector(sectorTab.sector)} // Store selected sector
+                className={`px-4 py-1 text-sm rounded-md border ${selectedSector === sectorTab.sector
+                  ? 'bg-blue-300 text-black'
                   : 'bg-white text-gray-500 hover:bg-gray-200'
                   }`}
               >
-                {categoryTab.sector} {/* Display sector name */}
+                {sectorTab.sector} {/* Display sector name */}
               </button>
             ))}
           </div>
-
-
-
-          {/* Subcategory Tabs */}
-          {/* <div className="mb-4 flex space-x-2">
-            {['CBD', 'Central', 'East', 'North', 'North-East', 'West'].map((subcategory) => (
+          {/* Region Tabs */}
+          <div className="mb-4 flex space-x-2">
+            {getUniqueRegions(micromarketOptions).map((regionTab) => (
               <button
-                key={subcategory}
-                onClick={() => setSelectedSubcategory(subcategory)}
-                className={`px- py-1 text-sm rounded-md border ${selectedSubcategory === subcategory
+                key={regionTab.id}
+                onClick={() => setSelectedRegion(regionTab.label)} // Store selected region
+                className={`px-4 py-1 text-sm rounded-md border ${selectedRegion === regionTab.label
                   ? 'bg-gray-300 text-black'
                   : 'bg-white text-gray-500 hover:bg-gray-200'
                   }`}
               >
-                {subcategory}
+                {regionTab.label} {/* Display region name */}
               </button>
             ))}
-          </div> */}
+          </div>
 
           {/* Search Box */}
           <div className="mb-4">
@@ -596,7 +606,7 @@ export default function ModalSearch({ isVisible, onClose, category, form, onForm
                 type="checkbox"
                 className="form-checkbox"
                 onChange={toggleAllMicromarkets}
-                checked={micromarketOptions.every((m) => m.checked)}
+                checked={(micromarketOptions || []).every((m) => m.checked)}
               />
               <span>All Micromarkets</span>
             </label>
@@ -604,33 +614,39 @@ export default function ModalSearch({ isVisible, onClose, category, form, onForm
 
           {/* Micromarket List */}
           <ul className="grid grid-cols-2 gap-4">
-            {filteredMicromarkets.map((micromarket) => {
-              const isChecked = form.regionId.includes(micromarket.id);
+            {(micromarketOptions || [])
+              .filter((option) => !selectedRegion || option.region === selectedRegion)
+              .filter((micromarket) =>
+                micromarket.label.toLowerCase().includes(searchTerm.toLowerCase())
+              ) // Filter micromarkets by search term
+              .map((micromarket) => {
+                const isChecked = form.regionId.includes(micromarket.id);
 
-              return (
-                <li
-                  key={micromarket.id}
-                  className="flex items-center p-1 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300"
-                >
-                  <input
-                    type="checkbox"
-                    className="form-checkbox text-blue-600 border-gray-300 rounded focus:ring-blue-500 focus:ring-offset-2"
-                    id={`micromarket-${micromarket.id}`}
-                    checked={isChecked}
-                    onChange={() => toggleMicromarket(micromarket.id)} // Toggle individual micromarket
-                  />
-                  <label
-                    htmlFor={`micromarket-${micromarket.id}`}
-                    className="w-full ml-3 text-gray-800 text-md whitespace-nowrap"
+                return (
+                  <li
+                    key={micromarket.id}
+                    className="flex items-center p-1 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300"
                   >
-                    {micromarket.name}
-                  </label>
-                </li>
-              );
-            })}
+                    <input
+                      type="checkbox"
+                      className="form-checkbox text-blue-600 border-gray-300 rounded focus:ring-blue-500 focus:ring-offset-2"
+                      id={`micromarket-${micromarket.id}`}
+                      checked={isChecked}
+                      onChange={() => toggleMicromarket(micromarket.id)} // Toggle individual micromarket
+                    />
+                    <label
+                      htmlFor={`micromarket-${micromarket.id}`}
+                      className="w-full ml-3 text-gray-800 text-md whitespace-nowrap"
+                    >
+                      {micromarket.label}
+                    </label>
+                  </li>
+                );
+              })}
           </ul>
-
         </div>
+
+
       );
       break;
     case 'MRT':

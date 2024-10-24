@@ -7,6 +7,7 @@ import { AddAlert } from '@mui/icons-material';
 import axios from 'axios';
 import { generateTransactionId } from '../../lib/api/Authorization';
 import { CONFIG } from '../../../config';
+import { SingleSelectField } from '../FormFields';
 
 const PropertySearchForm = () => {
     const { districts, fetchDistricts, useFetchOptions, useFetchResource } = PropertyResource();
@@ -17,11 +18,15 @@ const PropertySearchForm = () => {
     const [zoningOptions, setZoningOptions] = useState([]);
     const [spaceStatusOptions, setSpaceStatusOptions] = useState([]);
     const [micromarketOptions, setMicromarketOptions] = useState([]);
+    const [regionOptions, setRegionOptions] = useState([]);
     const [gradeOptions, setGradeOptions] = useState([]);
     const [buildingOwnerOptions, setBuildingOwnerOptions] = useState([]);
     const [buildingStatusOptions, setBuildingStatusOptions] = useState([]);
     const [propertyTypeOptions, setPropertyTypeOptions] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
+    const [selectedRegions, setSelectedRegions] = useState([]); // To store selected regions
+    const [filteredMicromarkets, setFilteredMicromarkets] = useState(micromarketOptions); // To store filtered micromarkets
+    const [selectedRegion, setSelectedRegion] = useState(null); // Initialize state for selected region
 
     // Helper function to fetch from localStorage or API
     const getOrFetchData = async (key, fetchFunction, setState) => {
@@ -48,10 +53,16 @@ const PropertySearchForm = () => {
 
                 const micromarketFetch = async () => {
                     const fetchedMicromarket = await useFetchResource('getmicromarkets');
-                    return fetchedMicromarket.microMarkets.map((district) => ({
-                        label: district,
-                        value: district,
-                    }));
+
+                    // Flatten the data from jsonString and map each micromarket
+                    return fetchedMicromarket.jsonString?.flatMap((regionData) =>
+                        regionData.microMarkets.map((market) => ({
+                            id: market.microMarketId,           // Use the microMarketId for the id
+                            label: market.microMarket,          // Use the microMarket name for the label
+                            value: market.microMarketId,          // Option value can also be the microMarket name
+                            region: regionData.region,          // Include the region from the parent object
+                        }))
+                    );
                 };
                 await getOrFetchData('micromarketOptions', micromarketFetch, setMicromarketOptions);
 
@@ -72,6 +83,27 @@ const PropertySearchForm = () => {
         // Call the function to fetch all options
         fetchAllOptions();
     }, []);
+
+    const getUniqueRegions = (options) => {
+        const uniqueRegions = [];
+        return options
+            .filter((option) => {
+                // If the region is not already in the uniqueRegions array, add it
+                if (!uniqueRegions.includes(option.region)) {
+                    uniqueRegions.push(option.region);
+                    return true; // Keep this option in the filtered array
+                }
+                return false; // Skip if region is already added
+            })
+            .map((option) => ({
+                id: option.region,   // Both id and label are set to the region value
+                label: option.region
+            }));
+    };
+
+    useEffect(() => {
+        console.log("ptferre ", getUniqueRegions(micromarketOptions));
+    })
 
     const [sectionVisibility, setSectionVisibility] = useState({
         basicSearchVisible: true,
@@ -192,28 +224,36 @@ const PropertySearchForm = () => {
                 propertyUsageIds: formState.propertyUsageIds,
             },
             advancedSearch: {
-                topDateFrom: formState.topFrom,
-                topDateTo: formState.topTo,
-                grade: formState.grade,
-                buildingStatusIds: formState.buildingStatusIds,
-                ownerIds: formState.ownerIds,
-                titleIds: formState.titleIds,
+                topDate: {
+                    from: formState.topFrom || null,
+                    to: formState.topTo || null
+                },
+                grade: formState.grade || "A",
+                propertyStatusId: formState.buildingStatusIds ? formState.buildingStatusIds[0] : null,
+                titleIds: formState.titleIds || [],
                 publicTransportation: {
-                    mrts: formState.mrts,
-                    proximity: formState.proximity || 2000,
+                    mrtLineIds: formState.mrts || [],
+                    proximity: formState.proximity || 2000
                 },
                 propertyDescription: {
-                    floorLoadingFrom: formState.floorLoadingFrom,
-                    floorLoadingTo: formState.floorLoadingTo,
-                    floorSystem: formState.floorSystem,
-                    airconSystem: formState.airconSystem,
-                    greenMark: formState.greenMark,
-                    carParkAllocRatio: formState.carParkAllocRatio,
-                    carSpaces: formState.carSpaces,
-                    seasonalParkingFee: formState.seasonalParkingFee,
-                    nonReservedParkingFee: formState.nonReservedParkingFee,
+                    floorLoading: {
+                        from: formState.floorLoadingFrom || null,
+                        to: formState.floorLoadingTo || null
+                    },
+                    floorCeilingHeight: {
+                        from: formState.floorCeilingHeightFrom || null,
+                        to: formState.floorCeilingHeightTo || null
+                    },
+                    floorSystem: formState.floorSystem || null,
+                    airconSystem: formState.airconSystem || null,
+                    greenMark: formState.greenMark || null,
+                    cpAllocRatio: formState.carParkAllocRatio || null,
+                    carSpaces: formState.carSpaces || null,
+                    seasonalParkingFee: formState.seasonalParkingFee || null,
+                    nonReservedParkingFee: formState.nonReservedParkingFee || null
                 }
             }
+
         };
 
         console.log('Constructed Payload:', JSON.stringify(payload, null, 2));
@@ -255,6 +295,34 @@ const PropertySearchForm = () => {
             setIsLoading(false); // Hide loading overlay
         }
     };
+
+    const handleRegionChange = (selectedOption) => {
+        const selectedValue = selectedOption?.target?.value; // Extract the selected region value safely
+        setSelectedRegion(selectedValue); // Update the selected region
+
+        if (selectedValue) {
+            // Filter micromarkets by the selected region
+            const filtered = micromarketOptions
+                .filter(option => option.region === selectedValue) // Filter by region
+                .map(microMarket => ({
+                    value: microMarket.id, // Extract the id
+                    label: microMarket.label // Extract the label
+                }));
+
+            setFilteredMicromarkets(filtered); // Update the filtered micromarkets state
+        } else {
+            // If no region is selected, show all micromarkets
+            const allMicromarkets = micromarketOptions.map(microMarket => ({
+                value: microMarket.id, // Extract the id
+                label: microMarket.label // Extract the label
+            }));
+
+            setFilteredMicromarkets(allMicromarkets); // Update the filtered micromarkets state
+        }
+    };
+
+
+
 
     const handleCheckboxChange = (event, field, useName = false) => {
         const { value, checked } = event.target;
@@ -431,13 +499,11 @@ const PropertySearchForm = () => {
 
                                     <div className="space-y-2">
                                         <span className='text-sm mt-8 font-semibold text-gray-600'>Region</span>
-                                        <MultipleSelect
+                                        <SingleSelectField
                                             label="Select Region"
-                                            options={districts}
-                                            isMulti={true}
-                                            labelKey="name"
-                                            valueKey="name"
-                                            onChange={(selectedOptions) => handleMultipleSelectChange(selectedOptions, 'districts', 'name')}
+                                            options={getUniqueRegions(micromarketOptions)}
+                                            onChange={handleRegionChange}
+                                            value={selectedRegion}
                                         />
                                     </div>
 
@@ -445,9 +511,9 @@ const PropertySearchForm = () => {
                                         <span className='text-sm mt-8 font-semibold text-gray-600'>Micromarket</span>
                                         <MultipleSelect
                                             label="Select Micromarket"
-                                            options={micromarketOptions}
+                                            options={filteredMicromarkets}
                                             isMulti={true}
-                                            labelKey="value"
+                                            labelKey="label"
                                             valueKey="value"
                                             onChange={(selectedOptions) => handleMultipleSelectChange(selectedOptions, 'micromarket', 'value')}
                                         />
@@ -744,6 +810,16 @@ const PropertySearchForm = () => {
                                 {/* MRT Fields */}
                                 <div className="flex flex-col gap-2">
                                     <label className="block text-sm font-medium">MRT</label>
+
+                                    <MultipleSelect
+                                        label="Select MRT"
+                                        options={filteredMicromarkets}
+                                        isMulti={true}
+                                        labelKey="label"
+                                        valueKey="value"
+                                        onChange={(selectedOptions) => handleMultipleSelectChange(selectedOptions, 'micromarket', 'value')}
+                                    />
+
                                     <Box sx={{ display: 'flex', gap: '8px' }}>
                                         <TextField
                                             label="Station"

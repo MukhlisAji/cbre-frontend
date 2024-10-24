@@ -28,7 +28,7 @@ const RELATIONSHIPCLUMN = [
   { label: "Account Name", accessor: "accountName" },
   { label: "Relationship Start Date", accessor: "relationshipStartDate" },
   { label: "Relationship End Date", accessor: "relationshipEndDate" },
-  { label: "Primary Account", accessor: "primaryAccount" },
+  { label: "Primary Account", accessor: "primary" },
   {
       label: "Action",
       accessor: "action",

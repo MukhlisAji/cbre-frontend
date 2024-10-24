@@ -143,7 +143,7 @@ export default function ContactForm({ onClose, isEditing, contactId }) {
             fetchAccountData();
         }
     }, [isEditing, url]);
-    
+
     useEffect(() => {
         if (initialData) {
             setFormData({
@@ -252,7 +252,7 @@ export default function ContactForm({ onClose, isEditing, contactId }) {
                 result = await handleSubmit(event);
             }
 
-            if (result.statusCode === "401" || result.statusDescription.message === "Session expired or invalid") {
+            if (result.statusCode === "02" || result.statusDescription.message === "Session expired or invalid") {
                 console.log("Session invalid, regenerating token...");
                 await generateAndSetToken();
 
@@ -485,6 +485,7 @@ export default function ContactForm({ onClose, isEditing, contactId }) {
                 <main className="flex-1 overflow-y-auto">
                     <div className="bg-white relative p-4">
                         <ContactFormSection
+                            setLoading={setIsLoading}
                             formData={formData}
                             setFormData={setFormData}
                             toggleVisibility={toggleVisibility}

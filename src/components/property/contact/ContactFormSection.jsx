@@ -3,6 +3,8 @@ import React, { useEffect, useRef, useState } from 'react';
 import { MdClear } from 'react-icons/md';
 import { CONFIG } from '../../../config';
 import { InputField, AutocompleteField, SelectField } from '../FormFields';
+import { useAppContext } from '../../../AppContext';
+import { generateTransactionId } from '../../lib/api/Authorization';
 
 
 // Main ContactFormSection Component
@@ -12,30 +14,36 @@ export default function ContactFormSection({
     toggleVisibility,
     sectionVisibility,
     copyBillingToShipping,
+    setLoading,
 }) {
-    const [resourceData, setResourceData] = useState(null);
-
+    const { contactResource, setContactResource } = useAppContext();
 
     useEffect(() => {
         const fetchResourceData = async () => {
+            setLoading(true);
             const cachedData = localStorage.getItem('resourceDataContact');
             if (cachedData) {
-                setResourceData(JSON.parse(cachedData));
+                setContactResource(JSON.parse(cachedData));
+                console.log('trans type ', cachedData);
+                setLoading(false);
             } else {
                 try {
                     const response = await fetch(`${CONFIG.CONTACT_SERVICE}/resources?category=Contact`, {
                         method: 'GET',
                         headers: {
-                            'transactionId': '46467657665',
+                            'transactionId': generateTransactionId(),
                             'Cookie': 'CookieConsentPolicy=0:1; LSKey-c$CookieConsentPolicy=0:1'
                         }
                     });
                     if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
                     const data = await response.json();
-                    setResourceData(data.resultSet);
+                    console.log('resource ', data);
+                    setContactResource(data.resultSet);
                     localStorage.setItem('resourceDataContact', JSON.stringify(data.resultSet));
+                    setLoading(false);
                 } catch (error) {
                     console.error('Error fetching resource data:', error);
+                    setLoading(false);
                 }
             }
         };
@@ -55,7 +63,7 @@ export default function ContactFormSection({
 
 
     const handleCountryChange = (field, countryField, stateField, countryCodeField) => (e) => {
-        const selectedCountry = resourceData.country.find(c => c.countryName === e.target.value);
+        const selectedCountry = contactResource.country.find(c => c.countryName === e.target.value);
         const countryCode = selectedCountry ? selectedCountry.countryCode : '';
 
 
@@ -151,7 +159,7 @@ export default function ContactFormSection({
             title: 'Contact Information',
             visibilityKey: 'contactInformationVisible',
             fields: [
-                { label: 'Salutation', value: formData.contactInformation.salutation, initialSearchTerm: formData.contactInformation.salutation, onChange: handleInputChange('contactInformation', 'salutation'), options: resourceData?.salutation.map(reason => ({ id: reason, label: reason })) || [], valueField: 'id', labelField: 'label' },
+                { label: 'Salutation', value: formData.contactInformation.salutation, initialSearchTerm: formData.contactInformation.salutation, onChange: handleInputChange('contactInformation', 'salutation'), options: (contactResource?.salutation || []).map(reason => ({ id: reason, label: reason })) || [], valueField: 'id', labelField: 'label' },
                 { label: 'First Name', type: 'text', value: formData.contactInformation.firstName, onChange: handleInputChange('contactInformation', 'firstName') },
                 { label: 'Middle Name', type: 'text', value: formData.contactInformation.middleName, onChange: handleInputChange('contactInformation', 'middleName') },
                 { label: 'Last Name*', type: 'text', value: formData.contactInformation.lastName, onChange: handleInputChange('contactInformation', 'lastName'), required: true },
@@ -196,7 +204,7 @@ export default function ContactFormSection({
                     onChange: (event) => {
                         const value = event.target ? event.target.value : event;
                         const selectedId = parseInt(value, 10);
-                        const selectedType = resourceData?.relationshipType.find(item => item.id === selectedId);
+                        const selectedType = contactResource?.relationshipType.find(item => item.id === selectedId);
 
 
                         setFormData(prevData => ({
@@ -211,7 +219,7 @@ export default function ContactFormSection({
                             },
                         }));
                     },
-                    options: resourceData?.relationshipType.map(reason => ({ id: reason.id, label: reason.name })) || [],
+                    options: (contactResource?.relationshipType || []).map(reason => ({ id: reason.id, label: reason.name })) || [],
                     valueField: 'id',
                     labelField: 'label',
                 },
@@ -226,26 +234,26 @@ export default function ContactFormSection({
                                 ...prevData.contactInformation,
                                 contactProfile: selectedIds.map(id => ({
                                     contactProfileId: id,
-                                    contactProfileName: resourceData?.contactProfile.find(profile => profile.id === id)?.name || '',
+                                    contactProfileName: contactResource?.contactProfile.find(profile => profile.id === id)?.name || '',
                                 })),
                             },
                         }));
                     },
-                    options: resourceData?.contactProfile.map(profile => ({ id: profile.id, label: profile.name })) || [],
+                    options: (contactResource?.contactProfile || []).map(profile => ({ id: profile.id, label: profile.name })) || [],
                     valueField: 'id',
                     labelField: 'label',
                     multiple: true,
                 },
 
-                { label: 'Influence Level', value: formData.contactInformation.influenceLevel, onChange: handleInputChange('contactInformation', 'influenceLevel'), options: resourceData?.influenceLevel.map(reason => ({ id: reason, label: reason })) || [], valueField: 'id', labelField: 'label' },
+                { label: 'Influence Level', value: formData.contactInformation.influenceLevel, onChange: handleInputChange('contactInformation', 'influenceLevel'), options: (contactResource?.influenceLevel || []).map(reason => ({ id: reason, label: reason })) || [], valueField: 'id', labelField: 'label' },
             ],
         },
         {
             title: 'Address Information',
             visibilityKey: 'addressInformationVisible',
             fields: [
-                { label: 'Mailing Country*', value: formData.addressInformation.mailingCountry, onChange: handleCountryChange('addressInformation', 'mailingCountry', 'mailingState', 'mailingCountryCode'), options: resourceData?.country || [], valueField: 'countryName', labelField: 'countryName', required: true },
-                { label: 'Mailing State/Province*', value: formData.addressInformation.mailingState, onChange: handleInputChange('addressInformation', 'mailingState'), options: resourceData?.country.find(c => c.countryCode === formData.addressInformation.mailingCountryCode)?.state || [], valueField: 'stateName', labelField: 'stateName', required: true, disabled: !formData.addressInformation.mailingCountryCode },
+                { label: 'Mailing Country*', value: formData.addressInformation.mailingCountry, onChange: handleCountryChange('addressInformation', 'mailingCountry', 'mailingState', 'mailingCountryCode'), options: contactResource?.country || [], valueField: 'countryName', labelField: 'countryName', required: true },
+                { label: 'Mailing State/Province*', value: formData.addressInformation.mailingState, onChange: handleInputChange('addressInformation', 'mailingState'), options: (contactResource?.country || []).find(c => c.countryCode === formData.addressInformation.mailingCountryCode)?.state || [], valueField: 'stateName', labelField: 'stateName', required: true, disabled: !formData.addressInformation.mailingCountryCode },
                 { label: 'Mailing City*', type: 'text', value: formData.addressInformation.mailingCity, onChange: handleInputChange('addressInformation', 'mailingCity'), required: true },
                 { label: 'Mailing Street*', type: 'text', value: formData.addressInformation.mailingStreet, onChange: handleInputChange('addressInformation', 'mailingStreet'), required: true },
                 { label: 'Mailing Zip/Postal Code', value: formData.addressInformation.mailingPostCode, onChange: handleInputChange('addressInformation', 'mailingPostCode') },
@@ -255,12 +263,12 @@ export default function ContactFormSection({
             title: 'Communication Preferences',
             visibilityKey: 'communicationPreferencesVisible',
             fields: [
-                { label: 'Preferred Communication Method', value: formData.communicationPreference.communicationMethod, onChange: handleInputChange('communicationPreference', 'communicationMethod'), options: resourceData?.communicationMethod.map(reason => ({ id: reason, label: reason })) || [], valueField: 'id', labelField: 'label' },
-                { label: 'Email Options', value: formData.communicationPreference.emailOptions, onChange: handleInputChange('communicationPreference', 'emailOptions'), options: resourceData?.emailOption.map(reason => ({ id: reason, label: reason })) || [], valueField: 'id', labelField: 'label' },
-                { label: 'Mail Options', value: formData.communicationPreference.mailOptions, onChange: handleInputChange('communicationPreference', 'mailOptions'), options: resourceData?.mailOption.map(reason => ({ id: reason, label: reason })) || [], valueField: 'id', labelField: 'label' },
-                { label: 'Call Options', value: formData.communicationPreference.callOptions, onChange: handleInputChange('communicationPreference', 'callOptions'), options: resourceData?.callOption.map(reason => ({ id: reason, label: reason })) || [], valueField: 'id', labelField: 'label' },
-                { label: 'SMS Options', value: formData.communicationPreference.smsOptions, onChange: handleInputChange('communicationPreference', 'smsOptions'), options: resourceData?.smsOption.map(reason => ({ id: reason, label: reason })) || [], valueField: 'id', labelField: 'label' },
-                { label: 'Exclude Reason', value: formData.communicationPreference.excludeReason, onChange: handleInputChange('communicationPreference', 'excludeReason'), options: resourceData?.excludeReason.map(reason => ({ id: reason, label: reason })) || [], valueField: 'id', labelField: 'label' },
+                { label: 'Preferred Communication Method', value: formData.communicationPreference.communicationMethod, onChange: handleInputChange('communicationPreference', 'communicationMethod'), options: (contactResource?.communicationMethod || []).map(reason => ({ id: reason, label: reason })) || [], valueField: 'id', labelField: 'label' },
+                { label: 'Email Options', value: formData.communicationPreference.emailOptions, onChange: handleInputChange('communicationPreference', 'emailOptions'), options: (contactResource?.emailOption || []).map(reason => ({ id: reason, label: reason })) || [], valueField: 'id', labelField: 'label' },
+                { label: 'Mail Options', value: formData.communicationPreference.mailOptions, onChange: handleInputChange('communicationPreference', 'mailOptions'), options: (contactResource?.mailOption || []).map(reason => ({ id: reason, label: reason })) || [], valueField: 'id', labelField: 'label' },
+                { label: 'Call Options', value: formData.communicationPreference.callOptions, onChange: handleInputChange('communicationPreference', 'callOptions'), options: (contactResource?.callOption || []).map(reason => ({ id: reason, label: reason })) || [], valueField: 'id', labelField: 'label' },
+                { label: 'SMS Options', value: formData.communicationPreference.smsOptions, onChange: handleInputChange('communicationPreference', 'smsOptions'), options: (contactResource?.smsOption || []).map(reason => ({ id: reason, label: reason })) || [], valueField: 'id', labelField: 'label' },
+                { label: 'Exclude Reason', value: formData.communicationPreference.excludeReason, onChange: handleInputChange('communicationPreference', 'excludeReason'), options: (contactResource?.excludeReason || []).map(reason => ({ id: reason, label: reason })) || [], valueField: 'id', labelField: 'label' },
                 { label: 'Exclude On', type: 'date', value: formData.communicationPreference.excludeOn, onChange: handleInputChange('communicationPreference', 'excludeOn') },
                 {
                     label: 'Exclude By',
@@ -385,7 +393,7 @@ export default function ContactFormSection({
                 },
                 { label: 'Status', value: formData.systemInformation.status, onChange: handleInputChange('systemInformation', 'status'), options: [{ id: 'Active', label: 'Active' }, { id: 'Inactive', label: 'Inactive' }], valueField: 'id', labelField: 'label' },
                 { label: 'Inactivation Date', type: 'date', value: formData.systemInformation.inactivationDate, onChange: handleInputChange('systemInformation', 'inactivationDate') },
-                { label: 'Reason for Inactivating', value: formData.systemInformation.reasonForInactivating, onChange: handleInputChange('systemInformation', 'reasonForInactivating'), options: resourceData?.inactiveReason.map(reason => ({ id: reason, label: reason })) || [], valueField: 'id', labelField: 'label' },
+                { label: 'Reason for Inactivating', value: formData.systemInformation.reasonForInactivating, onChange: handleInputChange('systemInformation', 'reasonForInactivating'), options: (contactResource?.inactiveReason || []).map(reason => ({ id: reason, label: reason })) || [], valueField: 'id', labelField: 'label' },
                 {
                     label: 'Save to SFDC',
                     type: 'checkbox',
