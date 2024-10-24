@@ -131,7 +131,7 @@ export default function PropertyResource() {
 
   const fetchProperties = async () => {
     try {
-      const response = await fetch(`${CONFIG.PROPERTY_SERVICE}?pageNo=1&pageSize=10`, {
+      const response = await fetch(`${CONFIG.PROPERTY_SERVICE}/all?pageNo=1&pageSize=10`, {
         method: 'GET',
         headers: {
           'transactionId': transactionId,
