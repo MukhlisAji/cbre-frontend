@@ -346,11 +346,11 @@ const ContactDetails = () => {
                 primary: row.primary === true ? "Yes" : "No" || 'N/A',
                 action: (
                     <div className='relative inline-block'>
-                        <FaEdit
+                        {/* <FaEdit
                             className="inline-block cursor-pointer text-c-teal/80 mr-2"
                             aria-label="Edit"
                             onClick={() => handleEdit(row)}
-                        />
+                        /> */}
                         {row.primary !== true && (
                             <FaTrash
                                 className="inline-block cursor-pointer text-red-500"
