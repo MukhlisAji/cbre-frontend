@@ -75,20 +75,28 @@ const SearchNew = ({ setIsClassic = () => {}, className, handleClickSearch=()=>{
   });
 
   const [formMicromarket, setFormMicromarket] = useState({
+    
     sectorId: "",
     regionId: "",
+    microMarketIds:[],
     pageNo: 1,
     pageSize: 10
   });
+
+  const [formLabel, setFormLabel] = useState({
+    regionName : '',
+    sectorName : '',
+    mrtName : [],
+    micromarketNames: [],
+    })
+
 
   const handleSetQuery = (form) => {
     let queryString = "";
 
     if (category === "District") {
-      // Include only district-related fields, adjust as per your state
       queryString = `${form.districts ? form.districts : ""}`.trim();
     } else if (category === "Address") {
-      // Include address-related fields
       queryString = `${form.buildingName ? form.buildingName : ""},${
         form.streetNumber ? form.streetNumber : ""
       },${form.streetName ? form.streetName : ""},${
@@ -99,18 +107,15 @@ const SearchNew = ({ setIsClassic = () => {}, className, handleClickSearch=()=>{
         form.type ? form.type : ""
       }`;
     } else if (category === "Micromarket") {
-      // Include only district-related fields, adjust as per your state
-      queryString = `${form.sectorId ? form.sectorId : ""},${form.sectorId ? form.regionId : ""}`.trim();
+      queryString = `${formLabel.sectorName ? formLabel.sectorName : ""},${formLabel.regionName ? formLabel.regionName : ""}, ${formLabel.micromarketNames? formLabel.micromarketNames : ''}`.trim();
     } else if (category === "MRT") {
-      // Include only district-related fields, adjust as per your state
       queryString = `${form.mrts ? form.mrts : ""}`.trim();
     }
 
-    // Remove any trailing commas or unnecessary spaces
     // queryString = queryString.replace(/,\s*$/, '').replace(/\s*,/g, '');
     console.log("Constructed Query: ", queryString);
 
-    setQuery(queryString); // Update the query with the constructed string
+    setQuery(queryString); 
   };
 
   const handleFormChange = (updatedForm) => {
@@ -552,6 +557,8 @@ const SearchNew = ({ setIsClassic = () => {}, className, handleClickSearch=()=>{
         onFormChange={handleFormChange}
         setQuery={setQuery}
         onClick={handleSearchClick}
+        formLabel={formLabel}
+        setFormLabel={setFormLabel}
       />
       <ModalFilter
         isVisible={isModalFilterVisible}

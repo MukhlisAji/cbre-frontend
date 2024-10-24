@@ -3,7 +3,7 @@ import { PROPERTYCATEGORIES } from "../../../lib/const/AppContant";
 import AccountContactInfo from "./AccountContact/AccountContactInfo";
 import Agency from "./Agency";
 
-export default function PropertyInfo({ propertyInfo, id}) {
+export default function PropertyInfo({ propertyInfo, id }) {
   const [selectedCategory, setSelectedCategory] = useState(
     PROPERTYCATEGORIES[0]?.items[0]?.label || ""
   );
@@ -55,6 +55,13 @@ export default function PropertyInfo({ propertyInfo, id}) {
     return <div>Loading...</div>;
   }
 
+  const formatLabel = (label) => {
+    return label
+      .replace(/([a-z])([A-Z])/g, '$1 $2')  // Handle camelCase to space-separated words
+      .replace(/_/g, ' ')                   // Replace underscores with spaces (for snake_case)
+      .replace(/\b\w/g, (char) => char.toUpperCase()); // Capitalize each word
+  };
+
   return (
     <div className="flex text-sm whitespace-nowrap p- space-x-2">
       {/* Sidebar */}
@@ -90,9 +97,9 @@ export default function PropertyInfo({ propertyInfo, id}) {
             className="w-full mx-auto bg-white shadow-md rounded-md border border-gray-200 space-y-4"
           >
             {item.label === "propertyAccountAndContacts" ? (
-              <AccountContactInfo propertyId={id}/>
+              <AccountContactInfo propertyId={id} />
             ) : item.label === "agency" ? (
-              <Agency agency={propertyInfo.agency}/>
+              <Agency agency={propertyInfo.agency} />
             ) : (
               <div className="p-4">
                 <div className="border-b border-green-600 pb-2 mb-4">
@@ -103,16 +110,30 @@ export default function PropertyInfo({ propertyInfo, id}) {
                 {/* Render details from propertyInfo based on the label */}
                 <div className="grid grid-cols-2 gap-y-2">
                   {propertyInfo[item.label] ? (
-                    Object.entries(propertyInfo[item.label]).map(([key, value], idx) => (
-                      <div className="flex text-sm space-x-4" key={idx}>
+                   Object.entries(propertyInfo[item.label]).map(([key, value], idx) => (
+                    <div className="mb-4" key={idx}>
+                      <div className="flex text-sm space-x-4">
                         <div className="font-semibold text-gray-800 w-2/5 truncate">
-                          {key}
+                          {formatLabel(key)}
                         </div>
-                        <div className="text-gray-600 w-full sm:w-2/3 truncate">
-                          {value || "-"}
+                        <div className="text-gray-600 w-full sm:w-2/3">
+                          {typeof value === 'object' && value !== null ? (
+                            // Render subfields vertically below the parent field
+                            <div className="mt-2 space-y-1 pl-4">
+                              {Object.entries(value).map(([subKey, subValue], subIdx) => (
+                                <div key={subIdx} className="flex justify-between">
+                                  <span className="font-medium">{formatLabel(subKey)}</span>: <span>{subValue || '-'}</span>
+                                </div>
+                              ))}
+                            </div>
+                          ) : (
+                            // Render simple fields directly to the right
+                            <span>{value || "-"}</span>
+                          )}
                         </div>
                       </div>
-                    ))
+                    </div>
+                  ))
                   ) : (
                     <div className="text-gray-600">No data available</div>
                   )}

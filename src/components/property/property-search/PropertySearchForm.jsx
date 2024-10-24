@@ -1,4 +1,4 @@
-import { Box, FormControl, InputLabel, MenuItem, Select, styled, TextField } from '@mui/material';
+import { Box, Checkbox, FormControl, FormControlLabel, InputLabel, MenuItem, Select, styled, TextField } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import MultipleSelect from '../../shared/element/MultipleSelect';
 import { DatePicker } from '@mui/x-date-pickers';
@@ -7,7 +7,8 @@ import { AddAlert } from '@mui/icons-material';
 import axios from 'axios';
 import { generateTransactionId } from '../../lib/api/Authorization';
 import { CONFIG } from '../../../config';
-import { SingleSelectField } from '../FormFields';
+import { InputField, SingleSelectField } from '../FormFields';
+import InputAdornment from '@mui/material/InputAdornment';
 
 const PropertySearchForm = () => {
     const { districts, fetchDistricts, useFetchOptions, useFetchResource } = PropertyResource();
@@ -27,6 +28,7 @@ const PropertySearchForm = () => {
     const [selectedRegions, setSelectedRegions] = useState([]); // To store selected regions
     const [filteredMicromarkets, setFilteredMicromarkets] = useState(micromarketOptions); // To store filtered micromarkets
     const [selectedRegion, setSelectedRegion] = useState(null); // Initialize state for selected region
+    const { mrtStations, setMrtStations, fetchMRTStations } = PropertyResource();
 
     // Helper function to fetch from localStorage or API
     const getOrFetchData = async (key, fetchFunction, setState) => {
@@ -39,6 +41,10 @@ const PropertySearchForm = () => {
             setState(fetchedData);
         }
     };
+
+    useEffect(() => {
+        fetchMRTStations(); // Fetch the MRT stations on mount
+    }, []);
 
     useEffect(() => {
         const fetchAllOptions = async () => {
@@ -83,6 +89,10 @@ const PropertySearchForm = () => {
         // Call the function to fetch all options
         fetchAllOptions();
     }, []);
+
+    const flattenStations = () => {
+        return Object.values(mrtStations).flatMap(line => line.stations);
+    };
 
     const getUniqueRegions = (options) => {
         const uniqueRegions = [];
@@ -139,7 +149,7 @@ const PropertySearchForm = () => {
 
     const [formState, setFormState] = useState({
         buildingName: '',
-        streetNumber: '',
+        street: '',
         streetName: '',
         possessionType: [], // Initialize as an empty array
         spaceStatus: [], // Initialize as an empty array
@@ -182,6 +192,17 @@ const PropertySearchForm = () => {
         }));
     };
 
+    const handleInput = (name) => (event) => {
+        const value = event.target.value; // Keep the existing destructuring
+        // Check if name is defined, otherwise handle it as an error or use a default
+        setFormState((prevState) => ({
+            ...prevState,
+            [name]: value, // Update the state with the correct name
+        }));
+    };
+
+    const isRetailSelected = formState.sectorIds.includes(3);
+
 
     const handleMultipleSelectChange = (selectedOptions, field, valueField = 'id') => {
         console.log('Selected options:', selectedOptions); // Debugging
@@ -201,7 +222,7 @@ const PropertySearchForm = () => {
             pageSize: 10,
             basicSearch: {
                 buildingName: formState.buildingName,
-                street: formState.streetNumber,
+                street: formState.street,
                 streetName: formState.streetName,
                 property: {
                     sectorIds: formState.sectorIds,
@@ -232,7 +253,7 @@ const PropertySearchForm = () => {
                 propertyStatusId: formState.buildingStatusIds ? formState.buildingStatusIds[0] : null,
                 titleIds: formState.titleIds || [],
                 publicTransportation: {
-                    mrtLineIds: formState.mrts || [],
+                    mrt: formState.mrts || [],
                     proximity: formState.proximity || 2000
                 },
                 propertyDescription: {
@@ -446,38 +467,36 @@ const PropertySearchForm = () => {
                                 {/* Building, Street, Postal Code */}
                                 <div className="grid grid-cols-4 gap-4">
                                     <div className="col-span-4">
-                                        <label className="block text-sm font-medium mb-1">Building Name</label>
-                                        <input
-                                            type="text"
+                                        <InputField
                                             name="buildingName"
+                                            label="Building Name"
+                                            type="text"
                                             value={formState.buildingName}
-                                            onChange={handleInputChange}
-                                            className="w-full p-2 border border-gray-300 rounded-md"
-                                            placeholder="Building Name"
+                                            onChange={handleInput("buildingName")}
                                         />
+
                                     </div>
 
                                     <div className="col-span-2">
-                                        <label className="block text-sm font-medium mb-1">Street</label>
-                                        <input
+                                        <InputField
+                                            label="Street"
                                             type="text"
-                                            name="streetNumber"
-                                            value={formState.streetNumber}
-                                            onChange={handleInputChange}
-                                            className="w-full p-2 border border-gray-300 rounded-md"
+                                            value={formState.street}
+                                            onChange={handleInput('street')}
                                             placeholder="Street"
+
                                         />
+
                                     </div>
 
                                     <div className="col-span-2">
-                                        <label className="block text-sm font-medium mb-1">Street Name</label>
-                                        <input
+                                        <InputField
+                                            label="Street Name"
                                             type="text"
-                                            name="streetName"
                                             value={formState.streetName}
-                                            onChange={handleInputChange}
-                                            className="w-full p-2 border border-gray-300 rounded-md"
+                                            onChange={handleInput('streetName')}
                                             placeholder="Street Name"
+
                                         />
                                     </div>
                                 </div>
@@ -526,23 +545,30 @@ const PropertySearchForm = () => {
                                     <Box sx={{ display: 'flex', justifyContent: 'space-between', width: '100%', gap: '8px' }}>
                                         <TextField
                                             label="From"
-                                            type="number"
+                                            type="text"
                                             size="small"
                                             sx={cusInput}
                                             name="sizeFrom"
                                             value={formState.sizeFrom}
                                             onChange={handleInputChange}
+                                            InputProps={{
+                                                endAdornment: <InputAdornment position="end">sqft</InputAdornment>,
+                                            }}
                                         />
                                         <TextField
                                             label="To"
-                                            type="number"
+                                            type="text"
                                             size="small"
                                             sx={cusInput}
                                             name="sizeTo"
                                             value={formState.sizeTo}
                                             onChange={handleInputChange}
+                                            InputProps={{
+                                                endAdornment: <InputAdornment position="end">sqft</InputAdornment>,
+                                            }}
                                         />
                                     </Box>
+
                                 </div>
 
                                 {/* Possession Status */}
@@ -625,21 +651,27 @@ const PropertySearchForm = () => {
                                     <Box sx={{ display: 'flex', justifyContent: 'space-between', width: '100%', gap: '8px' }}>
                                         <TextField
                                             label="From"
-                                            type="number"
+                                            type="text"
                                             size="small"
                                             sx={cusInput}
                                             name="rentFrom"
                                             value={formState.rentFrom}
                                             onChange={handleInputChange}
+                                            InputProps={{
+                                                endAdornment: <InputAdornment position="end">S$/Sq Ft/Month</InputAdornment>,
+                                            }}
                                         />
                                         <TextField
                                             label="To"
-                                            type="number"
+                                            type="text"
                                             size="small"
                                             sx={cusInput}
                                             name="rentTo"
                                             value={formState.rentTo}
                                             onChange={handleInputChange}
+                                            InputProps={{
+                                                endAdornment: <InputAdornment position="end">S$/Sq Ft/Month</InputAdornment>,
+                                            }}
                                         />
                                     </Box>
                                 </div>
@@ -718,283 +750,483 @@ const PropertySearchForm = () => {
                     </div>
 
                     {sectionVisibility.advancedSearchVisible && (
-
-                        <div className="p-8 grid grid-cols-6 gap-10 overflow-y-auto">
-                            {/* First Column */}
-                            <div className="col-span-3 space-y-4">
-                                {/* TOP (From-To) */}
-                                <div className="flex flex-col gap-2">
-                                    <label className="block text-sm font-medium">TOP</label>
-                                    <Box sx={{ display: 'flex', gap: '8px' }}>
-                                        <TextField
-                                            label="From"
-                                            type="text"
-                                            size="small"
-                                            sx={cusInput}
-                                            value={formState.topFrom}
-                                            onChange={handleInputChange}
-                                            name="topFrom"
-                                        />
-                                        <TextField
-                                            label="To"
-                                            type="text"
-                                            size="small"
-                                            sx={cusInput}
-                                            value={formState.topTo}
-                                            onChange={handleInputChange}
-                                            name="topTo"
-                                        />
-                                    </Box>
-                                </div>
-
-                                {/* Grade */}
-                                <div className="flex flex-col gap-2">
-                                    <label className="block text-sm font-medium">Grade</label>
-                                    <FormControl fullWidth size="small" sx={cusInput}>
-                                        <InputLabel id="grade-label">Grade</InputLabel>
-                                        <Select
-                                            labelId="grade-label"
-                                            id="grade-select"
-                                            label="Grade"
-                                            value={formState.grade}
-                                            onChange={(event) => handleSelectChange(event, 'grade')}
-                                        >
-                                            {gradeOptions.map((option) => (
-                                                <MenuItem key={option.gradeId} value={option.grade}>
-                                                    {option.grade}
-                                                </MenuItem>
-                                            ))}
-                                        </Select>
-                                    </FormControl>
-                                </div>
-
-
-                                {/* Property Status */}
-                                <div className="flex flex-col gap-2">
-                                    <label className="block text-sm font-medium">Property Status</label>
-                                    <FormControl fullWidth size="small" sx={cusInput}>
-                                        <InputLabel>Property Status</InputLabel>
-                                        <Select
-                                            label="Property Status"
-                                            value={formState.buildingStatusIds} // Bind the selected value to formState
-                                            onChange={(event) => handleSelectChange(event, 'buildingStatusIds')} // Handle selection changes
-                                        >
-                                            {buildingStatusOptions.map((option) => (
-                                                <MenuItem key={option.buildingStatusId} value={option.buildingStatusId}> {/* Store the ID */}
-                                                    {option.buildingStatus} {/* Display the label */}
-                                                </MenuItem>
-                                            ))}
-                                        </Select>
-                                    </FormControl>
-                                </div>
-
-
-                                {/* Ownership Structure */}
-                                <div className="flex flex-col gap-2">
-                                    <label className="block text-sm font-medium">Ownership Structure</label>
-                                    <div className="flex text-sm text-gray-600 flex-col space-y-2">
-                                        {buildingOwnerOptions.map(option => (
-                                            <label key={option.buildingOwnerId}>
-                                                <input
-                                                    type="checkbox"
-                                                    value={option.buildingOwnerId}
-                                                    checked={formState.ownerIds?.includes(option.buildingOwnerId)} // Check if it's selected
-                                                    onChange={(e) => handleCheckboxChange(e, 'ownerIds')} // Handle checkbox change
-                                                /> {option.buildingOwner}
-                                            </label>
-                                        ))}
+                        <div className="p-8 grid grid-cols-6  gap-x-8 gap-y-4 overflow-y-auto">
+                            {/* Other Section */}
+                            <div className="col-span-6">
+                                <h2 className="text-md font-semibold mb-4">Other</h2>
+                                <div className="grid grid-cols-2 gap-x-8 gap-y-4">
+                                    {/* TOP (From-To) */}
+                                    <div className="flex flex-col gap-2">
+                                        <label className="block text-sm font-medium">TOP</label>
+                                        <Box sx={{ display: 'flex', gap: '8px' }}>
+                                            <TextField
+                                                label="From"
+                                                type="text"
+                                                size="small"
+                                                sx={cusInput}
+                                                value={formState.topFrom}
+                                                onChange={handleInputChange}
+                                                name="topFrom"
+                                            />
+                                            <TextField
+                                                label="To"
+                                                type="text"
+                                                size="small"
+                                                sx={cusInput}
+                                                value={formState.topTo}
+                                                onChange={handleInputChange}
+                                                name="topTo"
+                                            />
+                                        </Box>
                                     </div>
-                                </div>
 
+                                    {/* Grade */}
+                                    <div className="flex flex-col gap-2">
+                                        <label className="block text-sm font-medium">Grade</label>
+                                        <FormControl fullWidth size="small" sx={cusInput}>
+                                            <InputLabel id="grade-label">Grade</InputLabel>
+                                            <Select
+                                                labelId="grade-label"
+                                                id="grade-select"
+                                                label="Grade"
+                                                value={formState.grade}
+                                                onChange={(event) => handleSelectChange(event, 'grade')}
+                                            >
+                                                {gradeOptions.map((option) => (
+                                                    <MenuItem key={option.gradeId} value={option.grade}>
+                                                        {option.grade}
+                                                    </MenuItem>
+                                                ))}
+                                            </Select>
+                                        </FormControl>
+                                    </div>
 
-                                {/* MRT Fields */}
-                                <div className="flex flex-col gap-2">
-                                    <label className="block text-sm font-medium">MRT</label>
+                                    {/* Property Status */}
+                                    <div className="flex flex-col gap-2">
+                                        <label className="block text-sm font-medium">Property Status</label>
+                                        <FormControl fullWidth size="small" sx={cusInput}>
+                                            <InputLabel>Property Status</InputLabel>
+                                            <Select
+                                                label="Property Status"
+                                                value={formState.buildingStatusIds}
+                                                onChange={(event) => handleSelectChange(event, 'buildingStatusIds')}
+                                            >
+                                                {buildingStatusOptions.map((option) => (
+                                                    <MenuItem key={option.buildingStatusId} value={option.buildingStatusId}>
+                                                        {option.buildingStatus}
+                                                    </MenuItem>
+                                                ))}
+                                            </Select>
+                                        </FormControl>
+                                    </div>
 
-                                    <MultipleSelect
-                                        label="Select MRT"
-                                        options={filteredMicromarkets}
-                                        isMulti={true}
-                                        labelKey="label"
-                                        valueKey="value"
-                                        onChange={(selectedOptions) => handleMultipleSelectChange(selectedOptions, 'micromarket', 'value')}
-                                    />
-
-                                    <Box sx={{ display: 'flex', gap: '8px' }}>
-                                        <TextField
-                                            label="Station"
-                                            size="small"
-                                            sx={cusInput}
-                                            value={formState.mrts[0] || ''}
-                                            onChange={(e) => handleInputChangeArray(e, 'mrts', 0)} // Assume you're handling an array of MRTs
-                                        />
-                                        <TextField
-                                            label="Distance"
-                                            type="number"
-                                            size="small"
-                                            sx={{
-                                                ...cusInput,
-                                                // Hide the arrows (spinner) for number input
-                                                '& input[type=number]': {
-                                                    MozAppearance: 'textfield', // For Firefox
-                                                },
-                                                '& input[type=number]::-webkit-outer-spin-button, & input[type=number]::-webkit-inner-spin-button': {
-                                                    WebkitAppearance: 'none', // For Chrome and Safari
-                                                    margin: 0,
-                                                },
-                                            }}
-                                            value={formState.proximity || ''}
-                                            onChange={(e) => handleInputChange(e)}  // Ensure onChange function is called correctly
-                                            name="proximity"
-                                        />
-
-
-                                    </Box>
-                                </div>
-
-                                {/* Floor To Ceiling Height */}
-                                <div className="flex flex-col gap-2">
-                                    <label className="block text-sm font-medium">Floor To Ceiling Height</label>
-                                    <Box sx={{ display: 'flex', gap: '8px' }}>
-                                        <TextField
-                                            label="From"
-                                            type="text"
-                                            size="small"
-                                            sx={cusInput}
-                                            value={formState.floorHeightFrom}
-                                            onChange={handleInputChange}
-                                            name="floorHeightFrom"
-                                        />
-                                        <TextField
-                                            label="To"
-                                            type="text"
-                                            size="small"
-                                            sx={cusInput}
-                                            value={formState.floorHeightTo}
-                                            onChange={handleInputChange}
-                                            name="floorHeightTo"
-                                        />
-                                    </Box>
+                                    {/* Ownership Structure */}
+                                    <div className="flex flex-col gap-2">
+                                        <label className="block text-sm font-medium">Ownership Structure</label>
+                                        <div className="flex text-sm text-gray-600 flex-col space-y-2">
+                                            {buildingOwnerOptions.map(option => (
+                                                <label key={option.buildingOwnerId}>
+                                                    <input
+                                                        type="checkbox"
+                                                        value={option.buildingOwnerId}
+                                                        checked={formState.ownerIds?.includes(option.buildingOwnerId)}
+                                                        onChange={(e) => handleCheckboxChange(e, 'ownerIds')}
+                                                    /> {option.buildingOwner}
+                                                </label>
+                                            ))}
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
 
-                            {/* Second Column */}
-                            <div className="col-span-3 space-y-4">
-
-
-                                {/* Floor Loading */}
-                                <div className="flex flex-col gap-2">
-                                    <label className="block text-sm font-medium">Floor Loading</label>
-                                    <Box sx={{ display: 'flex', gap: '8px' }}>
-                                        <TextField
-                                            label="From"
-                                            type="text"
-                                            size="small"
-                                            sx={cusInput}
-                                            value={formState.floorLoadingFrom}
-                                            onChange={handleInputChange}
-                                            name="floorLoadingFrom"
-                                        />
-                                        <TextField
-                                            label="To"
-                                            type="text"
-                                            size="small"
-                                            sx={cusInput}
-                                            value={formState.floorLoadingTo}
-                                            onChange={handleInputChange}
-                                            name="floorLoadingTo"
-                                        />
-                                        <span className="self-center">KN/Sqm</span>
-                                    </Box>
-                                </div>
-
-                                {/* Floor System */}
-                                <div className="flex flex-col gap-2">
-                                    <label className="block text-sm font-medium">Floor System</label>
-                                    <FormControl fullWidth size="small" sx={cusInput}>
-                                        <InputLabel>Floor System</InputLabel>
-                                        <Select
-                                            label="Floor System"
-                                            value={formState.floorSystem}
-                                            onChange={handleInputChange}
-                                            name="floorSystem"
-                                        >
-                                            <MenuItem value="Concrete">Concrete</MenuItem>
-                                            <MenuItem value="Raised">Raised</MenuItem>
-                                        </Select>
-                                    </FormControl>
-                                </div>
-
-                                {/* Allocation Ratio */}
-                                <div className="flex flex-col gap-2">
-                                    <label className="block text-sm font-medium">Allocation Ratio</label>
-                                    <Box sx={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                                        <span>1:</span>
-                                        <TextField
-                                            size="small"
-                                            sx={cusInput}
-                                            value={formState.allocationRatio}
-                                            onChange={handleInputChange}
-                                            name="allocationRatio"
-                                        />
-                                        <span className="self-center whitespace-nowrap">Sq Ft leased</span>
-                                    </Box>
-                                </div>
-
-                                {/* Parking Fee */}
-                                <div className="flex flex-col gap-2">
-                                    <label className="block text-sm font-medium">Parking Fee (Subject to GST)</label>
-                                    <div className="flex flex-col space-y-4">
-                                        <Box sx={{ display: 'flex', gap: '8px' }}>
-                                            <TextField
-                                                label="Seasonal"
-                                                size="small"
-                                                sx={cusInput}
-                                                value={formState.seasonalParkingFee}
-                                                onChange={handleInputChange}
-                                                name="seasonalParkingFee"
-                                            />
-                                            <span className="self-center">S$/lot/mth</span>
-                                        </Box>
-                                        <Box sx={{ display: 'flex', gap: '8px' }}>
-                                            <TextField
-                                                label="Non-Reserved"
-                                                size="small"
-                                                sx={cusInput}
-                                                value={formState.nonReservedParkingFee}
-                                                onChange={handleInputChange}
-                                                name="nonReservedParkingFee"
-                                            />
-                                            <span className="self-center">S$/lot/mth</span>
+                            {/* Public Transportation Section */}
+                            <div className="col-span-6 mt-4">
+                                <h2 className="text-md font-semibold mb-4">Public Transportation</h2>
+                                <div className="grid grid-cols-2 gap-8">
+                                    {/* MRT Fields */}
+                                    <div className="flex flex-col gap-2">
+                                        <label className="block text-sm font-medium">MRT</label>
+                                        <Box sx={{ display: 'flex', gap: '8px', width: '100%' }}>
+                                            <Box sx={{ flex: '2' }}>
+                                                <MultipleSelect
+                                                    label="Select MRT"
+                                                    options={flattenStations()}
+                                                    isMulti={true}
+                                                    labelKey="label"
+                                                    valueKey="value"
+                                                    onChange={(selectedOptions) => handleMultipleSelectChange(selectedOptions, 'mrts', 'value')}
+                                                />
+                                            </Box>
+                                            <Box sx={{ flex: '1' }}>
+                                                <TextField
+                                                    label="Distance"
+                                                    type="number"
+                                                    size="small"
+                                                    sx={{
+                                                        ...cusInput,
+                                                        '& input[type=number]': {
+                                                            MozAppearance: 'textfield',
+                                                        },
+                                                        '& input[type=number]::-webkit-outer-spin-button, & input[type=number]::-webkit-inner-spin-button': {
+                                                            WebkitAppearance: 'none',
+                                                            margin: 0,
+                                                        },
+                                                    }}
+                                                    value={formState.proximity || ''}
+                                                    onChange={(e) => handleInputChange(e)}
+                                                    name="proximity"
+                                                />
+                                            </Box>
                                         </Box>
                                     </div>
                                 </div>
+                            </div>
 
-                                {/* Car Spaces */}
-                                <div className="flex flex-col gap-2">
-                                    <label className="block text-sm font-medium">Car Spaces</label>
-                                    <Box sx={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                                        <TextField
-                                            size="small"
-                                            sx={cusInput}
-                                            value={formState.carSpaces}
-                                            onChange={handleInputChange}
-                                            name="carSpaces"
-                                        />
-                                        <span className="self-center whitespace-nowrap">and over</span>
-                                    </Box>
+                            {/* Property Description Section */}
+                            <div className="col-span-6 mt-4">
+                                <h2 className="text-md font-semibold mb-4">Property Description</h2>
+                                <div className="grid grid-cols-2 gap-x-8 gap-y-4">
+                                    {/* Floor Loading */}
+                                    <div className="flex flex-col gap-2">
+                                        <label className="block text-sm font-medium">Floor Loading</label>
+                                        <Box sx={{ display: 'flex', gap: '8px' }}>
+                                            <TextField
+                                                label="From"
+                                                type="text"
+                                                size="small"
+                                                sx={cusInput}
+                                                value={formState.floorLoadingFrom}
+                                                onChange={handleInputChange}
+                                                name="floorLoadingFrom"
+                                                InputProps={{
+                                                    endAdornment: <InputAdornment position="end">KN/Sqm</InputAdornment>, // Added InputAdornment
+                                                }}
+                                            />
+                                            <TextField
+                                                label="To"
+                                                type="text"
+                                                size="small"
+                                                sx={cusInput}
+                                                value={formState.floorLoadingTo}
+                                                onChange={handleInputChange}
+                                                name="floorLoadingTo"
+                                                InputProps={{
+                                                    endAdornment: <InputAdornment position="end">KN/Sqm</InputAdornment>, // Added InputAdornment
+                                                }}
+                                            />
+                                        </Box>
+                                    </div>
+
+                                    {/* Floor To Ceiling Height */}
+                                    <div className="flex flex-col gap-2">
+                                        <label className="block text-sm font-medium">Floor To Ceiling Height</label>
+                                        <Box sx={{ display: 'flex', gap: '8px' }}>
+                                            <TextField
+                                                label="From"
+                                                type="text"
+                                                size="small"
+                                                sx={cusInput}
+                                                value={formState.floorHeightFrom}
+                                                onChange={handleInputChange}
+                                                name="floorHeightFrom"
+                                                InputProps={{
+                                                    endAdornment: <InputAdornment position="end">m</InputAdornment>, // Example unit for height
+                                                }}
+                                            />
+                                            <TextField
+                                                label="To"
+                                                type="text"
+                                                size="small"
+                                                sx={cusInput}
+                                                value={formState.floorHeightTo}
+                                                onChange={handleInputChange}
+                                                name="floorHeightTo"
+                                                InputProps={{
+                                                    endAdornment: <InputAdornment position="end">m</InputAdornment>, // Example unit for height
+                                                }}
+                                            />
+                                        </Box>
+                                    </div>
+
+                                    {/* Floor System */}
+                                    <div className="flex flex-col gap-2">
+                                        <label className="block text-sm font-medium">Floor System</label>
+                                        <FormControl fullWidth size="small" sx={cusInput}>
+                                            <InputLabel>Floor System</InputLabel>
+                                            <Select
+                                                label="Floor System"
+                                                value={formState.floorSystem}
+                                                onChange={handleInputChange}
+                                                name="floorSystem"
+                                            >
+                                                <MenuItem value="Concrete">Concrete</MenuItem>
+                                                <MenuItem value="Raised">Raised</MenuItem>
+                                            </Select>
+                                        </FormControl>
+                                    </div>
+
+                                    {/* Car Park Allocation Ratio */}
+                                    <div className="flex flex-col gap-2">
+                                        <label className="block text-sm font-medium">Car Park Allocation Ratio</label>
+                                        <Box sx={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                                            <TextField
+                                                size="small"
+                                                sx={cusInput}
+                                                value={formState.allocationRatio}
+                                                onChange={handleInputChange}
+                                                name="allocationRatio"
+                                                InputProps={{
+                                                    startAdornment: <InputAdornment position="start">1:</InputAdornment>, // Added InputAdornment at the start
+                                                    endAdornment: <InputAdornment position="end">Sq Ft leased</InputAdornment>, // InputAdornment at the end
+                                                }}
+                                            />
+                                        </Box>
+
+                                    </div>
+
+                                    {/* Seasonal Parking Fee */}
+                                    <div className="flex flex-col gap-2">
+                                        <label className="block text-sm font-medium">Seasonal Parking Fee (Subject to GST)</label>
+                                        <div className="flex flex-col space-y-4">
+                                            <Box sx={{ display: 'flex', gap: '8px' }}>
+                                                <TextField
+                                                    label="Seasonal"
+                                                    size="small"
+                                                    sx={cusInput}
+                                                    value={formState.seasonalParkingFee}
+                                                    onChange={handleInputChange}
+                                                    name="seasonalParkingFee"
+                                                    InputProps={{
+                                                        endAdornment: <InputAdornment position="end">S$/lot/mth</InputAdornment>, // Added InputAdornment
+                                                    }}
+                                                />
+                                            </Box>
+                                            <Box sx={{ display: 'flex', gap: '8px' }}>
+                                                <TextField
+                                                    label="Non-Reserved"
+                                                    size="small"
+                                                    sx={cusInput}
+                                                    value={formState.nonReservedParkingFee}
+                                                    onChange={handleInputChange}
+                                                    name="nonReservedParkingFee"
+                                                    InputProps={{
+                                                        endAdornment: <InputAdornment position="end">S$/lot/mth</InputAdornment>, // Added InputAdornment
+                                                    }}
+                                                />
+                                            </Box>
+                                        </div>
+                                    </div>
+
+                                    {/* Car Spaces */}
+                                    <div className="flex flex-col gap-2">
+                                        <label className="block text-sm font-medium">Car Spaces</label>
+                                        <Box sx={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                                            <TextField
+                                                size="small"
+                                                sx={cusInput}
+                                                value={formState.carSpaces}
+                                                onChange={handleInputChange}
+                                                name="carSpaces"
+                                                InputProps={{
+                                                    endAdornment: <InputAdornment position="end">and over</InputAdornment>, // Added InputAdornment
+                                                }}
+                                            />
+                                        </Box>
+                                    </div>
                                 </div>
                             </div>
-                            {/* <div className='px-'>
-                                <button
-                                    // onClick={handleSave}
-                                    className="px-4 py-2 text-white rounded-lg bg-c-teal text-xs text-white hover:text-white hover:bg-c-weldon-blue"
-                                >
-                                    Search
-                                </button>
-                            </div> */}
+
+
+                            {/* Space Details Section */}
+                            <div className="col-span-6 mt-4">
+                                <h2 className="text-md font-semibold mb-4">Space Details</h2>
+                                <div className="grid grid-cols-2  gap-x-8 gap-y-4">
+                                    {/* Ground Floor */}
+                                    <div className="flex flex-col gap-2">
+                                        <label className="block text-sm font-medium">Ground Floor</label>
+                                        <FormControl>
+                                            <FormControlLabel
+                                                control={
+                                                    <Checkbox
+                                                        checked={formState.groundFloor} // Ensure this maps to your state
+                                                    // onChange={(e) => handleCheckboxChange(e, 'groundFloor')} // Handle checkbox change
+                                                    />
+                                                }
+                                                label="Ground Floor"
+                                            />
+                                        </FormControl>
+                                    </div>
+
+                                    {/* Floor Loading */}
+                                    <div className="flex flex-col gap-2">
+                                        <label className="block text-sm font-medium">Floor Loading</label>
+                                        <Box sx={{ display: 'flex', gap: '8px' }}>
+                                            <TextField
+                                                label="From"
+                                                type="text"
+                                                size="small"
+                                                sx={cusInput}
+                                                value={formState.floorLoadingFrom}
+                                                onChange={handleInputChange}
+                                                name="floorLoadingFrom"
+                                            />
+                                            <TextField
+                                                label="To"
+                                                type="text"
+                                                size="small"
+                                                sx={cusInput}
+                                                value={formState.floorLoadingTo}
+                                                onChange={handleInputChange}
+                                                name="floorLoadingTo"
+                                            />
+                                        </Box>
+                                    </div>
+
+                                    {/* Floor To Ceiling Height */}
+                                    <div className="flex flex-col gap-2">
+                                        <label className="block text-sm font-medium">Floor To Ceiling Height</label>
+                                        <Box sx={{ display: 'flex', gap: '8px' }}>
+                                            <TextField
+                                                label="From"
+                                                type="text"
+                                                size="small"
+                                                sx={cusInput}
+                                                value={formState.floorHeightFrom}
+                                                onChange={handleInputChange}
+                                                name="floorHeightFrom"
+                                            />
+                                            <TextField
+                                                label="To"
+                                                type="text"
+                                                size="small"
+                                                sx={cusInput}
+                                                value={formState.floorHeightTo}
+                                                onChange={handleInputChange}
+                                                name="floorHeightTo"
+                                            />
+                                        </Box>
+                                    </div>
+
+                                    {/* Space Usage */}
+                                    <div className="flex flex-col gap-2">
+                                        <label className="block text-sm font-medium">Space Usage</label>
+                                        {/* <div className="flex flex-col space-y-2">
+                        {spaceUsageOptions.map(option => (
+                            <label key={option.id}>
+                                <input
+                                    type="checkbox"
+                                    value={option.id}
+                                    checked={formState.spaceUsageIds?.includes(option.id)} // Check if it's selected
+                                    // onChange={(e) => handleCheckboxChange(e, 'spaceUsageIds')} // Handle checkbox change
+                                /> {option.label}
+                            </label>
+                        ))}
+                    </div> */}
+                                    </div>
+
+                                    {/* Air Condition */}
+                                    <div className="flex flex-col gap-2">
+                                        <label className="block text-sm font-medium">Air Condition</label>
+                                        <FormControl>
+                                            <FormControlLabel
+                                                control={
+                                                    <Checkbox
+                                                        checked={formState.airCondition} // Ensure this maps to your state
+                                                    // onChange={(e) => handleCheckboxChange(e, 'airCondition')} // Handle checkbox change
+                                                    />
+                                                }
+                                                label="Yes"
+                                            />
+                                        </FormControl>
+                                    </div>
+
+                                    {/* Space View */}
+                                    <div className="flex flex-col gap-2">
+                                        <label className="block text-sm font-medium">Space View</label>
+                                        <FormControl fullWidth size="small" sx={cusInput}>
+                                            <InputLabel>Space View</InputLabel>
+                                            <Select
+                                                label="Space View"
+                                                value={formState.spaceView}
+                                                onChange={handleInputChange}
+                                                name="spaceView"
+                                            >
+                                                {/* {spaceViewOptions.map(option => (
+                                <MenuItem key={option.id} value={option.id}>
+                                    {option.label}
+                                </MenuItem>
+                            ))} */}
+                                            </Select>
+                                        </FormControl>
+                                    </div>
+
+                                    {/* Space Condition */}
+                                    <div className="flex flex-col gap-2">
+                                        <label className="block text-sm font-medium">Space Condition</label>
+                                        <FormControl fullWidth size="small" sx={cusInput}>
+                                            <InputLabel>Space Condition</InputLabel>
+                                            <Select
+                                                label="Space Condition"
+                                                value={formState.spaceCondition}
+                                                onChange={handleInputChange}
+                                                name="spaceCondition"
+                                            >
+                                                {/* {spaceConditionOptions.map(option => (
+                                <MenuItem key={option.id} value={option.id}>
+                                    {option.label}
+                                </MenuItem>
+                            ))} */}
+                                            </Select>
+                                        </FormControl>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Conditional rendering for Retail space details */}
+                            {isRetailSelected && (
+                                <div className="col-span-6 mt-4">
+                                    <h2 className="text-md font-semibold">Retail Space Details</h2>
+
+                                    <Box className="mt-4">
+
+                                        {/* Water Provision Checkbox */}
+                                        <FormControlLabel
+                                            control={
+                                                <Checkbox
+                                                    checked={formState.waterProvision}
+                                                    onChange={(e) => setFormState({ ...formState, waterProvision: e.target.checked })}
+                                                />
+                                            }
+                                            label="Water Provision"
+                                        />
+
+                                        {/* Grease Trap Checkbox */}
+                                        <FormControlLabel
+                                            control={
+                                                <Checkbox
+                                                    checked={formState.greaseTrap}
+                                                    onChange={(e) => setFormState({ ...formState, greaseTrap: e.target.checked })}
+                                                />
+                                            }
+                                            label="Grease Trap"
+                                        />
+
+                                        {/* Floor Trap Checkbox */}
+                                        <FormControlLabel
+                                            control={
+                                                <Checkbox
+                                                    checked={formState.floorTrap}
+                                                    onChange={(e) => setFormState({ ...formState, floorTrap: e.target.checked })}
+                                                />
+                                            }
+                                            label="Floor Trap"
+                                        />
+                                    </Box>
+                                </div>
+                            )}
                         </div>
                     )}
+
                 </div>
             </div>
             <footer className="sticky bottom-0 bg-neutral-100 py-3 px-10 flex items-center gap-2 justify-start border border-neutral-200 shadow-md z-10 rounded-b-lg">
